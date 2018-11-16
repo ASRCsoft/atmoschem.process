@@ -1,4 +1,4 @@
-/* Process cpc data files */
+/* Process ultrafine data files */
 
 /* Take the hex flags value, convert it to binary, and return an array
 of the set flags */
@@ -17,13 +17,13 @@ BEGIN
 END;
 $flags$ LANGUAGE plpgsql;
 
-/* Load a cpc data file into the cpc table */
-CREATE OR REPLACE FUNCTION load_cpc(station text, file text) RETURNS void AS $$
+/* Load a ultrafine data file into the ultrafine table */
+CREATE OR REPLACE FUNCTION load_ultrafine(station text, file text) RETURNS void AS $$
 declare station_id int;
 BEGIN
   SELECT id into station_id from stations where short_name=station;
   /* this temporary table will hold a copy of the data file */
-  create temporary table cpc_file (
+  create temporary table ultrafine_file (
     date date,
     time time,
     concentration numeric,
@@ -38,9 +38,9 @@ BEGIN
   ) on commit drop;
   -- use the `tail` terminal command to ignore the first 5 lines of
   -- the data file so it can be read as a csv
-  EXECUTE format('COPY cpc_file FROM PROGRAM ''tail -n +6 "%s"'' delimiter '','' csv header;',
+  EXECUTE format('COPY ultrafine_file FROM PROGRAM ''tail -n +6 "%s"'' delimiter '','' csv header;',
     		 file);
-  INSERT INTO cpc
+  INSERT INTO ultrafine
   SELECT station_id,
   	 date + time,
 	 concentration,
@@ -51,6 +51,6 @@ BEGIN
 	 pulse_height,
 	 pulse_std,
 	 case when flags='0' then null else parse_flags(flags) end
-  FROM cpc_file;
+  FROM ultrafine_file;
 END;
 $$ LANGUAGE plpgsql;

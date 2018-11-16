@@ -14,11 +14,11 @@ values ('WFMS', 'Whiteface Mountain Summit'),
 
 /* These are the error codes described in the TSI3783 manual, p. B-5
 */
-create table tsi3783_codes (
+create table ultrafine_codes (
   id serial primary key,
   error text
 );
-insert into tsi3783_codes(error)
+insert into ultrafine_codes(error)
 values ('Conditioner Temperature'),
        ('Growth Tube Temperature'),
        ('Optics Temperature'),
@@ -36,7 +36,7 @@ values ('Conditioner Temperature'),
        ('Service Reminder'),
        ('Reserved (0x8000)');
 
-create table cpc (
+create table ultrafine (
   station_id int references stations,
   measure_time timestamp,
   concentration numeric,
