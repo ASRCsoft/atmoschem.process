@@ -54,3 +54,12 @@ BEGIN
   FROM ultrafine_file;
 END;
 $$ LANGUAGE plpgsql;
+
+/* Get the appropriate NARSTO flag based on the number of ultrafine
+   measurements in an hour and average concentration */
+CREATE OR REPLACE FUNCTION ultrafine_narsto_flag(concentration numeric, n int) RETURNS text AS $$
+  SELECT case when n=0 then 'M1'
+	 when n<45 then 'V4'
+	 when concentration<1 then 'V1'
+	 else 'V0' end;
+$$ LANGUAGE sql;
