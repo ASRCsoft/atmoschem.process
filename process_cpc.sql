@@ -18,8 +18,10 @@ END;
 $flags$ LANGUAGE plpgsql;
 
 /* Load a cpc data file into the cpc table */
-CREATE OR REPLACE FUNCTION load_cpc(file text) RETURNS void AS $$
+CREATE OR REPLACE FUNCTION load_cpc(station text, file text) RETURNS void AS $$
+declare station_id int;
 BEGIN
+  SELECT id into station_id from stations where short_name=station;
   /* this temporary table will hold a copy of the data file */
   create temporary table cpc_file (
     date date,
@@ -39,7 +41,7 @@ BEGIN
   EXECUTE format('COPY cpc_file FROM PROGRAM ''tail -n +6 "%s"'' delimiter '','' csv header;',
     		 file);
   INSERT INTO cpc
-  SELECT 1,
+  SELECT station_id,
   	 date + time,
 	 concentration,
 	 count,
