@@ -38,7 +38,9 @@ values ('Conditioner Temperature'),
 
 create table ultrafine (
   station_id int references stations,
-  measure_time timestamp,
+  file text,
+  row int,
+  instrument_time timestamp,
   concentration numeric,
   count int,
   livetime numeric,
@@ -47,5 +49,5 @@ create table ultrafine (
   pulse_height int,
   pulse_std int,
   flags int[],
-  primary key(station_id, measure_time)
+  primary key(station_id, file, row)
 );

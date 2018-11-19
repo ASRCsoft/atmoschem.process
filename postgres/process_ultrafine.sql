@@ -19,11 +19,19 @@ $flags$ LANGUAGE plpgsql;
 
 /* Load a ultrafine data file into the ultrafine table */
 CREATE OR REPLACE FUNCTION load_ultrafine(station text, file text) RETURNS void AS $$
-declare station_id int;
+  declare
+  station_id int;
+  bash_str text;
+  copy_str text;
+  -- remove file path and extension, so we're looking at just the file
+  -- name
+  file_name text := REGEXP_REPLACE(REGEXP_REPLACE(file, '^.*/', ''),
+				   '\.[^.]*$', '');
 BEGIN
   SELECT id into station_id from stations where short_name=station;
   /* this temporary table will hold a copy of the data file */
   create temporary table ultrafine_file (
+    row int,
     date date,
     time time,
     concentration numeric,
@@ -37,11 +45,19 @@ BEGIN
     flags varchar(4)
   ) on commit drop;
   -- use the `tail` terminal command to ignore the first 5 lines of
-  -- the data file so it can be read as a csv
-  EXECUTE format('COPY ultrafine_file FROM PROGRAM ''tail -n +6 "%s"'' delimiter '','' csv header;',
-    		 file);
+  -- the data file so it can be copied as a csv, and then use awk to
+  -- add row numbers
+  select format('tail -n +6 "%s" | awk -vOFS="," ''NR == 1 {print "row", $0; next}{print (NR-1), $0}''',
+      		file)
+    into bash_str;
+  select format('COPY ultrafine_file FROM PROGRAM ''%s'' delimiter '','' csv header',
+		replace(bash_str, '''', ''''''))
+    into copy_str;
+  EXECUTE copy_str;
   INSERT INTO ultrafine
   SELECT station_id,
+	 file_name,
+	 row,
   	 date + time,
 	 concentration,
 	 count,
