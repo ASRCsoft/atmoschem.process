@@ -62,5 +62,7 @@ create table ultrafine_time_corrections (
   end_file text,
   end_row int,
   time_offset interval,
-  explanation text
+  explanation text,
+  FOREIGN KEY (station_id, start_file, start_row) REFERENCES ultrafine (station_id, file, row),
+  FOREIGN KEY (station_id, end_file, end_row) REFERENCES ultrafine (station_id, file, row)
 );
