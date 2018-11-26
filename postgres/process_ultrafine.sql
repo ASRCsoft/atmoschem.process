@@ -193,3 +193,20 @@ BEGIN
   end if;
 END;
 $corrected_time$ LANGUAGE plpgsql;
+
+/* View the processed ultrafine data */
+CREATE MATERIALIZED VIEW processed_ultrafine as
+  select *,
+	 ultrafine_narsto_flag(concentration, count::int) as narsto_flag
+    from (select station_id,
+		 date_trunc('hour', corrected_time) as time,
+		 avg(concentration) as concentration,
+		 avg(pulse_height) as pulse_height,
+		 count(*)
+	    from (select station_id,
+			 case when station_id=3 then correct_ultrafine_time(file, row, instrument_time) 
+			 else instrument_time end as corrected_time,
+			 concentration,
+			 pulse_height
+		    from ultrafine where flags is null or flags='{15}') u1
+	   group by station_id, time) u2;
