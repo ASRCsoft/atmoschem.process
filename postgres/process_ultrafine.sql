@@ -79,3 +79,117 @@ CREATE OR REPLACE FUNCTION ultrafine_narsto_flag(concentration numeric, n int) R
 	 when concentration<1 then 'V1'
 	 else 'V0' end;
 $$ LANGUAGE sql;
+
+/* Match ultrafine clock audits with the corresponding file/row from
+   the raw data */
+CREATE MATERIALIZED VIEW ultrafine_clock_audits as
+  select *,
+	 (select file
+	    from ultrafine
+	   where station_id=3
+	     and date_trunc('minute', ultrafine.instrument_time)=clock_audits.instrument_time
+	   order by file, row asc
+	   limit 1) as ultrafine_file,
+	 (select row
+	    from ultrafine
+	   where station_id=3
+	     and date_trunc('minute', ultrafine.instrument_time)=clock_audits.instrument_time
+	   order by file, row asc
+	   limit 1) as ultrafine_row
+    from clock_audits
+   where instrument='EPC';
+
+
+/* Correct ultrafine instrument time using linear interpolation */
+CREATE OR REPLACE FUNCTION correct_ultrafine_time(file text, r int, t timestamp)
+  RETURNS timestamp AS $corrected_time$
+  DECLARE
+  matches_audit_time boolean;
+  has_lower_bound boolean;
+  has_upper_bound boolean;
+  x0 timestamp;
+  x1 timestamp;
+  y0 interval;
+  y1 interval;
+  interpolated_error interval;
+BEGIN
+  select exists(select *
+		  from ultrafine_clock_audits
+		 where ultrafine_clock_audits.ultrafine_file=file
+		   and ultrafine_clock_audits.ultrafine_row=r)
+    into matches_audit_time;
+  if matches_audit_time then
+    return (select audit_time
+	      from ultrafine_clock_audits
+	     where ultrafine_clock_audits.ultrafine_file=file
+	       and ultrafine_clock_audits.ultrafine_row=r);
+  end if;
+  select exists(select *
+		  from ultrafine_clock_audits
+		 where ultrafine_clock_audits.ultrafine_file<file
+		    or (ultrafine_clock_audits.ultrafine_file=file
+			and ultrafine_clock_audits.ultrafine_row<r))
+    into has_lower_bound;
+  select exists(select *
+		  from ultrafine_clock_audits
+		 where ultrafine_clock_audits.ultrafine_file>file
+		    or (ultrafine_clock_audits.ultrafine_file=file
+			and ultrafine_clock_audits.ultrafine_row>r))
+    into has_upper_bound;
+  if has_lower_bound then
+    -- if the clock error was corrected, then the new instrument_time
+    -- == audit_time, and if it wasn't corrected then the new
+    -- instrument_time == original instrument_time
+    select case when corrected then audit_time
+           else instrument_time end
+      from ultrafine_clock_audits
+     where ultrafine_clock_audits.ultrafine_file<file
+	or (ultrafine_clock_audits.ultrafine_file=file
+	    and ultrafine_clock_audits.ultrafine_row<r)
+     order by ultrafine_file desc, ultrafine_row desc
+     limit 1
+      into x0;
+    select case when corrected then '0'
+	   else audit_time - instrument_time end
+      from ultrafine_clock_audits
+     where ultrafine_clock_audits.ultrafine_file<file
+	or (ultrafine_clock_audits.ultrafine_file=file
+	    and ultrafine_clock_audits.ultrafine_row<r)
+     order by ultrafine_file desc, ultrafine_row desc
+     limit 1
+      into y0;
+  end if;
+  if has_upper_bound then
+    select instrument_time
+      from ultrafine_clock_audits
+     where ultrafine_clock_audits.ultrafine_file>file
+	or (ultrafine_clock_audits.ultrafine_file=file
+	    and ultrafine_clock_audits.ultrafine_row>r)
+     order by ultrafine_file asc, ultrafine_row asc
+     limit 1
+      into x1;
+    select audit_time - instrument_time
+      from ultrafine_clock_audits
+     where ultrafine_clock_audits.ultrafine_file>file
+	or (ultrafine_clock_audits.ultrafine_file=file
+	    and ultrafine_clock_audits.ultrafine_row>r)
+     order by ultrafine_file asc, ultrafine_row asc
+     limit 1
+      into y1;
+  end if;
+  if has_lower_bound and has_upper_bound then
+    -- interpolate
+    return t + (y0 + extract('epoch' from (t - x0)) * (y1 - y0) /
+		extract('epoch' from (x1 - x0)));
+  elsif has_lower_bound then
+    -- go with the most recent audit
+    return t + y0;
+  elsif has_upper_bound then
+    -- go with the next audit
+    return t + y1;
+  else
+    -- return the original time
+    return t;
+  end if;
+END;
+$corrected_time$ LANGUAGE plpgsql;
