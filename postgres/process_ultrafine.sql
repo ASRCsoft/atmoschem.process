@@ -102,81 +102,58 @@ CREATE MATERIALIZED VIEW ultrafine_clock_audits as
 
 /* Correct ultrafine instrument time using linear interpolation */
 CREATE OR REPLACE FUNCTION correct_ultrafine_time(file text, r int, t timestamp)
-  RETURNS timestamp AS $corrected_time$
+  RETURNS timestamp AS $$
   DECLARE
-  matches_audit_time boolean;
+  matching_audit_time timestamp;
   has_lower_bound boolean;
   has_upper_bound boolean;
   x0 timestamp;
   x1 timestamp;
   y0 interval;
   y1 interval;
-  interpolated_error interval;
 BEGIN
-  select exists(select *
-		  from ultrafine_clock_audits
-		 where ultrafine_clock_audits.ultrafine_file=file
-		   and ultrafine_clock_audits.ultrafine_row=r)
-    into matches_audit_time;
-  if matches_audit_time then
-    return (select audit_time
-	      from ultrafine_clock_audits
-	     where ultrafine_clock_audits.ultrafine_file=file
-	       and ultrafine_clock_audits.ultrafine_row=r);
+  -- 1) Find the closest clock audits.
+  select audit_time
+    from ultrafine_clock_audits
+   where ultrafine_clock_audits.ultrafine_file=file
+     and ultrafine_clock_audits.ultrafine_row=r
+    into matching_audit_time;
+  if found then
+    return matching_audit_time;
   end if;
-  select exists(select *
-		  from ultrafine_clock_audits
-		 where ultrafine_clock_audits.ultrafine_file<file
-		    or (ultrafine_clock_audits.ultrafine_file=file
-			and ultrafine_clock_audits.ultrafine_row<r))
-    into has_lower_bound;
-  select exists(select *
-		  from ultrafine_clock_audits
-		 where ultrafine_clock_audits.ultrafine_file>file
-		    or (ultrafine_clock_audits.ultrafine_file=file
-			and ultrafine_clock_audits.ultrafine_row>r))
+  -- if the clock error was corrected, then the new instrument_time is
+  -- the same as the audit_time and the new clock error is zero. If it
+  -- wasn't corrected then the instrument_time and clock errors don't
+  -- change.
+  select case when corrected then audit_time
+         else instrument_time end,
+         case when corrected then '0'
+         else audit_time - instrument_time end
+    from ultrafine_clock_audits
+   where ultrafine_clock_audits.ultrafine_file<file
+      or (ultrafine_clock_audits.ultrafine_file=file
+    	  and ultrafine_clock_audits.ultrafine_row<r)
+   order by ultrafine_file desc, ultrafine_row desc
+   limit 1
+    into x0, y0;
+  if found then
+    select true
+      into has_lower_bound;
+  end if;
+  select instrument_time,
+    	 audit_time - instrument_time
+    from ultrafine_clock_audits
+   where ultrafine_clock_audits.ultrafine_file>file
+      or (ultrafine_clock_audits.ultrafine_file=file
+    	  and ultrafine_clock_audits.ultrafine_row>r)
+   order by ultrafine_file asc, ultrafine_row asc
+   limit 1
+    into x1, y1;
+  if found then
+    select true
     into has_upper_bound;
-  if has_lower_bound then
-    -- if the clock error was corrected, then the new instrument_time
-    -- == audit_time, and if it wasn't corrected then the new
-    -- instrument_time == original instrument_time
-    select case when corrected then audit_time
-           else instrument_time end
-      from ultrafine_clock_audits
-     where ultrafine_clock_audits.ultrafine_file<file
-	or (ultrafine_clock_audits.ultrafine_file=file
-	    and ultrafine_clock_audits.ultrafine_row<r)
-     order by ultrafine_file desc, ultrafine_row desc
-     limit 1
-      into x0;
-    select case when corrected then '0'
-	   else audit_time - instrument_time end
-      from ultrafine_clock_audits
-     where ultrafine_clock_audits.ultrafine_file<file
-	or (ultrafine_clock_audits.ultrafine_file=file
-	    and ultrafine_clock_audits.ultrafine_row<r)
-     order by ultrafine_file desc, ultrafine_row desc
-     limit 1
-      into y0;
   end if;
-  if has_upper_bound then
-    select instrument_time
-      from ultrafine_clock_audits
-     where ultrafine_clock_audits.ultrafine_file>file
-	or (ultrafine_clock_audits.ultrafine_file=file
-	    and ultrafine_clock_audits.ultrafine_row>r)
-     order by ultrafine_file asc, ultrafine_row asc
-     limit 1
-      into x1;
-    select audit_time - instrument_time
-      from ultrafine_clock_audits
-     where ultrafine_clock_audits.ultrafine_file>file
-	or (ultrafine_clock_audits.ultrafine_file=file
-	    and ultrafine_clock_audits.ultrafine_row>r)
-     order by ultrafine_file asc, ultrafine_row asc
-     limit 1
-      into y1;
-  end if;
+  -- 2) Return the appropriate estimate of the clock error.
   if has_lower_bound and has_upper_bound then
     -- interpolate
     return t + (y0 + extract('epoch' from (t - x0)) * (y1 - y0) /
@@ -192,7 +169,7 @@ BEGIN
     return t;
   end if;
 END;
-$corrected_time$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 /* View the processed ultrafine data */
 CREATE MATERIALIZED VIEW processed_ultrafine as
