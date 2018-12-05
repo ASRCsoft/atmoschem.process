@@ -1,61 +1,42 @@
 /* Organizing various data contained in envidas files */
 
-create table envidas_common (
+create table envidas_wfms (
   station_id int references stations,
   file text,
   row int,
   instrument_time timestamp,
+  record int,
   temperature numeric,
   rh numeric,
+  temp_rh_flag numeric,
+  ptemp numeric,
+  bp numeric,
+  rain numeric,
+  ws3cup numeric,
+  ws3cup_max numeric,
+  winddir numeric,
+  winddir_d1_wvt numeric,
+  winddir_sd1_wvt numeric,
+  ws_ms numeric,
+  ws_ms_s_wvt numeric,
+  ws_ms_max numeric,
+  ws3cupb numeric,
+  ws3cupb_s_wvt numeric,
+  ws3cupb_max numeric,
+  wind_flag numeric,
   no numeric,
   no2 numeric,
-  o3 numeric,
-  co numeric,
-  so2 numeric,
-  primary key(station_id, file, row)
-);
-
-create table envidas_wfms (
-  temp_rh_flag numeric,
-  wind_flag numeric,
-  ptemp numeric,
-  rain numeric,
-  co_flag numeric,
-  so2_flag numeric,
   nox_flag numeric,
   noy numeric,
   noy_flag numeric,
+  ozone numeric,
+  co numeric,
+  co_flag numeric,
+  so2 numeric,
+  so2_flag numeric,
+  batt_volt numeric,
+  lamp numeric,
+  slrw numeric,
+  slrmj numeric,
   primary key(station_id, file, row)
-) INHERITS (envidas_common);
-
--- create table envidas_wfml (
---   ptemp numeric,
---   ptemp_flag numeric,
---   methane numeric,
---   methane_flag numeric,
---   nmhc numeric,
---   nmhc_flag numeric,
---   pm25 numeric,
---   pm25_flag numeric,
---   ngn3 numeric,
---   ngn3_flag numeric
--- ) INHERITS (envidas_common);
-
--- create table envidas_psp (
---   rain numeric,
---   rain_flag text,
---   noy numeric,
---   noy_flag text,
---   methane numeric,
---   methane_flag text,
---   nmhc numeric,
---   nmhc_flag text,
---   pm25 numeric,
---   pm25_flag text,
---   pm25c numeric,
---   pm25c_flag text,
---   ngn3 numeric,
---   ngn3_flag text,
---   thc numeric,
---   thc_flag text,
--- ) INHERITS (envidas_common);
+);
