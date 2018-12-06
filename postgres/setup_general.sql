@@ -4,9 +4,8 @@ create table autocals (
   station_id int references stations,
   instrument text,
   dates daterange,
-  start_time time,
-  end_time time,
-  primary key(station_id, instrument, dates, start_time, end_time)
+  times timerange,
+  primary key(station_id, instrument, dates, times)
 );
 
 create table clock_audits (

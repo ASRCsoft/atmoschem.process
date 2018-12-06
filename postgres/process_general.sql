@@ -23,8 +23,7 @@ BEGIN
 	   where short_name=station),
 	 instrument,
 	 daterange(start_date, end_date, '[]'),
-	 start_time,
-	 end_time
+	 timerange(start_time, end_time, '[]')
     FROM autocals_file;
 END;
 $$ LANGUAGE plpgsql;
