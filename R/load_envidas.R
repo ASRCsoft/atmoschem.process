@@ -8,12 +8,20 @@ library(lubridate)
 library(RPostgreSQL)
 
 read_envidas = function(f, ...) {
-  lines = readLines(f, encoding = 'UTF-8')
+  lines = readLines(f, warn = F, encoding = 'UTF-8')
   n_header = grep('^Date|^TIME', lines)[1]
   headers = strsplit(lines[n_header], ',')[[1]]
   ## find the first line that starts with a date
   n_start = grep('^[0-9]', lines)[1]
-  csv_lines = lines[c(n_header, n_start:length(lines))]
+  ## ignore summary statistics lines, which typically start with a row
+  ## of 'Min' values
+  min_lines = grep('^Min', lines)
+  if (length(min_lines) > 0) {
+    n_end = min_lines[1] - 1
+  } else {
+    n_end = length(lines)
+  }
+  csv_lines = lines[c(n_header, n_start:n_end)]
   csv_text = paste(csv_lines, collapse = '\n')
   na_strings = c('NA', 'NAN', 'NANN', '-9999')
   ## NA values are also sometimes represented with text values
