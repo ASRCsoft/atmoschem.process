@@ -65,28 +65,43 @@ format_envidas_headers = function(h) {
   df$new
 }
 
-process_envidas = function(df) {
+process_envidas = function(df, f) {
   ## tidy column names
   names(df) = format_envidas_headers(names(df))
   ## remove useless columns
   blank_regex = '^Spare|^Phase|^_flag$|^_indicator$|^$'
   df = df[, !grepl(blank_regex, names(df))]
-  ## remove empty columns and empty status columns
-  ## df = df[df$new != '', ]
+  ## determine timestamp format by comparing it to the month in the
+  ## file name
+  file_month = as.integer(gsub('.*envi_rpt-[0-9]{2}([0-9]{2}).*', '\\1', f))
+  ndf = nrow(df)
+  date_text = strsplit(as.character(df$Timestamp[ndf - 1]), ' ')[[1]][1]
+  ## ^Getting the second to last timestamp because it usually has
+  ## dates later in the month (like the 30th) that can't possibly be
+  ## months. If I start at the top, at the first of the month, then I
+  ## can't tell which field is which during January. But because some
+  ## files end at the first of the next month, I can't use the last
+  ## line, either, so I have to go with the second to last
+  ## line. Yeesh!
+  date_numbers = as.integer(strsplit(date_text, '/')[[1]])
+  day_first = date_numbers[2] == file_month
+  ## parse times, trying the full year format first, then falling back
+  ## to the last two numbers of the year if that doesn't work
+  if (day_first) {
+    time_formats = c('%d/%m/%Y %H:%M', '%d/%m/%y %H:%M')
+  } else {
+    time_formats = c('%m/%d/%Y %H:%M', '%m/%d/%y %H:%M')
+  }
   if ('Time' %in% names(df)) {
     ## if there's a time column add it to the timestamp
     df$Timestamp = as.POSIXct(paste(df$Timestamp,
                                     df$Time),
-                              format = "%m/%d/%Y %H:%M")
+                              format = time_formats[1])
     df$Time = NULL
   } else {
-    ## parse times, trying the full year format first, then falling
-    ## back to the last two numbers of the year if that doesn't work
-    time_formats = c('%m/%d/%Y %H:%M', '%m/%d/%y %H:%M')
     df$Timestamp = parse_date_time(df$Timestamp,
                                    orders = time_formats)
   }
-
   ## rename a few columns
   col_dict = c(Timestamp = 'instrument_time',
                Rain_mm_Tot = 'rain', PTemp_C = 'ptemp')
@@ -131,7 +146,7 @@ write_envidas_table = function(df, f) {
 }
 
 import_envidas_file = function(f) {
-  env = process_envidas(read_envidas(f))
+  env = process_envidas(read_envidas(f), f)
   write_envidas_table(env, f)
 }
 
