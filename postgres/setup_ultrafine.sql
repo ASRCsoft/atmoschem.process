@@ -1,16 +1,4 @@
-/* Set up the tables and extensions for the atmoschem project database */
-
-/* station table */
-create table stations (
-  id serial primary key,
-  short_name text,
-  long_name text
-);
-insert into stations(short_name, long_name)
-values ('WFMS', 'Whiteface Mountain Summit'),
-       ('WFML', 'Whiteface Mountain Lodge'),
-       ('PSP', 'Pinnacle State Park'),
-       ('QC', 'Queens College');
+/* Set up the tables and extensions for ultrafine data */
 
 /* These are the error codes described in the TSI3783 manual, p. B-5
 */
