@@ -30,8 +30,6 @@ read_envidas = function(f, ...) {
   df = read.csv(text = csv_text, na.strings = na_strings,
                 row.names = NULL, fileEncoding = 'UTF-8', ...)
   names(df) = headers # don't let R muck up header names
-  ## replace non-numeric values with NA in some columns
-  df$CO = as.numeric(df$CO)
   df
 }
 
