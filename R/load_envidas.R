@@ -15,11 +15,15 @@ read_envidas = function(f, ...) {
   n_start = grep('^[0-9]', lines)[1]
   csv_lines = lines[c(n_header, n_start:length(lines))]
   csv_text = paste(csv_lines, collapse = '\n')
-  na_strings = c('NA', 'NAN', 'NANN', '-9999',
-                 'InVld', '<Samp')
+  na_strings = c('NA', 'NAN', 'NANN', '-9999')
+  ## NA values are also sometimes represented with text values
+  ## 'InVld', '---', '<Samp', 'OffScan', but right now these are
+  ## removed in the write_envidas_table function
   df = read.csv(text = csv_text, na.strings = na_strings,
                 row.names = NULL, fileEncoding = 'UTF-8', ...)
   names(df) = headers # don't let R muck up header names
+  ## replace non-numeric values with NA in some columns
+  df$CO = as.numeric(df$CO)
   df
 }
 
@@ -86,12 +90,18 @@ process_envidas = function(df) {
 }
 
 format_hstore = function(x)
+  ## this assumes no names have quotation marks in them
   paste(paste0('"', names(x), '"=>"', x, '"'), collapse=',')
 
 write_envidas_table = function(df, f) {
   envidas_cols = c('instrument_time', 'temperature', 'rh',
                    'bp', 'no', 'co', 'so2')
   names(df) = tolower(names(df))
+  ## replace 'zero' text values with 0 in numeric columns, and replace
+  ## other text values with NA
+  for (h in envidas_cols[-1]) {
+    df[, h] = ifelse(df[, h] == 'zero', 0, as.numeric(df[, h]))
+  }
   dict_df = df[, !names(df) %in% envidas_cols]
   df = df[, names(df) %in% envidas_cols]
   ## add the source info columns
