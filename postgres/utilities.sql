@@ -7,3 +7,10 @@ CREATE TYPE timerange AS RANGE (
   subtype = time,
   subtype_diff = _time_diff_seconds
 );
+
+/* create a sourcerow composite data type, and corresponding
+   sourcerange range type, for selecting intervals of source data */
+CREATE TYPE sourcerow AS (date date, n int, row int);
+CREATE TYPE sourcerange AS RANGE (
+  subtype = sourcerow
+);
