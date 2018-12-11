@@ -27,6 +27,8 @@ CREATE OR REPLACE FUNCTION load_ultrafine(station text, file text) RETURNS void 
   -- name
   file_name text := REGEXP_REPLACE(REGEXP_REPLACE(file, '^.*/', ''),
 				   '\.[^.]*$', '');
+  file_n int := REGEXP_REPLACE(file_name, '.*\((.*)\)|^[0-9]{6}',
+			       '\1');
 BEGIN
   SELECT id into station_id from stations where short_name=station;
   /* this temporary table will hold a copy of the data file */
@@ -56,8 +58,7 @@ BEGIN
   EXECUTE copy_str;
   INSERT INTO ultrafine
   SELECT station_id,
-	 file_name,
-	 row,
+	 (substring(file_name, 1, 6), file_n, row)::sourcerow,
   	 date + time,
 	 concentration,
 	 count,
@@ -67,7 +68,7 @@ BEGIN
 	 pulse_height,
 	 pulse_std,
 	 case when flags='0' then null else parse_flags(flags) end
-  FROM ultrafine_file;
+    FROM ultrafine_file;
 END;
 $$ LANGUAGE plpgsql;
 

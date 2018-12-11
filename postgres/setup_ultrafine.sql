@@ -26,8 +26,7 @@ values ('Conditioner Temperature'),
 
 create table ultrafine (
   station_id int references stations,
-  file text,
-  row int,
+  source sourcerow,
   instrument_time timestamp,
   concentration numeric,
   count int,
@@ -37,7 +36,7 @@ create table ultrafine (
   pulse_height int,
   pulse_std int,
   flags int[],
-  primary key(station_id, file, row)
+  primary key(station_id, source)
 );
 
 /* A table of time corrections needed for when an instrument clock was
