@@ -75,7 +75,7 @@ process_envidas = function(df, f) {
   ## file name
   file_month = as.integer(gsub('.*envi_rpt-[0-9]{2}([0-9]{2}).*', '\\1', f))
   ndf = nrow(df)
-  date_text = strsplit(as.character(df$Timestamp[ndf - 1]), ' ')[[1]][1]
+  time_str = as.character(df$Timestamp[ndf - 1])
   ## ^Getting the second to last timestamp because it usually has
   ## dates later in the month (like the 30th) that can't possibly be
   ## months. If I start at the top, at the first of the month, then I
@@ -83,24 +83,31 @@ process_envidas = function(df, f) {
   ## files end at the first of the next month, I can't use the last
   ## line, either, so I have to go with the second to last
   ## line. Yeesh!
-  date_numbers = as.integer(strsplit(date_text, '/')[[1]])
+  date_str = strsplit(time_str, ' ')[[1]][1]
+  date_numbers = as.integer(strsplit(date_str, '/')[[1]])
   day_first = date_numbers[2] == file_month
   ## parse times, trying the full year format first, then falling back
   ## to the last two numbers of the year if that doesn't work
-  if (day_first) {
-    time_formats = c('%d/%m/%Y %H:%M', '%d/%m/%y %H:%M')
+  if (grepl('[AP]M$', time_str)) {
+    time_format = '%I:%M %p'
   } else {
-    time_formats = c('%m/%d/%Y %H:%M', '%m/%d/%y %H:%M')
+    time_format = '%H:%M'
   }
+  if (day_first) {
+    date_formats = c('%d/%m/%Y', '%d/%m/%y')
+  } else {
+    date_formats = c('%m/%d/%Y', '%m/%d/%y')
+  }
+  timestamp_formats = paste(date_formats, time_format)
   if ('Time' %in% names(df)) {
     ## if there's a time column add it to the timestamp
     df$Timestamp = as.POSIXct(paste(df$Timestamp,
                                     df$Time),
-                              format = time_formats[1])
+                              format = timestamp_formats[1])
     df$Time = NULL
   } else {
     df$Timestamp = parse_date_time(df$Timestamp,
-                                   orders = time_formats)
+                                   orders = timestamp_formats)
   }
   ## rename a few columns
   col_dict = c(Timestamp = 'instrument_time',
