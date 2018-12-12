@@ -16,3 +16,6 @@ create table envidas (
   data_dict hstore,
   primary key(station_id, file, row)
 );
+/* create index useful for subsetting based on recorded instrument
+   time (often used for displaying the raw data) */
+CREATE INDEX raw_envidas_time ON envidas(instrument_time);

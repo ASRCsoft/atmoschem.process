@@ -38,6 +38,9 @@ create table ultrafine (
   flags int[],
   primary key(station_id, source)
 );
+/* create index useful for subsetting based on recorded instrument
+   time (often used for displaying the raw data) */
+CREATE INDEX raw_ultrafine_time ON ultrafine(instrument_time);
 
 /* A table of time corrections needed for when an instrument clock was
    set to the wrong time-- not the same as clock drift, which is
