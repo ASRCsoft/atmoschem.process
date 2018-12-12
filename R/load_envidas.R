@@ -73,7 +73,8 @@ process_envidas = function(df, f) {
   df = df[, !grepl(blank_regex, names(df))]
   ## determine timestamp format by comparing it to the month in the
   ## file name
-  file_month = as.integer(gsub('.*envi_rpt-[0-9]{2}([0-9]{2}).*', '\\1', f))
+  file_month = as.integer(gsub('^[^0-9]*[0-9]{2}([0-9]{2}).*',
+                               '\\1', f))
   ndf = nrow(df)
   time_str = as.character(df$Timestamp[ndf - 1])
   ## ^Getting the second to last timestamp because it usually has
@@ -128,12 +129,11 @@ write_envidas_table = function(df, f) {
   ## replace 'zero' text values with 0 in numeric columns, and replace
   ## other text values with NA
   for (h in envidas_cols[-1]) {
-    df[, h] = ifelse(df[, h] == 'zero', 0, as.numeric(df[, h]))
+    df[, h] = ifelse(df[, h] == 'zero', 0,
+                     as.numeric(as.character(df[, h])))
   }
   dict_df = df[, !names(df) %in% envidas_cols]
   df = df[, names(df) %in% envidas_cols]
-  ## add the source info columns
-  df$row = as.integer(row.names(df))
   ## get the station id
   path_folders = strsplit(f, '/')[[1]]
   station = path_folders[length(path_folders) - 1]
@@ -144,7 +144,19 @@ write_envidas_table = function(df, f) {
   } else if (station == 'PSP') {
     df$station_id = 3
   }
-  df$file = gsub('\\.csv', '', tail(strsplit(f, '/')[[1]], 1))
+  source_file = gsub('\\.csv', '', tail(strsplit(f, '/')[[1]], 1))
+  source_date_str = gsub('^[^0-9]*([0-9]{4}).*', '\\1', source_file)
+  ## have to add a date number to get this to parse, oddly
+  source_date = as.Date(paste0(source_date_str, '01'), '%y%m%d')
+  source_n = gsub('^.*[0-9]{4}[^0-9]*([0-9]*).*', '\\1', source_file)
+  if (source_n == '') {
+    source_n = 1
+  } else {
+    source_n = as.integer(source_n)
+  }
+  source_rows = as.integer(row.names(df))
+  df$source = paste0("('", source_date, "',", source_n, ',',
+                     source_rows, ')')
   ## add the hstore column
   df$data_dict = apply(dict_df, 1, format_hstore)
   pg = dbConnect(PostgreSQL(), dbname = 'chemtest')

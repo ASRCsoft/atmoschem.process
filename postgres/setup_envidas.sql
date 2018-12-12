@@ -4,8 +4,7 @@ create extension hstore;
 
 create table envidas (
   station_id int references stations,
-  file text,
-  row int,
+  source sourcerow,
   instrument_time timestamp,
   temperature numeric,
   rh numeric,
@@ -14,7 +13,7 @@ create table envidas (
   co numeric,
   so2 numeric,
   data_dict hstore,
-  primary key(station_id, file, row)
+  primary key(station_id, source)
 );
 /* create index useful for subsetting based on recorded instrument
    time (often used for displaying the raw data) */
