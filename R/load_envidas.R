@@ -87,7 +87,7 @@ parse_envidas_times = function(df, f) {
   if (time_column) {
     time_str = df$Time[1]
   } else {
-    time_str = strsplit(timestamp_str, ' ')[[1]][2]
+    time_str = gsub('[^ ]* ', '', timestamp_str)
   }
   if (grepl('[AP]M$', time_str)) {
     time_format = '%I:%M %p'
