@@ -65,12 +65,7 @@ format_envidas_headers = function(h) {
   df$new
 }
 
-process_envidas = function(df, f) {
-  ## tidy column names
-  names(df) = format_envidas_headers(names(df))
-  ## remove useless columns
-  blank_regex = '^Spare|^Phase|^_flag$|^_indicator$|^$'
-  df = df[, !grepl(blank_regex, names(df))]
+parse_envidas_times = function(df, f) {
   ## determine timestamp format by comparing it to the month in the
   ## file name
   file_month = as.integer(gsub('^[^0-9]*[0-9]{2}([0-9]{2}).*',
@@ -87,8 +82,7 @@ process_envidas = function(df, f) {
   date_str = strsplit(timestamp_str, ' ')[[1]][1]
   date_numbers = as.integer(strsplit(date_str, '/')[[1]])
   day_first = date_numbers[2] == file_month
-  ## parse times, trying the full year format first, then falling back
-  ## to the last two numbers of the year if that doesn't work
+  ## find time format
   time_column = 'Time' %in% names(df)
   if (time_column) {
     time_str = df$Time[1]
@@ -100,6 +94,8 @@ process_envidas = function(df, f) {
   } else {
     time_format = '%H:%M'
   }
+  ## parse dates, trying the full year format first, then falling back
+  ## to the last two numbers of the year if that doesn't work
   if (day_first) {
     date_formats = c('%d/%m/%Y', '%d/%m/%y')
   } else {
@@ -108,14 +104,22 @@ process_envidas = function(df, f) {
   timestamp_formats = paste(date_formats, time_format)
   if (time_column) {
     ## if there's a time column add it to the timestamp
-    df$Timestamp = as.POSIXct(paste(df$Timestamp,
-                                    df$Time),
-                              format = timestamp_formats[1])
-    df$Time = NULL
+    as.POSIXct(paste(df$Timestamp, df$Time),
+               format = timestamp_formats[1])
   } else {
-    df$Timestamp = parse_date_time(df$Timestamp,
-                                   orders = timestamp_formats)
+    parse_date_time(df$Timestamp, orders = timestamp_formats)
   }
+}
+
+process_envidas = function(df, f) {
+  ## tidy column names
+  names(df) = format_envidas_headers(names(df))
+  ## remove useless columns
+  blank_regex = '^Spare|^Phase|^_flag$|^_indicator$|^$'
+  df = df[, !grepl(blank_regex, names(df))]
+  df$Timestamp = parse_envidas_times(df, f)
+  ## remove redundant time column if it exists
+  df$Time = NULL
   ## rename a few columns
   col_dict = c(Timestamp = 'instrument_time',
                Rain_mm_Tot = 'rain', PTemp_C = 'ptemp')
