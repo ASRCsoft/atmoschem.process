@@ -56,7 +56,7 @@ format_envidas_headers = function(h) {
     df$new[which(follows_previous) - 1]
   ## name things consistently
   df$new = gsub('^T$|^Temp$', 'Temperature', df$new)
-  time_regex = '^TIMESTAMP$|^Date Time$|^Date&Time$'
+  time_regex = '^TIMESTAMP$|^Date'
   df$new = gsub(time_regex, 'Timestamp', df$new)
   df$new = gsub('CupA', 'Cup', df$new)
   df$new = paste0(df$new,
@@ -76,7 +76,7 @@ process_envidas = function(df, f) {
   file_month = as.integer(gsub('^[^0-9]*[0-9]{2}([0-9]{2}).*',
                                '\\1', f))
   ndf = nrow(df)
-  time_str = as.character(df$Timestamp[ndf - 1])
+  timestamp_str = as.character(df$Timestamp[ndf - 1])
   ## ^Getting the second to last timestamp because it usually has
   ## dates later in the month (like the 30th) that can't possibly be
   ## months. If I start at the top, at the first of the month, then I
@@ -84,11 +84,17 @@ process_envidas = function(df, f) {
   ## files end at the first of the next month, I can't use the last
   ## line, either, so I have to go with the second to last
   ## line. Yeesh!
-  date_str = strsplit(time_str, ' ')[[1]][1]
+  date_str = strsplit(timestamp_str, ' ')[[1]][1]
   date_numbers = as.integer(strsplit(date_str, '/')[[1]])
   day_first = date_numbers[2] == file_month
   ## parse times, trying the full year format first, then falling back
   ## to the last two numbers of the year if that doesn't work
+  time_column = 'Time' %in% names(df)
+  if (time_column) {
+    time_str = df$Time[1]
+  } else {
+    time_str = strsplit(timestamp_str, ' ')[[1]][2]
+  }
   if (grepl('[AP]M$', time_str)) {
     time_format = '%I:%M %p'
   } else {
@@ -100,7 +106,7 @@ process_envidas = function(df, f) {
     date_formats = c('%m/%d/%Y', '%m/%d/%y')
   }
   timestamp_formats = paste(date_formats, time_format)
-  if ('Time' %in% names(df)) {
+  if (time_column) {
     ## if there's a time column add it to the timestamp
     df$Timestamp = as.POSIXct(paste(df$Timestamp,
                                     df$Time),
