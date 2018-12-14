@@ -50,10 +50,10 @@ BEGIN
   -- the data file so it can be copied as a csv, and then use awk to
   -- add row numbers
   select format('tail -n +6 "%s" | awk -vOFS="," ''NR == 1 {print "row", $0; next}{print (NR-1), $0}''',
-      		file)
+		file)
     into bash_str;
-  select format('COPY ultrafine_file FROM PROGRAM ''%s'' delimiter '','' csv header',
-		replace(bash_str, '''', ''''''))
+  select format('COPY ultrafine_file FROM PROGRAM %s delimiter '','' csv header',
+		quote_literal(bash_str))
     into copy_str;
   EXECUTE copy_str;
   INSERT INTO ultrafine
