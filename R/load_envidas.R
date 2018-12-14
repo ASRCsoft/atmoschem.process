@@ -180,6 +180,8 @@ import_envidas_file = function(f) {
 }
 
 env_files = commandArgs(trailingOnly = T)
+file_dates = gsub('^[^0-9]*([0-9]{4}).*', '\\1', env_files)
+env_files = env_files[order(file_dates)]
 for (f in env_files) {
   message(paste('Importing', f))
   import_envidas_file(f)
