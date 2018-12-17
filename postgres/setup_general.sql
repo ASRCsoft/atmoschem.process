@@ -15,6 +15,7 @@ values ('WFMS', 'Whiteface Mountain Summit'),
 create table autocals (
   station_id int references stations,
   instrument text,
+  type text,
   dates daterange,
   times timerange,
   primary key(station_id, instrument, dates, times)

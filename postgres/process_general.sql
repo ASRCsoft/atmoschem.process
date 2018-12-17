@@ -8,6 +8,7 @@ BEGIN
   create temporary table autocals_file (
     station text,
     instrument text,
+    type text,
     start_date date,
     end_date date,
     start_time time,
@@ -22,6 +23,7 @@ BEGIN
 	    from stations
 	   where short_name=station),
 	 instrument,
+	 type,
 	 daterange(start_date, end_date, '[]'),
 	 timerange(start_time, end_time, '[]')
     FROM autocals_file;
