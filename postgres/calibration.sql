@@ -47,3 +47,34 @@ end;
 $$ language plpgsql;
 
 /* After getting these calibration values, need to use linear interpolation to get zero/top for every measurement time, then correct each measurement */
+
+/* Calibration table:
+- day
+- timerange
+- chemical
+- type
+- value
+*/
+
+/* Match ultrafine clock audits with the corresponding file/row from
+   the raw data */
+CREATE MATERIALIZED VIEW calibration_values as
+  select cal_day,
+  cal_times,
+  chemical,
+  type,
+  estimate_min_val(val, times, cal_day, site) as value
+	 -- (select file
+	 --    from ultrafine
+	 --   where station_id=3
+	 --     and date_trunc('minute', ultrafine.instrument_time)=clock_audits.instrument_time
+	 --   order by file, row asc
+	 --   limit 1) as ultrafine_file,
+	 -- (select row
+	 --    from ultrafine
+	 --   where station_id=3
+	 --     and date_trunc('minute', ultrafine.instrument_time)=clock_audits.instrument_time
+	 --   order by file, row asc
+	 --   limit 1) as ultrafine_row
+    from clock_audits
+  where instrument='EPC';
