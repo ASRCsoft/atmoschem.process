@@ -72,7 +72,7 @@ CREATE MATERIALIZED VIEW calibration_values AS
 	    from autocals) a1;
 
 /* Estimate calibration values using linear interpolation */
-CREATE OR REPLACE FUNCTION interpolate_cal(station_id int, _chemical text, type text, t timestamp)
+CREATE OR REPLACE FUNCTION interpolate_cal(station_id int, chemical text, type text, t timestamp)
   RETURNS numeric AS $$
   #variable_conflict use_variable
   DECLARE
@@ -85,7 +85,7 @@ CREATE OR REPLACE FUNCTION interpolate_cal(station_id int, _chemical text, type 
 	   value
       from calibration_values
      where upper(cal_times)<=t
-       and calibration_values.chemical=_chemical
+       and calibration_values.chemical=chemical
        and calibration_values.type=type
      order by upper(cal_times) desc
      limit 1
@@ -95,7 +95,7 @@ CREATE OR REPLACE FUNCTION interpolate_cal(station_id int, _chemical text, type 
 	   value
       from calibration_values
      where upper(cal_times)>t
-       and calibration_values.chemical=_chemical
+       and calibration_values.chemical=chemical
        and calibration_values.type=type
      order by upper(cal_times) asc
      limit 1
