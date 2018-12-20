@@ -70,6 +70,8 @@ CREATE MATERIALIZED VIEW calibration_values AS
 				 interval '1 day')::date as cal_day,
 		 times as cal_times
 	    from autocals) a1;
+-- to make the interpolate_cal function faster
+CREATE INDEX calibration_values_upper_time_idx ON calibration_values(upper(cal_times));
 
 /* Estimate calibration values using linear interpolation */
 CREATE OR REPLACE FUNCTION interpolate_cal(station_id int, chemical text, type text, t timestamp)
@@ -102,5 +104,16 @@ CREATE OR REPLACE FUNCTION interpolate_cal(station_id int, chemical text, type t
       into t1, y1;
 
     return interpolate(t0, t1, y0, y1, t);
+  END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION correct_no(station_id int, val numeric, t timestamp)
+  RETURNS numeric AS $$
+  DECLARE
+  zero numeric = interpolate_cal(station_id, 'NO', 'zero', t);
+  span numeric = interpolate_cal(station_id, 'NO', 'span', t);
+  BEGIN
+    return (val - zero) * 3.79 / (span - zero);
   END;
 $$ LANGUAGE plpgsql;
