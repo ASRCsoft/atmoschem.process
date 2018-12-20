@@ -53,8 +53,9 @@ $$ language plpgsql;
 /* Get calibration estimates corresponding to the autocal periods */
 CREATE MATERIALIZED VIEW calibration_values AS
   select station_id,
-	 cal_day,
-	 cal_times,
+	 tsrange(cal_day + lower(cal_times),
+		 cal_day + upper(cal_times),
+		 '[]') as cal_times,
 	 chemical,
 	 type,
 	 case
@@ -70,4 +71,36 @@ CREATE MATERIALIZED VIEW calibration_values AS
 		 times as cal_times
 	    from autocals) a1;
 
-/* After getting these calibration values, need to use linear interpolation to get zero/top for every measurement time, then correct each measurement */
+/* Estimate calibration values using linear interpolation */
+CREATE OR REPLACE FUNCTION interpolate_cal(station_id int, _chemical text, type text, t timestamp)
+  RETURNS numeric AS $$
+  #variable_conflict use_variable
+  DECLARE
+  t0 timestamp;
+  t1 timestamp;
+  y0 numeric;
+  y1 numeric;
+  BEGIN
+    select upper(cal_times),
+	   value
+      from calibration_values
+     where upper(cal_times)<=t
+       and calibration_values.chemical=_chemical
+       and calibration_values.type=type
+     order by upper(cal_times) desc
+     limit 1
+      into t0, y0;
+
+    select upper(cal_times),
+	   value
+      from calibration_values
+     where upper(cal_times)>t
+       and calibration_values.chemical=_chemical
+       and calibration_values.type=type
+     order by upper(cal_times) asc
+     limit 1
+      into t1, y1;
+
+    return interpolate(t0, t1, y0, y1, t);
+  END;
+$$ LANGUAGE plpgsql;
