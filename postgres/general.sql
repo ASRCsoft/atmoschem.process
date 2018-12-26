@@ -21,14 +21,6 @@ create table autocals (
   primary key(station_id, instrument, dates, times)
 );
 
-create table clock_audits (
-  instrument text,
-  instrument_time timestamp,
-  audit_time timestamp,
-  corrected boolean,
-  primary key(instrument, audit_time)
-);
-
 /* Load autocal schedules into the autocals table */
 CREATE OR REPLACE FUNCTION load_autocals(file text)
   RETURNS void AS $$
