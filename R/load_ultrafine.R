@@ -2,17 +2,19 @@
 
 library(RPostgreSQL)
 
-ultrafine_path = '/home/wmay/data/ultrafine/'
-sites = c('WFMS', 'PSP', 'QC')
-pg = dbConnect(PostgreSQL(), dbname='chemtest')
-
-for (site in sites) {
-  site_path = paste0(ultrafine_path, site, '/')
-  files = list.files(site_path, full.names = T)
-  for (f in files) {
-    ## print(f)
-    q = paste0("select load_ultrafine('", site, "', '", f, "')")
-    dbGetQuery(pg, q)
-  }
+import_ultrafine_file = function(f) {
+  path_folders = strsplit(f, '/')[[1]]
+  station = path_folders[length(path_folders) - 1]
+  q = paste0("select load_ultrafine('", station, "', '", f, "')")
+  pg = dbConnect(PostgreSQL(), dbname='chemtest')
+  dbGetQuery(pg, q)
+  dbDisconnect(pg)
 }
-dbDisconnect(pg)
+
+env_files = commandArgs(trailingOnly = T)
+file_dates = gsub('^[^0-9]*([0-9]{8}).*', '\\1', env_files)
+env_files = env_files[order(file_dates)]
+for (f in env_files) {
+  message(paste('Importing', f))
+  import_ultrafine_file(f)
+}

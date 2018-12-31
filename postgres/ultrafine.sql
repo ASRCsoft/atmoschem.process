@@ -69,49 +69,59 @@ CREATE OR REPLACE FUNCTION load_ultrafine(station text, file text) RETURNS void 
   -- name
   file_name text := REGEXP_REPLACE(REGEXP_REPLACE(file, '^.*/', ''),
 				   '\.[^.]*$', '');
-  file_n int := REGEXP_REPLACE(file_name, '.*\((.*)\)|^[0-9]{6}',
-			       '\1');
-BEGIN
-  SELECT id into station_id from stations where short_name=station;
-  /* this temporary table will hold a copy of the data file */
-  create temporary table ultrafine_file (
-    row int,
-    date date,
-    time time,
-    concentration numeric,
-    count int,
-    livetime numeric,
-    blank text,
-    pressure int,
-    analog_voltage numeric,
-    pulse_height int,
-    pulse_std int,
-    flags varchar(4)
-  ) on commit drop;
-  -- use the `tail` terminal command to ignore the first 5 lines of
-  -- the data file so it can be copied as a csv, and then use awk to
-  -- add row numbers
-  select format('tail -n +6 "%s" | awk -vOFS="," ''NR == 1 {print "row", $0; next}{print (NR-1), $0}''',
-		file)
-    into bash_str;
-  select format('COPY ultrafine_file FROM PROGRAM %s delimiter '','' csv header',
-		quote_literal(bash_str))
-    into copy_str;
-  EXECUTE copy_str;
-  INSERT INTO ultrafine
-  SELECT station_id,
-	 (substring(file_name, 1, 6), file_n, row)::sourcerow,
-  	 date + time,
-	 concentration,
-	 count,
-	 livetime,
-	 pressure,
-	 analog_voltage,
-	 pulse_height,
-	 pulse_std,
-	 case when flags='0' then null else parse_flags(flags) end
-    FROM ultrafine_file;
-END;
+  file_n int := REGEXP_REPLACE(file_name, '.*\((.*)\)|^[0-9]{6}|[^0-9]*$',
+			       '\1', 'g');
+  BEGIN
+    -- Add one to the file number if there's a letter after the
+    -- numbers. This works most of the time. Unfortunately the
+    -- ultrafine file naming system is inconsistent and occasionally
+    -- nonsensical, so there's no way to correctly number all files by
+    -- file name alone. In the sad cases where this code does not work
+    -- the data manager must rename the affected files to something
+    -- more sensible.
+    select case when file_name ~ '^[0-9]{8}[a-z]' then file_n + 1
+	   else file_n end
+      into file_n;
+    SELECT id into station_id from stations where short_name=station;
+    /* this temporary table will hold a copy of the data file */
+    create temporary table ultrafine_file (
+      row int,
+      date date,
+      time time,
+      concentration numeric,
+      count int,
+      livetime numeric,
+      blank text,
+      pressure int,
+      analog_voltage numeric,
+      pulse_height int,
+      pulse_std int,
+      flags varchar(4)
+    ) on commit drop;
+    -- use the `tail` terminal command to ignore the first 5 lines of
+    -- the data file so it can be copied as a csv, and then use awk to
+    -- add row numbers
+    select format('tail -n +6 "%s" | awk -vOFS="," ''NR == 1 {print "row", $0; next}{print (NR-1), $0}''',
+	      file)
+      into bash_str;
+    select format('COPY ultrafine_file FROM PROGRAM %s delimiter '','' csv header',
+		  quote_literal(bash_str))
+      into copy_str;
+    EXECUTE copy_str;
+    INSERT INTO ultrafine
+    SELECT station_id,
+	   (substr(file_name, 1, 6), file_n, row)::sourcerow,
+	   date + time,
+	   concentration,
+	   count,
+	   livetime,
+	   pressure,
+	   analog_voltage,
+	   pulse_height,
+	   pulse_std,
+	   case when flags='0' then null else parse_flags(flags) end
+      FROM ultrafine_file;
+  END;
 $$ LANGUAGE plpgsql;
 
 /* Get the appropriate NARSTO flag based on the number of ultrafine
