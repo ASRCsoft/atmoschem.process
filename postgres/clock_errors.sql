@@ -19,26 +19,20 @@ create table ultrafine_time_corrections (
   end_row int,
   time_offset interval,
   explanation text,
-  FOREIGN KEY (station_id, start_file, start_row) REFERENCES ultrafine (station_id, file, row),
-  FOREIGN KEY (station_id, end_file, end_row) REFERENCES ultrafine (station_id, file, row)
+  FOREIGN KEY (station_id, start_row) REFERENCES ultrafine (station_id, source),
+  FOREIGN KEY (station_id, end_row) REFERENCES ultrafine (station_id, source)
 );
 
 /* Match ultrafine clock audits with the corresponding file/row from
    the raw data */
 CREATE MATERIALIZED VIEW ultrafine_clock_audits as
   select *,
-	 (select file
+	 (select source
 	    from ultrafine
 	   where station_id=3
 	     and date_trunc('minute', ultrafine.instrument_time)=clock_audits.instrument_time
-	   order by file, row asc
-	   limit 1) as ultrafine_file,
-	 (select row
-	    from ultrafine
-	   where station_id=3
-	     and date_trunc('minute', ultrafine.instrument_time)=clock_audits.instrument_time
-	   order by file, row asc
-	   limit 1) as ultrafine_row
+	   order by source asc
+	   limit 1) as ultrafine_sourcerow
     from clock_audits
    where instrument='EPC';
 
