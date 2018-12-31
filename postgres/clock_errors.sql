@@ -38,12 +38,10 @@ CREATE MATERIALIZED VIEW ultrafine_clock_audits as
 
 
 /* Correct ultrafine instrument time using linear interpolation */
-CREATE OR REPLACE FUNCTION correct_ultrafine_time(file text, r int, t timestamp)
+CREATE OR REPLACE FUNCTION correct_ultrafine_time(sr sourcerow, t timestamp)
   RETURNS timestamp AS $$
   DECLARE
   matching_audit_time timestamp;
-  has_lower_bound boolean;
-  has_upper_bound boolean;
   x0 timestamp;
   x1 timestamp;
   y0 interval;
@@ -52,8 +50,7 @@ BEGIN
   -- 1) Find the closest clock audits.
   select audit_time
     from ultrafine_clock_audits
-   where ultrafine_clock_audits.ultrafine_file=file
-     and ultrafine_clock_audits.ultrafine_row=r
+   where ultrafine_clock_audits.ultrafine_sourcerow=sr
     into matching_audit_time;
   if found then
     return matching_audit_time;
@@ -67,43 +64,17 @@ BEGIN
          case when corrected then '0'
          else audit_time - instrument_time end
     from ultrafine_clock_audits
-   where ultrafine_clock_audits.ultrafine_file<file
-      or (ultrafine_clock_audits.ultrafine_file=file
-    	  and ultrafine_clock_audits.ultrafine_row<r)
-   order by ultrafine_file desc, ultrafine_row desc
+   where ultrafine_clock_audits.ultrafine_sourcerow<sr
+   order by ultrafine_sourcerow desc
    limit 1
     into x0, y0;
-  if found then
-    select true
-      into has_lower_bound;
-  end if;
   select instrument_time,
     	 audit_time - instrument_time
     from ultrafine_clock_audits
-   where ultrafine_clock_audits.ultrafine_file>file
-      or (ultrafine_clock_audits.ultrafine_file=file
-    	  and ultrafine_clock_audits.ultrafine_row>r)
-   order by ultrafine_file asc, ultrafine_row asc
+   where ultrafine_clock_audits.ultrafine_sourcerow>sr
+   order by ultrafine_sourcerow asc
    limit 1
     into x1, y1;
-  if found then
-    select true
-    into has_upper_bound;
-  end if;
-  -- 2) Return the appropriate estimate of the clock error.
-  if has_lower_bound and has_upper_bound then
-    -- interpolate
-    return t + (y0 + extract('epoch' from (t - x0)) * (y1 - y0) /
-		extract('epoch' from (x1 - x0)));
-  elsif has_lower_bound then
-    -- go with the most recent audit
-    return t + y0;
-  elsif has_upper_bound then
-    -- go with the next audit
-    return t + y1;
-  else
-    -- return the original time
-    return t;
-  end if;
+  return t + interpolate(x0, x1, y0, y1, t);
 END;
 $$ LANGUAGE plpgsql;
