@@ -13,9 +13,7 @@ create table clock_audits (
    addressed in the clock audit table */
 create table ultrafine_time_corrections (
   station_id int references stations,
-  start_file text,
   start_row int,
-  end_file text,
   end_row int,
   time_offset interval,
   explanation text,
