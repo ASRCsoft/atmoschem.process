@@ -24,12 +24,10 @@ create table time_corrections (
    the raw data */
 CREATE MATERIALIZED VIEW ultrafine_clock_audits as
   select *,
-	 (select source
+	 (select min(source)
 	    from ultrafine
 	   where station_id=3
-	     and date_trunc('minute', ultrafine.instrument_time)=clock_audits.instrument_time
-	   order by source asc
-	   limit 1) as ultrafine_sourcerow
+	     and date_trunc('minute', ultrafine.instrument_time)=clock_audits.instrument_time) as ultrafine_sourcerow
     from clock_audits
    where instrument='EPC';
 
