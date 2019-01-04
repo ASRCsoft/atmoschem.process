@@ -20,16 +20,21 @@ create table time_corrections (
   explanation text
 );
 
-/* Match ultrafine clock audits with the corresponding file/row from
-   the raw data */
-CREATE MATERIALIZED VIEW ultrafine_clock_audits as
+/* Match clock audits with the corresponding file/row from the raw
+   data */
+CREATE MATERIALIZED VIEW matched_clock_audits as
   select *,
-	 (select min(source)
-	    from ultrafine
-	   where station_id=3
-	     and date_trunc('minute', ultrafine.instrument_time)=clock_audits.instrument_time) as ultrafine_sourcerow
+	 case when instrument='EPC'
+	 then (select min(source)
+		 from ultrafine
+		where station_id=3
+		  and date_trunc('minute', ultrafine.instrument_time)=clock_audits.instrument_time)
+	 else (select min(source)
+		 from envidas
+		where station_id=3
+		  and date_trunc('minute', envidas.instrument_time)=clock_audits.instrument_time) end as data_source
     from clock_audits
-   where instrument='EPC';
+   where instrument in ('EPC', 'DRDAS PC');
 
 
 /* Correct ultrafine instrument time using linear interpolation */
