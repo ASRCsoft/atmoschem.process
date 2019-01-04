@@ -8,11 +8,18 @@ CREATE TYPE timerange AS RANGE (
   subtype_diff = _time_diff_seconds
 );
 
-/* create a sourcerow composite data type, and corresponding
-   sourcerange range type, for selecting intervals of source data */
+/* create a sourcerow composite data type and supporting functions to
+document the origin of a measurement in a data file */
 CREATE TYPE sourcerow AS (date date, n int, row int);
 CREATE TYPE sourcerange AS RANGE (
   subtype = sourcerow
+);
+CREATE FUNCTION least_sourcerow(sourcerow, sourcerow) RETURNS sourcerow
+  LANGUAGE sql IMMUTABLE CALLED ON NULL INPUT
+AS 'SELECT LEAST($1, $2)';
+CREATE AGGREGATE min(sourcerow) (
+  SFUNC = least_sourcerow,
+  STYPE = sourcerow
 );
 
 /* estimate the y-value between x0 and x1 using linear interpolation
