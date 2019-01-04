@@ -11,14 +11,13 @@ create table clock_audits (
 /* A table of time corrections needed for when an instrument clock was
    set to the wrong time-- not the same as clock drift, which is
    addressed in the clock audit table */
-create table ultrafine_time_corrections (
+create table time_corrections (
   station_id int references stations,
+  chemical text,
   start_row int,
   end_row int,
   time_offset interval,
-  explanation text,
-  FOREIGN KEY (station_id, start_row) REFERENCES ultrafine (station_id, source),
-  FOREIGN KEY (station_id, end_row) REFERENCES ultrafine (station_id, source)
+  explanation text
 );
 
 /* Match ultrafine clock audits with the corresponding file/row from
