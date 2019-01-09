@@ -89,6 +89,7 @@ CREATE OR REPLACE FUNCTION interpolate_cal(station_id int, chemical text, type t
      where upper(cal_times)<=t
        and calibration_values.chemical=chemical
        and calibration_values.type=type
+       and value is not null
      order by upper(cal_times) desc
      limit 1
       into t0, y0;
@@ -99,6 +100,7 @@ CREATE OR REPLACE FUNCTION interpolate_cal(station_id int, chemical text, type t
      where upper(cal_times)>t
        and calibration_values.chemical=chemical
        and calibration_values.type=type
+       and value is not null
      order by upper(cal_times) asc
      limit 1
       into t1, y1;
