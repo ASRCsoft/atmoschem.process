@@ -65,3 +65,14 @@ CREATE OR REPLACE FUNCTION interpolate(t0 timestamp, t1 timestamp, y0 numeric, y
 		       extract(epoch from t)::numeric);
   END;
 $$ LANGUAGE plpgsql;
+
+/* also allow intervals as y values */
+CREATE OR REPLACE FUNCTION interpolate(t0 timestamp, t1 timestamp, y0 interval, y1 interval, t timestamp)
+  RETURNS interval AS $$
+  BEGIN
+    return (interpolate(t0, t1,
+			EXTRACT(epoch FROM y0)::numeric,
+			EXTRACT(epoch FROM y1)::numeric,
+			t) || ' seconds')::interval;
+  END;
+$$ LANGUAGE plpgsql;
