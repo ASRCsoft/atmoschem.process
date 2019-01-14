@@ -40,3 +40,21 @@ CREATE AGGREGATE median(numeric) (
   MFINALFUNC = arr_median,
   minitcond = '{}'
 );
+
+create or replace function arr_mad(arr numeric[]) RETURNS double precision AS $$
+  select percentile_cont(.5) WITHIN GROUP (ORDER BY abs_dev)
+    from (select abs(a - arr_median(arr)) as abs_dev
+	    from unnest(arr) a) b;
+$$ LANGUAGE SQL;
+
+CREATE AGGREGATE mad(numeric) (
+  sfunc = array_append,
+  stype = numeric[],
+  finalfunc = arr_mad,
+  initcond = '{}',
+  msfunc = array_append,
+  minvfunc = array_remove,
+  mstype = numeric[],
+  MFINALFUNC = arr_mad,
+  minitcond = '{}'
+);
