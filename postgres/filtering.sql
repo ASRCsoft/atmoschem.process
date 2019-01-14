@@ -19,3 +19,15 @@ create or replace function remove_extreme_values(int, text, numeric) RETURNS num
 	 then $3
 	 else null end;
 $$ LANGUAGE SQL;
+
+create or replace function arr_median(arr numeric[]) RETURNS double precision AS $$
+  select percentile_cont(.5) WITHIN GROUP (ORDER BY a)
+    from unnest(arr) a;
+$$ LANGUAGE SQL;
+
+CREATE AGGREGATE median(numeric) (
+  sfunc = array_append,
+  stype = numeric[],
+  finalfunc = arr_median,
+  initcond = '{}'
+);
