@@ -76,3 +76,9 @@ CREATE OR REPLACE FUNCTION interpolate(t0 timestamp, t1 timestamp, y0 interval, 
 			t) || ' seconds')::interval;
   END;
 $$ LANGUAGE plpgsql;
+
+/* Delete a value from an array at the given index */
+CREATE OR REPLACE FUNCTION remove_at(arr numeric[], n int)
+  RETURNS numeric[] AS $$
+  select arr[:(n - 1)] || arr[(n + 1):];
+$$ LANGUAGE sql;
