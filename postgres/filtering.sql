@@ -25,9 +25,18 @@ create or replace function arr_median(arr numeric[]) RETURNS double precision AS
     from unnest(arr) a;
 $$ LANGUAGE SQL;
 
+create or replace function array_remove(arr numeric[], n numeric) RETURNS numeric[] AS $$
+  select remove_at(arr, array_position(arr, n));
+$$ LANGUAGE SQL;
+
 CREATE AGGREGATE median(numeric) (
   sfunc = array_append,
   stype = numeric[],
   finalfunc = arr_median,
-  initcond = '{}'
+  initcond = '{}',
+  msfunc = array_append,
+  minvfunc = array_remove,
+  mstype = numeric[],
+  MFINALFUNC = arr_median,
+  minitcond = '{}'
 );
