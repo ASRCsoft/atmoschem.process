@@ -41,11 +41,18 @@ CREATE AGGREGATE median(numeric) (
   minitcond = '{}'
 );
 
+/* Get the median absolute deviation from an array of numbers. This
+function is more than 10 times faster when written in plpgsql but I
+don't know why. */
 create or replace function arr_mad(arr numeric[]) RETURNS double precision AS $$
-  select percentile_cont(.5) WITHIN GROUP (ORDER BY abs_dev)
-    from (select abs(a - arr_median(arr)) as abs_dev
-	    from unnest(arr) a) b;
-$$ LANGUAGE SQL;
+  declare
+  arr_med double precision = arr_median(arr);
+  begin
+    return percentile_cont(.5) WITHIN GROUP (ORDER BY abs_dev)
+      from (select abs(a - arr_med) as abs_dev
+	      from unnest(arr) a) b;
+  end;
+$$ LANGUAGE plpgsql;
 
 CREATE AGGREGATE mad(numeric) (
   sfunc = array_append,
