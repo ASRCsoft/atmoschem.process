@@ -44,6 +44,12 @@ create or replace function is_valid_value(measurement text, station_id int, valu
 			   '(,)'::numrange);
 $$ LANGUAGE sql;
 
+create or replace function is_outlier(value numeric, median numeric, mad numeric) RETURNS bool AS $$
+  -- decide if a value is an outlier using the method from the Hampel
+  -- filter
+  select (value - median) / mad > 3;
+$$ LANGUAGE sql;
+
 /* Determine if a measurement is flagged. */
 create or replace function is_flagged(measurement text, station_id int, source sourcerow, value numeric, flag text, median numeric, mad numeric) RETURNS bool AS $$
   begin
