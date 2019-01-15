@@ -20,11 +20,20 @@ create or replace function has_manual_flag(measurement text, station_id int, sou
 		   and $3 <@ manual_flags.source);
 $$ LANGUAGE sql;
 
+create or replace function has_instrument_flag(measurement text, flag text) RETURNS bool AS $$
+  select case when flag is null or flag='' then false
+	 when measurement='ultrafine' then array_length(parse_flags(flag), 1)>0
+	 else flag!='OK' end;
+$$ LANGUAGE sql;
+
 /* Determine if a measurement is flagged. */
 create or replace function is_flagged(measurement text, station_id int, source sourcerow, value numeric, flag text, median numeric, mad numeric) RETURNS bool AS $$
   begin
     -- steps:
     -- 1) apply manual flags
+    if has_manual_flag(measurement, station_id, source) then
+      return true;
+    end if;
     -- 2) instrument flags
     -- 3) calibration flags
     -- 4) extreme value flags
