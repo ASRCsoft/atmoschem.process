@@ -26,6 +26,15 @@ create or replace function has_instrument_flag(measurement text, flag text) RETU
 	 else flag!='OK' end;
 $$ LANGUAGE sql;
 
+create or replace function has_calibration_flag(measurement text, station_id int, measurement_time timestamp) RETURNS bool AS $$
+  -- need to add a check for manual calibrations here
+  select exists(select *
+		  from calibration_values
+		 where calibration_values.chemical=$1
+		   and calibration_values.station_id=$2
+		   and $3 <@ calibration_values.cal_times);
+$$ LANGUAGE sql;
+
 /* Determine if a measurement is flagged. */
 create or replace function is_flagged(measurement text, station_id int, source sourcerow, value numeric, flag text, median numeric, mad numeric) RETURNS bool AS $$
   begin
