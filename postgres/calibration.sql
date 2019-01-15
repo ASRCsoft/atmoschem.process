@@ -117,38 +117,28 @@ CREATE INDEX calibration_values_upper_time_idx ON calibration_values(upper(cal_t
 /* Estimate calibration values using linear interpolation */
 CREATE OR REPLACE FUNCTION interpolate_cal(station_id int, chemical text, type text, t timestamp)
   RETURNS numeric AS $$
-  #variable_conflict use_variable
-  DECLARE
-  t0 timestamp;
-  t1 timestamp;
-  y0 numeric;
-  y1 numeric;
-  BEGIN
-    select upper(cal_times),
-	   value
-      from calibration_values
-     where upper(cal_times)<=t
-       and calibration_values.chemical=chemical
-       and calibration_values.type=type
-       and value is not null
-     order by upper(cal_times) desc
-     limit 1
-      into t0, y0;
-
-    select upper(cal_times),
-	   value
-      from calibration_values
-     where upper(cal_times)>t
-       and calibration_values.chemical=chemical
-       and calibration_values.type=type
-       and value is not null
-     order by upper(cal_times) asc
-     limit 1
-      into t1, y1;
-
-    return interpolate(t0, t1, y0, y1, t);
-  END;
-$$ LANGUAGE plpgsql;
+  select interpolate(t0, t1, y0, y1, $4)
+    from (select upper(cal_times) as t0,
+		 value as y0
+	    from calibration_values
+	   where upper(cal_times)<=$4
+	     and chemical=$2
+	     and type=$3
+	     and value is not null
+	   order by upper(cal_times) desc
+	   limit 1) calib0
+	 full outer join
+	 (select upper(cal_times) as t1,
+		 value as y1
+	    from calibration_values
+	   where upper(cal_times)>$4
+	     and chemical=$2
+	     and type=$3
+	     and value is not null
+	   order by upper(cal_times) asc
+	   limit 1) calib1
+         on true;
+$$ LANGUAGE sql;
 
 
 CREATE OR REPLACE FUNCTION correct_no(station_id int, val numeric, t timestamp)
@@ -170,3 +160,26 @@ CREATE OR REPLACE FUNCTION apply_calib(station_id int, measurement text, val num
     return (val - zero) * 3.79 / (span - zero);
   END;
 $$ LANGUAGE plpgsql;
+
+
+
+-- just for testing
+select avg(no)
+  from (select station_id,
+	       source,
+	       corrected_time as time,
+	       apply_calib(station_id, 'NO', no, corrected_time) as no,
+	       data_dict->'no_flag' as no_flag
+	  from (select *,
+		       correct_instrument_time(station_id, 'DRDAS PC', source, instrument_time) as corrected_time
+		  from envidas limit 100) e1) e2;
+
+select station_id,
+       source,
+       corrected_time as time,
+       apply_calib(station_id, 'NO', no, corrected_time) as no,
+       interpolate_cal(station_id, 'NO', 'zero', corrected_time) as no_zero,
+       data_dict->'no_flag' as no_flag
+  from (select *,
+	       correct_instrument_time(station_id, 'DRDAS PC', source, instrument_time) as corrected_time
+	  from envidas limit 1) e1;
