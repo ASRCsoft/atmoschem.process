@@ -35,6 +35,15 @@ create or replace function has_calibration_flag(measurement text, station_id int
 		   and $3 <@ calibration_values.cal_times);
 $$ LANGUAGE sql;
 
+create or replace function is_valid_value(measurement text, station_id int, value numeric) RETURNS bool AS $$
+  -- need to add a check for manual calibrations here
+  select value <@ coalesce((select range
+			      from valid_ranges
+			     where valid_ranges.measurement=$1
+			       and valid_ranges.site=$2),
+			   '(,)'::numrange);
+$$ LANGUAGE sql;
+
 /* Determine if a measurement is flagged. */
 create or replace function is_flagged(measurement text, station_id int, source sourcerow, value numeric, flag text, median numeric, mad numeric) RETURNS bool AS $$
   begin
