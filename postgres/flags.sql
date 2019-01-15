@@ -51,21 +51,18 @@ create or replace function is_outlier(value numeric, median numeric, mad numeric
 $$ LANGUAGE sql;
 
 /* Determine if a measurement is flagged. */
-create or replace function is_flagged(measurement text, station_id int, source sourcerow, value numeric, flag text, median numeric, mad numeric) RETURNS bool AS $$
-  begin
-    -- steps:
-    -- 1) apply manual flags
-    if has_manual_flag(measurement, station_id, source) then
-      return true;
-    end if;
-    -- 2) instrument flags
-    -- 3) calibration flags
-    -- 4) extreme value flags
-    -- 5) outlier flags (based on the Hampel filter)
-    if (value - median) / mad > 3 then
-      return true;
-    end if;
-    -- 6) no flag
-    return false;
-  end;
-$$ LANGUAGE plpgsql;
+create or replace function is_flagged(measurement text, station_id int, source sourcerow, measurement_time timestamp, value numeric, flag text, median numeric, mad numeric) RETURNS bool AS $$
+  -- steps:
+  -- 1) apply manual flags
+  select case when has_manual_flag(measurement, station_id, source) then true
+	   -- 2) instrument flags
+	 when has_instrument_flag(measurement, flag) then true
+	   -- 3) calibration flags
+	 when has_calibration_flag(measurement, station_id, measurement_time) then true
+	   -- 4) extreme value flags
+	 when not is_valid_value(measurement, station_id, value) then true
+	   -- 5) outlier flags (based on the Hampel filter)
+	 when is_outlier(value, median, mad) then true
+	   -- 6) no flag
+	 else false end;
+$$ LANGUAGE sql;
