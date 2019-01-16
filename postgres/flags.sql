@@ -47,7 +47,7 @@ $$ LANGUAGE sql;
 create or replace function is_outlier(value numeric, median numeric, mad numeric) RETURNS bool AS $$
   -- decide if a value is an outlier using the method from the Hampel
   -- filter
-  select (value - median) / mad > 3;
+  select (value - median) / nullif(mad, 0) > 3;
 $$ LANGUAGE sql;
 
 /* Determine if a measurement is flagged. */
