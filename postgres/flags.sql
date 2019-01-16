@@ -15,9 +15,9 @@ create table manual_flags (
 create or replace function has_manual_flag(measurement text, station_id int, source sourcerow) RETURNS bool AS $$
   select exists(select *
 		  from manual_flags
-		 where manual_flags.measurement=$1
-		   and manual_flags.station_id=$2
-		   and $3 <@ manual_flags.source);
+		 where measurement=$1
+		   and station_id=$2
+		   and $3 <@ source);
 $$ LANGUAGE sql;
 
 create or replace function has_instrument_flag(measurement text, flag text) RETURNS bool AS $$
