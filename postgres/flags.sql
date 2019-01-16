@@ -30,9 +30,9 @@ create or replace function has_calibration_flag(measurement text, station_id int
   -- need to add a check for manual calibrations here
   select exists(select *
 		  from calibration_values
-		 where calibration_values.chemical=$1
-		   and calibration_values.station_id=$2
-		   and $3 <@ calibration_values.cal_times);
+		 where chemical=$1
+		   and station_id=$2
+		   and $3 <@ cal_times);
 $$ LANGUAGE sql;
 
 create or replace function is_valid_value(measurement text, station_id int, value numeric) RETURNS bool AS $$
