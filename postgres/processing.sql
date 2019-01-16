@@ -16,13 +16,15 @@ CREATE materialized VIEW filtered_envidas AS
 	 time,
 	 no,
 	 is_flagged('NO', station_id, source, time,
-		    no, no_flag, median_no, mad_no) as no_flagged
+		    no, no_flag, median_no::numeric,
+		    mad_no::numeric) as no_flagged
     from (select station_id,
 		 source,
 		 time,
 		 no,
 		 median(no) over w as median_no,
-		 mad(no) over w as mad_no
+		 mad(no) over w as mad_no,
+		 no_flag
 	    from calibrated_envidas
 	  WINDOW w AS (partition by station_id
 		       ORDER BY time
