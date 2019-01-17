@@ -1,5 +1,7 @@
 /* Determing flag values. */
 
+CREATE EXTENSION btree_gist;
+
 create table manual_flags (
   measurement text,
   station_id int references stations not null,
