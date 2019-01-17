@@ -8,4 +8,4 @@ create table narsto_flags (
   applicability text
 );
 COPY narsto_flags(code, definition, description, applicability)
-  FROM '/home/wmay/data/flag_codes/narsto.csv' csv header;
+  FROM '/home/wmay/data/metadata/narsto.csv' csv header;
