@@ -88,4 +88,4 @@ CREATE OR REPLACE FUNCTION correct_instrument_time(station_id int, instrument te
       into x1, y1;
     return t + interpolate(x0, x1, y0, y1, t);
   END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;

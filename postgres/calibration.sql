@@ -138,7 +138,7 @@ CREATE OR REPLACE FUNCTION interpolate_cal(station_id int, chemical text, type t
 	   order by upper(cal_times) asc
 	   limit 1) calib1
          on true;
-$$ LANGUAGE sql;
+$$ LANGUAGE sql STABLE PARALLEL SAFE;
 
 
 CREATE OR REPLACE FUNCTION correct_no(station_id int, val numeric, t timestamp)
@@ -159,7 +159,7 @@ CREATE OR REPLACE FUNCTION apply_calib(station_id int, measurement text, val num
   BEGIN
     return (val - zero) * 3.79 / (span - zero);
   END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 
 
 

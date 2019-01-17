@@ -53,7 +53,7 @@ CREATE OR REPLACE FUNCTION interpolate(x0 numeric, x1 numeric, y0 numeric, y1 nu
       return null;
     end if;
   END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql IMMUTABLE PARALLEL SAFE;
 
 /* overload to allow timestamps as x values */
 CREATE OR REPLACE FUNCTION interpolate(t0 timestamp, t1 timestamp, y0 numeric, y1 numeric, t timestamp)
@@ -64,7 +64,7 @@ CREATE OR REPLACE FUNCTION interpolate(t0 timestamp, t1 timestamp, y0 numeric, y
 		       y0, y1,
 		       extract(epoch from t)::numeric);
   END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql IMMUTABLE PARALLEL SAFE;
 
 /* also allow intervals as y values */
 CREATE OR REPLACE FUNCTION interpolate(t0 timestamp, t1 timestamp, y0 interval, y1 interval, t timestamp)
@@ -75,7 +75,7 @@ CREATE OR REPLACE FUNCTION interpolate(t0 timestamp, t1 timestamp, y0 interval, 
 			EXTRACT(epoch FROM y1)::numeric,
 			t) || ' seconds')::interval;
   END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql IMMUTABLE PARALLEL SAFE;
 
 /* Delete a value from an array at the given index */
 CREATE OR REPLACE FUNCTION remove_at(arr numeric[], n int)
