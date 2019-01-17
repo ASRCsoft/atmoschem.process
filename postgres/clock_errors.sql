@@ -7,6 +7,9 @@ create table clock_audits (
   corrected boolean,
   primary key(instrument, audit_time)
 );
+-- to read in clock audits from csv file:
+-- COPY clock_audits
+--  FROM '/home/wmay/data/metadata/clock_audits.csv' DELIMITER ',' CSV HEADER;
 
 /* A table of time corrections needed for when an instrument clock was
    set to the wrong time-- not the same as clock drift, which is
