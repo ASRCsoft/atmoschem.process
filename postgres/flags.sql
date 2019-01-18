@@ -51,6 +51,13 @@ create or replace function is_outlier(value numeric, median numeric, mad numeric
   select (value - median) / nullif(mad, 0) > 3;
 $$ LANGUAGE sql immutable parallel safe;
 
+create or replace function is_below_mdl(station_id int, measurement text, value numeric) RETURNS bool AS $$
+  select coalesce(value < (select mdl
+			     from mdls
+			    where station_id=$1
+			      and measurement=$2), false);
+$$ LANGUAGE sql stable parallel safe;
+
 /* Determine if a measurement is flagged. */
 create or replace function is_flagged(measurement text, station_id int, source sourcerow, measurement_time timestamp, value numeric, flag text, median numeric, mad numeric) RETURNS bool AS $$
   -- steps:
