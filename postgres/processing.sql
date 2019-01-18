@@ -9,6 +9,7 @@ CREATE materialized VIEW calibrated_envidas AS
     from (select *,
 		 correct_instrument_time(station_id, 'DRDAS PC', source, instrument_time) as corrected_time
 	    from envidas) e1;
+CREATE INDEX calibrated_envidas_station_time ON calibrated_envidas(station_id, time);
 
 
 CREATE materialized VIEW filtered_envidas AS
@@ -29,6 +30,3 @@ CREATE materialized VIEW filtered_envidas AS
 	  WINDOW w AS (partition by station_id
 		       ORDER BY time
 		       rows between 20 preceding and 20 following)) e1;
-/* Definitely need to handle zero MAD values here as there are
-sections of faulty data with the same numbered repeated over and
-over. */
