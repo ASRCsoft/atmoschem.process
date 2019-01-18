@@ -30,3 +30,15 @@ CREATE materialized VIEW filtered_envidas AS
 	  WINDOW w AS (partition by station_id
 		       ORDER BY time
 		       rows between 20 preceding and 20 following)) e1;
+
+CREATE materialized VIEW hourly_aqm AS
+  select station_id,
+	 hour as time,
+	 mean_no,
+	 get_hourly_flag(mean_no, no_count::int) as no_flag
+    from (select station_id,
+		 time_bucket('1 hour', time) as hour,
+		 avg(no) FILTER (WHERE not no_flagged) as mean_no,
+		 count(no) FILTER (WHERE not no_flagged) as no_count
+	    from filtered_envidas
+	   group by station_id, hour) e1;
