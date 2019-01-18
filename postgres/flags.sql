@@ -66,4 +66,4 @@ create or replace function is_flagged(measurement text, station_id int, source s
 	 when is_outlier(value, median, mad) then true
 	   -- 6) no flag
 	 else false end;
-$$ LANGUAGE sql;
+$$ LANGUAGE sql stable parallel safe;

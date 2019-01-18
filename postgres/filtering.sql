@@ -38,7 +38,8 @@ CREATE AGGREGATE median(numeric) (
   minvfunc = array_remove,
   mstype = numeric[],
   MFINALFUNC = arr_median,
-  minitcond = '{}'
+  minitcond = '{}',
+  PARALLEL = SAFE
 );
 
 /* Get the median absolute deviation from an array of numbers. This
@@ -63,5 +64,6 @@ CREATE AGGREGATE mad(numeric) (
   minvfunc = array_remove,
   mstype = numeric[],
   MFINALFUNC = arr_mad,
-  minitcond = '{}'
+  minitcond = '{}',
+  PARALLEL = SAFE
 );
