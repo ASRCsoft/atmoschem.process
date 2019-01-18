@@ -20,13 +20,13 @@ create or replace function has_manual_flag(measurement text, station_id int, sou
 		 where measurement=$1
 		   and station_id=$2
 		   and $3 <@ source);
-$$ LANGUAGE sql;
+$$ LANGUAGE sql stable parallel safe;
 
 create or replace function has_instrument_flag(measurement text, flag text) RETURNS bool AS $$
   select case when flag is null or flag='' then false
 	 when measurement='ultrafine' then array_length(parse_flags(flag), 1)>0
 	 else flag!='OK' end;
-$$ LANGUAGE sql;
+$$ LANGUAGE sql immutable parallel safe;
 
 create or replace function has_calibration_flag(measurement text, station_id int, measurement_time timestamp) RETURNS bool AS $$
   -- need to add a check for manual calibrations here
@@ -35,7 +35,7 @@ create or replace function has_calibration_flag(measurement text, station_id int
 		 where chemical=$1
 		   and station_id=$2
 		   and $3 <@ cal_times);
-$$ LANGUAGE sql;
+$$ LANGUAGE sql stable parallel safe;
 
 create or replace function is_valid_value(measurement text, station_id int, value numeric) RETURNS bool AS $$
   select value <@ coalesce((select range
@@ -43,13 +43,13 @@ create or replace function is_valid_value(measurement text, station_id int, valu
 			     where measurement=$1
 			       and site=$2),
 			   '(,)'::numrange);
-$$ LANGUAGE sql;
+$$ LANGUAGE sql stable parallel safe;
 
 create or replace function is_outlier(value numeric, median numeric, mad numeric) RETURNS bool AS $$
   -- decide if a value is an outlier using the method from the Hampel
   -- filter
   select (value - median) / nullif(mad, 0) > 3;
-$$ LANGUAGE sql;
+$$ LANGUAGE sql immutable parallel safe;
 
 /* Determine if a measurement is flagged. */
 create or replace function is_flagged(measurement text, station_id int, source sourcerow, measurement_time timestamp, value numeric, flag text, median numeric, mad numeric) RETURNS bool AS $$

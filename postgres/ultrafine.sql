@@ -57,7 +57,7 @@ BEGIN
   END LOOP;
   RETURN flags;
 END;
-$flags$ LANGUAGE plpgsql;
+$flags$ LANGUAGE plpgsql immutable parallel safe;
 
 /* Load a ultrafine data file into the ultrafine table */
 CREATE OR REPLACE FUNCTION load_ultrafine(station text, file text) RETURNS void AS $$
