@@ -35,7 +35,7 @@ CREATE materialized VIEW hourly_aqm AS
   select station_id,
 	 hour as time,
 	 mean_no,
-	 get_hourly_flag(mean_no, no_count::int) as no_flag
+	 get_hourly_flag(station_id, 'NO', mean_no, no_count::int) as no_flag
     from (select station_id,
 		 time_bucket('1 hour', time) as hour,
 		 avg(no) FILTER (WHERE not no_flagged) as mean_no,
