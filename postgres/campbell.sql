@@ -17,17 +17,13 @@ create table campbell_common (
   ptemp_c_avg numeric,
   batt_volt_avg numeric,
   f_co_avg numeric,
-  f_noy_avg numeric,
-  f_so2_avg numeric,
-  f_nox_avg numeric,
-  f_trh_avg numeric,
-  f_wind_avg numeric
+  f_nox_avg numeric
 );
 */
 
 create table campbell_wfms (
   file text not null,
-  timestamp timestamp not null,
+  timestamp timestamp primary key,
   record int,
   no_avg numeric,
   no2_avg numeric,
@@ -61,10 +57,11 @@ create table campbell_wfms (
   f_trh_avg numeric,
   f_wind_avg numeric
 );
+SELECT create_hypertable('campbell_wfms', 'timestamp');
 
 create table campbell_wfml (
   file text not null,
-  timestamp timestamp not null,
+  timestamp timestamp primary key,
   record int,
   no_avg numeric,
   no2_avg numeric,
@@ -87,10 +84,8 @@ create table campbell_wfml (
   ngn3_avg numeric,
   ptemp_c_avg numeric,
   batt_volt_avg numeric,
-  f_co_avg numeric,
-  f_noy_avg numeric,
-  f_so2_avg numeric,
   f_nox_avg numeric,
-  f_trh_avg numeric,
-  f_wind_avg numeric
+  f_co_avg numeric,
+  f_ngn_avg numeric
 );
+SELECT create_hypertable('campbell_wfml', 'timestamp');
