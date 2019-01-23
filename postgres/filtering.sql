@@ -23,11 +23,11 @@ $$ LANGUAGE SQL;
 create or replace function arr_median(arr numeric[]) RETURNS double precision AS $$
   select percentile_cont(.5) WITHIN GROUP (ORDER BY a)
     from unnest(arr) a;
-$$ LANGUAGE SQL;
+$$ LANGUAGE SQL immutable PARALLEL SAFE;
 
 create or replace function array_remove(arr numeric[], n numeric) RETURNS numeric[] AS $$
   select remove_at(arr, array_position(arr, n));
-$$ LANGUAGE SQL;
+$$ LANGUAGE SQL immutable PARALLEL SAFE;
 
 CREATE AGGREGATE median(numeric) (
   sfunc = array_append,
@@ -53,7 +53,7 @@ create or replace function arr_mad(arr numeric[]) RETURNS double precision AS $$
       from (select abs(a - arr_med) as abs_dev
 	      from unnest(arr) a) b;
   end;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql immutable PARALLEL SAFE;
 
 CREATE AGGREGATE mad(numeric) (
   sfunc = array_append,

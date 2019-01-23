@@ -99,14 +99,14 @@ CREATE MATERIALIZED VIEW calibration_values AS
   select *,
 	 case
 	 when station_id=1 then estimate_cal('campbell_wfms',
-					     chemical || '_avg',
+					     lower(chemical) || '_avg',
 					     type, cal_times)
 	 when station_id=2 then estimate_cal('campbell_wfml',
-					     chemical || '_avg',
+					     lower(chemical) || '_avg',
 					     type, cal_times)
 	 else estimate_cal('envidas', station_id, chemical, type, cal_times) end as value
     from (select station_id,
-		 lower(chemical) as chemical,
+		 chemical,
 		 type,
 		 tsrange(case
 			 -- ignore first 15 minutes of span
@@ -123,6 +123,8 @@ CREATE MATERIALIZED VIEW calibration_values AS
 					 interval '1 day')::date as cal_day,
 			 times as cal_times
 		    from autocals) a1) a2;
+-- to make the interpolate_cal function faster
+CREATE INDEX calibration_values_upper_time_idx ON calibration_values(upper(cal_times));
 
 /* Estimate calibration values using linear interpolation */
 CREATE OR REPLACE FUNCTION interpolate_cal(station_id int, chemical text, type text, t timestamp)

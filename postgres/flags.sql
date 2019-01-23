@@ -25,7 +25,7 @@ $$ LANGUAGE sql stable parallel safe;
 create or replace function has_instrument_flag(measurement text, flag text) RETURNS bool AS $$
   select case when flag is null or flag='' then false
 	 when measurement='ultrafine' then array_length(parse_flags(flag), 1)>0
-	 else flag!='OK' end;
+	 else flag not in ('OK', '1') end;
 $$ LANGUAGE sql immutable parallel safe;
 
 create or replace function has_calibration_flag(measurement text, station_id int, measurement_time timestamp) RETURNS bool AS $$

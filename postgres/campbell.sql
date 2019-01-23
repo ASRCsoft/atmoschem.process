@@ -89,3 +89,42 @@ create table campbell_wfml (
   f_ngn_avg numeric
 );
 SELECT create_hypertable('campbell_wfml', 'instrument_time');
+
+
+/* Process the WFMS campbell data */
+CREATE materialized VIEW processed_campbell_wfms AS
+  select time,
+	 no,
+	 -- ugh need to add source to campbell tables for manual flag
+	 -- matching
+	 is_flagged('NO', 1, null, time,
+		    no, f_nox_avg::text, median_no::numeric,
+		    mad_no::numeric) as no_flagged,
+	 no2,
+	 is_flagged('NO2', 1, null, time,
+		    no, f_nox_avg::text, median_no::numeric,
+		    mad_no::numeric) as no2_flagged
+    from (select instrument_time as time,
+	         -- collect rolling medians and MADs for flagging
+		 no,
+		 median(no) over w as median_no,
+		 mad(no) over w as mad_no,
+		 no2,
+		 median(no2) over w as median_no2,
+		 mad(no2) over w as mad_no2,
+		 f_nox_avg
+	    from (select *,
+		         -- calibrate everything
+			 apply_calib(1, 'NO', no_avg, instrument_time) as no,
+			 -- these two need to be calibrated when
+			 -- manual calibrations are added
+			 no2_avg as no2,
+			 -- noy_avg as noy,
+			 ozone_avg as ozone,
+			 apply_calib(1, 'CO', co_avg, instrument_time) as co,
+			 apply_calib(1, 'SO2', so2_avg, instrument_time) as so2,
+			 t_avg
+		    from campbell_wfms
+		   limit 50000) c1
+	  WINDOW w AS (ORDER BY instrument_time
+		       rows between 20 preceding and 20 following)) c2;
