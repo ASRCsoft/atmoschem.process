@@ -41,30 +41,32 @@ SELECT (select id
 END;
 $$ LANGUAGE plpgsql;
 
-create or replace function estimate_min_val(val text, times timerange, cal_date date, site int) returns numeric as $$
+create or replace function estimate_cal(tbl text, val text, caltype text, times tsrange) returns numeric as $$
   declare
   exec_str text = $exec$
     with moving_averages as (
-      select AVG(%I) OVER(ORDER BY instrument_time
+      select instrument_time,
+	     AVG(%I) OVER(ORDER BY instrument_time
 			  ROWS BETWEEN 2 PRECEDING AND 2 following) as moving_average
-	from envidas
-       where instrument_time between $1 and $2
-	 and envidas.station_id=$3
+	from %I
+       where instrument_time between ($1 - interval '2 minutes') and ($2 + interval '2 minutes')
     )
-    select min(moving_average) from moving_averages;
+    select %I(moving_average)
+    from moving_averages
+    where instrument_time between $1 and $2;
   $exec$;
-  start_time timestamp = cal_date + lower(times);
-  end_time timestamp = cal_date + upper(times);
   zero_estimate numeric;
-begin
-  execute format(exec_str, val)
-    into zero_estimate
-    using start_time, end_time, site;
-  RETURN zero_estimate;
-end;
-$$ language plpgsql;
+  begin
+    execute format(exec_str, val, tbl,
+		   case when caltype='zero' then 'min'
+		   when caltype='span' then 'max' end)
+      into zero_estimate
+      using lower(times), upper(times);
+    RETURN zero_estimate;
+  end;
+$$ language plpgsql STABLE PARALLEL SAFE;
 
-create or replace function estimate_max_val(val text, times timerange, cal_date date, site int) returns numeric as $$
+create or replace function estimate_cal(tbl text, station int, val text, caltype text, times tsrange) returns numeric as $$
   declare
   exec_str text = $exec$
     with moving_averages as (
@@ -72,48 +74,55 @@ create or replace function estimate_max_val(val text, times timerange, cal_date 
 	     AVG(%I) OVER(partition by station_id
 			  ORDER BY instrument_time
 			  ROWS BETWEEN 2 PRECEDING AND 2 following) as moving_average
-	from envidas
+	from %I
        where instrument_time between ($1 - interval '2 minutes') and ($2 + interval '2 minutes')
 	 and station_id=$3
     )
-    select max(moving_average)
-      from moving_averages
-     where instrument_time between $1 and $2;
+    select %I(moving_average)
+    from moving_averages
+    where instrument_time between $1 and $2;
   $exec$;
-  start_time timestamp = cal_date + lower(times);
-  end_time timestamp = cal_date + upper(times);
   zero_estimate numeric;
-begin
-  execute format(exec_str, val)
-    into zero_estimate
-    using start_time, end_time, site;
-  RETURN zero_estimate;
-end;
-$$ language plpgsql;
+  begin
+    execute format(exec_str, val, tbl,
+		   case when caltype='zero' then 'min'
+		   when caltype='span' then 'max' end)
+      into zero_estimate
+      using lower(times), upper(times), station;
+    RETURN zero_estimate;
+  end;
+$$ language plpgsql STABLE PARALLEL SAFE;
 
-/* Get calibration estimates corresponding to the autocal periods */
+/* Store calibration estimates derived from the raw instrument values
+*/
 CREATE MATERIALIZED VIEW calibration_values AS
-  select station_id,
-	 tsrange(cal_day + lower(cal_times),
-		 cal_day + upper(cal_times),
-		 '[]') as cal_times,
-	 chemical,
-	 type,
+  select *,
 	 case
-	 when type='zero' then estimate_min_val(lower(chemical), cal_times, cal_day, station_id)
-	 -- ignore first 15 minutes of span calibration data due to spikes I think?
-	 when type='span' then estimate_max_val(lower(chemical), timerange(lower(cal_times) + interval '15 minutes', upper(cal_times), '[]'), cal_day, station_id) end as value
+	 when station_id=1 then estimate_cal('campbell_wfms',
+					     chemical || '_avg',
+					     type, cal_times)
+	 when station_id=2 then estimate_cal('campbell_wfml',
+					     chemical || '_avg',
+					     type, cal_times)
+	 else estimate_cal('envidas', station_id, chemical, type, cal_times) end as value
     from (select station_id,
-		 instrument as chemical,
+		 lower(chemical) as chemical,
 		 type,
-		 generate_series(lower(dates),
-				 coalesce(upper(dates), CURRENT_DATE),
-				 interval '1 day')::date as cal_day,
-		 times as cal_times
-	    from autocals) a1;
--- to make the interpolate_cal function faster
-CREATE INDEX calibration_values_upper_time_idx ON calibration_values(upper(cal_times));
-CREATE INDEX calibration_values_cal_times_gist_idx ON calibration_values using gist(station_id, chemical, cal_times);
+		 tsrange(case
+			 -- ignore first 15 minutes of span
+			 -- calibration data due to spikes I think?
+			 when type='span' then cal_day + lower(cal_times) + interval '15 minutes'
+			 else cal_day + lower(cal_times) end,
+			 cal_day + upper(cal_times),
+			 '[]') as cal_times
+	    from (select station_id,
+			 instrument as chemical,
+			 type,
+			 generate_series(lower(dates),
+					 coalesce(upper(dates), CURRENT_DATE),
+					 interval '1 day')::date as cal_day,
+			 times as cal_times
+		    from autocals) a1) a2;
 
 /* Estimate calibration values using linear interpolation */
 CREATE OR REPLACE FUNCTION interpolate_cal(station_id int, chemical text, type text, t timestamp)

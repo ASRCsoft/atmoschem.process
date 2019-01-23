@@ -13,6 +13,9 @@ read_campbell = function(f) {
   na_strings = c('NAN', 'NaN')
   df = read.csv(f, header=F, skip = 4, col.names = headers,
                 na.strings = na_strings, stringsAsFactors = F)
+  ## replace 'TIMESTAMP' with 'instrument_time' to match other data
+  ## tables
+  names(df)[1] = 'instrument_time'
   ## replace 'CupA' with 'Cup' for consistency over time
   names(df) = gsub('CupA', 'Cup', names(df))
   ## remove empty columns
@@ -42,7 +45,7 @@ write_campbell = function(f) {
 
   ## It would be prudent to add a check here, though, to verify that
   ## duplicated times have matching values.
-  dbxUpsert(pg, table, campbell, where_cols = 'timestamp',
+  dbxUpsert(pg, table, campbell, where_cols = 'instrument_time',
             skip_existing = T)
   dbxDisconnect(pg)
 }

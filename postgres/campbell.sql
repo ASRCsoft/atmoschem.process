@@ -23,7 +23,7 @@ create table campbell_common (
 
 create table campbell_wfms (
   file text not null,
-  timestamp timestamp primary key,
+  instrument_time timestamp primary key,
   record int,
   no_avg numeric,
   no2_avg numeric,
@@ -57,11 +57,11 @@ create table campbell_wfms (
   f_trh_avg numeric,
   f_wind_avg numeric
 );
-SELECT create_hypertable('campbell_wfms', 'timestamp');
+SELECT create_hypertable('campbell_wfms', 'instrument_time');
 
 create table campbell_wfml (
   file text not null,
-  timestamp timestamp primary key,
+  instrument_time timestamp primary key,
   record int,
   no_avg numeric,
   no2_avg numeric,
@@ -88,4 +88,4 @@ create table campbell_wfml (
   f_co_avg numeric,
   f_ngn_avg numeric
 );
-SELECT create_hypertable('campbell_wfml', 'timestamp');
+SELECT create_hypertable('campbell_wfml', 'instrument_time');
