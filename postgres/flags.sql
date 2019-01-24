@@ -45,7 +45,7 @@ create or replace function is_valid_value(measurement text, station_id int, valu
 			   '(,)'::numrange);
 $$ LANGUAGE sql stable parallel safe;
 
-create or replace function is_outlier(value numeric, median numeric, mad numeric) RETURNS bool AS $$
+create or replace function is_outlier(value numeric, median double precision, mad double precision) RETURNS bool AS $$
   -- decide if a value is an outlier using the method from the Hampel
   -- filter
   select (value - median) / nullif(mad, 0) > 3;
@@ -59,7 +59,7 @@ create or replace function is_below_mdl(station_id int, measurement text, value 
 $$ LANGUAGE sql stable parallel safe;
 
 /* Determine if a measurement is flagged. */
-create or replace function is_flagged(measurement text, station_id int, source sourcerow, measurement_time timestamp, value numeric, flag text, median numeric, mad numeric) RETURNS bool AS $$
+create or replace function is_flagged(measurement text, station_id int, source sourcerow, measurement_time timestamp, value numeric, flag text, median double precision, mad double precision) RETURNS bool AS $$
   -- steps:
   -- 1) apply manual flags
   select case when has_manual_flag(measurement, station_id, source) then true
