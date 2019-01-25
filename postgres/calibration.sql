@@ -1,5 +1,7 @@
 /* Instrument calibration */
 
+create extension btree_gist;
+
 create table autocals (
   station_id int references stations,
   instrument text,
@@ -125,6 +127,7 @@ CREATE MATERIALIZED VIEW calibration_values AS
 		    from autocals) a1) a2;
 -- to make the interpolate_cal function faster
 CREATE INDEX calibration_values_upper_time_idx ON calibration_values(upper(cal_times));
+CREATE INDEX calibration_values_gist_idx ON calibration_values using gist(station_id, chemical, cal_times);
 
 /* Estimate calibration values using linear interpolation */
 CREATE OR REPLACE FUNCTION interpolate_cal(station_id int, chemical text, type text, t timestamp)
