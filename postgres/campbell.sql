@@ -98,44 +98,36 @@ CREATE materialized VIEW processed_campbell_wfms AS
 	 -- ugh need to add source to campbell tables for manual flag
 	 -- matching
 	 is_flagged('NO', 1, null, instrument_time,
-		    no, f_nox_avg::text,
-		    median(no) over w,
-		    mad(no) over w) as no_flagged,
+		    no, f_nox_avg::text, no_med,
+		    runmed(no - no_med) over w) as no_flagged,
 	 no2,
 	 is_flagged('NO2', 1, null, instrument_time,
-		    no2, f_nox_avg::text,
-		    median(no2) over w,
-		    mad(no2) over w) as no2_flagged,
+		    no2, f_nox_avg::text, no2_med,
+		    runmed(no2 - no2_med) over w) as no2_flagged,
 	 noy,
 	 is_flagged('NOy', 1, null, instrument_time,
-		    noy, f_noy_avg::text,
-		    median(noy) over w,
-		    mad(noy) over w) as noy_flagged,
+		    noy, f_noy_avg::text, noy_med,
+		    runmed(noy - noy_med) over w) as noy_flagged,
 	 ozone,
 	 is_flagged('Ozone', 1, null, instrument_time,
-		    ozone, null,
-		    median(ozone) over w,
-		    mad(ozone) over w) as ozone_flagged,
+		    ozone, null, ozone_med,
+		    runmed(ozone - ozone_med) over w) as ozone_flagged,
 	 co,
 	 is_flagged('CO', 1, null, instrument_time,
-		    co, f_co_avg::text,
-		    median(co) over w,
-		    mad(co) over w) as co_flagged,
+		    co, f_co_avg::text, co_med,
+		    runmed(co - co_med) over w) as co_flagged,
 	 so2,
 	 is_flagged('SO2', 1, null, instrument_time,
-		    so2, f_so2_avg::text,
-		    median(so2) over w,
-		    mad(so2) over w) as so2_flagged,
+		    so2, f_so2_avg::text, so2_med,
+		    runmed(so2 - so2_med) over w) as so2_flagged,
 	 temp,
 	 is_flagged('Temp', 1, null, instrument_time,
-		    temp, f_trh_avg::text,
-		    median(temp) over w,
-		    mad(temp) over w) as temp_flagged,
+		    temp, f_trh_avg::text, temp_med,
+		    runmed(temp - temp_med) over w) as temp_flagged,
 	 rh,
 	 is_flagged('RH', 1, null, instrument_time,
-		    rh, f_trh_avg::text,
-		    median(rh) over w,
-		    mad(rh) over w) as rh_flagged,
+		    rh, f_trh_avg::text, rh_med,
+		    runmed(rh - rh_med) over w) as rh_flagged,
 	 ws,
 	 is_flagged('WS', 1, null, instrument_time,
 		    ws, f_wind_avg::text,
@@ -153,28 +145,40 @@ CREATE materialized VIEW processed_campbell_wfms AS
 		    null, null) as ws_max_flagged,
 	 bp,
 	 is_flagged('BP', 1, null, instrument_time,
-		    bp, null,
-		    median(bp) over w,
-		    mad(bp) over w) as bp_flagged
+		    bp, null, bp_med,
+		    runmed(bp - bp_med) over w) as bp_flagged
     from (select *,
-	  -- calibrate everything
-		 apply_calib(1, 'NO', no_avg, instrument_time) as no,
-	  -- these two need to be calibrated when
-	  -- manual calibrations are added
-		 no2_avg as no2,
-		 noy_avg as noy,
-		 ozone_avg as ozone,
-		 apply_calib(1, 'CO', co_avg, instrument_time) as co,
-		 apply_calib(1, 'SO2', so2_avg, instrument_time) as so2,
-		 t_avg as temp,
-		 rh_avg as rh,
-		 -- get the max recorded wind speed
-		 ws3cup_avg as ws,
-		 winddir_avg % 360 as wd,
-		 winddir_d1_wvt % 360 as wd_v,
-		 ws3cup_max as ws_max,
-		 bp_avg as bp
-	    from campbell_wfms
-	   limit 1000) c1
-   WINDOW w AS (ORDER BY instrument_time
-		rows between 20 preceding and 20 following);
+                 -- get medians as needed
+		 runmed(no) over w as no_med,
+		 runmed(no2) over w as no2_med,
+		 runmed(noy) over w as noy_med,
+		 runmed(ozone) over w as ozone_med,
+		 runmed(co) over w as co_med,
+		 runmed(so2) over w as so2_med,
+		 runmed(temp) over w as temp_med,
+		 runmed(rh) over w as rh_med,
+		 runmed(bp) over w as bp_med
+	    from (select *,
+		         -- calibrate everything
+			 apply_calib(1, 'NO', no_avg, instrument_time) as no,
+			 -- these two need to be calibrated when
+			 -- manual calibrations are added
+			 no2_avg as no2,
+			 noy_avg as noy,
+			 ozone_avg as ozone,
+			 apply_calib(1, 'CO', co_avg, instrument_time) as co,
+			 apply_calib(1, 'SO2', so2_avg, instrument_time) as so2,
+			 t_avg as temp,
+			 rh_avg as rh,
+			 -- get the max recorded wind speed
+			 ws3cup_avg as ws,
+			 winddir_avg % 360 as wd,
+			 winddir_d1_wvt % 360 as wd_v,
+			 ws3cup_max as ws_max,
+			 bp_avg as bp
+		    from campbell_wfms
+		   limit 1000) c1
+	  WINDOW w AS (ORDER BY instrument_time
+		       rows between 7 preceding and 7 following)) c2
+  WINDOW w AS (ORDER BY instrument_time
+	       rows between 7 preceding and 7 following);

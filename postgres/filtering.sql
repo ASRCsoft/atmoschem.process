@@ -20,50 +20,28 @@ create or replace function remove_extreme_values(int, text, numeric) RETURNS num
 	 else null end;
 $$ LANGUAGE SQL;
 
-create or replace function arr_median(arr numeric[]) RETURNS double precision AS $$
-  select percentile_cont(.5) WITHIN GROUP (ORDER BY a)
-    from unnest(arr) a;
-$$ LANGUAGE SQL immutable PARALLEL SAFE;
+/* Efficient median filter */
+CREATE OR REPLACE FUNCTION runmed_transfn(internal, double precision)
+RETURNS internal
+AS '/home/wmay/nysatmoschem/src/median', 'median_transfn'
+  LANGUAGE c IMMUTABLE;
 
-create or replace function array_remove(arr numeric[], n numeric) RETURNS numeric[] AS $$
-  select remove_at(arr, array_position(arr, n));
-$$ LANGUAGE SQL immutable PARALLEL SAFE;
+CREATE OR REPLACE FUNCTION runmed_invtransfn(internal, double precision)
+  RETURNS internal
+AS '/home/wmay/nysatmoschem/src/median', 'median_invtransfn'
+LANGUAGE c IMMUTABLE;
 
-CREATE AGGREGATE median(numeric) (
-  sfunc = array_append,
-  stype = numeric[],
-  finalfunc = arr_median,
-  initcond = '{}',
-  msfunc = array_append,
-  minvfunc = array_remove,
-  mstype = numeric[],
-  MFINALFUNC = arr_median,
-  minitcond = '{}',
-  PARALLEL = SAFE
-);
+CREATE OR REPLACE FUNCTION runmed_finalfn(internal)
+RETURNS double precision
+AS '/home/wmay/nysatmoschem/src/median', 'median_finalfn'
+LANGUAGE c IMMUTABLE;
 
-/* Get the median absolute deviation from an array of numbers. This
-function is more than 10 times faster when written in plpgsql but I
-don't know why. */
-create or replace function arr_mad(arr numeric[]) RETURNS double precision AS $$
-  declare
-  arr_med double precision = arr_median(arr);
-  begin
-    return percentile_cont(.5) WITHIN GROUP (ORDER BY abs_dev)
-      from (select abs(a - arr_med) as abs_dev
-	      from unnest(arr) a) b;
-  end;
-$$ LANGUAGE plpgsql immutable PARALLEL SAFE;
-
-CREATE AGGREGATE mad(numeric) (
-  sfunc = array_append,
-  stype = numeric[],
-  finalfunc = arr_mad,
-  initcond = '{}',
-  msfunc = array_append,
-  minvfunc = array_remove,
-  mstype = numeric[],
-  MFINALFUNC = arr_mad,
-  minitcond = '{}',
-  PARALLEL = SAFE
+CREATE AGGREGATE runmed(double precision) (
+  stype = internal,
+  sfunc = runmed_transfn,
+  finalfunc = runmed_finalfn,
+  mstype = internal,
+  msfunc = runmed_transfn,
+  minvfunc = runmed_invtransfn,
+  mfinalfunc = runmed_finalfn
 );
