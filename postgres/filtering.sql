@@ -23,16 +23,25 @@ $$ LANGUAGE SQL;
 /* Efficient median filter */
 CREATE OR REPLACE FUNCTION runmed_transfn(internal, double precision)
 RETURNS internal
-AS 'median', 'median_transfn'
+AS '/home/wmay/nysatmoschem/src/median', 'median_transfn'
+  LANGUAGE c IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION runmed_invtransfn(internal, double precision)
+  RETURNS internal
+AS '/home/wmay/nysatmoschem/src/median', 'median_invtransfn'
 LANGUAGE c IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION runmed_finalfn(internal)
 RETURNS double precision
-AS 'median', 'median_finalfn'
+AS '/home/wmay/nysatmoschem/src/median', 'median_finalfn'
 LANGUAGE c IMMUTABLE;
 
 CREATE AGGREGATE runmed(double precision) (
   stype = internal,
   sfunc = runmed_transfn,
-  finalfunc = runmed_finalfn
+  finalfunc = runmed_finalfn,
+  mstype = internal,
+  msfunc = runmed_transfn,
+  minvfunc = runmed_invtransfn,
+  mfinalfunc = runmed_finalfn
 );

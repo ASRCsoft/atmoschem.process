@@ -34,6 +34,22 @@ median_transfn(PG_FUNCTION_ARGS)
 }
 
 
+Datum median_invtransfn(PG_FUNCTION_ARGS);
+PG_FUNCTION_INFO_V1(median_invtransfn);
+
+Datum
+median_invtransfn(PG_FUNCTION_ARGS)
+{
+  MemoryContext aggContext;
+  median_state *state;
+  if (!AggCheckCallContext(fcinfo, &aggContext)) {
+    elog(ERROR, "median_invtransfn called in non-aggregate context");
+  }
+  state = (median_state *)PG_GETARG_POINTER(0);
+  PG_RETURN_POINTER(state);
+}
+
+
 Datum median_finalfn(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(median_finalfn);
 
