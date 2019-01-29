@@ -128,15 +128,15 @@ CREATE or replace VIEW campbell_wfms_medians AS
 CREATE or replace VIEW campbell_wfms_mad AS
   select *,
   -- calculate Median Absolute Deviations
-	 runmed(no - c1.no_med) over w as no_mad,
-	 runmed(no2 - c1.no2_med) over w as no2_mad,
-	 runmed(noy - c1.noy_med) over w as noy_mad,
-	 runmed(ozone - c1.ozone_med) over w as ozone_mad,
-	 runmed(co - c1.co_med) over w as co_mad,
-	 runmed(so2 - c1.so2_med) over w as so2_mad,
-	 runmed(temp - c1.temp_med) over w as temp_mad,
-	 runmed(rh - c1.rh_med) over w as rh_mad,
-	 runmed(bp - c1.bp_med) over w as bp_mad
+	 runmad(no, no_med) over w as no_mad,
+	 runmad(no2, no2_med) over w as no2_mad,
+	 runmad(noy, noy_med) over w as noy_mad,
+	 runmad(ozone, ozone_med) over w as ozone_mad,
+	 runmad(co, co_med) over w as co_mad,
+	 runmad(so2, so2_med) over w as so2_mad,
+	 runmad(temp, temp_med) over w as temp_mad,
+	 runmad(rh, rh_med) over w as rh_mad,
+	 runmad(bp, bp_med) over w as bp_mad
     from campbell_wfms_medians c1
 	   WINDOW w AS (ORDER BY instrument_time
 			rows between 7 preceding and 7 following);
