@@ -31,10 +31,17 @@ $$ LANGUAGE sql immutable parallel safe;
 create or replace function has_calibration_flag(measurement text, station_id int, measurement_time timestamp) RETURNS bool AS $$
   -- need to add a check for manual calibrations here
   select exists(select *
-		  from calibration_values
-		 where chemical=$1
+		  from autocals
+		 where instrument=$1
 		   and station_id=$2
-		   and $3 <@ cal_times);
+		   and $3::date <@ dates
+		   and $3::time <@ times);
+  -- faster to check the autocal schedule
+  -- select exists(select *
+  -- 		  from calibration_values
+  -- 		 where chemical=$1
+  -- 		   and station_id=$2
+  -- 		   and $3 <@ cal_times);
 $$ LANGUAGE sql stable parallel safe;
 
 create or replace function is_valid_value(measurement text, station_id int, value numeric) RETURNS bool AS $$
