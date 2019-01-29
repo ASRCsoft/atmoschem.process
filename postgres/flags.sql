@@ -87,6 +87,22 @@ create or replace function is_flagged(measurement text, station_id int, source s
 	 else false end;
 $$ LANGUAGE sql stable parallel safe;
 
+create or replace function is_flagged(measurement text, station_id int, source sourcerow, measurement_time timestamp, value numeric, flag numeric, median double precision, mad double precision) RETURNS bool AS $$
+  -- steps:
+  -- 1) apply manual flags
+  select case when has_manual_flag(measurement, station_id, source) then true
+	   -- 2) instrument flags
+	 when has_instrument_flag(measurement, flag) then true
+	   -- 3) calibration flags
+	 when has_calibration_flag(measurement, station_id, measurement_time) then true
+	   -- 4) extreme value flags
+	 when not is_valid_value(measurement, station_id, value) then true
+	   -- 5) outlier flags (based on the Hampel filter)
+	 when is_outlier(value, median, mad) then true
+	   -- 6) no flag
+	 else false end;
+$$ LANGUAGE sql stable parallel safe;
+
 /* Get the NARSTO averaged data flag based on the number of
 measurements and average value. */
 CREATE OR REPLACE FUNCTION get_hourly_flag(station_id int, measurement text, value numeric, n int) RETURNS text AS $$
