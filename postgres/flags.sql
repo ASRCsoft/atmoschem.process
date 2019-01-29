@@ -29,7 +29,7 @@ create or replace function has_instrument_flag(measurement text, flag text) RETU
 $$ LANGUAGE sql immutable parallel safe;
 
 create or replace function has_instrument_flag(measurement text, flag numeric) RETURNS bool AS $$
-  select flag=1;
+  select flag!=1;
 $$ LANGUAGE sql immutable parallel safe;
 
 create or replace function has_calibration_flag(measurement text, station_id int, measurement_time timestamp) RETURNS bool AS $$
