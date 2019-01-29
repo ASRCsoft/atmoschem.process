@@ -53,9 +53,11 @@ create or replace function is_valid_value(measurement text, station_id int, valu
 $$ LANGUAGE sql stable parallel safe;
 
 create or replace function is_outlier(value numeric, median double precision, mad double precision) RETURNS bool AS $$
-  -- decide if a value is an outlier using the method from the Hampel
-  -- filter
-  select (value - median) / nullif(mad, 0) > 3;
+  -- Decide if a value is an outlier using the method from the Hampel
+  -- filter. The term (1.4826 * MAD) estimates the standard
+  -- deviation. See
+  -- https://en.wikipedia.org/wiki/Median_absolute_deviation#Relation_to_standard_deviation
+  select (value - median) / (1.4826 * nullif(mad, 0)) > 3;
 $$ LANGUAGE sql immutable parallel safe;
 
 create or replace function is_below_mdl(station_id int, measurement text, value numeric) RETURNS bool AS $$
