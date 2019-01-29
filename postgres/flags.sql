@@ -58,7 +58,7 @@ create or replace function is_outlier(value numeric, median double precision, ma
   -- deviation. See
   -- https://en.wikipedia.org/wiki/Median_absolute_deviation#Relation_to_standard_deviation
   select (value - median) / (1.4826 * nullif(mad, 0)) > 3;
-$$ LANGUAGE sql immutable parallel safe;
+$$ LANGUAGE sql immutable RETURNS NULL ON NULL INPUT parallel safe;
 
 create or replace function is_below_mdl(station_id int, measurement text, value numeric) RETURNS bool AS $$
   select coalesce(value < (select mdl
