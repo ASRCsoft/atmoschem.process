@@ -28,6 +28,10 @@ create or replace function has_instrument_flag(measurement text, flag text) RETU
 	 else flag not in ('OK', '1') end;
 $$ LANGUAGE sql immutable parallel safe;
 
+create or replace function has_instrument_flag(measurement text, flag numeric) RETURNS bool AS $$
+  select flag=1;
+$$ LANGUAGE sql immutable parallel safe;
+
 create or replace function has_calibration_flag(measurement text, station_id int, measurement_time timestamp) RETURNS bool AS $$
   -- need to add a check for manual calibrations here
   select exists(select *
@@ -45,11 +49,10 @@ create or replace function has_calibration_flag(measurement text, station_id int
 $$ LANGUAGE sql stable parallel safe;
 
 create or replace function is_valid_value(measurement text, station_id int, value numeric) RETURNS bool AS $$
-  select value <@ coalesce((select range
+  select coalesce(value <@ (select range
 			      from valid_ranges
 			     where measurement=$1
-			       and site=$2),
-			   '(,)'::numrange);
+			       and site=$2), true);
 $$ LANGUAGE sql stable parallel safe;
 
 create or replace function is_outlier(value numeric, median double precision, mad double precision) RETURNS bool AS $$
