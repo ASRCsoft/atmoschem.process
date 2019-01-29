@@ -23,9 +23,9 @@ create or replace function has_manual_flag(measurement text, station_id int, sou
 $$ LANGUAGE sql stable parallel safe;
 
 create or replace function has_instrument_flag(measurement text, flag text) RETURNS bool AS $$
-  select case when flag is null or flag='' then false
+  select case when flag is null or flag in ('', 'OK') then false
 	 when measurement='ultrafine' then array_length(parse_flags(flag), 1)>0
-	 else flag not in ('OK', '1') end;
+	 else true end;
 $$ LANGUAGE sql immutable parallel safe;
 
 create or replace function has_instrument_flag(measurement text, flag numeric) RETURNS bool AS $$
