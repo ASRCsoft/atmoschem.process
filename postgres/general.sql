@@ -12,6 +12,15 @@ values ('WFMS', 'Whiteface Mountain Summit'),
        ('PSP', 'Pinnacle State Park'),
        ('QC', 'Queens College');
 
+
+create table measurements (
+  site int,
+  measurement text,
+  valid_range numrange,
+  mdl numeric
+  primary key(site, measurement)
+);
+
 /* Method detection limits */
 create table mdls (
   station_id int references stations,
@@ -19,6 +28,3 @@ create table mdls (
   mdl numeric,
   primary key(station_id, measurement)
 );
--- not quite, but something like this:
--- COPY mdls
---   FROM '/home/wmay/data/metadata/mdl.csv' DELIMITER ',' CSV HEADER;
