@@ -8,6 +8,7 @@ create table autocals (
   type text,
   dates daterange,
   times timerange,
+  value numeric default 0,
   primary key(station_id, instrument, dates, times)
 );
 
