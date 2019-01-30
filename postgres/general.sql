@@ -14,11 +14,12 @@ values ('WFMS', 'Whiteface Mountain Summit'),
 
 
 create table measurements (
-  site int,
+  station_id int,
   measurement text,
   valid_range numrange,
-  mdl numeric
-  primary key(site, measurement)
+  mdl numeric,
+  span numeric,
+  primary key(station_id, measurement)
 );
 
 /* Method detection limits */
