@@ -11,6 +11,18 @@ pg = dbxConnect(adapter = 'postgres', dbname = 'chemtest')
 sites = dbxSelect(pg, 'select * from stations')
 dbxDisconnect(pg)
 
+write_measurements = function(f) {
+  measurements_file = file.path(f, 'measurements.csv')
+  measurements = read.csv(measurements_file)
+  measurements$station_id =
+    sites$id[match(measurements$site, sites$short_name)]
+  measurements$site = NULL
+  measurements$valid_range[measurements$valid_range == ''] = NA
+  idx_cols = c('measurement', 'station_id')
+  pg = dbxConnect(adapter = 'postgres', dbname = 'chemtest')
+  dbxUpsert(pg, 'measurements', measurements, where_cols = idx_cols)
+  dbxDisconnect(pg)
+}
 
 write_autocals = function(f) {
   autocal_file = file.path(f, 'autocals.csv')
@@ -26,5 +38,7 @@ write_autocals = function(f) {
 
 
 f = commandArgs(trailingOnly = T)
+message('Loading measurements info...')
+write_measurements(f)
 message('Loading autocalibration schedule...')
 write_autocals(f)
