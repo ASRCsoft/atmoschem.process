@@ -125,16 +125,6 @@ CREATE OR REPLACE FUNCTION interpolate_cal(station_id int, chemical text, type t
 $$ LANGUAGE sql STABLE PARALLEL SAFE;
 
 
-CREATE OR REPLACE FUNCTION correct_no(station_id int, val numeric, t timestamp)
-  RETURNS numeric AS $$
-  DECLARE
-  zero numeric = interpolate_cal(station_id, 'NO', 'zero', t);
-  span numeric = interpolate_cal(station_id, 'NO', 'span', t);
-  BEGIN
-    return (val - zero) * 3.79 / (span - zero);
-  END;
-$$ LANGUAGE plpgsql;
-
 CREATE OR REPLACE FUNCTION apply_calib(station_id int, measurement text, val numeric, t timestamp)
   RETURNS numeric AS $$
   DECLARE
