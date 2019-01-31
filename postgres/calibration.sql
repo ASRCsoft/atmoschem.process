@@ -93,7 +93,8 @@ CREATE MATERIALIZED VIEW calibration_values AS
 					 coalesce(upper(dates), CURRENT_DATE),
 					 interval '1 day')::date as cal_day,
 			 times as cal_times
-		    from autocals) a1) a2;
+		    from autocals
+		   where type in ('zero', 'span')) a1) a2;
 -- to make the interpolate_cal function faster
 CREATE INDEX calibration_values_upper_time_idx ON calibration_values(upper(cal_times));
 CREATE INDEX calibration_values_gist_idx ON calibration_values using gist(station_id, chemical, cal_times);
