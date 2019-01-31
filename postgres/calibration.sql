@@ -132,10 +132,10 @@ CREATE OR REPLACE FUNCTION apply_calib(station_id int, measurement text, val num
   span numeric = interpolate_cal(station_id, measurement, 'span', t);
   BEGIN
     return case when span is null then val - zero
-      else (val - zero) / (span - zero) * (select span
-					     from measurements
-					    where station_id=$1
-					      and measurement=$2) end;
+      else (val - zero) / (span - zero) * (select m.span
+					     from measurements m
+					    where m.station_id=$1
+					      and m.measurement=$2) end;
   END;
 $$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 
