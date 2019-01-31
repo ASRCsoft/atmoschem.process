@@ -106,10 +106,8 @@ CREATE or replace VIEW campbell_wfms_medians AS
     from (select *,
 	  -- calibrate everything
 		 apply_calib(1, 'NO', no_avg, instrument_time) as no,
-	  -- these two need to be calibrated when
-	  -- manual calibrations are added
-		 no2_avg as no2,
-		 noy_avg as noy,
+		 apply_calib(1, 'NO2', no2_avg, instrument_time) as no2,
+		 apply_calib(1, 'NOy', noy_avg, instrument_time) as noy,
 		 ozone_avg as ozone,
 		 apply_calib(1, 'CO', co_avg, instrument_time) as co,
 		 apply_calib(1, 'SO2', so2_avg, instrument_time) as so2,
