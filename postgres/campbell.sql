@@ -256,4 +256,12 @@ CREATE materialized VIEW hourly_campbell_wfms as
 		 avg(bp) FILTER (WHERE not bp_flagged) as bp,
 		 count(bp) FILTER (WHERE not bp_flagged) as n_bp
 	    from processed_campbell_wfms
-	   group by time) c1;
+	   group by time_bucket('1 hour', time)) c1;
+
+
+/* might try this later for storing processed data */
+/*
+CREATE TABLE processed_campbell_wfms_test (
+  like processed_campbell_wfms
+);
+*/
