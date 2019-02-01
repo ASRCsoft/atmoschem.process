@@ -30,7 +30,7 @@ create or replace function estimate_cal(tbl text, val text, caltype text, times 
   begin
     execute format(exec_str, val, tbl,
 		   case when caltype='zero' then 'min'
-		   when caltype='span' then 'max' end)
+		   when caltype in ('span', 'CE') then 'max' end)
       into zero_estimate
       using lower(times), upper(times);
     RETURN zero_estimate;
@@ -57,7 +57,7 @@ create or replace function estimate_cal(tbl text, station int, val text, caltype
   begin
     execute format(exec_str, val, tbl,
 		   case when caltype='zero' then 'min'
-		   when caltype='span' then 'max' end)
+		   when caltype in ('span', 'CE') then 'max' end)
       into zero_estimate
       using lower(times), upper(times), station;
     RETURN zero_estimate;
@@ -82,7 +82,7 @@ CREATE MATERIALIZED VIEW calibration_values AS
 		 tsrange(case
 			 -- ignore first 15 minutes of span
 			 -- calibration data due to spikes I think?
-			 when type='span' then cal_day + lower(cal_times) + interval '15 minutes'
+			 when type in ('span', 'CE') then cal_day + lower(cal_times) + interval '15 minutes'
 			 else cal_day + lower(cal_times) end,
 			 cal_day + upper(cal_times),
 			 '[]') as cal_times
@@ -94,7 +94,7 @@ CREATE MATERIALIZED VIEW calibration_values AS
 					 interval '1 day')::date as cal_day,
 			 times as cal_times
 		    from autocals
-		   where type in ('zero', 'span')) a1) a2;
+		   where type is not null) a1) a2;
 -- to make the interpolate_cal function faster
 CREATE INDEX calibration_values_upper_time_idx ON calibration_values(upper(cal_times));
 CREATE INDEX calibration_values_gist_idx ON calibration_values using gist(station_id, chemical, cal_times);
