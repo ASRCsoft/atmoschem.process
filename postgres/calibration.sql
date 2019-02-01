@@ -12,6 +12,16 @@ create table autocals (
   primary key(station_id, instrument, dates, times)
 );
 
+create table manual_calibrations (
+  station_id int references stations,
+  instrument text,
+  type text,
+  cal_time timestamp,
+  measured_value numeric not null,
+  corrected boolean not null,
+  primary key(station_id, instrument, cal_time)
+);
+
 create or replace function estimate_cal(tbl text, val text, caltype text, times tsrange) returns numeric as $$
   declare
   exec_str text = $exec$
