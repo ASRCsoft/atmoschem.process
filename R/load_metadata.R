@@ -13,7 +13,7 @@ dbxDisconnect(pg)
 
 write_measurements = function(f) {
   measurements_file = file.path(f, 'measurements.csv')
-  measurements = read.csv(measurements_file)
+  measurements = read.csv(measurements_file, na.strings=c('', 'NA'))
   measurements$station_id =
     sites$id[match(measurements$site, sites$short_name)]
   measurements$site = NULL
@@ -26,7 +26,7 @@ write_measurements = function(f) {
 
 write_autocals = function(f) {
   autocal_file = file.path(f, 'autocals.csv')
-  autocals = read.csv(autocal_file)
+  autocals = read.csv(autocal_file, na.strings=c('', 'NA'))
   autocals$station_id =
     sites$id[match(autocals$station, sites$short_name)]
   autocals$station = NULL
