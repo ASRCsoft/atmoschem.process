@@ -3,14 +3,15 @@
 CREATE EXTENSION btree_gist;
 
 create table manual_flags (
+  station_id int references stations,
   measurement text,
-  station_id int references stations not null,
-  source sourcerange not null,
-  explanation text,
-  CONSTRAINT overlapping_sources EXCLUDE USING GIST (
+  times tsrange,
+  explanation text not null,
+  primary key(station_id, measurement, times),
+  CONSTRAINT no_overlapping_times EXCLUDE USING GIST (
     measurement WITH =,
     station_id WITH =,
-    source WITH &&
+    times WITH &&
   )
 );
 
