@@ -2,14 +2,16 @@
 ## get manual calibrations from pdf cal sheets
 
 ## run this script from the command line like so:
-## Rscript load_cal_sheets.R ~/data/campbell/WFMS/WFMFS_SUMMIT_Table1_2018_06_29_2300.dat
+## Rscript load_cal_sheets.R dbname ~/data/campbell/WFMS/WFMFS_SUMMIT_Table1_2018_06_29_2300.dat
 
 library(dplyr)
 library(tidyr)
 library(dbx)
 
+dbname = commandArgs(trailingOnly = T)[1]
+
 ## get the sites and corresponding IDs
-pg = dbxConnect(adapter = 'postgres', dbname = 'chemtest')
+pg = dbxConnect(adapter = 'postgres', dbname = dbname)
 sites = dbxSelect(pg, 'select * from stations')
 dbxDisconnect(pg)
 
@@ -31,7 +33,7 @@ read_pdf_form = function(f) {
 write_cal = function(station, cal_type, cal_time,
                      measured_value, corrected) {
   station_id = sites$id[match(station, sites$short_name)]
-  pg = dbxConnect(adapter = 'postgres', dbname = 'chemtest')
+  pg = dbxConnect(adapter = 'postgres', dbname = dbname)
   dbxUpsert(pg, table, campbell, where_cols = 'instrument_time',
             skip_existing = T)
   dbxDisconnect(pg)

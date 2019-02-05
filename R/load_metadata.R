@@ -2,12 +2,14 @@
 ## load metadata into postgres
 
 ## run this script from the command line like so:
-## Rscript load_metadata.R /path/to/metadata/files
+## Rscript load_metadata.R dbname /path/to/metadata/files
 
 library(dbx)
 
+dbname = commandArgs(trailingOnly = T)[1]
+
 ## get the sites and corresponding IDs
-pg = dbxConnect(adapter = 'postgres', dbname = 'chemtest')
+pg = dbxConnect(adapter = 'postgres', dbname = dbname)
 sites = dbxSelect(pg, 'select * from stations')
 dbxDisconnect(pg)
 
@@ -16,7 +18,7 @@ write_metadata = function(f, tbl_name, idx_cols) {
   meta = read.csv(f, na.strings=c('', 'NA'))
   meta$station_id = sites$id[match(meta$site, sites$short_name)]
   meta$site = NULL
-  pg = dbxConnect(adapter = 'postgres', dbname = 'chemtest')
+  pg = dbxConnect(adapter = 'postgres', dbname = dbname)
   dbxUpsert(pg, tbl_name, meta, where_cols = idx_cols)
   dbxDisconnect(pg)
 }

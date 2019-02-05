@@ -2,7 +2,7 @@
 ## getting envidas data into postgres
 
 ## run this script from the command line like so:
-## Rscript load_envidas.R ~/data/envidas/WFMS/envi-rpt-1101.csv
+## Rscript load_envidas.R dbname ~/data/envidas/WFMS/envi-rpt-1101.csv
 
 library(lubridate)
 library(RPostgreSQL)
@@ -169,7 +169,7 @@ write_envidas_table = function(df, f) {
                      source_rows, ')')
   ## add the hstore column
   df$data_dict = apply(dict_df, 1, format_hstore)
-  pg = dbConnect(PostgreSQL(), dbname = 'chemtest')
+  pg = dbConnect(PostgreSQL(), dbname = dbname)
   dbWriteTable(pg, 'envidas', df, append = T, row.names = F)
   dbDisconnect(pg)
 }
@@ -179,7 +179,8 @@ import_envidas_file = function(f) {
   write_envidas_table(env, f)
 }
 
-env_files = commandArgs(trailingOnly = T)
+dbname = commandArgs(trailingOnly = T)[1]
+env_files = commandArgs(trailingOnly = T)[-1]
 file_dates = gsub('^[^0-9]*([0-9]{4}).*', '\\1', env_files)
 env_files = env_files[order(file_dates)]
 for (f in env_files) {

@@ -34,13 +34,14 @@ import_aethelometer_file = function(f) {
   aedf$source = paste0('(', as.Date(date_str, format='%y%m%d'),
                        ',1,', aedf$source_row, ')')
   aedf$source_row = NULL
-  pg = dbConnect(PostgreSQL(), dbname='chemtest')
+  pg = dbConnect(PostgreSQL(), dbname = dbname)
   dbWriteTable(pg, 'wfms_aethelometer', aedf,
                row.names = F, append = T)
   dbDisconnect(pg)
 }
 
-env_files = commandArgs(trailingOnly = T)
+dbname = commandArgs(trailingOnly = T)[1]
+env_files = commandArgs(trailingOnly = T)[-1]
 file_dates = gsub('^.*ae|\\..*$', '', env_files)
 env_files = env_files[order(file_dates)]
 for (f in env_files) {

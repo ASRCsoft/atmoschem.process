@@ -2,7 +2,7 @@
 ## getting campbell data into postgres
 
 ## run this script from the command line like so:
-## Rscript load_campbell.R ~/data/campbell/WFMS/WFMFS_SUMMIT_Table1_2018_06_29_2300.dat
+## Rscript load_campbell.R dbname ~/data/campbell/WFMS/WFMFS_SUMMIT_Table1_2018_06_29_2300.dat
 
 library(dbx)
 
@@ -37,7 +37,7 @@ write_campbell = function(f) {
   }
   ## add to postgres
   names(campbell) = tolower(names(campbell))
-  pg = dbxConnect(adapter = 'postgres', dbname = 'chemtest')
+  pg = dbxConnect(adapter = 'postgres', dbname = dbname)
   ## Some files contain duplicate times due to a datalogger
   ## restart. However, all the duplicated times appear to have
   ## matching values, so we can skip updates for those pre-existing
@@ -50,7 +50,8 @@ write_campbell = function(f) {
   dbxDisconnect(pg)
 }
 
-files = commandArgs(trailingOnly = T)
+dbname = commandArgs(trailingOnly = T)[1]
+files = commandArgs(trailingOnly = T)[-1]
 file_date_strs = gsub('^.*Table1_|\\.dat$', '', files)
 files = files[order(file_date_strs)]
 for (f in files) {
