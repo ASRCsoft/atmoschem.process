@@ -17,7 +17,7 @@ create table manual_calibrations (
   instrument text,
   type text,
   cal_time timestamp,
-  measured_value numeric not null,
+  measured_value numeric,
   corrected boolean not null,
   primary key(station_id, instrument, cal_time)
 );
