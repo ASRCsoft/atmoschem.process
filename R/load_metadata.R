@@ -43,7 +43,7 @@ write_manual_flags = function(f) {
 }
 
 
-f = commandArgs(trailingOnly = T)
+f = commandArgs(trailingOnly = T)[-1]
 message('Loading measurements info...')
 write_measurements(f)
 message('Loading autocalibration schedule...')
