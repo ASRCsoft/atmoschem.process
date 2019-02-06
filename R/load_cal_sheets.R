@@ -82,7 +82,7 @@ write_42C = function(f) {
               pdf$measured_zero_noy_a_3,
               corrected)
     write_cal(station, 'NOx', 'zero', cal_time,
-              pdf$measured_zero_noy_a_3,
+              pdf$measured_zero_noy_b_3,
               corrected)
   }
   if (box_checked(pdf$span_cal_mode_4) && !is.na(pdf$time_log_5)) {
@@ -105,34 +105,61 @@ write_42C = function(f) {
   }
 }
 
+write_42Cs = function(f) {
+  pdf = read_pdf_form(f)
+  ## get the station
+  path_folders = strsplit(f, '/')[[1]]
+  station = path_folders[length(path_folders) - 1]
+  ## [don't need] cal start time: time_log_1
+  ## zero time: time_log_3
+  ## NOy A zero: measured_zero_noy_a_3
+  ## NOy B zero: measured_zero_noy_b_3
+  ## set 42Cs zero: set_42ctls_to_zero_3
+  ## span time: time_log_5
+  ## NOy A span: measured_span_noy_a_5
+  ## NOy B span: measured_span_noy_b_5
+  ## set NOy A span: set_span_noy_a_5
+  ## set NOy B span: set_span_noy_b_5
+  ## zero check time: time_log_7
+  ## NO zero check: 42ctls_zero_noy_a_7
+  ## NOx zero check: 42ctls_zero_noy_b_7
+  ## [don't need] cal end time: time_log_8
+
+  ## 42Cs sheets contain 2 calibrations but we are ignoring the second
+  ## one for now
+  if (box_checked(pdf$zero_cal_mode_2) && !is.na(pdf$time_log_3)) {
+    cal_time = strptime(paste(pdf$date, pdf$time_log_3),
+                        '%d-%b-%y %H:%M')
+    corrected = box_checked(pdf$set_42ctls_to_zero_3)
+    write_cal(station, 'NO', 'zero', cal_time,
+              pdf$measured_zero_noy_a_3,
+              corrected)
+  }
+  if (box_checked(pdf$span_cal_mode_4) && !is.na(pdf$time_log_5)) {
+    cal_time = strptime(paste(pdf$date, pdf$time_log_5),
+                        '%d-%b-%y %H:%M')
+    write_cal(station, 'NO', 'span', cal_time,
+              pdf$measured_span_noy_a_5,
+              box_checked(pdf$set_span_noy_a_5))
+  }
+  if (box_checked(pdf$zero_check_7) && !is.na(pdf$time_log_7)) {
+    cal_time = strptime(paste(pdf$date, pdf$time_log_7),
+                        '%d-%b-%y %H:%M')
+    write_cal(station, 'NO', 'zero', cal_time,
+              pdf$`42ctls_zero_noy_a_7`, FALSE)
+  }
+}
+
 files = commandArgs(trailingOnly = T)[-1]
 for (f in files) {
   message(paste('Importing', f))
   file_type = gsub('^.*/|_[^/]*$', '', f)
   if (file_type == '42C') {
     write_42C(f)
+  } else if (file_type == '42Cs') {
+    write_42Cs(f)
   }
 }
-
-
-## noy_file = '/home/wmay/2018_Summit_Cal_Sheets/42Cs_180103.pdf'
-## noy = read_pdf_form(noy_file)
-## 42Cs sheets contain 2 calibrations!
-
-## [don't need] cal start time: time_log_1
-## zero time: time_log_3
-## NOy A zero: measured_zero_noy_a_3
-## NOy B zero: measured_zero_noy_b_3
-## set 42Cs zero: set_42ctls_to_zero_3
-## span time: time_log_5
-## NOy A span: measured_span_noy_a_5
-## NOy B span: measured_span_noy_b_5
-## set NOy A span: set_span_noy_a_5
-## set NOy B span: set_span_noy_b_5
-## zero check time: time_log_7
-## NO zero check: 42ctls_zero_noy_a_7
-## NOx zero check: 42ctls_zero_noy_b_7
-## [don't need] cal end time: time_log_8
 
 ## so2_file = '/home/wmay/2018_Summit_Cal_Sheets/43C_180103.pdf'
 ## so2 = read_pdf_form(so2_file)
