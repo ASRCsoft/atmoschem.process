@@ -29,8 +29,9 @@ create or replace function has_instrument_flag(measurement text, flag text) RETU
 	 else true end;
 $$ LANGUAGE sql immutable parallel safe;
 
-create or replace function has_instrument_flag(measurement text, flag numeric) RETURNS bool AS $$
-  select flag!=1;
+create or replace function has_instrument_flag(measurement text, station_id int, flag numeric) RETURNS bool AS $$
+  select case when station_id=1 then flag!=1
+	 when station_id=2 then flag!=0 end;
 $$ LANGUAGE sql immutable parallel safe;
 
 create or replace function has_calibration_flag(measurement text, station_id int, measurement_time timestamp) RETURNS bool AS $$
@@ -90,7 +91,7 @@ create or replace function is_flagged(measurement text, station_id int, source s
   -- 1) apply manual flags
   select case when has_manual_flag(measurement, station_id, measurement_time) then true
 	   -- 2) instrument flags
-	 when has_instrument_flag(measurement, flag) then true
+	 when has_instrument_flag(measurement, station_id, flag) then true
 	   -- 3) calibration flags
 	 when has_calibration_flag(measurement, station_id, measurement_time) then true
 	   -- 4) extreme value flags
