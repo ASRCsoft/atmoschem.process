@@ -117,6 +117,7 @@ CREATE OR REPLACE FUNCTION interpolate_cal(station_id int, chemical text, type t
 		 value as y0
 	    from calibration_values
 	   where upper(cal_times)<=$4
+	     and station_id=$1
 	     and chemical=$2
 	     and type=$3
 	     and value is not null
@@ -127,6 +128,7 @@ CREATE OR REPLACE FUNCTION interpolate_cal(station_id int, chemical text, type t
 		 value as y1
 	    from calibration_values
 	   where upper(cal_times)>$4
+	     and station_id=$1
 	     and chemical=$2
 	     and type=$3
 	     and value is not null
