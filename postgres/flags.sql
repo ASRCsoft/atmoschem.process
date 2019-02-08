@@ -6,7 +6,8 @@ create table manual_flags (
   station_id int references stations,
   measurement text,
   times tsrange,
-  explanation text not null,
+  aqs_flag text not null,
+  explanation text,
   primary key(station_id, measurement, times),
   CONSTRAINT no_overlapping_times EXCLUDE USING GIST (
     measurement WITH =,
