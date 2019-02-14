@@ -82,7 +82,7 @@ CREATE MATERIALIZED VIEW calibration_values AS
   select *,
 	 case
 	 when station_id=1 then estimate_cal('campbell_wfms',
-					     lower(chemical) || '_avg',
+					     chemical,
 					     type, cal_times)
 	 -- when station_id=2 then estimate_cal('campbell_wfml',
 	 -- 				     lower(chemical) || '_avg',
@@ -154,6 +154,19 @@ CREATE OR REPLACE FUNCTION apply_calib(station_id int, measurement text, val num
 					      and m.measurement=$2) end;
   END;
 $$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
+-- for whatever reason this is faster as a plpgsql function
+
+-- CREATE OR REPLACE FUNCTION apply_calib(station_id int, measurement text, val numeric, t timestamp)
+--   RETURNS numeric AS $$
+--   select case when span is null then val - zero
+-- 	 else (val - zero) / (span - zero) *
+-- 	   (select m.span
+-- 	      from measurements m
+-- 	     where m.station_id=$1
+-- 	       and m.measurement=$2) end
+--   from (select interpolate_cal(station_id, measurement, 'zero', t) as zero,
+-- 	       interpolate_cal(station_id, measurement, 'span', t) as span) as cals;
+-- $$ LANGUAGE sql STABLE PARALLEL SAFE;
 
 
 
