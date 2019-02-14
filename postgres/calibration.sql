@@ -27,10 +27,12 @@ create or replace function estimate_cal(tbl text, val text, caltype text, times 
   exec_str text = $exec$
     with moving_averages as (
       select instrument_time,
-	     AVG(%I) OVER(ORDER BY instrument_time
-			  ROWS BETWEEN 2 PRECEDING AND 2 following) as moving_average
+	     AVG(value) OVER(partition by measurement
+			     ORDER BY instrument_time
+			     ROWS BETWEEN 2 PRECEDING AND 2 following) as moving_average
 	from %I
-       where instrument_time between ($1 - interval '2 minutes') and ($2 + interval '2 minutes')
+       where measurement='%s'
+	 and instrument_time between ($1 - interval '2 minutes') and ($2 + interval '2 minutes')
     )
     select %I(moving_average)
     from moving_averages
@@ -38,7 +40,7 @@ create or replace function estimate_cal(tbl text, val text, caltype text, times 
   $exec$;
   zero_estimate numeric;
   begin
-    execute format(exec_str, val, tbl,
+    execute format(exec_str, tbl, val,
 		   case when caltype='zero' then 'min'
 		   when caltype in ('span', 'CE') then 'max' end)
       into zero_estimate
@@ -82,10 +84,11 @@ CREATE MATERIALIZED VIEW calibration_values AS
 	 when station_id=1 then estimate_cal('campbell_wfms',
 					     lower(chemical) || '_avg',
 					     type, cal_times)
-	 when station_id=2 then estimate_cal('campbell_wfml',
-					     lower(chemical) || '_avg',
-					     type, cal_times)
-	 else estimate_cal('envidas', station_id, chemical, type, cal_times) end as value
+	 -- when station_id=2 then estimate_cal('campbell_wfml',
+	 -- 				     lower(chemical) || '_avg',
+	 -- 				     type, cal_times)
+	   -- else estimate_cal('envidas', station_id, chemical, type, cal_times) end as value
+	 else null end as value
     from (select station_id,
 		 chemical,
 		 type,
