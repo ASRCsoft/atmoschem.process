@@ -35,6 +35,8 @@ write_campbell = function(f) {
   station = path_folders[length(path_folders) - 1]
   if (station == 'WFMS') {
     table = 'campbell_wfms'
+    ## replace mislabeled NO2 column
+    names(campbell)[names(campbell) == 'NO2_Avg'] = 'NOX_Avg'
   } else if (station == 'WFML') {
     table = 'campbell_wfml'
   } else {
