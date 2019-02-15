@@ -45,7 +45,11 @@ write_campbell = function(f) {
   is_flag = grepl('^F_', names(campbell))
   campbell_long = campbell[, !is_flag] %>%
     gather(measurement, value, -c(instrument_time, RECORD))
-  flag_mat = as.matrix(campbell[, is_flag])
+  if (station == 'WFMS') {
+    flag_mat = as.matrix(campbell[, is_flag]) != 1
+  } else if (station == 'WFML') {
+    flag_mat = as.matrix(campbell[, is_flag]) != 0
+  }
   row.names(flag_mat) = campbell$instrument_time
   campbell_long$measurement =
     gsub('_Avg$', '', campbell_long$measurement)

@@ -5,7 +5,7 @@ create table campbell_wfms (
   record int,
   measurement text,
   value numeric,
-  flag numeric,
+  flagged boolean,
   primary key(instrument_time, measurement)
 );
 SELECT create_hypertable('campbell_wfms', 'instrument_time');
@@ -73,7 +73,7 @@ CREATE materialized VIEW processed_campbell_wfms as
 	 measurement,
 	 calibrated_value as value,
 	 is_flagged(measurement, 1, null, instrument_time,
-		    calibrated_value, flag, running_median,
+		    calibrated_value, flagged, running_median,
 		    running_mad) as flagged
     from campbell_wfms_mad;
 
