@@ -8,7 +8,7 @@ library(dbx)
 library(tidyr)
 
 wfms_flags = c(NO = 'NOX', NO2 = 'NOX', T = 'TRH',
-               RH = 'TRH')
+               RH = 'TRH', NOy = 'NOY', SO2 = 'SO2')
 wfml_flags = c(CO = 'CO', NO = 'NOX', NO2 = 'NOX')
 
 read_campbell = function(f) {
