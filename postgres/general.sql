@@ -1,5 +1,9 @@
 /* Creating tables used by multiple instruments */
 
+create extension hstore;
+create extension btree_gist;
+CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;
+
 /* station table */
 create table stations (
   id serial primary key,

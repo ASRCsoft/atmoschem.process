@@ -1,7 +1,5 @@
 /* Instrument calibration */
 
-create extension btree_gist;
-
 create table autocals (
   station_id int references stations,
   instrument text,

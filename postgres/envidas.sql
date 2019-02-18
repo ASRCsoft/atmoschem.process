@@ -1,8 +1,5 @@
 /* Organizing various data contained in envidas files */
 
-create extension hstore;
-CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;
-
 create table envidas (
   station_id int references stations not null,
   source sourcerow not null,
