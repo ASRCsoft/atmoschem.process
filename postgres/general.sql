@@ -25,11 +25,3 @@ create table measurements (
   span numeric,
   primary key(station_id, measurement)
 );
-
-/* Method detection limits */
-create table mdls (
-  station_id int references stations,
-  measurement text,
-  mdl numeric,
-  primary key(station_id, measurement)
-);

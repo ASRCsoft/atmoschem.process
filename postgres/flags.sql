@@ -63,7 +63,7 @@ $$ LANGUAGE sql immutable RETURNS NULL ON NULL INPUT parallel safe;
 
 create or replace function is_below_mdl(station_id int, measurement text, value numeric) RETURNS bool AS $$
   select coalesce(value < (select mdl
-			     from mdls
+			     from measurements
 			    where station_id=$1
 			      and measurement=$2), false);
 $$ LANGUAGE sql stable parallel safe;
