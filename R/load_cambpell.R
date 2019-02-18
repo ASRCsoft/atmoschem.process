@@ -11,6 +11,17 @@ wfms_flags = c(NO = 'NOX', NO2 = 'NOX', T = 'TRH',
                RH = 'TRH', NOy = 'NOY', SO2 = 'SO2')
 wfml_flags = c(CO = 'CO', NO = 'NOX', NO2 = 'NOX')
 
+fast_lookup = function(vals, dict) {
+  ## This code to get dictionary (named vector) entries shouldn't need
+  ## to be this long but the current version of R seems to have a very
+  ## slow lookup function for named vectors, so we need extra code to
+  ## work around that.
+  res = rep(NA, length(vals))
+  has_entry = vals %in% names(dict)
+  res[has_entry] = dict[vals[has_entry]]
+  res
+}
+
 read_campbell = function(f) {
   ## headers are on the second line, but data starts on line 4
   headers = read.csv(f, header=F, skip = 1, nrows=1,
@@ -57,19 +68,11 @@ write_campbell = function(f) {
     gsub('_Avg$', '', campbell_long$measurement)
   flag_rows = match(campbell_long$instrument_time,
                     campbell$instrument_time)
-  ## This code to get the column indices shouldn't need to be this
-  ## long but the current version of R seems to have a very slow
-  ## lookup function for named vectors, so we need extra code to work
-  ## around that.
-  ## flag_cols = match(paste('F', wfms_flags[campbell_long$measurement],
-  ##                         'Avg', sep = '_'),
-  ##                   colnames(flag_mat))
-  flag_cols = rep(NA, nrow(campbell_long))
-  has_flag = campbell_long$measurement %in% names(wfms_flags)
-  flag_cols[has_flag] = match(paste('F',
-                                    wfms_flags[campbell_long$measurement[has_flag]],
-                                    'Avg', sep = '_'),
-                              colnames(flag_mat))
+  flag_cols = match(paste('F',
+                          fast_lookup(campbell_long$measurement,
+                                      wfms_flags),
+                          'Avg', sep = '_'),
+                    colnames(flag_mat))
   campbell_long$flagged = flag_mat[cbind(flag_rows, flag_cols)]
   
   ## add to postgres
