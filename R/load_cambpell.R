@@ -84,7 +84,7 @@ write_campbell = function(f) {
   ## duplicated times have matching values.
   dbxUpsert(pg, table, campbell_long,
             where_cols = c('instrument_time', 'measurement'),
-            skip_existing = T)
+            batch_size = 10000, skip_existing = T)
   dbxDisconnect(pg)
 }
 
