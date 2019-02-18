@@ -70,7 +70,7 @@ write_campbell = function(f) {
                                     wfms_flags[campbell_long$measurement[has_flag]],
                                     'Avg', sep = '_'),
                               colnames(flag_mat))
-  campbell_long$flag = flag_mat[cbind(flag_rows, flag_cols)]
+  campbell_long$flagged = flag_mat[cbind(flag_rows, flag_cols)]
   
   ## add to postgres
   names(campbell_long) = tolower(names(campbell_long))
