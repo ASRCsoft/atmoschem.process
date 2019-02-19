@@ -47,10 +47,10 @@ create or replace function has_calibration_flag(measurement text, station_id int
 $$ LANGUAGE sql stable parallel safe;
 
 create or replace function is_valid_value(measurement text, station_id int, value numeric) RETURNS bool AS $$
-  select coalesce(value <@ (select range
-			      from valid_ranges
+  select coalesce(value <@ (select valid_range
+			      from measurements
 			     where measurement=$1
-			       and site=$2), true);
+			       and station_id=$2), true);
 $$ LANGUAGE sql stable parallel safe;
 
 create or replace function is_outlier(value numeric, median double precision, mad double precision) RETURNS bool AS $$
