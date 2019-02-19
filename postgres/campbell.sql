@@ -43,33 +43,32 @@ SELECT create_hypertable('campbell_wfml', 'instrument_time');
 
 
 CREATE materialized VIEW calibrated_campbell_wfms as
-  select *,
+  select instrument_time,
+	 record,
+	 c.measurement,
+	 value,
 	 case when has_calibration then apply_calib(1, c.measurement, value, instrument_time)
-	 else value end as calibrated_value
+	 else value end as calibrated_value,
+	 flagged,
+	 valid_range,
+	 mdl,
+	 remove_outliers
     from campbell_wfms c
 	   join measurements m
 	       on station_id=1
 	       and c.measurement=m.measurement;
 create index calibrated_measurement_times on calibrated_campbell_wfms(measurement, instrument_time);
 
-CREATE or replace VIEW campbell_wfms_medians AS
-  select *,
-	 case when measurement in ('NO', 'NO2', 'NOy', 'Ozone', 'CO', 'SO2', 'T', 'RH', 'BP') then runmed(calibrated_value) over w
-	 else null end as running_median
-    from calibrated_campbell_wfms
-	   WINDOW w AS (partition by measurement
-			ORDER BY instrument_time
-			rows between 7 preceding and 7 following);
-
 CREATE materialized VIEW campbell_wfms_mad AS
   select *,
-	 case when running_median is null then null
-	 else runmad(calibrated_value, running_median) over w end as running_mad
-    from campbell_wfms_medians
-	   WINDOW w AS (partition by measurement
-			ORDER BY instrument_time
-			rows between 7 preceding and 7 following);
-
+	 case when remove_outliers then runmed(calibrated_value) over w
+	 else null end as running_median,
+	 case when remove_outliers then runmad(calibrated_value) over w
+	 else null end as running_mad
+    from calibrated_campbell_wfms
+	 WINDOW w AS (partition by measurement
+		      ORDER BY instrument_time
+		      rows between 120 preceding and 120 following);
 
 CREATE materialized VIEW processed_campbell_wfms as
   select instrument_time as time,
