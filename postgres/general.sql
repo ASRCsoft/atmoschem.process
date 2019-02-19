@@ -23,5 +23,7 @@ create table measurements (
   valid_range numrange,
   mdl numeric,
   span numeric,
+  has_calibration boolean,
+  remove_outliers boolean,
   primary key(station_id, measurement)
 );

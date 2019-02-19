@@ -44,9 +44,12 @@ SELECT create_hypertable('campbell_wfml', 'instrument_time');
 
 CREATE materialized VIEW calibrated_campbell_wfms as
   select *,
-	 case when measurement in ('NO', 'NO2', 'NOy', 'CO', 'SO2') then apply_calib(1, measurement, value, instrument_time)
+	 case when has_calibration then apply_calib(1, c.measurement, value, instrument_time)
 	 else value end as calibrated_value
-    from campbell_wfms;
+    from campbell_wfms c
+	   join measurements m
+	       on station_id=1
+	       and c.measurement=m.measurement;
 create index calibrated_measurement_times on calibrated_campbell_wfms(measurement, instrument_time);
 
 CREATE or replace VIEW campbell_wfms_medians AS
