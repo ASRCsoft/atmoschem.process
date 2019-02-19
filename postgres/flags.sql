@@ -69,12 +69,12 @@ create or replace function is_below_mdl(station_id int, measurement text, value 
 $$ LANGUAGE sql stable parallel safe;
 
 /* Determine if a measurement is flagged. */
-create or replace function is_flagged(measurement text, station_id int, source sourcerow, measurement_time timestamp, value numeric, flag text, median double precision, mad double precision) RETURNS bool AS $$
+create or replace function is_flagged(measurement text, station_id int, source sourcerow, measurement_time timestamp, value numeric, flagged boolean, median double precision, mad double precision) RETURNS bool AS $$
   -- steps:
   -- 1) apply manual flags
   select case when has_manual_flag(measurement, station_id, measurement_time) then true
 	   -- 2) instrument flags
-	 when has_instrument_flag(measurement, flag) then true
+	 when flagged then true
 	   -- 3) calibration flags
 	 when has_calibration_flag(measurement, station_id, measurement_time) then true
 	   -- 4) extreme value flags
