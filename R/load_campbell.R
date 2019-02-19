@@ -47,7 +47,7 @@ write_campbell = function(f) {
   if (station == 'WFMS') {
     table = 'campbell_wfms'
     ## replace mislabeled NO2 column
-    names(campbell)[names(campbell) == 'NO2_Avg'] = 'NOX_Avg'
+    names(campbell)[names(campbell) == 'NO2_Avg'] = 'NOx_Avg'
     ## adjust miscalculated wind speeds
     campbell$WS3Cup[campbell$instrument_time > '2016-12-14' &
                     campbell$instrument_time < '2019-02-14 15:57'] =
