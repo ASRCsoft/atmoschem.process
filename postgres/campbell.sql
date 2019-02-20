@@ -1,14 +1,15 @@
 /* Campbell datalogger files */
 
-create table campbell_wfms (
+create table campbell (
+  station_id int references stations,
   instrument_time timestamp,
   record int,
   measurement text,
   value numeric,
   flagged boolean,
-  primary key(instrument_time, measurement)
+  primary key(station_id, instrument_time, measurement)
 );
-SELECT create_hypertable('campbell_wfms', 'instrument_time');
+SELECT create_hypertable('campbell', 'instrument_time');
 
 create table campbell_wfml (
   file text not null,
@@ -42,33 +43,34 @@ create table campbell_wfml (
 SELECT create_hypertable('campbell_wfml', 'instrument_time');
 
 
-CREATE materialized VIEW calibrated_campbell_wfms as
-  select instrument_time,
+CREATE materialized VIEW calibrated_campbell as
+  select c.station_id,
+	 instrument_time,
 	 record,
 	 c.measurement,
 	 value,
-	 case when has_calibration then apply_calib(1, c.measurement, value, instrument_time)
+	 case when has_calibration then apply_calib(c.station_id, c.measurement, value, instrument_time)
 	 else value end as calibrated_value,
 	 flagged,
 	 valid_range,
 	 mdl,
 	 remove_outliers
-    from campbell_wfms c
+    from campbell c
 	   join measurements m
-	       on station_id=1
+	       on c.station_id=m.station_id
 	       and c.measurement=m.measurement;
 create index calibrated_measurement_times on calibrated_campbell_wfms(measurement, instrument_time);
 
-CREATE materialized VIEW campbell_wfms_mad AS
+CREATE materialized VIEW campbell_mad AS
   select *,
 	 case when remove_outliers then runmed(calibrated_value) over w
 	 else null end as running_median,
 	 case when remove_outliers then runmad(calibrated_value) over w
 	 else null end as running_mad
-    from calibrated_campbell_wfms
-	 WINDOW w AS (partition by measurement
-		      ORDER BY instrument_time
-		      rows between 120 preceding and 120 following);
+    from calibrated_campbell
+  WINDOW w AS (partition by station_id, measurement
+	       ORDER BY instrument_time
+	       rows between 120 preceding and 120 following);
 
 CREATE materialized VIEW processed_campbell_wfms as
   select instrument_time as time,
@@ -77,7 +79,8 @@ CREATE materialized VIEW processed_campbell_wfms as
 	 is_flagged(measurement, 1, null, instrument_time,
 		    calibrated_value, flagged, running_median,
 		    running_mad) as flagged
-    from campbell_wfms_mad;
+    from campbell_mad
+   where station_id=1;
 
 
 

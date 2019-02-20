@@ -11,6 +11,13 @@ wfms_flags = c(NO = 'NOX', NO2 = 'NOX', T = 'TRH',
                RH = 'TRH', NOy = 'NOY', SO2 = 'SO2')
 wfml_flags = c(CO = 'CO', NO = 'NOX', NO2 = 'NOX')
 
+dbname = commandArgs(trailingOnly = T)[1]
+
+## get the sites and corresponding IDs
+pg = dbxConnect(adapter = 'postgres', dbname = dbname)
+sites = dbxSelect(pg, 'select * from stations')
+dbxDisconnect(pg)
+
 fast_lookup = function(vals, dict) {
   ## This code to get dictionary (named vector) entries shouldn't need
   ## to be this long but the current version of R seems to have a very
@@ -45,17 +52,12 @@ write_campbell = function(f) {
   ## get the station
   station = path_folders[length(path_folders) - 1]
   if (station == 'WFMS') {
-    table = 'campbell_wfms'
     ## replace mislabeled NO2 column
     names(campbell)[names(campbell) == 'NO2_Avg'] = 'NOx_Avg'
     ## adjust miscalculated wind speeds
     campbell$WS3Cup[campbell$instrument_time > '2016-12-14' &
                     campbell$instrument_time < '2019-02-14 15:57'] =
       (.5 / .527) * campbell$WS3Cup - (.5 / .527) - .5
-  } else if (station == 'WFML') {
-    table = 'campbell_wfml'
-  } else {
-    stop('Station not recognized.')
   }
   
   ## clean and reorganize the data
@@ -81,6 +83,8 @@ write_campbell = function(f) {
   
   ## add to postgres
   names(campbell_long) = tolower(names(campbell_long))
+  campbell_long$station_id =
+    sites$id[sites$short_name == station]
   pg = dbxConnect(adapter = 'postgres', dbname = dbname)
   ## Some files contain duplicate times due to a datalogger
   ## restart. However, all the duplicated times appear to have
@@ -89,13 +93,13 @@ write_campbell = function(f) {
 
   ## It would be prudent to add a check here, though, to verify that
   ## duplicated times have matching values.
-  dbxUpsert(pg, table, campbell_long,
-            where_cols = c('instrument_time', 'measurement'),
+  dbxUpsert(pg, 'campbell', campbell_long,
+            where_cols = c('instrument_time', 'measurement',
+                           'station_id'),
             batch_size = 10000, skip_existing = T)
   dbxDisconnect(pg)
 }
 
-dbname = commandArgs(trailingOnly = T)[1]
 files = commandArgs(trailingOnly = T)[-1]
 file_date_strs = gsub('^.*Table1_|\\.dat$', '', files)
 files = files[order(file_date_strs)]
