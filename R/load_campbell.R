@@ -4,6 +4,7 @@
 ## run this script from the command line like so:
 ## Rscript load_campbell.R dbname ~/data/campbell/WFMS/WFMFS_SUMMIT_Table1_2018_06_29_2300.dat
 
+library(parallel)
 library(dbx)
 library(tidyr)
 
@@ -103,7 +104,5 @@ write_campbell = function(f) {
 files = commandArgs(trailingOnly = T)[-1]
 file_date_strs = gsub('^.*Table1_|\\.dat$', '', files)
 files = files[order(file_date_strs)]
-for (f in files) {
-  message(paste('Importing', f))
-  write_campbell(f)
-}
+n_cores = max(1, detectCores() - 1)
+mclapply(files, write_campbell, mc.cores = n_cores)
