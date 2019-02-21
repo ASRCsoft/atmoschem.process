@@ -70,35 +70,13 @@ $$ LANGUAGE sql stable parallel safe;
 
 /* Determine if a measurement is flagged. */
 create or replace function is_flagged(measurement text, station_id int, source sourcerow, measurement_time timestamp, value numeric, flagged boolean, median double precision, mad double precision) RETURNS bool AS $$
-  -- steps:
-  -- 1) apply manual flags
-  select case when has_manual_flag(measurement, station_id, measurement_time) then true
-	   -- 2) instrument flags
-	 when flagged then true
-	   -- 3) calibration flags
-	 when has_calibration_flag(measurement, station_id, measurement_time) then true
-	   -- 4) extreme value flags
-	 when not is_valid_value(measurement, station_id, value) then true
-	   -- 5) outlier flags (based on the Hampel filter)
-	 when is_outlier(value, median, mad) then true
-	   -- 6) no flag
-	 else false end;
-$$ LANGUAGE sql stable parallel safe;
-
-create or replace function is_flagged(measurement text, station_id int, source sourcerow, measurement_time timestamp, value numeric, flag numeric, median double precision, mad double precision) RETURNS bool AS $$
-  -- steps:
-  -- 1) apply manual flags
-  select case when has_manual_flag(measurement, station_id, measurement_time) then true
-	   -- 2) instrument flags
-	 when has_instrument_flag(measurement, station_id, flag) then true
-	   -- 3) calibration flags
-	 when has_calibration_flag(measurement, station_id, measurement_time) then true
-	   -- 4) extreme value flags
-	 when not is_valid_value(measurement, station_id, value) then true
-	   -- 5) outlier flags (based on the Hampel filter)
-	 when is_outlier(value, median, mad) then true
-	   -- 6) no flag
-	 else false end;
+  -- Check for: 1) manual flags, 2) instrument flags, 3) calibrations,
+  -- 4) invalid values, and 5) outliers (based on the Hampel filter)
+  select has_manual_flag(measurement, station_id, measurement_time)
+	   or flagged
+	   or has_calibration_flag(measurement, station_id, measurement_time)
+	   or not is_valid_value(measurement, station_id, value)
+	   or is_outlier(value, median, mad);
 $$ LANGUAGE sql stable parallel safe;
 
 /* Get the NARSTO averaged data flag based on the number of
