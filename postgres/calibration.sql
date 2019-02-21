@@ -55,10 +55,12 @@ create or replace view calibration_periods as
 /* Store calibration estimates derived from the raw instrument values
  */
 CREATE MATERIALIZED VIEW calibration_values AS
-  select *,
-	 estimate_cal(station_id, chemical, type, cal_times) as value
-    from calibration_periods
-   where type is not null;
+  select *
+    from (select *,
+		 estimate_cal(station_id, chemical, type, cal_times) as value
+	    from calibration_periods
+	   where type is not null) c1
+   where value is not null;
 -- to make the interpolate_cal function faster
 CREATE INDEX calibration_values_upper_time_idx ON calibration_values(upper(cal_times));
 CREATE INDEX calibration_values_gist_idx ON calibration_values using gist(station_id, chemical, cal_times);
