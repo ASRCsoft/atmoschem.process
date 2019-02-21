@@ -7,8 +7,8 @@ CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;
 /* station table */
 create table stations (
   id serial primary key,
-  short_name text,
-  long_name text
+  short_name text unique,
+  long_name text unique
 );
 insert into stations(short_name, long_name)
 values ('WFMS', 'Whiteface Mountain Summit'),
