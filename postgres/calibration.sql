@@ -27,7 +27,7 @@ select case when cal_type='zero' then min(moving_average)
 	       AVG(value) OVER(partition by site_id
 			       ORDER BY instrument_time
 			       ROWS BETWEEN 1 PRECEDING AND 1 following) as moving_average
-	  from campbell
+	  from measurements
 	 where site_id=site
 	   and instrument_time between (lower(cal_times) - interval '2 minutes') and (upper(cal_times) + interval '2 minutes')) moving_averages
   -- ignore first 15 minutes of span calibration data due to spikes I
