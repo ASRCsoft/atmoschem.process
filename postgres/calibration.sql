@@ -15,24 +15,23 @@ create table autocals (
 );
 
 create table manual_calibrations (
-  site_id int references sites,
-  instrument text,
+  measurement_type_id int references measurement_types,
   type text,
   cal_time timestamp,
   measured_value numeric,
   corrected boolean not null,
-  primary key(site_id, instrument, cal_time)
+  primary key(measurement_type_id, cal_time)
 );
 
-create or replace function estimate_cal(site int, val text, cal_type text, cal_times tsrange) returns numeric as $$
+create or replace function estimate_cal(measurement_type int, cal_type text, cal_times tsrange) returns numeric as $$
 select case when cal_type='zero' then min(moving_average)
        else max(moving_average) end
   from (select instrument_time,
-	       AVG(value) OVER(partition by site_id
+	       AVG(value) OVER(partition by measurement_type_id
 			       ORDER BY instrument_time
 			       ROWS BETWEEN 1 PRECEDING AND 1 following) as moving_average
 	  from measurements
-	 where site_id=site
+	 where measurement_type_id=$1
 	   and instrument_time between (lower(cal_times) - interval '2 minutes') and (upper(cal_times) + interval '2 minutes')) moving_averages
   -- ignore first 15 minutes of span calibration data due to spikes I
   -- think?
@@ -41,14 +40,12 @@ select case when cal_type='zero' then min(moving_average)
 $$ language sql STABLE PARALLEL SAFE;
 
 create or replace view calibration_periods as
-  select site_id,
-	 chemical,
+  select measurement_type_id,
 	 type,
 	 tsrange(cal_day + lower(cal_times),
 		 cal_day + upper(cal_times),
 		 '[]') as cal_times
-    from (select site_id,
-		 instrument as chemical,
+    from (select measurement_type_id,
 		 type,
 		 generate_series(lower(dates),
 				 coalesce(upper(dates), CURRENT_DATE),
@@ -61,7 +58,7 @@ create or replace view calibration_periods as
 CREATE MATERIALIZED VIEW calibration_values AS
   select *
     from (select *,
-		 estimate_cal(site_id, chemical, type, cal_times) as value
+		 estimate_cal(measurement_type_id, type, cal_times) as value
 	    from calibration_periods
 	   where type is not null) c1
    where value is not null;
@@ -70,16 +67,15 @@ CREATE INDEX calibration_values_upper_time_idx ON calibration_values(upper(cal_t
 CREATE INDEX calibration_values_gist_idx ON calibration_values using gist(site_id, chemical, cal_times);
 
 /* Estimate calibration values using linear interpolation */
-CREATE OR REPLACE FUNCTION interpolate_cal(site_id int, chemical text, type text, t timestamp)
+CREATE OR REPLACE FUNCTION interpolate_cal(measurement_type_id int, type text, t timestamp)
   RETURNS numeric AS $$
-  select interpolate(t0, t1, y0, y1, $4)
+  select interpolate(t0, t1, y0, y1, $3)
     from (select upper(cal_times) as t0,
 		 value as y0
 	    from calibration_values
-	   where upper(cal_times)<=$4
-	     and site_id=$1
-	     and chemical=$2
-	     and type=$3
+	   where upper(cal_times)<=$3
+	     and measurement_type_id=$1
+	     and type=$2
 	     and value is not null
 	   order by upper(cal_times) desc
 	   limit 1) calib0
@@ -87,10 +83,9 @@ CREATE OR REPLACE FUNCTION interpolate_cal(site_id int, chemical text, type text
 	 (select upper(cal_times) as t1,
 		 value as y1
 	    from calibration_values
-	   where upper(cal_times)>$4
-	     and site_id=$1
-	     and chemical=$2
-	     and type=$3
+	   where upper(cal_times)>$3
+	     and measurement_type_id=$1
+	     and type=$2
 	     and value is not null
 	   order by upper(cal_times) asc
 	   limit 1) calib1
@@ -98,17 +93,16 @@ CREATE OR REPLACE FUNCTION interpolate_cal(site_id int, chemical text, type text
 $$ LANGUAGE sql STABLE PARALLEL SAFE;
 
 
-CREATE OR REPLACE FUNCTION apply_calib(site_id int, measurement text, val numeric, t timestamp)
+CREATE OR REPLACE FUNCTION apply_calib(measurement_type_id int, val numeric, t timestamp)
   RETURNS numeric AS $$
   DECLARE
-  zero numeric = interpolate_cal(site_id, measurement, 'zero', t);
-  span numeric = interpolate_cal(site_id, measurement, 'span', t);
+  zero numeric = interpolate_cal(measurement_type_id, 'zero', t);
+  span numeric = interpolate_cal(measurement_type_id, 'span', t);
   BEGIN
     return case when span is null then val - zero
       else (val - zero) / (span - zero) * (select m.span
 					     from measurement_types m
-					    where m.site_id=$1
-					      and m.measurement=$2) end;
+					    where m.id=$1) end;
   END;
 $$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 -- for whatever reason this is faster as a plpgsql function
