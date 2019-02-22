@@ -73,10 +73,10 @@ create or replace function is_flagged(measurement text, station_id int, source s
   -- Check for: 1) manual flags, 2) instrument flags, 3) calibrations,
   -- 4) invalid values, and 5) outliers (based on the Hampel filter)
   select has_manual_flag(measurement, station_id, measurement_time)
-	   or flagged
+	   or coalesce(flagged, false)
 	   or has_calibration_flag(measurement, station_id, measurement_time)
 	   or not is_valid_value(measurement, station_id, value)
-	   or is_outlier(value, median, mad);
+	   or coalesce(is_outlier(value, median, mad), false);
 $$ LANGUAGE sql stable parallel safe;
 
 /* Get the NARSTO averaged data flag based on the number of
