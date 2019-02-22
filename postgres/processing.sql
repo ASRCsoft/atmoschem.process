@@ -1,6 +1,3 @@
-/* Campbell datalogger files */
-
-
 /* A few notes on how the processing is organized:
 
 I found that the processing is bizarrely, shockingly slow if I attempt
@@ -18,7 +15,7 @@ constraints. */
 
 These views apply calibration adjustments if needed. They rely on
 functions from calibration.sql. */
-CREATE or replace VIEW calibrated_campbell as
+CREATE or replace VIEW calibrated_measurements as
   select c.site_id,
 	 instrument_time,
 	 record,
@@ -30,20 +27,20 @@ CREATE or replace VIEW calibrated_campbell as
 	 valid_range,
 	 mdl,
 	 remove_outliers
-    from campbell c
+    from measurements c
 	   left join measurement_types m
 	       on c.site_id=m.site_id
 	       and c.measurement=m.measurement;
 
 CREATE materialized VIEW calibrated_campbell_wfms as
   select *
-    from calibrated_campbell
+    from calibrated_measurements
    where site_id=1;
 create index calibrated_campbell_wfms_idx on calibrated_campbell_wfms(site_id, measurement, instrument_time);
 
 CREATE materialized VIEW calibrated_campbell_wfml as
   select *
-    from calibrated_campbell
+    from calibrated_measurements
    where site_id=2;
 create index calibrated_campbell_wfml_idx on calibrated_campbell_wfml(site_id, measurement, instrument_time);
 
