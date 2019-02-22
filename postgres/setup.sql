@@ -27,3 +27,14 @@ create table measurement_types (
   remove_outliers boolean,
   primary key(site_id, measurement)
 );
+
+create table measurements (
+  site_id int references sites,
+  instrument_time timestamp,
+  record int,
+  measurement text,
+  value numeric,
+  flagged boolean,
+  primary key(site_id, instrument_time, measurement)
+);
+SELECT create_hypertable('measurements', 'instrument_time');

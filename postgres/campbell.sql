@@ -1,15 +1,5 @@
 /* Campbell datalogger files */
 
-create table campbell (
-  site_id int references sites,
-  instrument_time timestamp,
-  record int,
-  measurement text,
-  value numeric,
-  flagged boolean,
-  primary key(site_id, instrument_time, measurement)
-);
-SELECT create_hypertable('campbell', 'instrument_time');
 
 /* A few notes on how the processing is organized:
 
