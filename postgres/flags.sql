@@ -19,17 +19,6 @@ create or replace function has_manual_flag(measurement_type int, measurement_tim
 		   and $2 <@ times);
 $$ LANGUAGE sql stable parallel safe;
 
-create or replace function has_instrument_flag(measurement text, flag text) RETURNS bool AS $$
-  select case when flag is null or flag in ('', 'OK') then false
-	 when measurement='ultrafine' then array_length(parse_flags(flag), 1)>0
-	 else true end;
-$$ LANGUAGE sql immutable parallel safe;
-
-create or replace function has_instrument_flag(measurement text, site_id int, flag numeric) RETURNS bool AS $$
-  select case when site_id=1 then flag!=1
-	 when site_id=2 then flag!=0 end;
-$$ LANGUAGE sql immutable parallel safe;
-
 create or replace function has_calibration_flag(measurement_type_id int, measurement_time timestamp) RETURNS bool AS $$
   -- check to see if a measurement occurred in a calibration period,
   -- or immediately after one
