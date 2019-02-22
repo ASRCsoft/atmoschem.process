@@ -15,7 +15,7 @@ create table clock_audits (
    set to the wrong time-- not the same as clock drift, which is
    addressed in the clock audit table */
 create table time_corrections (
-  station_id int references stations,
+  site_id int references sites,
   chemical text,
   start_row int,
   end_row int,
@@ -30,18 +30,18 @@ CREATE MATERIALIZED VIEW matched_clock_audits as
 	 case when instrument='EPC'
 	 then (select min(source)
 		 from ultrafine
-		where station_id=3
+		where site_id=3
 		  and date_trunc('minute', ultrafine.instrument_time)=clock_audits.instrument_time)
 	 else (select min(source)
 		 from envidas
-		where station_id=3
+		where site_id=3
 		  and date_trunc('minute', envidas.instrument_time)=clock_audits.instrument_time) end as data_source
     from clock_audits
    where instrument in ('EPC', 'DRDAS PC');
 
 
 /* Correct ultrafine instrument time using linear interpolation */
-CREATE OR REPLACE FUNCTION correct_instrument_time(station_id int, instrument text, sr sourcerow, t timestamp)
+CREATE OR REPLACE FUNCTION correct_instrument_time(site_id int, instrument text, sr sourcerow, t timestamp)
   RETURNS timestamp AS $$
   #variable_conflict use_variable
   DECLARE
@@ -52,7 +52,7 @@ CREATE OR REPLACE FUNCTION correct_instrument_time(station_id int, instrument te
   y1 interval;
   BEGIN
     -- only applies to PSP for now
-    if station_id!=3 then
+    if site_id!=3 then
       return t;
     end if;
     -- 1) Find the closest clock audits.

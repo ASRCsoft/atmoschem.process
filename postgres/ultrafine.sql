@@ -25,7 +25,7 @@ values ('Conditioner Temperature'),
        ('Reserved (0x8000)');
 
 create table ultrafine (
-  station_id int references stations,
+  site_id int references sites,
   source sourcerow,
   instrument_time timestamp,
   concentration numeric,
@@ -36,7 +36,7 @@ create table ultrafine (
   pulse_height int,
   pulse_std int,
   flags int[],
-  primary key(station_id, source)
+  primary key(site_id, source)
 );
 /* create index useful for subsetting based on recorded instrument
    time (often used for displaying the raw data) */
@@ -60,9 +60,9 @@ END;
 $flags$ LANGUAGE plpgsql immutable parallel safe;
 
 /* Load a ultrafine data file into the ultrafine table */
-CREATE OR REPLACE FUNCTION load_ultrafine(station text, file text) RETURNS void AS $$
+CREATE OR REPLACE FUNCTION load_ultrafine(site text, file text) RETURNS void AS $$
   declare
-  station_id int;
+  site_id int;
   bash_str text;
   copy_str text;
   -- remove file path and extension, so we're looking at just the file
@@ -82,7 +82,7 @@ CREATE OR REPLACE FUNCTION load_ultrafine(station text, file text) RETURNS void 
     select case when file_name ~ '^[0-9]{8}[a-z]' then file_n + 1
 	   else file_n end
       into file_n;
-    SELECT id into station_id from stations where short_name=station;
+    SELECT id into site_id from sites where short_name=site;
     /* this temporary table will hold a copy of the data file */
     create temporary table ultrafine_file (
       row int,
@@ -109,7 +109,7 @@ CREATE OR REPLACE FUNCTION load_ultrafine(station text, file text) RETURNS void 
       into copy_str;
     EXECUTE copy_str;
     INSERT INTO ultrafine
-    SELECT station_id,
+    SELECT site_id,
 	   (substr(file_name, 1, 6), file_n, row)::sourcerow,
 	   date + time,
 	   concentration,
@@ -137,15 +137,15 @@ $$ LANGUAGE sql;
 CREATE MATERIALIZED VIEW processed_ultrafine as
   select *,
 	 ultrafine_narsto_flag(concentration, count::int) as narsto_flag
-    from (select station_id,
+    from (select site_id,
 		 date_trunc('hour', corrected_time) as time,
 		 avg(concentration) as concentration,
 		 avg(pulse_height) as pulse_height,
 		 count(*)
-	    from (select station_id,
-			 case when station_id=3 then correct_ultrafine_time(file, row, instrument_time) 
+	    from (select site_id,
+			 case when site_id=3 then correct_ultrafine_time(file, row, instrument_time) 
 			 else instrument_time end as corrected_time,
 			 concentration,
 			 pulse_height
 		    from ultrafine where flags is null or flags='{15}') u1
-	   group by station_id, time) u2;
+	   group by site_id, time) u2;

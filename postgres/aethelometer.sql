@@ -1,5 +1,5 @@
 create table wfms_aethelometer (
-  station_id int references stations,
+  site_id int references sites,
   source sourcerow,
   instrument_time timestamp,
   channel int,
@@ -10,5 +10,5 @@ create table wfms_aethelometer (
   rb numeric,
   fraction numeric,
   attenuation numeric,
-  primary key(station_id, source, channel)
+  primary key(site_id, source, channel)
 );

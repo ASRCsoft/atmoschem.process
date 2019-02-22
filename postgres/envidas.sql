@@ -1,7 +1,7 @@
 /* Organizing various data contained in envidas files */
 
 create table envidas (
-  station_id int references stations not null,
+  site_id int references sites not null,
   source sourcerow not null,
   instrument_time timestamp not null,
   temperature numeric,
@@ -13,7 +13,7 @@ create table envidas (
   data_dict hstore
 );
 SELECT create_hypertable('envidas', 'instrument_time');
-/* create index useful for subsetting based on station and recorded
+/* create index useful for subsetting based on site and recorded
    instrument time (used when plotting the raw data and when running
    processing queries) */
-CREATE INDEX envidas_station_raw_time ON envidas(station_id, instrument_time);
+CREATE INDEX envidas_site_raw_time ON envidas(site_id, instrument_time);
