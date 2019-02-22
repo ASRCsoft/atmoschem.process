@@ -17,7 +17,7 @@ values ('WFMS', 'Whiteface Mountain Summit'),
        ('QC', 'Queens College');
 
 
-create table measurements (
+create table measurement_types (
   site_id int,
   measurement text,
   valid_range numrange,

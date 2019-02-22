@@ -48,7 +48,7 @@ $$ LANGUAGE sql stable parallel safe;
 
 create or replace function is_valid_value(measurement text, site_id int, value numeric) RETURNS bool AS $$
   select coalesce(value <@ (select valid_range
-			      from measurements
+			      from measurement_types
 			     where measurement=$1
 			       and site_id=$2), true);
 $$ LANGUAGE sql stable parallel safe;
@@ -63,7 +63,7 @@ $$ LANGUAGE sql immutable RETURNS NULL ON NULL INPUT parallel safe;
 
 create or replace function is_below_mdl(site_id int, measurement text, value numeric) RETURNS bool AS $$
   select coalesce(value < (select mdl
-			     from measurements
+			     from measurement_types
 			    where site_id=$1
 			      and measurement=$2), false);
 $$ LANGUAGE sql stable parallel safe;

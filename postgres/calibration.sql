@@ -102,7 +102,7 @@ CREATE OR REPLACE FUNCTION apply_calib(site_id int, measurement text, val numeri
   BEGIN
     return case when span is null then val - zero
       else (val - zero) / (span - zero) * (select m.span
-					     from measurements m
+					     from measurement_types m
 					    where m.site_id=$1
 					      and m.measurement=$2) end;
   END;

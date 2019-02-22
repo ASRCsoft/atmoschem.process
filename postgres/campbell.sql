@@ -41,7 +41,7 @@ CREATE or replace VIEW calibrated_campbell as
 	 mdl,
 	 remove_outliers
     from campbell c
-	   left join measurements m
+	   left join measurement_types m
 	       on c.site_id=m.site_id
 	       and c.measurement=m.measurement;
 
