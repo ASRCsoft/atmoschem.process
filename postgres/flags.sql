@@ -12,12 +12,11 @@ create table manual_flags (
   )
 );
 
-create or replace function has_manual_flag(measurement text, site_id int, measurement_time timestamp) RETURNS bool AS $$
+create or replace function has_manual_flag(measurement_type int, measurement_time timestamp) RETURNS bool AS $$
   select exists(select *
 		  from manual_flags
-		 where measurement=$1
-		   and site_id=$2
-		   and $3 <@ times);
+		 where measurement_type_id=$1
+		   and $2 <@ times);
 $$ LANGUAGE sql stable parallel safe;
 
 create or replace function has_instrument_flag(measurement text, flag text) RETURNS bool AS $$
@@ -31,24 +30,22 @@ create or replace function has_instrument_flag(measurement text, site_id int, fl
 	 when site_id=2 then flag!=0 end;
 $$ LANGUAGE sql immutable parallel safe;
 
-create or replace function has_calibration_flag(measurement text, site_id int, measurement_time timestamp) RETURNS bool AS $$
+create or replace function has_calibration_flag(measurement_type_id int, measurement_time timestamp) RETURNS bool AS $$
   -- check to see if a measurement occurred in a calibration period,
   -- or immediately after one
   -- (need to add a check for manual calibrations here)
   select exists(select *
 		  from autocals
-		 where instrument=$1
-		   and site_id=$2
-		   and $3::date <@ dates
-		   and $3::time <@ timerange(lower(times),
+		 where measurement_type_id=$1
+		   and $2::date <@ dates
+		   and $2::time <@ timerange(lower(times),
 					     upper(times) + interval '5 minutes'));
 $$ LANGUAGE sql stable parallel safe;
 
-create or replace function is_valid_value(measurement text, site_id int, value numeric) RETURNS bool AS $$
+create or replace function is_valid_value(measurement_type_id int, value numeric) RETURNS bool AS $$
   select coalesce(value <@ (select valid_range
 			      from measurement_types
-			     where measurement=$1
-			       and site_id=$2), true);
+			     where id=$1), true);
 $$ LANGUAGE sql stable parallel safe;
 
 create or replace function is_outlier(value numeric, median double precision, mad double precision) RETURNS bool AS $$
@@ -59,29 +56,28 @@ create or replace function is_outlier(value numeric, median double precision, ma
   select (value - median) / (1.4826 * nullif(mad, 0)) > 3.5;
 $$ LANGUAGE sql immutable RETURNS NULL ON NULL INPUT parallel safe;
 
-create or replace function is_below_mdl(site_id int, measurement text, value numeric) RETURNS bool AS $$
+create or replace function is_below_mdl(measurement_type_id int, value numeric) RETURNS bool AS $$
   select coalesce(value < (select mdl
 			     from measurement_types
-			    where site_id=$1
-			      and measurement=$2), false);
+			    where id=$1), false);
 $$ LANGUAGE sql stable parallel safe;
 
 /* Determine if a measurement is flagged. */
-create or replace function is_flagged(measurement text, site_id int, source sourcerow, measurement_time timestamp, value numeric, flagged boolean, median double precision, mad double precision) RETURNS bool AS $$
+create or replace function is_flagged(measurement_type_id int, source sourcerow, measurement_time timestamp, value numeric, flagged boolean, median double precision, mad double precision) RETURNS bool AS $$
   -- Check for: 1) manual flags, 2) instrument flags, 3) calibrations,
   -- 4) invalid values, and 5) outliers (based on the Hampel filter)
-  select has_manual_flag(measurement, site_id, measurement_time)
+  select has_manual_flag(measurement_type_id, measurement_time)
 	   or coalesce(flagged, false)
-	   or has_calibration_flag(measurement, site_id, measurement_time)
-	   or not is_valid_value(measurement, site_id, value)
+	   or has_calibration_flag(measurement_type_id, measurement_time)
+	   or not is_valid_value(measurement_type_id, value)
 	   or coalesce(is_outlier(value, median, mad), false);
 $$ LANGUAGE sql stable parallel safe;
 
 /* Get the NARSTO averaged data flag based on the number of
 measurements and average value. */
-CREATE OR REPLACE FUNCTION get_hourly_flag(site_id int, measurement text, value numeric, n int) RETURNS text AS $$
+CREATE OR REPLACE FUNCTION get_hourly_flag(measurement_type_id int, value numeric, n int) RETURNS text AS $$
   SELECT case when n=0 then 'M1'
-	 when is_below_mdl(site_id, measurement, value) then 'V1'
+	 when is_below_mdl(measurement_type_id, value) then 'V1'
 	 when n<45 then 'V4'
 	 else 'V0' end;
 $$ LANGUAGE sql immutable parallel safe;
