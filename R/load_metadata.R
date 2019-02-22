@@ -10,42 +10,60 @@ dbname = commandArgs(trailingOnly = T)[1]
 
 ## get the sites and corresponding IDs
 pg = dbxConnect(adapter = 'postgres', dbname = dbname)
-sites = dbxSelect(pg, 'select * from stations')
+sites = dbxSelect(pg, 'select * from sites')
 dbxDisconnect(pg)
+
+get_site_id = function(x) sites$id[match(x, sites$short_name)]
 
 write_metadata = function(f, tbl_name, idx_cols) {
   ## upsert metadata from a metadata csv file
   meta = read.csv(f, na.strings=c('', 'NA'))
-  meta$station_id = sites$id[match(meta$site, sites$short_name)]
+  meta$site_id = get_site_id(meta$site)
   meta$site = NULL
+  ## get the measurement type IDs
+  meta = merge(meta, measurement_types)
+  meta$site_id = NULL
+  meta$measurement = NULL
   pg = dbxConnect(adapter = 'postgres', dbname = dbname)
   dbxUpsert(pg, tbl_name, meta, where_cols = idx_cols)
   dbxDisconnect(pg)
 }
 
-write_measurements = function(f) {
-  measurements_file = file.path(f, 'measurements.csv')
-  idx_cols = c('measurement', 'station_id')
-  write_metadata(measurements_file,
-                 'measurements', idx_cols)
+write_measurement_types = function(f) {
+  measurements_file = file.path(f, 'measurement_types.csv')
+  idx_cols = c('measurement', 'site_id')
+  ## write_metadata(measurements_file,
+  ##                'measurement_types', idx_cols)
+  meta = read.csv(measurements_file, na.strings=c('', 'NA'))
+  meta$site_id = get_site_id(meta$site)
+  meta$site = NULL
+  pg = dbxConnect(adapter = 'postgres', dbname = dbname)
+  dbxUpsert(pg, 'measurement_types', meta, where_cols = idx_cols)
+  dbxDisconnect(pg)
 }
 
 write_autocals = function(f) {
   autocal_file = file.path(f, 'autocals.csv')
-  idx_cols = c('instrument', 'dates', 'times', 'station_id')
+  idx_cols = c('dates', 'times', 'measurement_type_id')
   write_metadata(autocal_file, 'autocals', idx_cols)
 }
 
 write_manual_flags = function(f) {
   flags_file = file.path(f, 'manual_flags.csv')
-  idx_cols = c('measurement', 'times', 'station_id')
+  idx_cols = c('times', 'measurement_type_id')
   write_metadata(flags_file, 'manual_flags', idx_cols)
 }
 
 
 f = commandArgs(trailingOnly = T)[-1]
 message('Loading measurements info...')
-write_measurements(f)
+write_measurement_types(f)
+## get the new measurement types
+pg = dbxConnect(adapter = 'postgres', dbname = dbname)
+measurement_types =
+  dbxSelect(pg, 'select id as measurement_type_id, site_id, measurement from measurement_types')
+dbxDisconnect(pg)
+## return to loading the metadata
 message('Loading autocalibration schedule...')
 write_autocals(f)
 message('Loading manual flags...')

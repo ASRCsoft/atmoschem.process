@@ -1,15 +1,13 @@
 /* Determing flag values. */
 
 create table manual_flags (
-  site_id int references sites,
-  measurement text,
+  measurement_type_id int references measurement_types,
   times tsrange,
   aqs_flag text not null,
   explanation text,
-  primary key(site_id, measurement, times),
+  primary key(measurement_type_id, times),
   CONSTRAINT no_overlapping_times EXCLUDE USING GIST (
-    measurement WITH =,
-    site_id WITH =,
+    measurement_type_id WITH =,
     times WITH &&
   )
 );

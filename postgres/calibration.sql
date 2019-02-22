@@ -1,13 +1,17 @@
 /* Instrument calibration */
 
 create table autocals (
-  site_id int references sites,
-  instrument text,
+  measurement_type_id int references measurement_types,
   type text,
   dates daterange,
   times timerange,
   value numeric default 0,
-  primary key(site_id, instrument, dates, times)
+  primary key(measurement_type_id, dates, times),
+  CONSTRAINT no_overlapping_autocals EXCLUDE USING GIST (
+    measurement_type_id WITH =,
+    dates WITH &&,
+    times WITH &&
+  )
 );
 
 create table manual_calibrations (

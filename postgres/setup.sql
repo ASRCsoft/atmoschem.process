@@ -18,23 +18,23 @@ values ('WFMS', 'Whiteface Mountain Summit'),
 
 
 create table measurement_types (
-  site_id int,
-  measurement text,
+  id serial primary key,
+  site_id int not null references sites,
+  measurement text not null,
   valid_range numrange,
   mdl numeric,
   span numeric,
   has_calibration boolean,
   remove_outliers boolean,
-  primary key(site_id, measurement)
+  unique(site_id, measurement)
 );
 
 create table measurements (
-  site_id int references sites,
+  measurement_type_id int references measurement_types,
   instrument_time timestamp,
   record int,
-  measurement text,
   value numeric,
   flagged boolean,
-  primary key(site_id, instrument_time, measurement)
+  primary key(measurement_type_id, instrument_time)
 );
 SELECT create_hypertable('measurements', 'instrument_time');

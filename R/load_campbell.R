@@ -16,7 +16,8 @@ dbname = commandArgs(trailingOnly = T)[1]
 
 ## get the sites and corresponding IDs
 pg = dbxConnect(adapter = 'postgres', dbname = dbname)
-sites = dbxSelect(pg, 'select * from stations')
+sites = dbxSelect(pg, 'select * from sites')
+measurement_types = dbxSelect(pg, 'select * from measurement_types')
 dbxDisconnect(pg)
 
 fast_lookup = function(vals, dict) {
@@ -50,9 +51,9 @@ write_campbell = function(f) {
   campbell = read_campbell(f)
   path_folders = strsplit(f, '/')[[1]]
   ## campbell$file = tail(path_folders, 1)
-  ## get the station
-  station = path_folders[length(path_folders) - 1]
-  if (station == 'WFMS') {
+  ## get the site
+  site = path_folders[length(path_folders) - 1]
+  if (site == 'WFMS') {
     ## replace mislabeled NO2 column
     names(campbell)[names(campbell) == 'NO2_Avg'] = 'NOx_Avg'
     ## adjust miscalculated wind speeds
@@ -65,9 +66,9 @@ write_campbell = function(f) {
   is_flag = grepl('^F_', names(campbell))
   campbell_long = campbell[, !is_flag] %>%
     gather(measurement, value, -c(instrument_time, RECORD))
-  if (station == 'WFMS') {
+  if (site == 'WFMS') {
     flag_mat = as.matrix(campbell[, is_flag]) != 1
-  } else if (station == 'WFML') {
+  } else if (site == 'WFML') {
     flag_mat = as.matrix(campbell[, is_flag]) != 0
   }
   row.names(flag_mat) = campbell$instrument_time
@@ -84,8 +85,14 @@ write_campbell = function(f) {
   
   ## add to postgres
   names(campbell_long) = tolower(names(campbell_long))
-  campbell_long$station_id =
-    sites$id[sites$short_name == station]
+  site_id = sites$id[sites$short_name == site]
+  site_measurement_types =
+    measurement_types[measurement_types$site_id == site_id, ]
+  campbell_long$measurement_type_id =
+    site_measurement_types$id[match(campbell_long$measurement,
+                                    site_measurement_types$measurement)]
+  campbell_long$measurement = NULL
+  campbell_long = subset(campbell_long, !is.na(measurement_type_id))
   pg = dbxConnect(adapter = 'postgres', dbname = dbname)
   ## Some files contain duplicate times due to a datalogger
   ## restart. However, all the duplicated times appear to have
@@ -94,9 +101,9 @@ write_campbell = function(f) {
 
   ## It would be prudent to add a check here, though, to verify that
   ## duplicated times have matching values.
-  dbxUpsert(pg, 'campbell', campbell_long,
-            where_cols = c('instrument_time', 'measurement',
-                           'station_id'),
+  dbxUpsert(pg, 'measurements', campbell_long,
+            where_cols = c('instrument_time',
+                           'measurement_type_id'),
             batch_size = 10000, skip_existing = T)
   dbxDisconnect(pg)
 }
