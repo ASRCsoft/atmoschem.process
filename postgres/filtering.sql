@@ -4,17 +4,17 @@
 /* Efficient median filter */
 CREATE OR REPLACE FUNCTION runmed_transfn(internal, double precision)
 RETURNS internal
-AS '/home/wmay/nysatmoschem/src/median', 'median_transfn'
+AS 'median', 'median_transfn'
 LANGUAGE c IMMUTABLE parallel safe;
 
 CREATE OR REPLACE FUNCTION runmed_invtransfn(internal, double precision)
   RETURNS internal
-AS '/home/wmay/nysatmoschem/src/median', 'median_invtransfn'
+AS 'median', 'median_invtransfn'
 LANGUAGE c IMMUTABLE parallel safe;
 
 CREATE OR REPLACE FUNCTION runmed_finalfn(internal)
 RETURNS double precision
-AS '/home/wmay/nysatmoschem/src/median', 'median_finalfn'
+AS 'median', 'median_finalfn'
 LANGUAGE c IMMUTABLE parallel safe;
 
 CREATE AGGREGATE runmed(double precision) (
@@ -31,17 +31,17 @@ CREATE AGGREGATE runmed(double precision) (
 /* Efficient running MAD */
 CREATE OR REPLACE FUNCTION runmad_transfn(internal, double precision)
 RETURNS internal
-AS '/home/wmay/nysatmoschem/src/median', 'mad_transfn'
+AS 'median', 'mad_transfn'
 LANGUAGE c IMMUTABLE parallel safe;
 
 CREATE OR REPLACE FUNCTION runmad_invtransfn(internal, double precision)
   RETURNS internal
-AS '/home/wmay/nysatmoschem/src/median', 'mad_invtransfn'
+AS 'median', 'mad_invtransfn'
 LANGUAGE c IMMUTABLE parallel safe;
 
 CREATE OR REPLACE FUNCTION runmad_finalfn(internal)
 RETURNS double precision
-AS '/home/wmay/nysatmoschem/src/median', 'mad_finalfn'
+AS 'median', 'mad_finalfn'
 LANGUAGE c IMMUTABLE parallel safe;
 
 CREATE AGGREGATE runmad(double precision) (
