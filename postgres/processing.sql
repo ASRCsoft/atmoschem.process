@@ -10,6 +10,23 @@ I also split the processing by data source so that a new data file
 does not require reprocessing all data. Therefore there are separate
 materialized views for each source. */
 
+/* Apply calibration adjustments if needed, using functions from
+   calibration.sql. */
+create or replace view calibrated_measurements as
+  select c.measurement_type_id,
+	 instrument_time,
+	 record,
+	 value,
+	 case when has_calibration then apply_calib(c.measurement_type_id, value, instrument_time)
+	 else value end as calibrated_value,
+	 flagged,
+	 valid_range,
+	 mdl,
+	 remove_outliers
+    from measurements c
+	   left join measurement_types m
+	       on c.measurement_type_id=m.id;
+
 CREATE OR REPLACE FUNCTION process_measurements(measurement_type_ids int[])
   RETURNS TABLE (
     measurement_type_id int,
@@ -17,45 +34,26 @@ CREATE OR REPLACE FUNCTION process_measurements(measurement_type_ids int[])
     value numeric,
     flagged boolean
   ) as $$
-  with calibrated_measurements as (
-    /* 1) Calibration.
-
-       This statement applies calibration adjustments if needed. It
-       relies on functions from calibration.sql. */
-    select c.measurement_type_id,
-	   instrument_time,
-	   record,
-	   value,
-	   case when has_calibration then apply_calib(c.measurement_type_id, value, instrument_time)
-	   else value end as calibrated_value,
-	   flagged,
-	   valid_range,
-	   mdl,
-	   remove_outliers
-      from measurements c
-	     left join measurement_types m
-		 on c.measurement_type_id=m.id
-     where m.id = any(measurement_type_ids)
+  with calibrated_measurements_subset as (
+    select *
+      from calibrated_measurements
+     where measurement_type_id = any(measurement_type_ids)
   ), measurement_medians as (
-    /* 2) Running medians.
-
-       This statement calculates running medians and running Median
-       Absolute Deviations (MAD). It relies on functions from
-       filtering.sql. These numbers are used to check for outliers. */
+    /* Calculate running medians and running Median Absolute
+       Deviations (MAD) using functions from filtering.sql. These
+       numbers are used to check for outliers. */
     select *,
 	   case when remove_outliers then runmed(calibrated_value) over w
 	   else null end as running_median,
 	   case when remove_outliers then runmad(calibrated_value) over w
 	   else null end as running_mad
-      from calibrated_measurements
+      from calibrated_measurements_subset
 	     WINDOW w AS (partition by measurement_type_id
 			  ORDER BY instrument_time
 			  rows between 120 preceding and 120 following)
   )
-  /* 3) QC checks.
-
-     This statement checks for flag conditions. It relies on functions
-     from flags.sql. The end result is the fully processed data. */
+  /* Check for flag conditions using functions from flags.sql. The end
+     result is the fully processed data. */
   select measurement_type_id,
 	 instrument_time as time,
 	 calibrated_value as value,
@@ -81,10 +79,8 @@ CREATE materialized VIEW processed_campbell_wfml as
 create index processed_campbell_wfml_idx on processed_campbell_wfml(measurement_type_id, measurement_time);
 
 
-/* 4) Hourly aggragates.
-
-This view aggregates the processed data by hour. It relies on a
-function from flags.sql. */
+/* Aggregate the processed data by hour using a function from
+   flags.sql. */
 CREATE materialized VIEW hourly_campbell_wfms as
   select measurement_type_id,
 	 measurement_time,
@@ -111,7 +107,9 @@ CREATE materialized VIEW hourly_campbell_wfml as
 	   group by measurement_type_id, time_bucket('1 hour', measurement_time)) c1;
 create index hourly_campbell_wfml_idx on hourly_campbell_wfml(measurement_type_id, measurement_time);
 
-/* To update the processed data, simply need to refresh the relevant materialized views. For example, to update WFMS campbell results:
+/* To update the processed data, simply need to refresh the relevant
+materialized views. For example, to update WFMS campbell results:
+
 refresh materialized view calibration_values;
 refresh materialized view processed_campbell_wfms;
 refresh materialized view hourly_campbell_wfms; */
