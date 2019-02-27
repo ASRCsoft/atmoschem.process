@@ -9,7 +9,8 @@ library(dbx)
 library(tidyr)
 
 wfms_flags = c(NO = 'NOX', NO2 = 'NOX', T = 'TRH',
-               RH = 'TRH', NOy = 'NOY', SO2 = 'SO2')
+               RH = 'TRH', NOy = 'NOY', SO2 = 'SO2',
+               CO = 'CO')
 wfml_flags = c(CO = 'CO', NO = 'NOX', NO2 = 'NOX')
 
 dbname = commandArgs(trailingOnly = T)[1]
