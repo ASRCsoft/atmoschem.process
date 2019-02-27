@@ -117,3 +117,41 @@ $$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 --   from (select interpolate_cal(site_id, measurement, 'zero', t) as zero,
 -- 	       interpolate_cal(site_id, measurement, 'span', t) as span) as cals;
 -- $$ LANGUAGE sql STABLE PARALLEL SAFE;
+
+
+CREATE MATERIALIZED VIEW conversion_efficiencies AS
+  select measurement_type_id,
+	 cal_times,
+	 apply_calib(measurement_type_id, value,
+		     upper(cal_times)) / 12.57 as conversion_efficiency
+    from (select *,
+		 estimate_cal(measurement_type_id, type, cal_times) as value
+	    from calibration_periods
+	   where type='CE') c1
+   where value is not null;
+-- to make the interpolate_ce function faster
+CREATE INDEX conversion_efficiencies_upper_time_idx ON conversion_efficiencies(upper(cal_times));
+
+/* Estimate conversion efficiencies using linear interpolation */
+CREATE OR REPLACE FUNCTION interpolate_ce(measurement_type_id int, t timestamp)
+  RETURNS numeric AS $$
+  select interpolate(t0, t1, y0, y1, $2)
+    from (select upper(cal_times) as t0,
+		 conversion_efficiency as y0
+	    from conversion_efficiencies
+	   where upper(cal_times)<=$2
+	     and measurement_type_id=$1
+	     and conversion_efficiency is not null
+	   order by upper(cal_times) desc
+	   limit 1) ce0
+         full outer join
+         (select upper(cal_times) as t1,
+		 conversion_efficiency as y1
+	    from conversion_efficiencies
+	   where upper(cal_times)>$2
+	     and measurement_type_id=$1
+	     and conversion_efficiency is not null
+	   order by upper(cal_times) asc
+	   limit 1) ce1
+         on true;
+$$ LANGUAGE sql STABLE PARALLEL SAFE;
