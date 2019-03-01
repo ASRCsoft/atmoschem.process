@@ -48,6 +48,18 @@ read_campbell = function(f) {
   df[, -grep('Spare|Phase', names(df), ignore.case = T)]
 }
 
+fix_wfms = function(df) {
+  ## fix various issues with WFMS data
+  
+  ## replace mislabeled NO2 column
+  names(df)[names(df) == 'NO2_Avg'] = 'NOx_Avg'
+  ## adjust miscalculated wind speeds
+  df$WS3Cup_Avg[df$instrument_time > '2016-12-14' &
+                      df$instrument_time < '2019-02-14 15:57'] =
+    (.5 / .527) * df$WS3Cup_Avg - (.5 / .527) - .5
+  df
+}
+
 write_campbell = function(f) {
   campbell = read_campbell(f)
   path_folders = strsplit(f, '/')[[1]]
@@ -55,12 +67,7 @@ write_campbell = function(f) {
   ## get the site
   site = path_folders[length(path_folders) - 1]
   if (site == 'WFMS') {
-    ## replace mislabeled NO2 column
-    names(campbell)[names(campbell) == 'NO2_Avg'] = 'NOx_Avg'
-    ## adjust miscalculated wind speeds
-    campbell$WS3Cup_Avg[campbell$instrument_time > '2016-12-14' &
-                        campbell$instrument_time < '2019-02-14 15:57'] =
-      (.5 / .527) * campbell$WS3Cup_Avg - (.5 / .527) - .5
+    campbell = fix_wfms(campbell)
   }
   
   ## clean and reorganize the data
