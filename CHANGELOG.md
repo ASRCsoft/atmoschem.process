@@ -10,6 +10,8 @@
 - Replace standard deviation-based outlier detection with median
   absolute deviation-based outlier detection.
 - Use 3-minute moving averages for all calibration estimates.
+- Treat zero WindDir\_SD1\_WVT as an indicator of wind direction
+  instrument malfunction.
 
 ### Fixed
 - Fix bug ignoring ultrafine 'Nozzle Pressure' flag (400) instead of

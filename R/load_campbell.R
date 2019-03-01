@@ -63,8 +63,8 @@ fix_wfms = function(df) {
   ## ignore some incorrect flags
   df$F_TRH_Avg[df$instrument_time > '2018-12-01' &
                df$instrument_time < '2019-01-01'] = 1
-  ## replace missing wind direction values with NA
-  df[df$WindDir_D1_WVT == 0 & df$WindDir_SD1_WVT == 0,
+  ## replace malfunctioning wind direction values with NA
+  df[df$WindDir_SD1_WVT == 0,
      c('WindDir_D1_WVT', 'WindDir_SD1_WVT')] = NA
   df
 }
