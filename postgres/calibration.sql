@@ -60,7 +60,7 @@ CREATE MATERIALIZED VIEW calibration_values AS
     from (select *,
 		 estimate_cal(measurement_type_id, type, cal_times) as value
 	    from calibration_periods
-	   where type is not null) c1
+	   where type in ('zero', 'span')) c1
    where value is not null;
 -- to make the interpolate_cal function faster
 CREATE INDEX calibration_values_upper_time_idx ON calibration_values(upper(cal_times));
