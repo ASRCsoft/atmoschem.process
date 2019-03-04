@@ -21,6 +21,17 @@ sites = dbxSelect(pg, 'select * from sites')
 measurement_types = dbxSelect(pg, 'select * from measurement_types')
 dbxDisconnect(pg)
 
+update_measurement_types = function(site_id, df) {
+  ## add measurement types that don't already exist in postgres
+  mt_df = data.frame(site_id = site_id,
+                     measurement = unique(df$measurement))
+  pg = dbxConnect(adapter = 'postgres', dbname = dbname)
+  dbxUpsert(pg, 'measurement_types', mt_df,
+            where_cols = c('site_id', 'measurement'),
+            skip_existing = T)
+  dbxDisconnect(pg)
+}
+
 fast_lookup = function(vals, dict) {
   ## This code to get dictionary (named vector) entries shouldn't need
   ## to be this long but the current version of R seems to have a very
@@ -103,13 +114,13 @@ write_campbell = function(f) {
   ## add to postgres
   names(campbell_long) = tolower(names(campbell_long))
   site_id = sites$id[sites$short_name == site]
+  update_measurement_types(site_id, campbell_long)
   site_measurement_types =
     measurement_types[measurement_types$site_id == site_id, ]
   campbell_long$measurement_type_id =
     site_measurement_types$id[match(campbell_long$measurement,
                                     site_measurement_types$measurement)]
   campbell_long$measurement = NULL
-  campbell_long = subset(campbell_long, !is.na(measurement_type_id))
   pg = dbxConnect(adapter = 'postgres', dbname = dbname)
   ## Some files contain duplicate times due to a datalogger
   ## restart. However, all the duplicated times appear to have
