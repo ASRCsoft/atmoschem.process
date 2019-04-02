@@ -8,7 +8,7 @@ library(parallel)
 library(dbx)
 library(tidyr)
 
-wfms_flags = c(NO = 'NOX', NO2 = 'NOX', T = 'TRH',
+wfms_flags = c(NO = 'NOX', NOx = 'NOX', T = 'TRH',
                RH = 'TRH', NOy = 'NOY', SO2 = 'SO2',
                CO = 'CO')
 wfml_flags = c(CO = 'CO', NO = 'NOX', NO2 = 'NOX')
@@ -18,18 +18,25 @@ dbname = commandArgs(trailingOnly = T)[1]
 ## get the sites and corresponding IDs
 pg = dbxConnect(adapter = 'postgres', dbname = dbname)
 sites = dbxSelect(pg, 'select * from sites')
-measurement_types = dbxSelect(pg, 'select * from measurement_types')
 dbxDisconnect(pg)
 
 update_measurement_types = function(site_id, df) {
   ## add measurement types that don't already exist in postgres
   mt_df = data.frame(site_id = site_id,
-                     measurement = unique(df$measurement))
+                     measurement = unique(df$measurement),
+                     data_source = 'campbell')
   pg = dbxConnect(adapter = 'postgres', dbname = dbname)
   dbxUpsert(pg, 'measurement_types', mt_df,
-            where_cols = c('site_id', 'measurement'),
+            where_cols = c('site_id', 'measurement', 'data_source'),
             skip_existing = T)
   dbxDisconnect(pg)
+}
+
+get_measurement_types = function() {
+  pg = dbxConnect(adapter = 'postgres', dbname = dbname)
+  measurement_types = dbxSelect(pg, "select * from measurement_types where data_source='campbell'")
+  dbxDisconnect(pg)
+  measurement_types
 }
 
 fast_lookup = function(vals, dict) {
@@ -115,6 +122,7 @@ write_campbell = function(f) {
   names(campbell_long) = tolower(names(campbell_long))
   site_id = sites$id[sites$short_name == site]
   update_measurement_types(site_id, campbell_long)
+  measurement_types = get_measurement_types()
   site_measurement_types =
     measurement_types[measurement_types$site_id == site_id, ]
   campbell_long$measurement_type_id =
