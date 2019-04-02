@@ -12,6 +12,85 @@ create table manual_flags (
   )
 );
 
+/* Find frozen wind periods */
+-- get the anemometer measurement type IDs
+create or replace function anemometer_ids() RETURNS int[] AS $$
+  select array_agg(id)
+    from (select id
+	    from measurement_types
+	   where measurement in ('WS3Cup',
+				 'WS3Cup_Max',
+				 'WS3CupB',
+				 'WS3CupB_Max')) m1;
+$$ LANGUAGE sql stable parallel safe;
+
+-- see if the anemometers look frozen
+CREATE or replace VIEW wind_looks_frozen AS
+  select measurement_type_id,
+	 instrument_time,
+	 (bit_and(slow_wind::int) over w)::boolean as looks_frozen
+    from (select measurement_type_id,
+		 instrument_time,
+		 value < .2 as slow_wind
+	    from measurements
+	   where measurement_type_id=any(anemometer_ids())) w1
+	   window w as (partition by measurement_type_id
+			order by instrument_time
+			rows between current row and 30 following);
+
+-- get contiguous periods of frozen anemometer times
+CREATE or replace VIEW contiguous_freezes AS
+  select measurement_type_id,
+	 tsrange(min(instrument_time) - interval '1 hour',
+		 max(instrument_time) + interval '40 minutes') as freezing_times
+    from (select *,
+		 sum(freeze_starts::int) over w as freeze_group
+	    from (select *,
+			 looks_frozen and not lag(looks_frozen) over w as freeze_starts
+		    from wind_looks_frozen
+			   window w as (partition by measurement_type_id
+					order by instrument_time)) w1
+		   window w as (partition by measurement_type_id
+				order by instrument_time)) w2
+   where looks_frozen
+   group by measurement_type_id, freeze_group;
+
+-- filter contiguous_freezes using the corresponding site temperature
+-- at the beginning of the freeze
+CREATE or replace VIEW contiguous_cold_freezes AS
+  select f1.measurement_type_id,
+	 freezing_times,
+	 mt1.site_id
+    from contiguous_freezes f1
+  	   join measurement_types mt1
+	       on f1.measurement_type_id=mt1.id
+	   join measurement_types mt2
+	       on mt1.site_id=mt2.site_id
+	   join measurements m1
+	       on m1.measurement_type_id=mt2.id
+	       and m1.instrument_time=(lower(freezing_times) + interval '1 hour')
+   where mt2.measurement='T'
+     and m1.value<5;
+
+-- get clusters of frozen anemometer times
+CREATE materialized VIEW freezing_clusters AS
+  select measurement_type_id,
+	 tsrange(min(lower(freezing_times)),
+		 max(upper(freezing_times))) as freeze_period
+    from (select *,
+		 sum(new_freeze::int) over w as freeze_cluster
+	    from (select *,
+			 coalesce(not freezing_times && lag(freezing_times) over w,
+				  true) as new_freeze
+		    from contiguous_cold_freezes
+			   window w as (partition by measurement_type_id
+					order by lower(freezing_times))) w1
+		   window w as (partition by measurement_type_id
+				order by lower(freezing_times))) w2
+   group by measurement_type_id, freeze_cluster;
+CREATE INDEX freezing_clusters_idx ON freezing_clusters using gist(measurement_type_id, freeze_period);
+
+/* Check for flags */
 create or replace function has_manual_flag(measurement_type int, measurement_time timestamp) RETURNS bool AS $$
   select exists(select *
 		  from manual_flags
@@ -51,15 +130,25 @@ create or replace function is_below_mdl(measurement_type_id int, value numeric) 
 			    where id=$1), false);
 $$ LANGUAGE sql stable parallel safe;
 
+create or replace function is_frozen(measurement_type_id int, measurement_time timestamp) RETURNS bool AS $$
+  select exists(select *
+		  from freezing_clusters
+		 where measurement_type_id=$1
+		   and $2 <@ freeze_period);
+$$ LANGUAGE sql stable parallel safe;
+  
 /* Determine if a measurement is flagged. */
 create or replace function is_flagged(measurement_type_id int, source sourcerow, measurement_time timestamp, value numeric, flagged boolean, median double precision, mad double precision) RETURNS bool AS $$
   -- Check for: 1) manual flags, 2) instrument flags, 3) calibrations,
-  -- 4) invalid values, and 5) outliers (based on the Hampel filter)
+  -- 4) invalid values, 5) outliers (based on the Hampel filter), and
+  -- 6) freezing anemometers
   select has_manual_flag(measurement_type_id, measurement_time)
 	   or coalesce(flagged, false)
 	   or has_calibration_flag(measurement_type_id, measurement_time)
 	   or not is_valid_value(measurement_type_id, value)
-	   or coalesce(is_outlier(value, median, mad), false);
+	   or coalesce(is_outlier(value, median, mad), false)
+	   or case when measurement_type_id=any(anemometer_ids()) then is_frozen(measurement_type_id, measurement_time)
+	      else false end;
 $$ LANGUAGE sql stable parallel safe;
 
 /* Get the NARSTO averaged data flag based on the number of

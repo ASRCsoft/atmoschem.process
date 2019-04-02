@@ -1,7 +1,6 @@
 /* Creating tables used by multiple instruments */
 
 create extension btree_gist;
-CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;
 
 /* site table */
 create table sites (
@@ -19,13 +18,18 @@ values ('WFMS', 'Whiteface Mountain Summit'),
 create table measurement_types (
   id serial primary key,
   site_id int not null references sites,
+  data_source text not null,
   measurement text not null,
+  apply_processing boolean,
   valid_range numrange,
   mdl numeric,
   span numeric,
   has_calibration boolean,
   remove_outliers boolean,
-  unique(site_id, measurement)
+  max_jump numeric,
+  apply_ce boolean,
+  max_ce numeric,
+  unique(site_id, data_source, measurement)
 );
 
 create table measurements (
@@ -36,4 +40,3 @@ create table measurements (
   flagged boolean,
   primary key(measurement_type_id, instrument_time)
 );
-SELECT create_hypertable('measurements', 'instrument_time');
