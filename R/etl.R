@@ -21,37 +21,37 @@ etl_extract.etl_nysatmoschem <- function(obj, ...) {
   invisible(obj)
 }
 
-etl_init.nysatmoschem = function(obj, script = NULL,
-                                 schema_name = "init",
-                                 pkg = attr(obj, "pkg"),
-                                 ext = NULL, ...) {
+#' @export
+etl_init.etl_nysatmoschem = function(obj, script = NULL, schema_name = "init",
+                                     pkg = attr(obj, "pkg"),
+                                     ext = NULL, ...) {
   ## make sure the database connection is good
   obj = etl:::verify_con(obj)
   if (!methods::is(obj$con, "DBIConnection")) {
     stop("Invalid connection to database.")
   }
+  pg = obj$con
   
   ## add to postgres' libdir so it can find compiled code
-  pg_src_path = system.file('libs',
-                            package = 'nysatmoschem')
-  ## (think I need to change the colon to semi-colon on windows)
-  dynamic_library_path = paste(pg_src_path, '$libdir', sep = ':')
-  sql_txt = paste0("set dynamic_library_path to '",
-                   dynamic_library_path, "'")
-  DBI::dbClearResult(DBI::dbSendStatement(obj$con, sql_txt))
+  update_dynamic_library_path(pg)
 
   ## set up tables and functions
-  sql_files = c('utilities', 'setup', 'calibration',
-                'filtering', 'flags', 'processing')
+  sql_files = c('utilities', 'setup', 'filtering',
+                'calibration', 'flags', 'processing')
   for (sql_file in sql_files) {
-    ## this works a lot better than dbRunScript in the default
-    ## method
-    schema = find_schema(obj, sql_file, 'nysatmoschem', 'sql')
-    sql_txt = paste(readLines(schema), collapse = "\n")
-    suppressWarnings(DBI::dbClearResult(DBI::dbSendStatement(obj$con, sql_txt)))
+    sql_file = etl::find_schema(obj, sql_file, ext = 'sql')
+    run_sql_script(pg, sql_file)
   }
 
   ## add metadata
-  ## ...
+  metadata_path = system.file('extdata', package = 'nysatmoschem')
+  measurement_types_csv =
+    file.path(metadata_path, 'measurement_types.csv')
+  update_measurement_types(pg, measurement_types_csv)
+  autocals_csv = file.path(metadata_path, 'autocals.csv')
+  update_autocals(pg, autocals_csv)
+  manual_flags_csv = file.path(metadata_path, 'manual_flags.csv')
+  update_manual_flags(pg, manual_flags_csv)
+  
   invisible(obj)
 }
