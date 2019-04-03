@@ -1,7 +1,15 @@
 *scratch*
 
-# Emacs
-*~
+# R
+.Rproj.user
 *.Rhistory
 *.o
 *.so
+
+# Emacs
+*~
+
+# vignettes
+inst/doc
+vignettes/img
+*.pdf

@@ -3,9 +3,12 @@ Title: New York State atmospheric chemistry database
 Version: 0.0.0.9000
 Authors@R: person("William", "May", email = "wcmay@albany.edu", role = c("aut", "cre"))
 Description: Creates the nysatmoschem database.
-Depends: 
+Depends:
     R (>= 3.4.4),
     etl
 License: MIT
 Encoding: UTF-8
 LazyData: true
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr

@@ -1,0 +1,363 @@
+---
+title: "ASRC NYS Atmospheric Chemistry Database"
+author: "William May"
+date: "`r gsub(' 0', ' ', format(Sys.Date(), '%B %d, %Y'))`"
+output:
+  bookdown::pdf_document2:
+    toc: true
+    number_sections: false
+vignette: >
+  %\VignetteIndexEntry{The ASRC NYS Atmospheric Chemistry Database (official documentation)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+urlcolor: blue
+bibliography: nysatmoschem.bib
+header-includes:
+   - \usepackage[section]{placeins}
+   - \usepackage{caption}
+   - \DeclareMathOperator{\median}{median}
+   - \DeclareMathOperator{\MAD}{MAD}
+   - \DeclareMathOperator{\atantwo}{atan2}
+---
+
+```{r setup, include=FALSE}
+library(RPostgreSQL)
+knitr::opts_chunk$set(echo = FALSE, cache = FALSE)
+db = dbConnect(PostgreSQL(), dbname = 'chem2')
+```
+
+# Overview
+
+The data manager plays a role that is part database maintainer, part statistician, and part archivist. He or she collects data from various sources, cleans, organizes, and stores the data, and provides it to the government agencies and atmospheric science researchers. Figure \@ref(fig:overview) shows the path of the data.
+
+```{r overview, fig.cap='Instrument data is provided to the ASRC data manager, who processes the data to prepare it for researchers and government agencies.'}
+library(DiagrammeR)
+node_labels = c('Whiteface\nMountain', 'Pinnacle\nState Park',
+                'Queens\nCollege', 'NYS\nMesonet',
+                'ASRC', 'Gov. Agencies', 'Researchers')
+n_nodes = length(node_labels)
+nodes = create_node_df(n_nodes, label = node_labels)
+edges = create_edge_df(c(1:4, rep(5, 2)),
+                       c(rep(5, 4), 6:7))
+graph = create_graph(nodes, edges, attr_theme = NULL)
+graph %>% export_graph(file_name = 'img/overview.pdf')
+knitr::include_graphics('img/overview.pdf')
+```
+
+The data goes through a complicated series of processing steps before being provided to researchers and bureaucrats for analysis. Figure \@ref(fig:processing) attempts to summarize these steps.
+
+```{r processing, fig.cap='Processing steps for atmoschem datasets.'}
+library(reshape2)
+library(ggplot2)
+
+## list the datasets and processing steps
+datasets = c('Ultrafine', 'PM 2.5', 'NO', 'NO2', 'NOy', 'CO',
+             'SO2', 'Ozone', 'Methane', 'Aethelometer',
+             'Wind', 'Temperature', 'RH', 'BP', 'Nephelometer')
+steps = c('Clock corrections',
+          'Calibration corrections',
+          'Conversion Efficiency',
+          'Instrument flags',
+          'Manual flags',
+          'Extreme values filter',
+          'Spike filter')
+
+## easier to set default to true and change the false ones
+m = matrix(T, nrow = length(datasets), ncol = length(steps),
+           dimnames = list(datasets, steps))
+
+## exceptions (false)
+calib_exceptions = c('Ultrafine', 'Ozone', 'Temperature', 'RH',
+                     'Wind', 'BP', 'Nephelometer')
+autocal_exceptions = c('Ultrafine', 'Ozone', 'Wind',
+                       'Temperature', 'RH', 'BP', 'Nephelometer')
+bounds_exceptions = c('Temperature', 'Wind', 'Nephelometer')
+m[calib_exceptions, 'Calibration corrections'] = F
+m[bounds_exceptions, 'Extreme values filter'] = F
+m['Ultrafine', 'Spike filter'] = F
+
+## exceptions (only ones that are true)
+ce_exceptions = c('NO2', 'NOy')
+rn_exceptions = c('NO', 'NO2', 'NOy')
+m[, 'Conversion Efficiency'] = F
+m[ce_exceptions, 'Conversion Efficiency'] = T
+
+df = melt(m, value.name = 'Required',
+          varnames = c('Dataset', 'Processing Steps'))
+
+ggplot(df, aes(`Processing Steps`, Dataset, fill = Required)) +
+  geom_tile(color = 'gray', size = 1) +
+  scale_x_discrete('Processing Steps', position = 'top') +
+  coord_fixed() +
+  theme(panel.background = element_blank(),
+        axis.text.x=element_text(angle = -60, hjust = 1),
+        axis.text.x.top = element_text(vjust = 0.5),
+        ## ^see note here for explanation of that adjustment:
+        ## https://github.com/tidyverse/ggplot2/issues/1878#issuecomment-257683121
+        legend.position = 'bottom')
+```
+
+# Database Organization
+
+The nysatmoschem database is designed as a small data warehouse. That is, an Extract, Transform, Load (ETL) process standardizes and imports data from a variety of sources to prepare the data for analysis. Figure \@ref(fig:dbschema) shows the resulting data schema. A set of automated reports serve as a data mart providing simplified access to the data.
+
+The ETL functions are implemented in R and organized using the etl package [@baumer_etl:_2017; @baumer_grammar_2017]. Data files are reorganized to match the format of the measurements table. When instrument flags are provided along with measurement values, the flag information is parsed to provide a boolean data quality flag indicating whether the measurement is usable.
+
+```{r dbschema, fig.cap='The NYS Atmospheric Chemistry database schema.'}
+library(datamodelr)
+
+sQuery <- dm_re_query('postgres')
+dm_atmoschem <- dbGetQuery(db, sQuery)
+dm_atmoschemdm <- as.data_model(dm_atmoschem)
+graph <- dm_create_graph(dm_atmoschemdm, rankdir = "RL", columnArrows = T)
+# do a silly dance to get the output in pdf
+rsvg::rsvg_pdf(charToRaw(DiagrammeRsvg::export_svg(dm_render_graph(graph))),
+               file = 'img/schema.pdf')
+knitr::include_graphics('img/schema.pdf')
+```
+
+# Getting Data
+
+The Whiteface Mountain datasets can be obtained on the atmoschem server. These include a calibration sheet, a flag report sheet, and the individual data files. Data can also be accessed through the Campbell datalogger, currently made available on the webdev server.
+
+Most Pinnacle State Park data is recieved via email from the site operator, with the exception of the Envidas files. Currently the data manager accesses the Pinnacle computer using VNC, then generates the data file with Envidas and downloads it over VNC. Some relevant data is stored in a logbook. Sections of the logbook are scanned and emailed periodically to the ASRC data manager, and when logbooks are filled they're sent to the ASRC for more scanning and archiving, before being sent back to Pinnacle.
+
+Most Queens College data is obtained from the [EPA Air Quality System Data Mart](https://aqs.epa.gov/aqsweb/documents/data_mart_welcome.html). Ultrafine data is emailed monthly from the Queens College data manager.
+
+# Data Corrections
+
+## Clock Corrections
+
+Some instruments are not connected to the internet and suffer from clock drift. The site operator at Pinnacle State Park audits instrument clock times regularly and corrects instrument clocks that drift more than a few minutes away from the true time. We use linear interpolation to estimate the clock error and true measurement time between clock audits.
+
+$$
+\hat{t}_i = t_0 + (t_{obs,i} - t_{obs,0})\frac{t_1 - t_0}{t_{obs,1} - t_{obs,0}}
+$$
+where $t_i$ is the true time recorded by the site operator, $t_0$ and $t_1$ are the preceding and next clock audit times, $t_{obs}$ is the reported instrument time, and $\hat{t}$ is the resulting estimate of the true time.
+
+When the site operator corrects the instrument clock, $t_{obs,0}$ equals $t_0$ for the next interval, and the equation changes to
+$$
+\hat{t}_i = t_0 + (t_{obs,i} - t_0)\frac{t_1 - t_0}{t_{obs,1} - t_0}.
+$$
+
+## Calibration Corrections
+
+Chemistry instruments are periodically tested with known amounts of chemicals to estimate biases in instrument measurements. Usually this involves two sets of measurements, *zero* values (with clean air) and *span* values (air with a known positive amount of the chemical). Operators sometimes add a short *zero check* afterward to double check zero measurements.
+
+We assume that instrument biases take the form of a linear transformation, so that corrections can be applied with linear interpolation.
+
+$$
+\hat{chem}_i = cal_{zero} + (x_i - cal_{zero})\frac{span}{cal_{span} - cal_{zero}}
+$$
+where $\hat{chem}_i$ is the estimate of the true amount of the chemical at time $i$, $x_i$ is the value reported by the instrument, $span$ is the known span calibration value, $cal_{zero}$ is the value reported by the instrument in response to clean air, and $cal_{span}$ is the value reported by the instrument in response to $span$ amount of the chemical.
+
+Most calibrations are automated and require us to calculate the result. We calculate calibration results using
+$$
+y_j =
+\begin{cases}
+\min_{i \in T_j}\bar{X}_i & type_j = zero\\
+\max_{i \in T_j}\bar{X}_i & type_j = span
+\end{cases}
+= cal_j + \epsilon_j
+$$
+$$
+X_i = \{x_{i - 1}, x_i, x_{i + 1}\}
+$$
+where $y_j$ is the result of calibration $j$, $T_j$ is the set of observations during calibration $j$, and $\bar{X}_i$ is the average of the set of measurements in the 3-observation window around observation $i$. $y_j$ is a noisy estimate of the true instrument calibration value $cal_j$.
+
+To get more precise zero and span estimates, we first smooth the calibration results of the corresponding estimates with a median filter, and then use linear interpolation between the smoothed values.
+$$
+\hat{cal}_{type,i} = \tilde{Y}_{type,0} + (t_i - t_0)\frac{\tilde{Y}_{type,1} - \tilde{Y}_{type,0}}{t_1 - t_0}
+$$
+$$
+Y_{type,j} = \{y_{type, j - 6}, y_{type, j - 5}, \dots, y_{type, j + 6}\}
+$$
+where $type$ can be either zero or span, $\hat{cal}_{type,i}$ is the estimate of the $type$ calibration value at the time of observation $i$, $\tilde{Y}_{type,j}$ is the median of the set of $type$ calibration results in a window around calibration $j$, and $t$ is the corrected measurement time.
+
+And finally, even the $span$ value must be estimated. The flow instruments generating calibration air can be imperfectly calibrated. These instruments are periodically checked against a gilibrator. Current procedures estimate the span value using the most recent gilibrator result before the measurement was taken.
+$$
+\hat{span} = span_{gilibrator}
+$$
+
+After this long series of estimations, we can plug the estimates for observation $i$ into the equation for $\hat{chem}_i$. The data rewards us for our hard work with chemistry estimates having many fewer sources of bias.
+
+## Conversion Efficiency Corrections
+
+Some chemistry instruments, rather than measuring the presence of a chemical directly, convert the chemical and measure a product of that conversion. The observed amount of the converted chemical depends on the efficiency of the conversion.
+
+Conversion efficiency is estimated in a process similar to calibrations. The instrument is tested with a gas with a known amount of the original chemical. The conversion efficiency is then calculated as
+$$
+y_j = \frac{\max_{i \in T_j}\bar{X}_i}{CE_{complete}}
+$$
+$$
+X_i = \{x_{i - 1}, x_i, x_{i + 1}\}
+$$
+where $T_j$ is the set of times during conversion efficiency test $j$, $\bar{X}_i$ is the average of the set of calibration-corrected measurements in the 3-observation window around observation $i$, and $CE_{complete}$ is the amount of the converted chemical that would result if the original chemical was completely converted.
+
+Smoothing, linear interpolation, and gilibrator tests are applied to these conversion efficiency results exactly as they are for calibration results.
+
+Conversion efficiency-corrected values can then be estimated as
+$$
+\hat{chem}_{orig,i} = \frac{\hat{chem}_{converted,i}}{\hat{CE}_i}.
+$$
+where $\hat{chem}_{converted,i}$ is the calibration-corrected measurement of the converted chemical at the time of observation $i$, and $\hat{CE}_i$ is the estimated conversion efficiency at the time of observation $i$.
+
+# Data Flags
+
+## Instrument Flags
+
+## Manual Flags
+
+## Calibrations
+
+## Invalid Values
+
+Measurements outside the range of realistic values are flagged. Table \@ref(tab:valuefilters) shows a selection of measurement types with their corresponding ranges.
+
+```{sql, connection=db, output.var='allowable_ranges'}
+select short_name as site,
+       measurement,
+       valid_range
+  from measurement_types
+	join sites
+    on measurement_types.site_id=sites.id
+ where valid_range is not null
+ limit 5;
+```
+
+```{r valuefilters}
+# format the range strings
+allowable_ranges$range = allowable_ranges$valid_range
+allowable_ranges$valid_range = NULL
+allowable_ranges$range = gsub(',)', ',NA)', allowable_ranges$range)
+allowable_ranges$range = gsub(',', ', ', allowable_ranges$range)
+knitr::kable(allowable_ranges, format = 'latex',
+             col.names = c('Site', 'Measurement', 'Range'),
+             booktabs = TRUE, linesep = '',
+             caption = 'Allowable data ranges.')
+```
+
+## Repeating Values
+
+Repeating values often indicate an instrument failure, for example a frozen instrument. These checks are currently applied to anemometers and weather vanes.
+
+## Outliers
+
+Researchers often use distance measured in standard deviations from the mean to identify outliers. This method is intuitive but has the downside that both the mean and standard deviation are influenced by outliers.
+
+Instead we use a robust alternative, the median absolute deviation from the median (MAD) [@leys_detecting_2013; @hellerstein_quantitative_2008].
+
+$$
+\MAD_i = \median|X_i - \median X_i|
+$$
+where $X_i$ is the set of measurements in the window around $x_i$, the measurement at time $i$. To determine if the value should be flagged we compare the distance to a threshold given in standard deviations,
+
+$$
+\frac{|x_i - \median X_i|}{1.4826 \MAD_i} > C
+$$
+where $C$ is a constant (typically 2.5 or 3.5), and $1.4826 \MAD_i$ is an estimate of the standard deviation of $X_i$. In all cases when checking for outliers we use a window width of 4 hours.
+
+## Jumps
+
+For some variables we also flag anomalous jumps in values.
+$$
+|x_i - x_{i - 1}| > C
+$$
+where $C$ is a constant specific to each measurement type, and $x_i$ is the measurement at time $i$. The WMO refers to this test as "Plausible rate of change" [-@wmo_guide_2017, pp. 543].
+
+# Derived Values
+
+## NO~2~
+
+$$
+NO_2 = NO_X - NO
+$$
+
+## HNO~3~
+
+$$
+HNO_3 = NO_Y - (NO_Y - HNO_3)
+$$
+
+## Sea Level Pressure
+
+Sea level pressure is estimated using the barometric formula,
+$$
+p_0 = p_b (\frac{T_b}{T_b + L_b h_b})^{-\frac{g M}{R^* L_b}},
+$$
+where $p_b$ is barometric pressure and $T_b$ is temperature in Kelvin. (We use the indoor temperature since pressure is measured indoors.)
+
+At Whiteface Mountain this becomes
+$$
+p_0 = p (\frac{T_b}{T_b + .0065 \times 1483.5})^{-5.257}.
+$$
+
+
+## Wind Shadow-Corrected Wind Speeds
+
+Wind speed instruments sometimes under-report wind speeds as a result of a wind shadow, that is, an area where the wind flow has been obstructed by some object. Since we have two anemometers at the Whiteface Mountain summit, we can insure against this bias to some extent by reporting the higher wind speeds, which are probably less effected by wind shadowing. That is,
+$$
+WS_{corrected} = \max(WS_A, WS_B).
+$$
+
+## Wind Components and Averages
+
+Wind direction can't be directly averaged, so to get average direction we break wind velocity into its $u$ and $v$ components.
+$$
+\begin{aligned}
+u &= WS \sin \theta\\
+v &= WS \cos \theta\\
+\theta &= (270 - WD) \frac{\pi}{180}
+\end{aligned}
+$$
+where $WD$ is the reported wind direction measured in degrees clockwise from due north, and $\theta$ is the standard mathematical direction measured in radians counterclockwise from the east. $WS$ is the wind shadow-corrected wind speed if available, and the uncorrected wind speed if not.
+
+The average speed and direction are calculated from the average component values:
+$$
+\begin{aligned}
+\overline{WS} &= \sqrt{\bar{u}^2 + \bar{v}^2}\\
+\overline{WD} &= 270 - \frac{180}{\pi}\atantwo(\bar{v}, \bar{u})
+\end{aligned}
+$$
+where $\atantwo$ is the common programming implementation of the arctangent that handles zero denominator values.
+
+## Precipitation
+
+Our equation for calculating instantaneous rainfall from cumulative rainfall is
+
+$$
+\Delta R_i = R_i - R_{i - 1} +
+\begin{cases}
+0.5 & R_i - R_{i - 1} \leq -0.02 \\
+0 & R_i - R_{i - 1} > -0.02
+\end{cases}.
+$$
+
+The Pinnacle State Park tipping bucket rain gauge tips when reaching .5 inches of rain, so .5 inches have to be added after each tip. Generally we can identify tips using negative accumulations of rain, which are impossible. However, due to measurement error, the instrument sometimes misreports negative changes down to -0.02, so we use -0.02 as the tipping indicator threshold. (One-minute accumulations of 0.5 inches of rain or greater are unheard of, so we don't have to worry about round trips where the instrument reports a positive accumulation.)
+
+## Woodsmoke
+
+$$
+Woodsmoke = BC_{370nm} - BC_{880nm}
+$$
+following @allen_evaluation_2004 and @zhang_joint_2017.
+
+# Regular Reports
+
+## Weekly Meetings
+
+## Monthly Ultrafine Data Reports
+
+## Quarterly DEC Data Reports
+
+## Quarterly NYSERDA Reports
+
+# Making Changes
+
+Any changes to the processing procedures should be clearly documented. This means the new code (if applicable) should be available on Github, and the change should be noted in the Github repository changelog as well as the data manager SOP.
+
+When making changes to the processing code, experimental changes and works in progress should be saved to separate git branches so that others can still use the code from the master branch. When the changes are completed and ready for use in the production database they should be merged into the master branch. Before merging into master it should also be verified that the code passes all automated tests.
+
+The changelog follows the format described at [keepachangelog.com](https://keepachangelog.com).
+
+# References
