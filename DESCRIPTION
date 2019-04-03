@@ -6,7 +6,7 @@ Description: Creates the nysatmoschem database.
 Depends:
     R (>= 3.4.4),
     etl
-License: MIT
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Suggests: knitr,
