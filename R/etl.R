@@ -45,14 +45,36 @@ etl_init.etl_nysatmoschem = function(obj, script = NULL, schema_name = "init",
   }
 
   ## add metadata
-  metadata_path = system.file('extdata', package = 'nysatmoschem')
-  measurement_types_csv =
-    file.path(metadata_path, 'measurement_types.csv')
-  update_measurement_types(pg, measurement_types_csv)
-  autocals_csv = file.path(metadata_path, 'autocals.csv')
-  update_autocals(pg, autocals_csv)
-  manual_flags_csv = file.path(metadata_path, 'manual_flags.csv')
-  update_manual_flags(pg, manual_flags_csv)
+  measurement_types = read_meta_csv('measurement_types')
+  update_measurement_types(pg, measurement_types)
+  autocals = read_meta_csv('autocals')
+  update_autocals(pg, autocals)
+  manual_flags = read_meta_csv('manual_flags')
+  update_manual_flags(pg, manual_flags)
   
   invisible(obj)
 }
+
+
+## #' @rdname etl_create
+## #' @method etl_transform etl_nysatmoschem
+## #' @export
+
+## etl_transform.etl_nysatmoschem = function(obj, sites, years, ...) {
+##   ## get the Cartesian product of sites and years, then all
+##   ## corresponding files
+##   site_years = expand.grid(sites, years)
+
+##   ## transform site_year function?
+
+##   ## for row in site_years
+##   ##     1) get associated files
+##   ##     2) transform files
+
+  
+##   # load the data and process it if necessary
+##   src = list.files(attr(obj, "raw_dir"), "\\.csv", full.names = TRUE)
+##   lcl = file.path(attr(obj, "load_dir"), basename(src))
+##   file.copy(from = src, to = lcl)
+##   invisible(obj)
+## }

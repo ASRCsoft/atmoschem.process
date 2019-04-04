@@ -48,40 +48,46 @@ get_measurement_type_id = function(pg, site,
   df2$id[order(df2$order)]
 }
 
-update_metadata_tbl = function(pg, tbl_name, f, action = 'replace') {
-  meta = read.csv(f, na.strings=c('', 'NA'))
+read_meta_csv = function(name) {
+  metadata_path = system.file('extdata', package = 'nysatmoschem')
+  meta_csv = file.path(metadata_path,
+                       paste(name, 'csv', sep = '.'))
+  read.csv(meta_csv, na.strings=c('', 'NA'))
+}
+
+update_metadata_tbl = function(pg, tbl_name, df, action = 'replace') {
   if (action == 'replace') {
-    meta$measurement_type_id =
-      get_measurement_type_id(pg, meta$site,
-                              meta$data_source,
-                              meta$measurement)
-    meta$site = NULL
-    meta$data_source = NULL
-    meta$measurement = NULL
+    df$measurement_type_id =
+      get_measurement_type_id(pg, df$site,
+                              df$data_source,
+                              df$measurement)
+    df$site = NULL
+    df$data_source = NULL
+    df$measurement = NULL
     ## purge old data then add new data
     dbxDelete(pg, tbl_name)
-    dbxInsert(pg, tbl_name, meta)
+    dbxInsert(pg, tbl_name, df)
   } else if (action == 'update') {
-    meta$site_id = get_site_id(pg, meta$site)
-    meta$site = NULL
+    df$site_id = get_site_id(pg, df$site)
+    df$site = NULL
     ## don't delete any rows, but erase values of unused rows
     pg_meta = dbxSelect(pg, 'select site_id, data_source, measurement from measurement_types')
-    merged_meta = merge(pg_meta, meta, all = T)
+    merged_meta = merge(pg_meta, df, all = T)
     idx_cols = c('site_id', 'data_source', 'measurement')
     dbxUpsert(pg, tbl_name, merged_meta,
               where_cols = idx_cols)
   }
 }
 
-update_measurement_types = function(pg, f) {
-  update_metadata_tbl(pg, 'measurement_types', f,
+update_measurement_types = function(pg, df) {
+  update_metadata_tbl(pg, 'measurement_types', df,
                       action = 'update')
 }
 
-update_autocals = function(pg, f) {
-  update_metadata_tbl(pg, 'autocals', f)
+update_autocals = function(pg, df) {
+  update_metadata_tbl(pg, 'autocals', df)
 }
 
-update_manual_flags = function(pg, f) {
-  update_metadata_tbl(pg, 'manual_flags', f)
+update_manual_flags = function(pg, df) {
+  update_metadata_tbl(pg, 'manual_flags', df)
 }
