@@ -43,7 +43,7 @@ get_measurement_type_id = function(pg, site,
                   data_source = data_source,
                   measurement = measurement,
                   order = 1:length(measurement))
-  df2 = merge(df, measurement_types)
+  df2 = merge(df, measurement_types, all = TRUE)
   ## df2 is sorted, have to unsort it
   df2$id[order(df2$order)]
 }
