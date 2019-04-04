@@ -11,6 +11,7 @@
 #' }
 
 etl_extract.etl_nysatmoschem <- function(obj, ...) {
+  stop('etl_extract is not yet implemented')
   # Specify the URLs that you want to download
   src <- c("http://www.stat.tamu.edu/~sheather/book/docs/datasets/HoustonChronicle.csv")
 
