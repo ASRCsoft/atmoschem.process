@@ -9,20 +9,6 @@
 #'     etl_create()
 #' }
 #' }
-
-etl_extract.etl_nysatmoschem <- function(obj, ...) {
-  stop('etl_extract is not yet implemented')
-  # Specify the URLs that you want to download
-  src <- c("http://www.stat.tamu.edu/~sheather/book/docs/datasets/HoustonChronicle.csv")
-
-  # Use the smart_download() function for convenience
-  etl::smart_download(obj, src, ...)
-
-  # Always return obj invisibly to ensure pipeability!
-  invisible(obj)
-}
-
-#' @export
 etl_init.etl_nysatmoschem = function(obj, script = NULL, schema_name = "init",
                                      pkg = attr(obj, "pkg"),
                                      ext = NULL, ...) {
