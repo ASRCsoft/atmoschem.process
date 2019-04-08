@@ -28,26 +28,6 @@ run_sql_script = function(pg, f) {
   suppressWarnings(dbExecute(pg, sql_txt))
 }
 
-get_site_id = function(pg, x) {
-  sites = dbGetQuery(pg, 'select * from sites')
-  sites$id[match(x, sites$short_name)]
-}
-
-get_measurement_type_id = function(pg, site,
-                                   data_source,
-                                   measurement) {
-  site_id = get_site_id(pg, site)
-  sql_txt = 'select * from measurement_types'
-  measurement_types = dbxSelect(pg, sql_txt)
-  df = data.frame(site_id = site_id,
-                  data_source = data_source,
-                  measurement = measurement,
-                  order = 1:length(measurement))
-  df2 = merge(df, measurement_types, all = TRUE)
-  ## df2 is sorted, have to unsort it
-  df2$id[order(df2$order)]
-}
-
 read_meta_csv = function(name) {
   metadata_path = system.file('extdata', package = 'nysatmoschem')
   meta_csv = file.path(metadata_path,

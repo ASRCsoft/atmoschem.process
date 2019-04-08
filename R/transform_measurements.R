@@ -30,27 +30,6 @@ add_new_measurement_types = function(pg, site, data_source,
   }
 }
 
-## get_site_id = function(pg, x) {
-##   sites = dbGetQuery(pg, 'select * from sites')
-##   sites$id[match(x, sites$short_name)]
-## }
-
-## get_measurement_type_id = function(pg, site,
-##                                    data_source,
-##                                    measurement) {
-##   site_id = get_site_id(pg, site)
-##   sql_txt = 'select * from measurement_types'
-##   measurement_types = dbxSelect(pg, sql_txt)
-##   df = data.frame(site_id = site_id,
-##                   data_source = data_source,
-##                   measurement = measurement,
-##                   order = 1:length(measurement))
-##   df2 = merge(df, measurement_types)
-##   ## df2 is sorted, have to unsort it
-##   df2$id[order(df2$order)]
-## }
-
-
 wfms_flags = c(NO = 'NOX', NOx = 'NOX', T = 'TRH',
                RH = 'TRH', NOy = 'NOY', SO2 = 'SO2',
                CO = 'CO')
