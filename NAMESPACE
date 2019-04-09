@@ -2,5 +2,6 @@
 
 S3method(etl_extract,etl_nysatmoschem)
 S3method(etl_init,etl_nysatmoschem)
+S3method(etl_transform,etl_nysatmoschem)
 import(dbx)
 import(etl)

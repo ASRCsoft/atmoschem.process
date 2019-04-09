@@ -1,7 +1,5 @@
 ## transform measurement files
 
-library(tidyr)
-
 fast_lookup = function(vals, dict) {
   ## This code to get dictionary (named vector) entries shouldn't need
   ## to be this long but the current version of R seems to have a very
@@ -26,7 +24,8 @@ add_new_measurement_types = function(pg, site, data_source,
     new_mtypes = data.frame(site_id = get_site_id(pg, site),
                             data_source = data_source,
                             measurement = uniq_measurements[is.na(m_ids)])
-    dbWriteTable(pg, new_mtypes, append = T)
+    dbWriteTable(pg, 'measurement_types', new_mtypes, row.names = FALSE,
+                 append = TRUE)
   }
 }
 
@@ -85,7 +84,7 @@ transform_campbell = function(pg, f) {
   ## clean and reorganize the data
   is_flag = grepl('^F_', names(campbell))
   campbell_long = campbell[, !is_flag] %>%
-    gather(measurement, value, -c(instrument_time, RECORD))
+    tidyr::gather(measurement, value, -c(instrument_time, RECORD))
   if (site == 'WFMS') {
     flag_mat = as.matrix(campbell[, is_flag]) != 1
   } else if (site == 'WFML') {
@@ -106,10 +105,11 @@ transform_campbell = function(pg, f) {
   ## add to postgres
   names(campbell_long) = tolower(names(campbell_long))
   ## add measurement types that don't already exist in postgres
-  add_new_measurement_types(pg, campbell_long, 'campbell')
+  add_new_measurement_types(pg, site, 'campbell',
+                            campbell_long$measurement)
   campbell_long$measurement_type_id =
-    get_measurement_types(pg, site, 'campbell',
-                          campbell_long$measurement)
+    get_measurement_type_id(pg, site, 'campbell',
+                            campbell_long$measurement)
   campbell_long$measurement = NULL
-  campbell
+  campbell_long
 }
