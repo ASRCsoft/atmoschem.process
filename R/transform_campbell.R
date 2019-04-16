@@ -111,5 +111,6 @@ transform_campbell = function(pg, f) {
     get_measurement_type_id(pg, site, 'campbell',
                             campbell_long$measurement)
   campbell_long$measurement = NULL
-  campbell_long
+  ## reorder the columns to match the database table
+  campbell_long[, c(5, 1:4)]
 }

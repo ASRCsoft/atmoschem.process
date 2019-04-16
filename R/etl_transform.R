@@ -30,13 +30,18 @@ etl_transform.etl_nysatmoschem = function(obj, sites, years, ...) {
         }
         year_files = files[file_years == year]
         for (f in year_files) {
-          message(paste('transforming', f, '...'))
           f_path = file.path(attr(obj, 'raw_dir'), site, ds, f)
+          message(paste('Transforming ', f_path, '...'))
           df = transform_file(obj$con, f_path, site, ds)
           out_path = file.path(attr(obj, 'load_dir'), site, ds)
           dir.create(out_path, showWarnings = FALSE, recursive = TRUE)
           out_file = file.path(out_path, gsub('\\..*$', '.csv', f))
-          write.csv(df, file = out_file, row.names = FALSE)
+          ## write.csv(df, file = out_file, row.names = FALSE,
+          ##           col.names = FALSE)
+          ## use write.table to write files without header lines--
+          ## dbWriteTable from RPostgreSQL can't handle header lines
+          write.table(df, file = out_file, sep = ',', na = '',
+                      row.names = FALSE,  col.names = FALSE)
         }
       }
     }
