@@ -34,3 +34,21 @@ get_measurement_type_id = function(pg, site,
   ## df2 is sorted, have to unsort it
   df2$id[order(df2$order)]
 }
+
+add_new_measurement_types = function(pg, site, data_source,
+                                     measurements) {
+  ## since we only run this function for one site and data source at a
+  ## time, no need to have a site or data source for each row in the
+  ## data frame
+  uniq_measurements = unique(measurements)
+  m_ids = get_measurement_type_id(pg, site, data_source,
+                                  uniq_measurements)
+  if (sum(is.na(m_ids)) > 0) {
+    ## insert new measurement types
+    new_mtypes = data.frame(site_id = get_site_id(pg, site),
+                            data_source = data_source,
+                            measurement = uniq_measurements[is.na(m_ids)])
+    dbWriteTable(pg, 'measurement_types', new_mtypes, row.names = FALSE,
+                 append = TRUE)
+  }
+}
