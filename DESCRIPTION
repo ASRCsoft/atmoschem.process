@@ -1,15 +1,35 @@
 Package: nysatmoschem
-Title: New York State atmospheric chemistry database
+Title: The ASRC NYS Atmospheric Chemistry Database
 Version: 0.0.0.9000
 Authors@R: person("William", "May", email = "wcmay@albany.edu", role = c("aut", "cre"))
-Description: Creates the nysatmoschem database.
+Description: An R package providing the ASRC NYS Atmospheric Chemistry
+    Database, along with tools to process and visualize the data and
+    generate reports.
+Imports:
+    DBI,
+    dbplyr,
+    dbx,
+    httr,
+    RPostgreSQL,
+    rvest,
+    tidyr,
+    xml2
 Depends:
     R (>= 3.4.4),
     etl
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Suggests: knitr,
-    rmarkdown
+Suggests: bookdown,
+    datamodelr,
+    DiagrammeR,
+    DiagrammeRsvg,
+    ggplot2,
+    knitr,
+    reshape2,
+    rmarkdown,
+    rsvg,
+    shiny
+Remotes: bergant/datamodelr
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
