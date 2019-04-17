@@ -16,9 +16,7 @@ dbcon = src_postgres(dbname = 'nysacdb', user = 'user')
 nysac = etl('nysatmoschem', db = dbcon, dir = 'data')
 
 # set up the database and add data from the ASRC's atmoschem server
-nysac %>%
-  etl_init() %>%
-  etl_update(user = 'user', password = 'pass')
+nysac %>% etl_create(user = 'user', password = 'pass')
 ```
 
 ## Installation
