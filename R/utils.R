@@ -52,3 +52,10 @@ add_new_measurement_types = function(pg, site, data_source,
                       row.names = FALSE, append = TRUE)
   }
 }
+
+#' @import shiny
+#' @export
+view_processing = function(...) {
+  shinyOptions(pg = dplyr::src_postgres(...))
+  runApp(system.file('processing_viewer', package = 'nysatmoschem'))
+}
