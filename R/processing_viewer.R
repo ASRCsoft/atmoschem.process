@@ -1,6 +1,6 @@
 #' @import shiny
 #' @export
 view_processing = function(...) {
-  shinyOptions(pg = src_dbi(dbConnect(PostgreSQL(), ...)))
+  shinyOptions(pg = dplyr::src_postgres(...))
   runApp(system.file('processing_viewer', package = 'nysatmoschem'))
 }
