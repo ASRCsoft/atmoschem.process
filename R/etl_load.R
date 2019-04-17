@@ -40,12 +40,11 @@ etl_load.etl_nysatmoschem = function(obj, sites = NULL, years = NULL, ...) {
       } else {
         year_files = files[file_years %in% years]
       }
-      for (f in year_files) {
-        f_path = file.path(attr(obj, 'load_dir'), site, ds, f)
-        message(paste0('Loading ', f_path, '...'))
-        load_file(obj, f_path, ds, header = FALSE,
-                  row.names = FALSE)
-      }
+      f_paths = file.path(attr(obj, 'load_dir'), site,
+                          ds, year_files)
+      message(paste('Loading', site, '/', ds, 'files...'))
+      load_file(obj, f_paths, ds, header = FALSE,
+                row.names = FALSE)
     }
   }
   
