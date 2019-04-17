@@ -4,7 +4,7 @@
 
 update_dynamic_library_path = function(pg) {
   ## get the current paths
-  cur_paths = dbGetQuery(pg, 'show dynamic_library_path')
+  cur_paths = DBI::dbGetQuery(pg, 'show dynamic_library_path')
   
   ## add median C library location if needed
   lib_path = system.file('libs',
@@ -18,14 +18,14 @@ update_dynamic_library_path = function(pg) {
     new_paths = paste(cur_paths, lib_path, sep = path_sep)
     sql_txt = paste0("set dynamic_library_path to '",
                      new_paths, "'")
-    dbExecute(pg, sql_txt)
+    DBI::dbExecute(pg, sql_txt)
   }
 }
 
 ## this works better than dbRunScript in the default method
 run_sql_script = function(pg, f) {
   sql_txt = paste(readLines(f), collapse = "\n")
-  suppressWarnings(dbExecute(pg, sql_txt))
+  suppressWarnings(DBI::dbExecute(pg, sql_txt))
 }
 
 read_meta_csv = function(name) {

@@ -16,7 +16,7 @@ extract_year = function(f, site, ds) {
 }
 
 get_site_id = function(pg, x) {
-  sites = dbGetQuery(pg, 'select * from sites')
+  sites = DBI::dbGetQuery(pg, 'select * from sites')
   sites$id[match(x, sites$short_name)]
 }
 
@@ -25,7 +25,7 @@ get_measurement_type_id = function(pg, site,
                                    measurement) {
   site_id = get_site_id(pg, site)
   sql_txt = 'select * from measurement_types'
-  measurement_types = dbxSelect(pg, sql_txt)
+  measurement_types = DBI::dbGetQuery(pg, sql_txt)
   df = data.frame(site_id = site_id,
                   data_source = data_source,
                   measurement = measurement,
@@ -48,7 +48,7 @@ add_new_measurement_types = function(pg, site, data_source,
     new_mtypes = data.frame(site_id = get_site_id(pg, site),
                             data_source = data_source,
                             measurement = uniq_measurements[is.na(m_ids)])
-    dbWriteTable(pg, 'measurement_types', new_mtypes, row.names = FALSE,
-                 append = TRUE)
+    DBI::dbWriteTable(pg, 'measurement_types', new_mtypes,
+                      row.names = FALSE, append = TRUE)
   }
 }
