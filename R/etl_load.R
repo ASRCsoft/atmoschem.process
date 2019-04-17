@@ -18,7 +18,7 @@ load_file = function(obj, f, ds, ...) {
 #' @import etl
 #' @inheritParams etl::etl_load
 #' @export
-etl_load.etl_nysatmoschem = function(obj, sites, years, ...) {
+etl_load.etl_nysatmoschem = function(obj, sites = NULL, years = NULL, ...) {
   ## if no site is specified, get list of sites from the raw data
   ## files
   if (is.null(sites)) {
@@ -29,20 +29,22 @@ etl_load.etl_nysatmoschem = function(obj, sites, years, ...) {
     data_sources = list.files(file.path(attr(obj, 'load_dir'), site))
     for (ds in data_sources) {
       files = list.files(file.path(attr(obj, 'load_dir'), site, ds))
-      for (year in years) {
-        try_result = try(file_years <- extract_year(files, site, ds))
-        if (class(try_result) == 'try-error') {
-          ## this means extract_year isn't implemented for that data
-          ## source
-          next()
-        }
-        year_files = files[file_years == year]
-        for (f in year_files) {
-          f_path = file.path(attr(obj, 'load_dir'), site, ds, f)
-          message(paste0('Loading ', f_path, '...'))
-          load_file(obj, f_path, ds, header = FALSE,
-                    row.names = FALSE)
-        }
+      try_result = try(file_years <- extract_year(files, site, ds))
+      if (class(try_result) == 'try-error') {
+        ## this means extract_year isn't implemented for that data
+        ## source
+        next()
+      }
+      if (is.null(years)) {
+        year_files = files
+      } else {
+        year_files = files[file_years %in% years]
+      }
+      for (f in year_files) {
+        f_path = file.path(attr(obj, 'load_dir'), site, ds, f)
+        message(paste0('Loading ', f_path, '...'))
+        load_file(obj, f_path, ds, header = FALSE,
+                  row.names = FALSE)
       }
     }
   }

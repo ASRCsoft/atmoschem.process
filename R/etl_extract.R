@@ -22,7 +22,7 @@ list_html_files = function(url, user, password) {
 #'     etl_create()
 #' }
 #' }
-etl_extract.etl_nysatmoschem <- function(obj, user, password, years, sites = NULL) {
+etl_extract.etl_nysatmoschem <- function(obj, user, password, sites = NULL, years = NULL) {
   if (is.null(user) || is.null(password)) {
     stop('Username and password required to access data.')
   }
@@ -41,22 +41,24 @@ etl_extract.etl_nysatmoschem <- function(obj, user, password, years, sites = NUL
     for (s in data_sources) {
       s_url = paste(site_url, s, sep = '/')
       files = list_html_files(s_url, user, password)
-      for (year in years) {
-        try_result = try(file_years <- extract_year(files, site, s))
-        if (class(try_result) == 'try-error') {
-          ## this means extract_year isn't implemented for that data
-          ## source
-          next()
-        }
-        year_files = files[file_years == year]
-        if (length(year_files) > 0) {
-          ## add urls to download list
-          file_urls = paste(base_url, site, s, year_files, sep = '/')
-          download_urls = c(download_urls, file_urls)
-          ## make sure local directory exists
-          dir.create(file.path(attr(obj, 'raw_dir'), site, s),
-                     showWarnings = FALSE, recursive = TRUE)
-        }
+      try_result = try(file_years <- extract_year(files, site, s))
+      if (class(try_result) == 'try-error') {
+        ## this means extract_year isn't implemented for that data
+        ## source
+        next()
+      }
+      if (is.null(years)) {
+        year_files = files
+      } else {
+        year_files = files[file_years %in% years]
+      }
+      if (length(year_files) > 0) {
+        ## add urls to download list
+        file_urls = paste(base_url, site, s, year_files, sep = '/')
+        download_urls = c(download_urls, file_urls)
+        ## make sure local directory exists
+        dir.create(file.path(attr(obj, 'raw_dir'), site, s),
+                   showWarnings = FALSE, recursive = TRUE)
       }
     }
   }
