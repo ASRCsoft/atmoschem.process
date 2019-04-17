@@ -6,7 +6,7 @@ The `nysatmoschem` R package provides utilities to reproduce the database, along
 
 ## Usage
 
-`nysatmoschem` builds on the [`etl` package](https://cran.r-project.org/web/packages/etl/index.html) and follows the `etl` syntax and design structure. To reproduce the database, run `etl_init()` and `etl_update()` with a `nysatmoschem` dataset object. Users require a username and password to download the data, which can be obtained from the [ASRC AQM Data Products page](http://pireds.asrc.cestm.albany.edu:3000/).
+`nysatmoschem` builds on the [`etl` package](https://cran.r-project.org/web/packages/etl/index.html) and follows the `etl` syntax and design structure. To reproduce the database, run `etl_create()` with a `nysatmoschem` dataset object. Users require a username and password to download the data, which can be obtained from the [ASRC AQM Data Products page](http://pireds.asrc.cestm.albany.edu:3000/).
 
 ```R
 library(nysatmoschem)
