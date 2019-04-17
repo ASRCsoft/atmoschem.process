@@ -74,7 +74,7 @@ update_manual_flags = function(pg, df) {
 
 #' My ETL functions
 #' @import etl
-#' @inheritParams etl::etl_extract
+#' @inheritParams etl::etl_init
 #' @export
 #' @examples
 #' \dontrun{
