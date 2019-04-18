@@ -18,6 +18,7 @@ create table manual_calibrations (
   measurement_type_id int references measurement_types,
   type text,
   cal_time timestamp,
+  provided_value numeric,
   measured_value numeric,
   corrected boolean not null,
   primary key(measurement_type_id, type, cal_time)
