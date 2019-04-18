@@ -6,6 +6,8 @@ transform_file = function(pg, f, site, ds) {
     transform_campbell(pg, f)
   } else if (site == 'PSP' & ds == 'envidas') {
     transform_psp_envidas(pg, f)
+  } else if (site == 'PSP' && ds == 'calibrations') {
+    transform_psp_calibrations(pg, f)
   }
 }
 

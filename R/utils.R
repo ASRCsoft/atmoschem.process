@@ -1,5 +1,14 @@
 ## useful functions
 
+extract_psp_calibrations_year = function(f) {
+  if (substr(basename(f), 1, 12) == 'Pinnacle_42C') {
+    paste0('20', substr(gsub('^.* ', '', f), 1, 2))
+  } else {
+    warning(paste('extract_year not implemented for PSP calibration', f))
+    NA
+  }
+}
+
 ## get the file year given the filename, site, and data source
 extract_year = function(f, site, ds) {
   year_str = if (site == 'WFMS' && ds == 'campbell') {
@@ -8,6 +17,8 @@ extract_year = function(f, site, ds) {
                paste0('20', substr(gsub('^.*_', '', f), 1, 2))
              } else if (site == 'PSP' && ds == 'envidas') {
                paste0('20', substr(gsub('^.*-', '', f), 1, 2))
+             } else if (site == 'PSP' && ds == 'calibrations') {
+               sapply(f, extract_psp_calibrations_year)
              } else {
                stop(paste('extract_year not implemented for',
                           site, 'and', ds))

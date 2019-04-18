@@ -48,7 +48,7 @@ etl_extract.etl_nysatmoschem <- function(obj, user, password, sites = NULL, year
         next()
       }
       if (is.null(years)) {
-        year_files = files
+        year_files = files[!is.na(file_years)]
       } else {
         year_files = files[file_years %in% years]
       }
@@ -65,7 +65,8 @@ etl_extract.etl_nysatmoschem <- function(obj, user, password, sites = NULL, year
 
   if (length(download_urls) > 0) {
     rel_paths = gsub('.*/raw/', '', download_urls)
-    etl::smart_download(obj, download_urls, rel_paths)
+    etl::smart_download(obj, sapply(download_urls, URLencode),
+                        rel_paths)
   }
 
   invisible(obj)

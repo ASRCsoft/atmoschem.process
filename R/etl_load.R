@@ -3,13 +3,13 @@ load_measurements = function(obj, f, ...) {
   smart_upload(obj, f, 'measurements', ...)
 }
 
-load_calibrations = function(obj, f) {
+load_calibrations = function(obj, f, ...) {
   smart_upload(obj, f, 'manual_calibrations', ...)
 }
 
 load_file = function(obj, f, ds, ...) {
   if (ds == 'calibrations') {
-    ## load_calibrations(obj, f)
+    load_calibrations(obj, f, ...)
   } else {
     load_measurements(obj, f, ...)
   }
