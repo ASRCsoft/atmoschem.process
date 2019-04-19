@@ -1,20 +1,42 @@
 
 
 ## transform a raw data file according to its site and data source
-transform_file = function(pg, f, site, ds) {
-  if (ds == 'campbell') {
-    transform_campbell(pg, f)
-  } else if (site == 'PSP' & ds == 'envidas') {
-    transform_psp_envidas(pg, f)
-  } else if (site == 'PSP' && ds == 'calibrations') {
-    transform_psp_calibrations(pg, f)
+transform_file = function(pg, f, out_file, site, ds) {
+  df = if (ds == 'campbell') {
+         transform_campbell(pg, f)
+       } else if (site == 'PSP' & ds == 'envidas') {
+         transform_psp_envidas(pg, f)
+       } else if (site == 'PSP' && ds == 'calibrations') {
+         transform_psp_calibrations(pg, f)
+       }
+  ## use write.table to write csv files without header lines--
+  ## dbWriteTable from RPostgreSQL can't handle header lines
+  write.table(df, file = out_file, sep = ',', na = '',
+              row.names = FALSE,  col.names = FALSE)
+}
+
+## Only transform new files, similar to `smart_download` from etl
+smart_transform = function(obj, raw, cleaned, site, ds, clobber = FALSE) {
+  if (length(raw) != length(cleaned)) {
+    stop("src and new_filenames must be of the same length")
   }
+  if (!clobber) {
+    missing = !file.exists(cleaned)
+  } else {
+    missing = cleaned == cleaned
+  }
+  message(paste("Transforming", sum(missing), "new files. ",
+                sum(!missing), "untouched."))
+  if (sum(missing) == 0) return(NULL)
+  ## mapply(downloader::download, src[missing], lcl[missing], ... = ...)
+  mapply(transform_file, obj$con, raw[missing], cleaned[missing],
+         site, ds)
 }
 
 #' @import etl
 #' @inheritParams etl::etl_transform
 #' @export
-etl_transform.etl_nysatmoschem = function(obj, sites = NULL, years = NULL, ...) {
+etl_transform.etl_nysatmoschem = function(obj, sites = NULL, years = NULL, clobber = FALSE) {
   ## if no site is specified, get list of sites from the raw data
   ## files
   if (is.null(sites)) {
@@ -36,20 +58,12 @@ etl_transform.etl_nysatmoschem = function(obj, sites = NULL, years = NULL, ...) 
       } else {
         year_files = files[file_years %in% years]
       }
-      for (f in year_files) {
-        f_path = file.path(attr(obj, 'raw_dir'), site, ds, f)
-        message(paste('Transforming ', f_path, '...'))
-        df = transform_file(obj$con, f_path, site, ds)
-        out_path = file.path(attr(obj, 'load_dir'), site, ds)
-        dir.create(out_path, showWarnings = FALSE, recursive = TRUE)
-        out_file = file.path(out_path, gsub('\\..*$', '.csv', f))
-        ## write.csv(df, file = out_file, row.names = FALSE,
-        ##           col.names = FALSE)
-        ## use write.table to write files without header lines--
-        ## dbWriteTable from RPostgreSQL can't handle header lines
-        write.table(df, file = out_file, sep = ',', na = '',
-                    row.names = FALSE,  col.names = FALSE)
-      }
+      message(paste('Transforming', site, '/', ds, 'files...', sep = ' '))
+      f_paths = file.path(attr(obj, 'raw_dir'), site, ds, year_files)
+      out_path = file.path(attr(obj, 'load_dir'), site, ds)
+      dir.create(out_path, showWarnings = FALSE, recursive = TRUE)
+      out_files = file.path(out_path, gsub('\\..*$', '.csv', year_files))
+      smart_transform(obj, f_paths, out_files, site, ds, clobber)
     }
   }
   
