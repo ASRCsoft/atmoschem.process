@@ -34,7 +34,7 @@ etl_extract.etl_nysatmoschem <- function(obj, user, password, sites = NULL, year
     sites = gsub('/$', '', list_html_files(base_url, user, password))
   }
 
-  download_urls = character(0)
+  ## download_urls = character(0)
   for (site in sites) {
     site_url = paste(base_url, site, sep = '/')
     data_sources = gsub('/$', '', list_html_files(site_url, user, password))
@@ -53,20 +53,17 @@ etl_extract.etl_nysatmoschem <- function(obj, user, password, sites = NULL, year
         year_files = files[file_years %in% years]
       }
       if (length(year_files) > 0) {
+        message(paste('Extracting', site, '/', s, 'files...', sep = ' '))
         ## add urls to download list
         file_urls = paste(base_url, site, s, year_files, sep = '/')
-        download_urls = c(download_urls, file_urls)
+        rel_paths = gsub('.*/raw/', '', file_urls)
         ## make sure local directory exists
         dir.create(file.path(attr(obj, 'raw_dir'), site, s),
                    showWarnings = FALSE, recursive = TRUE)
+        etl::smart_download(obj, sapply(file_urls, URLencode),
+                            rel_paths)
       }
     }
-  }
-
-  if (length(download_urls) > 0) {
-    rel_paths = gsub('.*/raw/', '', download_urls)
-    etl::smart_download(obj, sapply(download_urls, URLencode),
-                        rel_paths)
   }
 
   invisible(obj)
