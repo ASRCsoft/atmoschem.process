@@ -4,6 +4,8 @@
 transform_file = function(pg, f, out_file, site, ds) {
   df = if (ds == 'campbell') {
          transform_campbell(pg, f)
+       } else if (ds == 'ultrafine') {
+         transform_ultrafine(pg, f)
        } else if (site == 'PSP' & ds == 'envidas') {
          transform_psp_envidas(pg, f)
        } else if (site == 'PSP' && ds == 'calibrations') {
@@ -29,7 +31,7 @@ smart_transform = function(obj, raw, cleaned, site, ds, clobber = FALSE) {
                 sum(!missing), "untouched."))
   if (sum(missing) == 0) return(NULL)
   ## mapply(downloader::download, src[missing], lcl[missing], ... = ...)
-  mapply(transform_file, obj$con, raw[missing], cleaned[missing],
+  mapply(transform_file, list(obj$con), raw[missing], cleaned[missing],
          site, ds)
 }
 

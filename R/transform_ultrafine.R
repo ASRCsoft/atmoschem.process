@@ -21,13 +21,14 @@ transform_ultrafine = function(pg, f) {
                                   tz = 'UTC')
   ## it's not really in UTC but setting the time zone this way keeps R
   ## from trying to convert times
+  uf$record = 1:nrow(uf) + 6 # row number in the file
   uf$`Status Flags` = NULL
   uf$Blank = NULL
   uf$Date = NULL
   uf$Time = NULL
 
   long_uf = tidyr::gather(uf, measurement_name, value,
-                          -c(instrument_time, flagged))
+                          -c(instrument_time, record, flagged))
   ## add measurement types that don't already exist in postgres
   path_folders = strsplit(f, '/')[[1]]
   ## get the site
@@ -38,5 +39,6 @@ transform_ultrafine = function(pg, f) {
     get_measurement_type_id(pg, site, 'ultrafine',
                             long_uf$measurement_name)
   long_uf$measurement_name = NULL
-  long_uf
+  long_uf[, c('measurement_type_id', 'instrument_time',
+              'record', 'value', 'flagged')]
 }

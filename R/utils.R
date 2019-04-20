@@ -11,7 +11,9 @@ extract_psp_calibrations_year = function(f) {
 
 ## get the file year given the filename, site, and data source
 extract_year = function(f, site, ds) {
-  year_str = if (site == 'WFMS' && ds == 'campbell') {
+  year_str = if (ds == 'ultrafine') {
+               paste0('20', substr(basename(f), 1, 2))
+             } else if (site == 'WFMS' && ds == 'campbell') {
                substr(gsub('^.*Table1_', '', f), 1, 4)
              } else if (site == 'WFMS' && ds == 'calibrations') {
                paste0('20', substr(gsub('^.*_', '', f), 1, 2))
@@ -34,6 +36,7 @@ get_site_id = function(pg, x) {
 get_measurement_type_id = function(pg, site,
                                    data_source,
                                    measurement) {
+  if (length(measurement) == 0) return(integer(0))
   site_id = get_site_id(pg, site)
   sql_txt = 'select * from measurement_types'
   measurement_types = DBI::dbGetQuery(pg, sql_txt)
