@@ -18,7 +18,7 @@ load_file = function(obj, f, ds, ...) {
 #' @import etl
 #' @inheritParams etl::etl_load
 #' @export
-etl_load.etl_nysatmoschem = function(obj, sites = NULL, years = NULL, ...) {
+etl_load.etl_nysatmoschem = function(obj, sites = NULL, data_sources = NULL, years = NULL, ...) {
   ## if no site is specified, get list of sites from the raw data
   ## files
   if (is.null(sites)) {
@@ -26,8 +26,9 @@ etl_load.etl_nysatmoschem = function(obj, sites = NULL, years = NULL, ...) {
   }
   
   for (site in sites) {
-    data_sources = list.files(file.path(attr(obj, 'load_dir'), site))
-    for (ds in data_sources) {
+    site_data_sources = list.files(file.path(attr(obj, 'load_dir'), site))
+    site_data_sources = site_data_sources[site_data_sources %in% data_sources]
+    for (ds in site_data_sources) {
       files = list.files(file.path(attr(obj, 'load_dir'), site, ds))
       try_result = try(file_years <- extract_year(files, site, ds))
       if (class(try_result) == 'try-error') {

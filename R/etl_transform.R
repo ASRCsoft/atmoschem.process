@@ -38,7 +38,8 @@ smart_transform = function(obj, raw, cleaned, site, ds, clobber = FALSE) {
 #' @import etl
 #' @inheritParams etl::etl_transform
 #' @export
-etl_transform.etl_nysatmoschem = function(obj, sites = NULL, years = NULL, clobber = FALSE) {
+etl_transform.etl_nysatmoschem = function(obj, sites = NULL, data_sources = NULL,
+                                          years = NULL, clobber = FALSE) {
   ## if no site is specified, get list of sites from the raw data
   ## files
   if (is.null(sites)) {
@@ -46,8 +47,9 @@ etl_transform.etl_nysatmoschem = function(obj, sites = NULL, years = NULL, clobb
   }
   
   for (site in sites) {
-    data_sources = list.files(file.path(attr(obj, 'raw_dir'), site))
-    for (ds in data_sources) {
+    site_data_sources = list.files(file.path(attr(obj, 'raw_dir'), site))
+    site_data_sources = site_data_sources[site_data_sources %in% data_sources]
+    for (ds in site_data_sources) {
       files = list.files(file.path(attr(obj, 'raw_dir'), site, ds))
       try_result = try(file_years <- extract_year(files, site, ds))
       if (class(try_result) == 'try-error') {

@@ -22,7 +22,8 @@ list_html_files = function(url, user, password) {
 #'     etl_create()
 #' }
 #' }
-etl_extract.etl_nysatmoschem <- function(obj, user, password, sites = NULL, years = NULL) {
+etl_extract.etl_nysatmoschem <- function(obj, user, password, sites = NULL,
+                                         data_sources = NULL, years = NULL, ...) {
   if (is.null(user) || is.null(password)) {
     stop('Username and password required to access data.')
   }
@@ -37,8 +38,9 @@ etl_extract.etl_nysatmoschem <- function(obj, user, password, sites = NULL, year
   ## download_urls = character(0)
   for (site in sites) {
     site_url = paste(base_url, site, sep = '/')
-    data_sources = gsub('/$', '', list_html_files(site_url, user, password))
-    for (s in data_sources) {
+    site_data_sources = gsub('/$', '', list_html_files(site_url, user, password))
+    site_data_sources = site_data_sources[site_data_sources %in% data_sources]
+    for (s in site_data_sources) {
       s_url = paste(site_url, s, sep = '/')
       files = list_html_files(s_url, user, password)
       try_result = try(file_years <- extract_year(files, site, s))
@@ -61,7 +63,7 @@ etl_extract.etl_nysatmoschem <- function(obj, user, password, sites = NULL, year
         dir.create(file.path(attr(obj, 'raw_dir'), site, s),
                    showWarnings = FALSE, recursive = TRUE)
         etl::smart_download(obj, sapply(file_urls, URLencode),
-                            rel_paths)
+                            rel_paths, ...)
       }
     }
   }
