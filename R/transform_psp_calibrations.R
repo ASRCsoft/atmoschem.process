@@ -57,8 +57,6 @@ transform_psp_42C_calibrations = function(pg, f) {
 
   cal_df = expand.grid(c('NO', 'NOx'), c('zero', 'span'))
   names(cal_df) = c('measurement_name', 'type')
-  add_new_measurement_types(pg, 'PSP', 'envidas',
-                            cal_df$measurement_name)
   cal_df$measurement_type_id =
     get_measurement_type_id(pg, 'PSP', 'envidas',
                             cal_df$measurement_name)
@@ -82,7 +80,6 @@ transform_psp_API300EU_calibrations = function(pg, f) {
     return(empty_measurements())
   }
 
-  add_new_measurement_types(pg, 'PSP', 'envidas', 'CO')
   data.frame(measurement_type_id = get_measurement_type_id(pg, 'PSP', 'envidas', 'CO'),
              type = row.names(cals),
              cal_time = cal_end,
@@ -106,8 +103,6 @@ transform_psp_ASRC_TEI42i_Y_NOy_146i_calibrations = function(pg, f) {
 
   cal_df = expand.grid(c('NO-DEC', 'NOy-DEC'), c('zero', 'span'))
   names(cal_df) = c('measurement_name', 'type')
-  add_new_measurement_types(pg, 'PSP', 'envidas',
-                            cal_df$measurement_name)
   cal_df$measurement_type_id =
     get_measurement_type_id(pg, 'PSP', 'envidas',
                             cal_df$measurement_name)

@@ -86,9 +86,6 @@ transform_campbell = function(pg, f) {
   
   ## add to postgres
   names(campbell_long) = tolower(names(campbell_long))
-  ## add measurement types that don't already exist in postgres
-  add_new_measurement_types(pg, site, 'campbell',
-                            campbell_long$measurement)
   campbell_long$measurement_type_id =
     get_measurement_type_id(pg, site, 'campbell',
                             campbell_long$measurement)

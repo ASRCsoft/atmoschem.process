@@ -51,8 +51,6 @@ transform_psp_envidas = function(pg, f) {
   long_df = cbind(long_vals, flagged = long_flags$flagged)
 
   ## organize the measurement type IDs
-  add_new_measurement_types(pg, 'PSP', 'envidas',
-                            long_df$measurement)
   long_df$measurement_type_id =
     get_measurement_type_id(pg, 'PSP', 'envidas',
                             long_df$measurement)

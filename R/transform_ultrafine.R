@@ -33,8 +33,6 @@ transform_ultrafine = function(pg, f) {
   path_folders = strsplit(f, '/')[[1]]
   ## get the site
   site = path_folders[length(path_folders) - 2]
-  add_new_measurement_types(pg, site, 'ultrafine',
-                            long_uf$measurement_name)
   long_uf$measurement_type_id =
     get_measurement_type_id(pg, site, 'ultrafine',
                             long_uf$measurement_name)

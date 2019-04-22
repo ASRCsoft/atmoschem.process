@@ -44,10 +44,35 @@ get_site_id = function(pg, x) {
   sites$id[match(x, sites$short_name)]
 }
 
+add_new_measurement_types = function(pg, site, data_source,
+                                     measurements) {
+  ## since we only run this function for one site and data source at a
+  ## time, no need to have a site or data source for each row in the
+  ## data frame
+  uniq_measurements = unique(measurements)
+  m_ids = get_measurement_type_id(pg, site, data_source,
+                                  uniq_measurements,
+                                  add_new = FALSE)
+  if (sum(is.na(m_ids)) > 0) {
+    ## insert new measurement types
+    new_mtypes = data.frame(site_id = get_site_id(pg, site),
+                            data_source = data_source,
+                            measurement = uniq_measurements[is.na(m_ids)])
+    DBI::dbWriteTable(pg, 'measurement_types', new_mtypes,
+                      row.names = FALSE, append = TRUE)
+  }
+}
+
 get_measurement_type_id = function(pg, site,
                                    data_source,
-                                   measurement) {
+                                   measurement,
+                                   add_new = TRUE) {
   if (length(measurement) == 0) return(integer(0))
+  if (add_new) {
+    ## make sure we aren't asking for ID's that don't exist yet
+    add_new_measurement_types(pg, site, data_source,
+                              measurement)
+  }
   site_id = get_site_id(pg, site)
   sql_txt = 'select * from measurement_types'
   measurement_types = DBI::dbGetQuery(pg, sql_txt)
@@ -58,24 +83,6 @@ get_measurement_type_id = function(pg, site,
   df2 = merge(df, measurement_types, all.x = TRUE)
   ## df2 is sorted, have to unsort it
   df2$id[order(df2$order)]
-}
-
-add_new_measurement_types = function(pg, site, data_source,
-                                     measurements) {
-  ## since we only run this function for one site and data source at a
-  ## time, no need to have a site or data source for each row in the
-  ## data frame
-  uniq_measurements = unique(measurements)
-  m_ids = get_measurement_type_id(pg, site, data_source,
-                                  uniq_measurements)
-  if (sum(is.na(m_ids)) > 0) {
-    ## insert new measurement types
-    new_mtypes = data.frame(site_id = get_site_id(pg, site),
-                            data_source = data_source,
-                            measurement = uniq_measurements[is.na(m_ids)])
-    DBI::dbWriteTable(pg, 'measurement_types', new_mtypes,
-                      row.names = FALSE, append = TRUE)
-  }
 }
 
 #' @import shiny
