@@ -1,8 +1,15 @@
 ## useful functions
 
+is_psp_42C_cal = function(f)
+  substr(basename(f), 1, 12) == 'Pinnacle_42C'
+is_psp_API300EU_cal = function(f)
+  substr(basename(f), 1, 27) == 'Pinnacle_API300EU_CO_Weekly'
+
 extract_psp_calibrations_year = function(f) {
-  if (substr(basename(f), 1, 12) == 'Pinnacle_42C') {
+  if (is_psp_42C_cal(f)) {
     paste0('20', substr(gsub('^.* ', '', f), 1, 2))
+  } else if (is_psp_API300EU_cal(f)) {
+    gsub('^.*Weekly_|_[^_].*$', '', f)
   } else {
     warning(paste('extract_year not implemented for PSP calibration', f))
     NA
