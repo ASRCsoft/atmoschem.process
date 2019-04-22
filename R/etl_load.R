@@ -1,10 +1,10 @@
 
 load_measurements = function(obj, f, ...) {
-  smart_upload(obj, f, 'measurements', ...)
+  smart_upload(obj, f, rep('measurements', length(f)), ...)
 }
 
 load_calibrations = function(obj, f, ...) {
-  smart_upload(obj, f, 'manual_calibrations', ...)
+  smart_upload(obj, f, rep('manual_calibrations', length(f)), ...)
 }
 
 load_file = function(obj, f, ds, ...) {
