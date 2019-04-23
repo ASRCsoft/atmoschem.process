@@ -40,7 +40,8 @@ update_metadata_tbl = function(pg, tbl_name, df, action = 'replace') {
     df$measurement_type_id =
       get_measurement_type_id(pg, df$site,
                               df$data_source,
-                              df$measurement)
+                              df$measurement,
+                              add_new = FALSE)
     df$site = NULL
     df$data_source = NULL
     df$measurement = NULL
