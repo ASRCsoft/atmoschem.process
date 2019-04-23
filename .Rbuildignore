@@ -1,2 +1,5 @@
+^Meta$
+^doc$
+^data-raw$
 ^nysatmoschem\.Rproj$
 ^\.Rproj\.user$

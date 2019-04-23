@@ -21,9 +21,8 @@ header-includes:
 ---
 
 ```{r setup, include=FALSE}
-library(RPostgreSQL)
 knitr::opts_chunk$set(echo = FALSE, cache = FALSE)
-db = dbConnect(PostgreSQL(), dbname = 'chem2')
+img_path = tempdir()
 ```
 
 # Overview
@@ -40,8 +39,9 @@ nodes = create_node_df(n_nodes, label = node_labels)
 edges = create_edge_df(c(1:4, rep(5, 2)),
                        c(rep(5, 4), 6:7))
 graph = create_graph(nodes, edges, attr_theme = NULL)
-graph %>% export_graph(file_name = 'img/overview.pdf')
-knitr::include_graphics('img/overview.pdf')
+overview_file = file.path(img_path, 'overview.pdf')
+graph %>% export_graph(file_name = overview_file)
+knitr::include_graphics(overview_file)
 ```
 
 The data goes through a complicated series of processing steps before being provided to researchers and bureaucrats for analysis. Figure \@ref(fig:processing) attempts to summarize these steps.
@@ -105,15 +105,17 @@ The ETL functions are implemented in R and organized using the etl package [@bau
 
 ```{r dbschema, fig.cap='The NYS Atmospheric Chemistry database schema.'}
 library(datamodelr)
+schema_file = system.file('extdata', 'nysacdb_schema.rda',
+                          package = 'nysatmoschem')
+load(schema_file)
 
-sQuery <- dm_re_query('postgres')
-dm_atmoschem <- dbGetQuery(db, sQuery)
-dm_atmoschemdm <- as.data_model(dm_atmoschem)
-graph <- dm_create_graph(dm_atmoschemdm, rankdir = "RL", columnArrows = T)
+dm_atmoschemdm = as.data_model(nysacdb_schema)
+graph = dm_create_graph(dm_atmoschemdm, rankdir = "RL", columnArrows = T)
 # do a silly dance to get the output in pdf
+schema_file = file.path(img_path, 'schema.pdf')
 rsvg::rsvg_pdf(charToRaw(DiagrammeRsvg::export_svg(dm_render_graph(graph))),
-               file = 'img/schema.pdf')
-knitr::include_graphics('img/schema.pdf')
+               file = schema_file)
+knitr::include_graphics(schema_file)
 ```
 
 # Getting Data
@@ -212,30 +214,32 @@ where $\hat{chem}_{converted,i}$ is the calibration-corrected measurement of the
 
 ## Invalid Values
 
-Measurements outside the range of realistic values are flagged. Table \@ref(tab:valuefilters) shows a selection of measurement types with their corresponding ranges.
+Measurements outside the range of realistic values are flagged.
 
-```{sql, connection=db, output.var='allowable_ranges'}
-select short_name as site,
-       measurement,
-       valid_range
-  from measurement_types
-	join sites
-    on measurement_types.site_id=sites.id
- where valid_range is not null
- limit 5;
-```
+<!-- Table \@ref(tab:valuefilters) shows a selection of measurement types with their corresponding ranges. -->
 
-```{r valuefilters}
-# format the range strings
-allowable_ranges$range = allowable_ranges$valid_range
-allowable_ranges$valid_range = NULL
-allowable_ranges$range = gsub(',)', ',NA)', allowable_ranges$range)
-allowable_ranges$range = gsub(',', ', ', allowable_ranges$range)
-knitr::kable(allowable_ranges, format = 'latex',
-             col.names = c('Site', 'Measurement', 'Range'),
-             booktabs = TRUE, linesep = '',
-             caption = 'Allowable data ranges.')
-```
+<!-- ```{sql, connection=db, output.var='allowable_ranges'} -->
+<!-- select short_name as site, -->
+<!--        measurement, -->
+<!--        valid_range -->
+<!--   from measurement_types -->
+<!-- 	join sites -->
+<!--     on measurement_types.site_id=sites.id -->
+<!--  where valid_range is not null -->
+<!--  limit 5; -->
+<!-- ``` -->
+
+<!-- ```{r valuefilters} -->
+<!-- # format the range strings -->
+<!-- allowable_ranges$range = allowable_ranges$valid_range -->
+<!-- allowable_ranges$valid_range = NULL -->
+<!-- allowable_ranges$range = gsub(',)', ',NA)', allowable_ranges$range) -->
+<!-- allowable_ranges$range = gsub(',', ', ', allowable_ranges$range) -->
+<!-- knitr::kable(allowable_ranges, format = 'latex', -->
+<!--              col.names = c('Site', 'Measurement', 'Range'), -->
+<!--              booktabs = TRUE, linesep = '', -->
+<!--              caption = 'Allowable data ranges.') -->
+<!-- ``` -->
 
 ## Repeating Values
 
