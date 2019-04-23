@@ -6,6 +6,8 @@ is_psp_API300EU_cal = function(f)
   startsWith(basename(f), 'Pinnacle_API300EU_CO_Weekly')
 is_psp_ASRC_TEI42i_Y_NOy_146i_cal = function(f)
   startsWith(basename(f), 'Pinnacle_ASRC_TEI42i_Y_NOy_146i_Weekly')
+is_psp_DEC_TEI42i_NOy_cal = function(f)
+  startsWith(basename(f), 'Pinnacle DEC TEI42i NOy Weekly')
 
 extract_psp_calibrations_year = function(f) {
   if (is_psp_42C_cal(f)) {
@@ -14,6 +16,8 @@ extract_psp_calibrations_year = function(f) {
     gsub('^.*Weekly_|_[^_].*$', '', f)
   } else if (is_psp_ASRC_TEI42i_Y_NOy_146i_cal(f)) {
     gsub('^.*Weekly_|_[^_].*$', '', f)
+  } else if (is_psp_DEC_TEI42i_NOy_cal(f)) {
+    gsub('^.* |_.*$', '', f)
   } else {
     warning(paste('extract_year not implemented for PSP calibration', f))
     NA
