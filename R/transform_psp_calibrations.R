@@ -134,6 +134,15 @@ transform_psp_TEI43i_SO2_146i_calibrations = function(pg, f) {
                      chem_name = 'SO2', cal_end)
 }
 
+transform_psp_TEI43i_SO2_calibrations = function(pg, f) {  
+  cal_end = read_psp_cal_times(f)$end_time
+  if (is.null(cal_end)) {
+    return(empty_measurements())
+  }
+  read_psp_cal_table(pg, f, trange = 'U36:AA40',
+                     chem_name = 'SO2', cal_end)
+}
+
 transform_psp_calibrations = function(pg, f) {
   ## figure out which function to send this file to
   if (is_psp_42C_cal(f)) {
@@ -146,6 +155,8 @@ transform_psp_calibrations = function(pg, f) {
     transform_psp_DEC_TEI42i_NOy_calibrations(pg, f)
   } else if (is_psp_TEI43i_SO2_146i_cal(f)) {
     transform_psp_TEI43i_SO2_146i_calibrations(pg, f)
+  } else if (is_psp_TEI43i_SO2_cal(f)) {
+    transform_psp_TEI43i_SO2_calibrations(pg, f)
   } else {
     warning(paste('Transform not implemented for', f))
   }

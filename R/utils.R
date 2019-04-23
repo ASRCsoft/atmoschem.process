@@ -10,6 +10,8 @@ is_psp_DEC_TEI42i_NOy_cal = function(f)
   startsWith(basename(f), 'Pinnacle DEC TEI42i NOy Weekly')
 is_psp_TEI43i_SO2_146i_cal = function(f)
   startsWith(basename(f), 'Pinnacle_TEI43i_SO2_146i_Weekly')
+is_psp_TEI43i_SO2_cal = function(f)
+  startsWith(basename(f), 'Pinnacle_TEI43i_SO2_Weekly')
 
 extract_psp_calibrations_year = function(f) {
   if (is_psp_42C_cal(f)) {
@@ -21,6 +23,8 @@ extract_psp_calibrations_year = function(f) {
   } else if (is_psp_DEC_TEI42i_NOy_cal(f)) {
     gsub('^.* |_.*$', '', f)
   } else if (is_psp_TEI43i_SO2_146i_cal(f)) {
+    gsub('^.*Weekly_|_[^_].*$', '', f)
+  } else if (is_psp_TEI43i_SO2_cal(f)) {
     gsub('^.*Weekly_|_[^_].*$', '', f)
   } else {
     warning(paste('extract_year not implemented for PSP calibration', f))
