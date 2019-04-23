@@ -1,7 +1,10 @@
 Package: nysatmoschem
 Title: The ASRC NYS Atmospheric Chemistry Database
 Version: 0.0.0.9000
-Authors@R: person("William", "May", email = "wcmay@albany.edu", role = c("aut", "cre"))
+Authors@R: c(
+    person("William", "May", email = "wcmay@albany.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-3201-1885")),
+    person("Adam", "Shelly", role = "ctb"),
+    person("SUNY RF", role = "cph"))
 Description: An R package providing the ASRC NYS Atmospheric Chemistry
     Database, along with tools to process and visualize the data and
     generate reports.
