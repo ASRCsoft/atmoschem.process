@@ -13,8 +13,10 @@ Imports:
     dbplyr,
     dbx,
     httr,
+    readxl,
     RPostgreSQL,
     rvest,
+    R.utils,
     tidyr,
     xml2
 Depends:
