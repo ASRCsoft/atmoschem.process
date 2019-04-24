@@ -78,9 +78,12 @@ get_cals = function(measure, t1, t2) {
     ## prevent RPostgreSQL from mucking with the time zones
     mutate(time = as.character(time)) %>%
     arrange(time) %>%
-    collect() %>%
-    ## get the times back
-    mutate(time = as.POSIXct(time, tz = 'GMT'))
+    collect()
+  if (nrow(results) > 0) {
+    results = results %>%
+      ## get the times back
+      mutate(time = as.POSIXct(time, tz = 'GMT'))
+  }
   ## dbDisconnect(pg)
   results
 }
