@@ -7,8 +7,8 @@ common table expressions (CTEs), which serve as optimization fences so
 that postgres optimizes each query section separately.
 
 I also split the processing by data source so that a new data file
-does not require reprocessing all data. Therefore there are separate
-materialized views for each source. */
+does not require reprocessing all data. The `update_processing`
+function will update the processing for a single data source. */
 
 /* Apply calibration adjustments if needed, using functions from
    calibration.sql. */
@@ -69,7 +69,15 @@ CREATE OR REPLACE FUNCTION process_measurements(measurement_type_ids int[])
     from measurement_medians;
 $$ language sql;
 
-/* Store processed results by data source*/
+/* Store processed results, before adding derived values */
+create table _processed_measurements (
+  measurement_type_id int references measurement_types,
+  measurement_time timestamp,
+  value numeric,
+  flagged boolean,
+  primary key(measurement_type_id, measurement_time)
+);
+
 CREATE OR REPLACE FUNCTION get_data_source_ids(int, text)
   RETURNS int[] as $$
   select array_agg(id)
@@ -77,31 +85,16 @@ CREATE OR REPLACE FUNCTION get_data_source_ids(int, text)
    where site_id=$1
      and data_source=$2;
 $$ language sql STABLE PARALLEL SAFE;
-  
-CREATE materialized VIEW processed_wfms_campbell as
-  select *
-    from process_measurements(get_data_source_ids(1, 'campbell'));
-create index processed_wfms_campbell_idx on processed_wfms_campbell(measurement_type_id, measurement_time);
 
-CREATE materialized VIEW processed_wfml_campbell as
+CREATE OR REPLACE FUNCTION update_processing(int, text)
+  RETURNS void as $$
+  delete
+    from _processed_measurements
+   where measurement_type_id=any(get_data_source_ids($1, $2));
+  insert into _processed_measurements
   select *
-    from process_measurements(get_data_source_ids(2, 'campbell'));
-create index processed_wfml_campbell_idx on processed_wfml_campbell(measurement_type_id, measurement_time);
-
-CREATE materialized VIEW processed_wfml_envidas as
-  select *
-    from process_measurements(get_data_source_ids(2, 'envidas'));
-create index processed_wfml_envidas_idx on processed_wfml_envidas(measurement_type_id, measurement_time);
-
-CREATE materialized VIEW processed_wfml_mesonet as
-  select *
-    from process_measurements(get_data_source_ids(2, 'mesonet'));
-create index processed_wfml_mesonet_idx on processed_wfml_mesonet(measurement_type_id, measurement_time);
-
-CREATE materialized VIEW processed_psp_envidas as
-  select *
-    from process_measurements(get_data_source_ids(3, 'envidas'));
-create index processed_psp_envidas_idx on processed_psp_envidas(measurement_type_id, measurement_time);
+    from process_measurements(get_data_source_ids($1, $2));
+$$ language sql;
 
 /* Add derived measurements to the processed measurements. */
 CREATE OR REPLACE FUNCTION get_measurement_id(int, text)
@@ -122,38 +115,20 @@ CREATE OR REPLACE FUNCTION combine_measures(measurement_type_id1 int, measuremen
     flagged1 boolean,
     flagged2 boolean
   ) as $$
-  declare
-  q text := '
-    select m1.measurement_time,
-	   m1.value,
-	   m2.value,
-	   coalesce(m1.flagged, false),
-	   coalesce(m2.flagged, false)
-      from (select *
-	      from %I
-	     where measurement_type_id=$1) m1
-	     join (select *
-		     from %I
-		    where measurement_type_id=$2) m2
-		 on m1.measurement_time=m2.measurement_time';
-  data_source text;
-  begin
-    -- return null if measurements don't exist
-    if measurement_type_id1 is null or measurement_type_id2 is null then
-      return;
-    end if;
-    -- get the processed data view name using the data source and site
-    select 'processed_' ||
-	     lower(sites.short_name) ||
-	     '_' || m1.data_source into data_source
-      from measurement_types m1
-	     join sites
-		 on m1.site_id=sites.id
-     where m1.id=measurement_type_id1;
-    RETURN QUERY EXECUTE format(q, data_source, data_source)
-      USING measurement_type_id1, measurement_type_id2;
-  end;
-$$ language plpgsql;
+  select m1.measurement_time,
+	 m1.value,
+	 m2.value,
+	 coalesce(m1.flagged, false),
+	 coalesce(m2.flagged, false)
+    from (select *
+	    from _processed_measurements
+	   where measurement_type_id=$1) m1
+	   join
+	   (select *
+	      from _processed_measurements
+	     where measurement_type_id=$2) m2
+	       on m1.measurement_time=m2.measurement_time;
+$$ language sql;
 
 create or replace view wfms_no2 as
   select measurement_type_id,
@@ -231,7 +206,7 @@ create or replace view wfms_ws_max as
 
 /* Combine all processed data. */
 CREATE materialized VIEW processed_measurements as
-  select * from processed_wfms_campbell
+  select * from _processed_measurements
    union
   select * from wfms_no2
    union
@@ -241,15 +216,7 @@ CREATE materialized VIEW processed_measurements as
    union
   select * from wfms_ws_max
    union
-  select * from wfms_ws_components
-   union
-  select * from processed_wfml_campbell
-   union
-  select * from processed_wfml_envidas
-   union
-  select * from processed_wfml_mesonet
-   union
-  select * from processed_psp_envidas;
+  select * from wfms_ws_components;
 create index processed_measurements_idx on processed_measurements(measurement_type_id, measurement_time);
 
 /* Aggregate the processed data by hour using a function from
@@ -272,30 +239,15 @@ CREATE materialized VIEW hourly_measurements as
 create index hourly_measurements_idx on hourly_measurements(measurement_type_id, measurement_time);
 
 /* Update the processed data. */
-CREATE OR REPLACE FUNCTION update_processing(text)
+CREATE OR REPLACE FUNCTION update_all()
   RETURNS void as $$
-  begin
-    EXECUTE format('refresh materialized view %I',
-		   'processed_' || $1);
-  end;
-$$ language plpgsql;
-
-CREATE OR REPLACE FUNCTION update_all(text)
-  RETURNS void as $$
-  declare
-  data_sources text[] := array['wfms_campbell', 'wfml_campbell'];
-  begin
-    refresh materialized view calibration_values;
-    refresh materialized view conversion_efficiencies;
-    refresh materialized view freezing_clusters;
-    if $1='all' then
-      for i in 1..array_upper(data_sources, 1) loop
-	perform update_processing(data_sources[i]);
-      end loop;
-    else
-      perform update_processing($1);
-    end if;
-    refresh materialized view processed_measurements;
-    refresh materialized view hourly_measurements;
-  end;
-$$ language plpgsql;
+  refresh materialized view calibration_values;
+  refresh materialized view conversion_efficiencies;
+  refresh materialized view freezing_clusters;
+  select update_processing(site_id, data_source)
+    from (select distinct site_id,
+			  data_source
+	    from measurement_types) m1;
+  refresh materialized view processed_measurements;
+  refresh materialized view hourly_measurements;
+$$ language sql;
