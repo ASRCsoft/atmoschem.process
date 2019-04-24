@@ -54,14 +54,12 @@ create or replace view calibration_periods as
 		 times as cal_times
 	    from autocals) a1;
 
-/* Store calibration estimates derived from the raw instrument values
- */
-CREATE MATERIALIZED VIEW calibration_values AS
+CREATE or replace VIEW calibration_zeros AS
   select *
     from (select *,
 		 estimate_cal(measurement_type_id, type, cal_times) as value
 	    from calibration_periods
-	   where type in ('zero', 'span')) c1
+	   where type = 'zero') c1
    where value is not null
   union
   select measurement_type_id,
@@ -72,8 +70,74 @@ CREATE MATERIALIZED VIEW calibration_values AS
     from manual_calibrations m1
 	   join measurement_types m2
 	       on m1.measurement_type_id=m2.id
-   where site_id=3
-     and type in ('zero', 'span');
+     and type = 'zero';
+
+CREATE OR REPLACE FUNCTION interpolate_cal_zero(measurement_type_id int, t timestamp)
+  RETURNS numeric AS $$
+  select interpolate(t0, t1, y0, y1, $2)
+    from (select upper(cal_times) as t0,
+		 value as y0
+	    from calibration_zeros
+	   where upper(cal_times)<=$2
+	     and measurement_type_id=$1
+	     and value is not null
+	   order by upper(cal_times) desc
+	   limit 1) calib0
+	 full outer join
+	 (select upper(cal_times) as t1,
+		 value as y1
+	    from calibration_zeros
+	   where upper(cal_times)>$2
+	     and measurement_type_id=$1
+	     and value is not null
+	   order by upper(cal_times) asc
+	   limit 1) calib1
+         on true;
+$$ LANGUAGE sql STABLE PARALLEL SAFE;
+
+CREATE or replace VIEW calibration_spans AS
+  select c1.*,
+	 m.span as provided_value
+    from (select *,
+		 estimate_cal(measurement_type_id, type, cal_times) as value
+	    from calibration_periods
+	   where type = 'span') c1
+	   join
+	   measurement_types m
+	   on c1.measurement_type_id=m.id
+   where value is not null
+  union
+  select measurement_type_id,
+	 type,
+	 tsrange(cal_time - interval '1 hour',
+		 cal_time, '[]') as cal_times,
+	 provided_value,
+	 measured_value as value
+    from manual_calibrations m1
+	   join measurement_types m2
+	       on m1.measurement_type_id=m2.id
+     and type = 'span';
+
+CREATE OR REPLACE FUNCTION calc_span(measurement_type_id int, provided_val numeric, val numeric, ts timestamp)
+  RETURNS numeric AS $$
+  select (val - interpolate_cal_zero(measurement_type_id, ts)) / provided_val;
+$$ LANGUAGE sql STABLE PARALLEL SAFE;
+
+/* Store calibration estimates derived from the raw instrument values
+ */
+CREATE MATERIALIZED VIEW calibration_values AS
+  select measurement_type_id,
+	 type,
+	 cal_times,
+	 value
+    from calibration_zeros
+   union
+  select measurement_type_id,
+	 type,
+	 cal_times,
+	 calc_span(measurement_type_id, provided_value,
+		   value, upper(cal_times)) as value
+    from calibration_spans;
 -- to make the interpolate_cal function faster
 CREATE INDEX calibration_values_upper_time_idx ON calibration_values(measurement_type_id, type, upper(cal_times));
 
@@ -103,7 +167,6 @@ CREATE OR REPLACE FUNCTION interpolate_cal(measurement_type_id int, type text, t
          on true;
 $$ LANGUAGE sql STABLE PARALLEL SAFE;
 
-
 CREATE OR REPLACE FUNCTION apply_calib(measurement_type_id int, val numeric, t timestamp)
   RETURNS numeric AS $$
   DECLARE
@@ -111,9 +174,7 @@ CREATE OR REPLACE FUNCTION apply_calib(measurement_type_id int, val numeric, t t
   span numeric = interpolate_cal(measurement_type_id, 'span', t);
   BEGIN
     return case when span is null then val - zero
-      else (val - zero) / (span - zero) * (select m.span
-					     from measurement_types m
-					    where m.id=$1) end;
+      else (val - zero) / span end;
   END;
 $$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 -- for whatever reason this is faster as a plpgsql function
