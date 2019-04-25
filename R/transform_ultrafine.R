@@ -21,7 +21,11 @@ transform_ultrafine = function(pg, f) {
                                   tz = 'UTC')
   ## it's not really in UTC but setting the time zone this way keeps R
   ## from trying to convert times
-  uf$record = 1:nrow(uf) + 6 # row number in the file
+  if (nrow(uf) > 0) {
+    uf$record = 1:nrow(uf) + 6 # row number in the file
+  } else {
+    uf$record = integer(0)
+  }
   uf$`Status Flags` = NULL
   uf$Blank = NULL
   uf$Date = NULL
