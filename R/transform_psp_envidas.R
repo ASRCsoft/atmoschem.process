@@ -34,13 +34,13 @@ transform_psp_envidas = function(pg, f) {
 
   ## get data frame of values
   df_vals = df[, !grepl('Status', names(df))]
-  long_vals = tidyr::gather(df_vals, measurement, value,
+  long_vals = tidyr::gather(df_vals, measurement_name, value,
                             -c(instrument_time, RECORD))
 
   ## get data frame of flags
   df_flags = df[, c(1:2, grep('Status', names(df)))]
   names(df_flags) = names(df_vals)
-  long_flags = tidyr::gather(df_flags, measurement, flag,
+  long_flags = tidyr::gather(df_flags, measurement_name, flag,
                              -c(instrument_time, RECORD))
   long_flags$flagged =
     long_flags$flag == 'OK' | long_flags$flag == ''
@@ -50,11 +50,6 @@ transform_psp_envidas = function(pg, f) {
   ## safe to assume both data frames are in the same order for now
   long_df = cbind(long_vals, flagged = long_flags$flagged)
 
-  ## organize the measurement type IDs
-  long_df$measurement_type_id =
-    get_measurement_type_id(pg, 'PSP', 'envidas',
-                            long_df$measurement)
-  long_df$measurement = NULL
-  
-  long_df[, c(5, 1:4)]
+  long_df[, c('measurement_name', 'instrument_time',
+              'record', 'value', 'flagged')]
 }

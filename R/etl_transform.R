@@ -11,10 +11,12 @@ transform_file = function(pg, f, out_file, site, ds) {
        } else if (site == 'PSP' && ds == 'calibrations') {
          transform_psp_calibrations(pg, f)
        }
-  ## use write.table to write csv files without header lines--
-  ## dbWriteTable from RPostgreSQL can't handle header lines
-  write.table(df, file = out_file, sep = ',', na = '',
-              row.names = FALSE,  col.names = FALSE)
+  write.csv(df, file = out_file, na = '',
+            row.names = FALSE)
+  ## ## use write.table to write csv files without header lines--
+  ## ## dbWriteTable from RPostgreSQL can't handle header lines
+  ## write.table(df, file = out_file, sep = ',', na = '',
+  ##             row.names = FALSE,  col.names = FALSE)
 }
 
 ## Only transform new files, similar to `smart_download` from etl

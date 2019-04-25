@@ -29,14 +29,6 @@ transform_ultrafine = function(pg, f) {
 
   long_uf = tidyr::gather(uf, measurement_name, value,
                           -c(instrument_time, record, flagged))
-  ## add measurement types that don't already exist in postgres
-  path_folders = strsplit(f, '/')[[1]]
-  ## get the site
-  site = path_folders[length(path_folders) - 2]
-  long_uf$measurement_type_id =
-    get_measurement_type_id(pg, site, 'ultrafine',
-                            long_uf$measurement_name)
-  long_uf$measurement_name = NULL
-  long_uf[, c('measurement_type_id', 'instrument_time',
+  long_uf[, c('measurement_name', 'instrument_time',
               'record', 'value', 'flagged')]
 }

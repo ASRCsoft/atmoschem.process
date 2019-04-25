@@ -49,10 +49,7 @@ read_psp_NO_cal_table = function(pg, f, trange = 'F33:AD35',
   row.names(cals) = chem_names
   cal_df = expand.grid(chem_names, c('zero', 'span'))
   names(cal_df) = c('measurement_name', 'type')
-  cal_df$measurement_type_id =
-    get_measurement_type_id(pg, 'PSP', 'envidas',
-                            cal_df$measurement_name)
-  data.frame(measurement_type_id = cal_df$measurement_type_id,
+  data.frame(measurement_name = cal_df$measurement_name,
              type = cal_df$type,
              cal_time = cal_end,
              provided_value = c(rep(0, 2), cals$cert_span),
@@ -67,9 +64,7 @@ read_psp_cal_table = function(pg, f, trange = 'U36:AA40',
   cals = as.data.frame(df[c(1, nrow(df)), c(1, ncol(df))])
   names(cals) = c('provided_value', 'measured_value')
   row.names(cals) = c('span', 'zero')
-  mtype_id = get_measurement_type_id(pg, 'PSP', 'envidas',
-                                     chem_name)
-  data.frame(measurement_type_id = mtype_id,
+  data.frame(measurement_name = chem_name,
              type = row.names(cals),
              cal_time = cal_end,
              provided_value = cals$provided_value,
@@ -78,7 +73,7 @@ read_psp_cal_table = function(pg, f, trange = 'U36:AA40',
 }
 
 empty_measurements = function() {
-  data.frame(measurement_type_id = integer(0),
+  data.frame(measurement_name = character(0),
              type = character(0),
              cal_time = vector(),
              provided_value = numeric(0),

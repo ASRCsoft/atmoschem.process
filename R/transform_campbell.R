@@ -66,30 +66,26 @@ transform_campbell = function(pg, f) {
   ## clean and reorganize the data
   is_flag = grepl('^F_', names(campbell))
   campbell_long = campbell[, !is_flag] %>%
-    tidyr::gather(measurement, value, -c(instrument_time, RECORD))
+    tidyr::gather(measurement_name, value, -c(instrument_time, RECORD))
   if (site == 'WFMS') {
     flag_mat = as.matrix(campbell[, is_flag]) != 1
   } else if (site == 'WFML') {
     flag_mat = as.matrix(campbell[, is_flag]) != 0
   }
   row.names(flag_mat) = campbell$instrument_time
-  campbell_long$measurement =
-    gsub('_Avg$', '', campbell_long$measurement)
+  campbell_long$measurement_name =
+    gsub('_Avg$', '', campbell_long$measurement_name)
   flag_rows = match(campbell_long$instrument_time,
                     campbell$instrument_time)
   flag_cols = match(paste('F',
-                          fast_lookup(campbell_long$measurement,
+                          fast_lookup(campbell_long$measurement_name,
                                       wfms_flags),
                           'Avg', sep = '_'),
                     colnames(flag_mat))
   campbell_long$flagged = flag_mat[cbind(flag_rows, flag_cols)]
   
-  ## add to postgres
   names(campbell_long) = tolower(names(campbell_long))
-  campbell_long$measurement_type_id =
-    get_measurement_type_id(pg, site, 'campbell',
-                            campbell_long$measurement)
-  campbell_long$measurement = NULL
   ## reorder the columns to match the database table
-  campbell_long[, c(5, 1:4)]
+  campbell_long[, c('measurement_name', 'instrument_time',
+                    'record', 'value', 'flagged')]
 }

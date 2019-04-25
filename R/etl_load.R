@@ -1,17 +1,21 @@
 
-load_measurements = function(obj, f, ...) {
-  smart_upload(obj, f, rep('measurements', length(f)), ...)
-}
-
-load_calibrations = function(obj, f, ...) {
-  smart_upload(obj, f, rep('manual_calibrations', length(f)), ...)
-}
-
-load_file = function(obj, f, ds, ...) {
+load_file = function(obj, f, site, ds) {
   if (ds == 'calibrations') {
-    load_calibrations(obj, f, ...)
+    tbl_name = 'manual_calibrations'
   } else {
-    load_measurements(obj, f, ...)
+    tbl_name = 'measurements'
+  }
+  for (f_i in f) {
+    df = read.csv(f_i)
+    df$measurement_type_id =
+      get_measurement_type_id(obj$con, site, ds,
+                              df$measurement_name)
+    df$measurement_name = NULL
+    ncols = ncol(df)
+    ## put the measurement type ID first
+    df = df[, c(ncols, 1:(ncols - 1))]
+    DBI::dbWriteTable(obj$con, tbl_name, df,
+                      row.names = FALSE, append = TRUE)
   }
 }
 
@@ -44,8 +48,7 @@ etl_load.etl_nysatmoschem = function(obj, sites = NULL, data_sources = NULL, yea
       f_paths = file.path(attr(obj, 'load_dir'), site,
                           ds, year_files)
       message(paste('Loading', site, '/', ds, 'files...'))
-      load_file(obj, f_paths, ds, header = FALSE,
-                row.names = FALSE)
+      load_file(obj, f_paths, site, ds)
     }
   }
   
