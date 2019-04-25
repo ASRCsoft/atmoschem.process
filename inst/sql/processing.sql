@@ -178,7 +178,7 @@ create or replace view wfms_ws_components as
 		       ws1.flagged or wd1.flagged as flagged
 		  from wfms_ws ws1
   			 join (select *
-				 from processed_wfms_campbell
+				 from _processed_measurements
 				where measurement_type_id=get_measurement_id(1, 'WindDir_D1_WVT')) wd1
 			     on ws1.measurement_time=wd1.measurement_time)
   select get_measurement_id(1, 'WS_u'),
