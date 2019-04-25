@@ -29,19 +29,19 @@ transform_psp_envidas = function(pg, f) {
                                   format = date_format,
                                   tz = 'UTC')
   ## match the row number of the original file
-  df$RECORD = 1:nrow(df) + 4
+  df$record = 1:nrow(df) + 4
   df = df[, c(1, ncol(df), 2:(ncol(df) - 1))]
 
   ## get data frame of values
   df_vals = df[, !grepl('Status', names(df))]
   long_vals = tidyr::gather(df_vals, measurement_name, value,
-                            -c(instrument_time, RECORD))
+                            -c(instrument_time, record))
 
   ## get data frame of flags
   df_flags = df[, c(1:2, grep('Status', names(df)))]
   names(df_flags) = names(df_vals)
   long_flags = tidyr::gather(df_flags, measurement_name, flag,
-                             -c(instrument_time, RECORD))
+                             -c(instrument_time, record))
   long_flags$flagged =
     long_flags$flag == 'OK' | long_flags$flag == ''
   long_flags$flag = NULL
