@@ -125,7 +125,7 @@ transform_psp_API300EU_calibrations = function(pg, f) {
 
 transform_psp_ASRC_TEI42i_Y_NOy_146i_calibrations = function(pg, f) {
   transform_psp_NO_calibrations(pg, f,
-                                chem_names = c('NO-ASRC', 'NOy-ASRC'))
+                                chem_names = c('NO-42i', 'NOy'))
 }
 
 transform_psp_DEC_TEI42i_NOy_calibrations = function(pg, f) {
