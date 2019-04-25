@@ -1,5 +1,5 @@
 hexToBinStr = function(h)
-  format(R.utils::intToBin(strtoi(sprintf('%04d', h), 16L)),
+  format(R.utils::intToBin(strtoi(h, 16L)),
          justify = 'right', width = 16)
 
 ## return TRUE for a 1 in any position except 9 and 15, which are
@@ -14,7 +14,7 @@ read_ultrafine = function(f) {
 
 transform_ultrafine = function(pg, f) {
   uf = read_ultrafine(f)
-  uf$flagged = parse_ultrafine_flag(uf$`Status Flags`)
+  uf$flagged = parse_ultrafine_flag(as.character(uf$`Status Flags`))
   time_strs = paste(uf$Date, uf$Time)
   uf$instrument_time = as.POSIXct(time_strs,
                                   format = '%Y/%m/%d %T',
