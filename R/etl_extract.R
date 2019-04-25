@@ -39,7 +39,9 @@ etl_extract.etl_nysatmoschem <- function(obj, user, password, sites = NULL,
   for (site in sites) {
     site_url = paste(base_url, site, sep = '/')
     site_data_sources = gsub('/$', '', list_html_files(site_url, user, password))
-    site_data_sources = site_data_sources[site_data_sources %in% data_sources]
+    if (!is.null(data_sources)) {
+      site_data_sources = site_data_sources[site_data_sources %in% data_sources]
+    }
     for (s in site_data_sources) {
       s_url = paste(site_url, s, sep = '/')
       files = list_html_files(s_url, user, password)

@@ -31,7 +31,9 @@ etl_load.etl_nysatmoschem = function(obj, sites = NULL, data_sources = NULL, yea
   
   for (site in sites) {
     site_data_sources = list.files(file.path(attr(obj, 'load_dir'), site))
-    site_data_sources = site_data_sources[site_data_sources %in% data_sources]
+    if (!is.null(data_sources)) {
+      site_data_sources = site_data_sources[site_data_sources %in% data_sources]
+    }
     for (ds in site_data_sources) {
       files = list.files(file.path(attr(obj, 'load_dir'), site, ds))
       try_result = try(file_years <- extract_year(files, site, ds))
