@@ -42,8 +42,7 @@ transform_psp_envidas = function(pg, f) {
   names(df_flags) = names(df_vals)
   long_flags = tidyr::gather(df_flags, measurement_name, flag,
                              -c(instrument_time, record))
-  long_flags$flagged =
-    long_flags$flag == 'OK' | long_flags$flag == ''
+  long_flags$flagged = is.na(long_flags$flag) | long_flags$flag != 'Ok'
   long_flags$flag = NULL
 
   ## long_df = merge(long_vals, long_flags)
