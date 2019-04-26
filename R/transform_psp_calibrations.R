@@ -118,7 +118,7 @@ transform_psp_API300EU_calibrations = function(pg, f) {
                                     chem_name = 'CO')
 }
 
-transform_psp_ASRC_TEI42i_Y_NOy_146i_calibrations = function(pg, f) {
+transform_psp_ASRC_TEI42i_Y_NOy_calibrations = function(pg, f) {
   transform_psp_NO_calibrations(pg, f,
                                 chem_names = c('NOy-HNO3', 'NOy'))
 }
@@ -126,11 +126,6 @@ transform_psp_ASRC_TEI42i_Y_NOy_146i_calibrations = function(pg, f) {
 transform_psp_DEC_TEI42i_NOy_calibrations = function(pg, f) {
   transform_psp_NO_calibrations(pg, f, 'K11', trange = 'F34:AD36',
                                 chem_names = c('NO-DEC', 'NOy-DEC'))
-}
-
-transform_psp_TEI43i_SO2_146i_calibrations = function(pg, f) {  
-  transform_psp_single_calibrations(pg, f,
-                                    chem_name = 'SO2')
 }
 
 transform_psp_TEI43i_SO2_calibrations = function(pg, f) {  
@@ -150,12 +145,10 @@ transform_psp_calibrations = function(pg, f) {
     transform_psp_42C_calibrations(pg, f)
   } else if (is_psp_API300EU_cal(f)) {
     transform_psp_API300EU_calibrations(pg, f)
-  } else if (is_psp_ASRC_TEI42i_Y_NOy_146i_cal(f)) {
-    transform_psp_ASRC_TEI42i_Y_NOy_146i_calibrations(pg, f)
+  } else if (is_psp_ASRC_TEI42i_Y_NOy_cal(f)) {
+    transform_psp_ASRC_TEI42i_Y_NOy_calibrations(pg, f)
   } else if (is_psp_DEC_TEI42i_NOy_cal(f)) {
     transform_psp_DEC_TEI42i_NOy_calibrations(pg, f)
-  } else if (is_psp_TEI43i_SO2_146i_cal(f)) {
-    transform_psp_TEI43i_SO2_146i_calibrations(pg, f)
   } else if (is_psp_TEI43i_SO2_cal(f)) {
     transform_psp_TEI43i_SO2_calibrations(pg, f)
   } else if (is_psp_TEI49i_O3_49i_cal(f)) {

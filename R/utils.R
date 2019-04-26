@@ -4,32 +4,31 @@ is_psp_42C_cal = function(f)
   startsWith(basename(f), 'Pinnacle_42C')
 is_psp_API300EU_cal = function(f)
   startsWith(basename(f), 'Pinnacle_API300EU_CO_Weekly')
-is_psp_ASRC_TEI42i_Y_NOy_146i_cal = function(f)
-  startsWith(basename(f), 'Pinnacle_ASRC_TEI42i_Y_NOy_146i_Weekly')
+is_psp_ASRC_TEI42i_Y_NOy_cal = function(f)
+  startsWith(basename(f), 'Pinnacle_ASRC_TEI42i_Y_NOy_146i_Weekly') |
+    startsWith(basename(f), 'Pinnacle_ASRC_TEI42i_Y_NOy_T700_Weekly')
 is_psp_DEC_TEI42i_NOy_cal = function(f)
-  startsWith(basename(f), 'Pinnacle DEC TEI42i NOy Weekly')
-is_psp_TEI43i_SO2_146i_cal = function(f)
-  startsWith(basename(f), 'Pinnacle_TEI43i_SO2_146i_Weekly')
+  startsWith(basename(f), 'Pinnacle DEC TEI42i NOy Weekly') |
+    startsWith(basename(f), 'Pinnacle_DEC_TEI42i_NOy_Weekly')
 is_psp_TEI43i_SO2_cal = function(f)
-  startsWith(basename(f), 'Pinnacle_TEI43i_SO2_Weekly')
+  startsWith(basename(f), 'Pinnacle_TEI43i_SO2_Weekly') |
+    startsWith(basename(f), 'Pinnacle_TEI43i_SO2_146i_Weekly')
 is_psp_TEI49i_O3_49i_cal = function(f)
   startsWith(basename(f), 'Pinnacle_TEI49i_O3_49i_Weekly')
 
 extract_psp_calibrations_year = function(f) {
   if (is_psp_42C_cal(f)) {
-    paste0('20', substr(gsub('^.* ', '', f), 1, 2))
+    paste0('20', substr(gsub('^.*[ _]', '', f), 1, 2))
   } else if (is_psp_API300EU_cal(f)) {
-    gsub('^.*Weekly_|_[^_].*$', '', f)
-  } else if (is_psp_ASRC_TEI42i_Y_NOy_146i_cal(f)) {
-    gsub('^.*Weekly_|_[^_].*$', '', f)
+    gsub('^.*Weekly_|_[^_]*$', '', f)
+  } else if (is_psp_ASRC_TEI42i_Y_NOy_cal(f)) {
+    substr(gsub('^.*Weekly_', '', f), 1, 4)
   } else if (is_psp_DEC_TEI42i_NOy_cal(f)) {
-    gsub('^.* |_.*$', '', f)
-  } else if (is_psp_TEI43i_SO2_146i_cal(f)) {
-    gsub('^.*Weekly_|_[^_].*$', '', f)
+    gsub('^.*Weekly[ _]|_[^_]*$', '', f)
   } else if (is_psp_TEI43i_SO2_cal(f)) {
-    gsub('^.*Weekly_|_[^_].*$', '', f)
+    gsub('^.*Weekly_|_[^_]*$', '', f)
   } else if (is_psp_TEI49i_O3_49i_cal(f)) {
-    gsub('^.*Weekly_|_[^_].*$', '', f)
+    gsub('^.*Weekly_|_[^_]*$', '', f)
   } else {
     warning(paste('extract_year not implemented for PSP calibration', f))
     NA
