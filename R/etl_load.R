@@ -2,6 +2,12 @@
 load_file = function(obj, f, site, ds) {
   if (ds == 'calibrations') {
     tbl_name = 'manual_calibrations'
+    ## fix the data_source for calibration files
+    if (site == 'WFMS') {
+      ds = 'campbell'
+    } else if (site == 'PSP') {
+      ds = 'envidas'
+    }
   } else {
     tbl_name = 'measurements'
   }
