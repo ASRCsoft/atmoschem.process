@@ -74,19 +74,19 @@ get_site_id = function(pg, x) {
 }
 
 add_new_measurement_types = function(pg, site, data_source,
-                                     measurements) {
+                                     names) {
   ## since we only run this function for one site and data source at a
   ## time, no need to have a site or data source for each row in the
   ## data frame
-  uniq_measurements = unique(measurements)
+  uniq_names = unique(names)
   m_ids = get_measurement_type_id(pg, site, data_source,
-                                  uniq_measurements,
+                                  uniq_names,
                                   add_new = FALSE)
   if (sum(is.na(m_ids)) > 0) {
     ## insert new measurement types
     new_mtypes = data.frame(site_id = get_site_id(pg, site),
                             data_source = data_source,
-                            measurement = uniq_measurements[is.na(m_ids)])
+                            measurement = uniq_names[is.na(m_ids)])
     DBI::dbWriteTable(pg, 'measurement_types', new_mtypes,
                       row.names = FALSE, append = TRUE)
   }
@@ -94,21 +94,21 @@ add_new_measurement_types = function(pg, site, data_source,
 
 get_measurement_type_id = function(pg, site,
                                    data_source,
-                                   measurement,
+                                   name,
                                    add_new = TRUE) {
-  if (length(measurement) == 0) return(integer(0))
+  if (length(name) == 0) return(integer(0))
   if (add_new) {
     ## make sure we aren't asking for ID's that don't exist yet
     add_new_measurement_types(pg, site, data_source,
-                              measurement)
+                              name)
   }
   site_id = get_site_id(pg, site)
   sql_txt = 'select * from measurement_types'
   measurement_types = DBI::dbGetQuery(pg, sql_txt)
   df = data.frame(site_id = site_id,
                   data_source = data_source,
-                  measurement = measurement,
-                  order = 1:length(measurement))
+                  name = name,
+                  order = 1:length(name))
   df2 = merge(df, measurement_types, all.x = TRUE)
   ## df2 is sorted, have to unsort it
   df2$id[order(df2$order)]

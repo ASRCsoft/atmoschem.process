@@ -18,10 +18,10 @@ create or replace function anemometer_ids() RETURNS int[] AS $$
   select array_agg(id)
     from (select id
 	    from measurement_types
-	   where measurement in ('WS3Cup',
-				 'WS3Cup_Max',
-				 'WS3CupB',
-				 'WS3CupB_Max')) m1;
+	   where name in ('WS3Cup',
+			  'WS3Cup_Max',
+			  'WS3CupB',
+			  'WS3CupB_Max')) m1;
 $$ LANGUAGE sql stable parallel safe;
 
 -- see if the anemometers look frozen
@@ -69,7 +69,7 @@ CREATE or replace VIEW contiguous_cold_freezes AS
 	   join measurements m1
 	       on m1.measurement_type_id=mt2.id
 	       and m1.instrument_time=(lower(freezing_times) + interval '1 hour')
-   where mt2.measurement='T'
+   where mt2.name='T'
      and m1.value<5;
 
 -- get clusters of frozen anemometer times

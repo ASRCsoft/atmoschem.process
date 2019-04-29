@@ -1,4 +1,4 @@
-site,data_source,measurement,apply_processing,valid_range,mdl,span,has_calibration,remove_outliers,max_jump,apply_ce,max_ce
+site,data_source,name,apply_processing,valid_range,mdl,span,has_calibration,remove_outliers,max_jump,apply_ce,max_ce
 WFMS,campbell,NO,TRUE,,0.03,3.79,TRUE,TRUE,,,
 WFMS,campbell,NOx,TRUE,,,3.79,TRUE,TRUE,,,12.57
 WFMS,campbell,NO2,TRUE,,,,,,,TRUE,12.57

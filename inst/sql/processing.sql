@@ -102,7 +102,7 @@ CREATE OR REPLACE FUNCTION get_measurement_id(int, text)
   select id
     from measurement_types
    where site_id=$1
-     and measurement=$2;
+     and name=$2;
 $$ language sql STABLE PARALLEL SAFE;
 
 -- join two measurement types to make it easy to derive values from
@@ -228,7 +228,7 @@ CREATE materialized VIEW hourly_measurements as
 	 get_hourly_flag(measurement_type_id, value::numeric, n_values::int) as flag
     from (select measurement_type_id,
 		 date_trunc('hour', measurement_time) as measurement_time,
-		 case when (select measurement like '%\_Max'
+		 case when (select name like '%\_Max'
 			      from measurement_types
 			     where id=measurement_type_id)
 		   then max(value) FILTER (WHERE not flagged)

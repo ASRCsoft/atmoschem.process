@@ -1,4 +1,4 @@
-site,data_source,measurement,times,aqs_flag,explanation
+site,data_source,measurement_name,times,aqs_flag,explanation
 WFMS,campbell,NO,"[2018-12-05 10:13, 2018-12-05 11:28)",AT,manual calibration
 WFMS,campbell,NOx,"[2018-12-05 10:13, 2018-12-05 11:28)",AT,manual calibration
 WFMS,campbell,NOy,"[2018-12-05 10:13, 2018-12-05 11:28)",AT,manual calibration

@@ -19,7 +19,7 @@ create table measurement_types (
   id serial primary key,
   site_id int not null references sites,
   data_source text not null,
-  measurement text not null,
+  name text not null,
   apply_processing boolean,
   valid_range numrange,
   mdl numeric,
@@ -29,7 +29,7 @@ create table measurement_types (
   max_jump numeric,
   apply_ce boolean,
   max_ce numeric,
-  unique(site_id, data_source, measurement)
+  unique(site_id, data_source, name)
 );
 
 create table measurements (

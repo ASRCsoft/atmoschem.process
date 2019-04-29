@@ -1,4 +1,4 @@
-site,data_source,measurement,type,dates,times,value
+site,data_source,measurement_name,type,dates,times,value
 WFMS,campbell,NO,zero,"[2018-01-01,)","[0:00,0:15)",
 WFMS,campbell,NO,span,"[2018-01-01,)","[0:15,0:45)",4
 WFMS,campbell,NO,zero check,"[2018-01-01,)","[0:45,1:05)",
