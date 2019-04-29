@@ -10,6 +10,8 @@ transform_file = function(pg, f, out_file, site, ds) {
          transform_psp_envidas(pg, f)
        } else if (site == 'PSP' && ds == 'calibrations') {
          transform_psp_calibrations(pg, f)
+       } else if (site == 'WFMS' && ds == 'aethelometer') {
+         transform_wfms_aethelometer(f)
        }
   write.csv(df, file = out_file, na = '',
             row.names = FALSE)

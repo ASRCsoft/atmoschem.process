@@ -35,6 +35,18 @@ extract_psp_calibrations_year = function(f) {
   }
 }
 
+extract_wfms_aethelometer_year = function(f) {
+  fbase = basename(f)
+  if (startsWith(fbase, 'ae')) {
+    paste0('20', substr(fbase, 3, 4))
+  } else if (startsWith(fbase, 'BC')) {
+    paste0('20', substr(fbase, 7, 8))
+  } else {
+    warning(paste('extract_year not implemented for WFMS aethelometer file', f))
+    NA
+  }
+}
+
 ## get the file year given the filename, site, and data source
 extract_year = function(f, site, ds) {
   year_str = if (ds == 'ultrafine') {
@@ -47,6 +59,8 @@ extract_year = function(f, site, ds) {
                paste0('20', substr(gsub('^.*-', '', f), 1, 2))
              } else if (site == 'PSP' && ds == 'calibrations') {
                sapply(f, extract_psp_calibrations_year)
+             } else if (site == 'WFMS' && ds == 'aethelometer') {
+               sapply(f, extract_wfms_aethelometer_year)
              } else {
                stop(paste('extract_year not implemented for',
                           site, 'and', ds))
