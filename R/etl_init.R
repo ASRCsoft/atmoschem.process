@@ -22,8 +22,8 @@ update_dynamic_library_path = function(pg) {
     DBI::dbExecute(pg, sql_txt)
     ## set dynamic_library_path for future sessions
     dbname = DBI::dbGetInfo(pg)$dbname
-    sql_txt = paste0('alter database ', dbname,
-                     " set dynamic_library_path to '",
+    sql_txt = paste0('alter database "', dbname,
+                     "\" set dynamic_library_path to '",
                      new_paths, "'")
     DBI::dbExecute(pg, sql_txt)
   }
