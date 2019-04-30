@@ -12,7 +12,7 @@ read_ultrafine = function(f) {
   df
 }
 
-transform_ultrafine = function(pg, f) {
+transform_ultrafine = function(f) {
   uf = read_ultrafine(f)
   uf$flagged = parse_ultrafine_flag(as.character(uf$`Status Flags`))
   time_strs = paste(uf$Date, uf$Time)

@@ -35,7 +35,7 @@ read_psp_cal_times = function(f, date_cell = 'L11', start_cell = 'Z11',
 }
 
 ## get "zero and span checks" section
-read_psp_NO_cal_table = function(pg, f, trange = 'F33:AD35',
+read_psp_NO_cal_table = function(f, trange = 'F33:AD35',
                                  chem_names = c('NO', 'NOx'),
                                  cal_end) {
   ## gotta help out readxl a bit with the macro files
@@ -58,7 +58,7 @@ read_psp_NO_cal_table = function(pg, f, trange = 'F33:AD35',
 }
 
 ## get "zero, span and PC checks" section
-read_psp_cal_table = function(pg, f, trange = 'U36:AA40',
+read_psp_cal_table = function(f, trange = 'U36:AA40',
                               chem_name = 'CO', cal_end) {
   df = readxl::read_xlsx(f, range = trange, col_names = F)
   cals = as.data.frame(df[c(1, nrow(df)), c(1, ncol(df))])
@@ -81,7 +81,7 @@ empty_measurements = function() {
              corrected = logical(0))
 }
 
-transform_psp_NO_calibrations = function(pg, f, date_cell = 'L11',
+transform_psp_NO_calibrations = function(f, date_cell = 'L11',
                                          start_cell = 'Z11', end_cell = 'AE11',
                                          trange = 'F33:AD35',
                                          chem_names = c('NO', 'NOx')) {
@@ -90,11 +90,11 @@ transform_psp_NO_calibrations = function(pg, f, date_cell = 'L11',
   if (is.null(cal_end)) {
     return(empty_measurements())
   }
-  read_psp_NO_cal_table(pg, f, trange, chem_names,
+  read_psp_NO_cal_table(f, trange, chem_names,
                         cal_end)
 }
 
-transform_psp_single_calibrations = function(pg, f, date_cell = 'L11',
+transform_psp_single_calibrations = function(f, date_cell = 'L11',
                                              start_cell = 'Z11', end_cell = 'AE11',
                                              trange = 'U36:AA40',
                                              chem_name = 'CO') {  
@@ -103,56 +103,55 @@ transform_psp_single_calibrations = function(pg, f, date_cell = 'L11',
   if (is.null(cal_end)) {
     return(empty_measurements())
   }
-  read_psp_cal_table(pg, f, trange, chem_name,
+  read_psp_cal_table(f, trange, chem_name,
                      cal_end)
 }
 
-transform_psp_42C_calibrations = function(pg, f) {
-  transform_psp_NO_calibrations(pg, f, 'K10', 'Z10', 'AF10',
+transform_psp_42C_calibrations = function(f) {
+  transform_psp_NO_calibrations(f, 'K10', 'Z10', 'AF10',
                                 trange = 'F33:AD35',
                                 chem_names = c('NO', 'NOx'))
 }
 
-transform_psp_API300EU_calibrations = function(pg, f) {  
-  transform_psp_single_calibrations(pg, f, trange = 'U38:AA42',
+transform_psp_API300EU_calibrations = function(f) {  
+  transform_psp_single_calibrations(f, trange = 'U38:AA42',
                                     chem_name = 'CO')
 }
 
-transform_psp_ASRC_TEI42i_Y_NOy_calibrations = function(pg, f) {
-  transform_psp_NO_calibrations(pg, f,
+transform_psp_ASRC_TEI42i_Y_NOy_calibrations = function(f) {
+  transform_psp_NO_calibrations(f,
                                 chem_names = c('NOy-HNO3', 'NOy'))
 }
 
-transform_psp_DEC_TEI42i_NOy_calibrations = function(pg, f) {
-  transform_psp_NO_calibrations(pg, f, 'K11', trange = 'F34:AD36',
+transform_psp_DEC_TEI42i_NOy_calibrations = function(f) {
+  transform_psp_NO_calibrations(f, 'K11', trange = 'F34:AD36',
                                 chem_names = c('NO-DEC', 'NOy-DEC'))
 }
 
-transform_psp_TEI43i_SO2_calibrations = function(pg, f) {  
-  transform_psp_single_calibrations(pg, f,
-                                    chem_name = 'SO2')
+transform_psp_TEI43i_SO2_calibrations = function(f) {  
+  transform_psp_single_calibrations(f, chem_name = 'SO2')
 }
 
-transform_psp_TEI49i_O3_49i_calibrations = function(pg, f) {  
-  transform_psp_single_calibrations(pg, f, 'L10', 'Z10', 'AE10',
+transform_psp_TEI49i_O3_49i_calibrations = function(f) {  
+  transform_psp_single_calibrations(f, 'L10', 'Z10', 'AE10',
                                     trange = 'U35:AA39',
                                     chem_name = 'Thermo_O3')
 }
 
-transform_psp_calibrations = function(pg, f) {
+transform_psp_calibrations = function(f) {
   ## figure out which function to send this file to
   if (is_psp_42C_cal(f)) {
-    transform_psp_42C_calibrations(pg, f)
+    transform_psp_42C_calibrations(f)
   } else if (is_psp_API300EU_cal(f)) {
-    transform_psp_API300EU_calibrations(pg, f)
+    transform_psp_API300EU_calibrations(f)
   } else if (is_psp_ASRC_TEI42i_Y_NOy_cal(f)) {
-    transform_psp_ASRC_TEI42i_Y_NOy_calibrations(pg, f)
+    transform_psp_ASRC_TEI42i_Y_NOy_calibrations(f)
   } else if (is_psp_DEC_TEI42i_NOy_cal(f)) {
-    transform_psp_DEC_TEI42i_NOy_calibrations(pg, f)
+    transform_psp_DEC_TEI42i_NOy_calibrations(f)
   } else if (is_psp_TEI43i_SO2_cal(f)) {
-    transform_psp_TEI43i_SO2_calibrations(pg, f)
+    transform_psp_TEI43i_SO2_calibrations(f)
   } else if (is_psp_TEI49i_O3_49i_cal(f)) {
-    transform_psp_TEI49i_O3_49i_calibrations(pg, f)
+    transform_psp_TEI49i_O3_49i_calibrations(f)
   } else {
     warning(paste('Transform not implemented for', f))
   }

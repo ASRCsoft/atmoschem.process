@@ -54,7 +54,7 @@ fix_wfms = function(df) {
   df
 }
 
-transform_campbell = function(pg, f) {
+transform_campbell = function(f) {
   campbell = read_campbell(f)
   path_folders = strsplit(f, '/')[[1]]
   ## get the site

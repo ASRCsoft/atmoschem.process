@@ -15,7 +15,7 @@ read_psp_envidas = function(f, ...) {
   df
 }
 
-transform_psp_envidas = function(pg, f) {
+transform_psp_envidas = function(f) {
   df = read_psp_envidas(f)
   ## check for newer files with the absurd date format
   file_date = gsub('.*envi_rpt-|\\.csv', '', f)

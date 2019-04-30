@@ -1,15 +1,15 @@
 
 
 ## transform a raw data file according to its site and data source
-transform_file = function(pg, f, out_file, site, ds) {
+transform_file = function(f, out_file, site, ds) {
   df = if (ds == 'campbell') {
-         transform_campbell(pg, f)
+         transform_campbell(f)
        } else if (ds == 'ultrafine') {
-         transform_ultrafine(pg, f)
+         transform_ultrafine(f)
        } else if (site == 'PSP' & ds == 'envidas') {
-         transform_psp_envidas(pg, f)
+         transform_psp_envidas(f)
        } else if (site == 'PSP' && ds == 'calibrations') {
-         transform_psp_calibrations(pg, f)
+         transform_psp_calibrations(f)
        } else if (site == 'WFMS' && ds == 'aethelometer') {
          transform_wfms_aethelometer(f)
        }
@@ -22,7 +22,7 @@ transform_file = function(pg, f, out_file, site, ds) {
 }
 
 ## Only transform new files, similar to `smart_download` from etl
-smart_transform = function(obj, raw, cleaned, site, ds, clobber = FALSE) {
+smart_transform = function(raw, cleaned, site, ds, clobber = FALSE) {
   if (length(raw) != length(cleaned)) {
     stop("src and new_filenames must be of the same length")
   }
@@ -35,7 +35,7 @@ smart_transform = function(obj, raw, cleaned, site, ds, clobber = FALSE) {
                 sum(!missing), "untouched."))
   if (sum(missing) == 0) return(NULL)
   ## mapply(downloader::download, src[missing], lcl[missing], ... = ...)
-  mapply(transform_file, list(obj$con), raw[missing], cleaned[missing],
+  mapply(transform_file, raw[missing], cleaned[missing],
          site, ds)
 }
 
@@ -73,7 +73,7 @@ etl_transform.etl_nysatmoschem = function(obj, sites = NULL, data_sources = NULL
       out_path = file.path(attr(obj, 'load_dir'), site, ds)
       dir.create(out_path, showWarnings = FALSE, recursive = TRUE)
       out_files = file.path(out_path, gsub('\\..*$', '.csv', year_files))
-      smart_transform(obj, f_paths, out_files, site, ds, clobber)
+      smart_transform(f_paths, out_files, site, ds, clobber)
     }
   }
   
