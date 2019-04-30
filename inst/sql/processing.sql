@@ -80,10 +80,12 @@ create table _processed_measurements (
 
 CREATE OR REPLACE FUNCTION get_data_source_ids(int, text)
   RETURNS int[] as $$
-  select array_agg(id)
-    from measurement_types
+  select array_agg(mt.id)
+    from measurement_types mt
+	   join data_sources ds
+	   on mt.data_source_id=ds.id
    where site_id=$1
-     and data_source=$2;
+     and ds.name=$2;
 $$ language sql STABLE PARALLEL SAFE;
 
 CREATE OR REPLACE FUNCTION update_processing(int, text)
@@ -99,10 +101,12 @@ $$ language sql;
 /* Add derived measurements to the processed measurements. */
 CREATE OR REPLACE FUNCTION get_measurement_id(int, text)
   RETURNS int as $$
-  select id
-    from measurement_types
+  select mt.id
+    from measurement_types mt
+	   join data_sources ds
+	       on mt.data_source_id=ds.id
    where site_id=$1
-     and name=$2;
+     and mt.name=$2;
 $$ language sql STABLE PARALLEL SAFE;
 
 -- join two measurement types to make it easy to derive values from
@@ -244,10 +248,9 @@ CREATE OR REPLACE FUNCTION update_all()
   refresh materialized view calibration_values;
   refresh materialized view conversion_efficiencies;
   refresh materialized view freezing_clusters;
-  select update_processing(site_id, data_source)
-    from (select distinct site_id,
-			  data_source
-	    from measurement_types) m1;
+  select update_processing(site_id, name)
+    from (select *
+	    from data_sources) ds1;
   refresh materialized view processed_measurements;
   refresh materialized view hourly_measurements;
 $$ language sql;

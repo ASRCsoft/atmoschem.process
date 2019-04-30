@@ -14,11 +14,16 @@ values ('WFMS', 'Whiteface Mountain Summit'),
        ('PSP', 'Pinnacle State Park'),
        ('QC', 'Queens College');
 
+create table data_sources (
+  id serial primary key,
+  site_id int references sites,
+  name text,
+  unique(site_id, name)
+);
 
 create table measurement_types (
   id serial primary key,
-  site_id int not null references sites,
-  data_source text not null,
+  data_source_id int references data_sources,
   name text not null,
   apply_processing boolean,
   valid_range numrange,
@@ -29,7 +34,7 @@ create table measurement_types (
   max_jump numeric,
   apply_ce boolean,
   max_ce numeric,
-  unique(site_id, data_source, name)
+  unique(data_source_id, name)
 );
 
 create table measurements (

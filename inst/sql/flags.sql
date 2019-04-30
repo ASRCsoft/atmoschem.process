@@ -59,13 +59,12 @@ CREATE or replace VIEW contiguous_freezes AS
 -- at the beginning of the freeze
 CREATE or replace VIEW contiguous_cold_freezes AS
   select f1.measurement_type_id,
-	 freezing_times,
-	 mt1.site_id
+	 freezing_times
     from contiguous_freezes f1
   	   join measurement_types mt1
 	       on f1.measurement_type_id=mt1.id
 	   join measurement_types mt2
-	       on mt1.site_id=mt2.site_id
+	       on mt1.data_source_id=mt2.data_source_id
 	   join measurements m1
 	       on m1.measurement_type_id=mt2.id
 	       and m1.instrument_time=(lower(freezing_times) + interval '1 hour')

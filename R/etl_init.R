@@ -56,12 +56,13 @@ update_metadata_tbl = function(pg, tbl_name, df, action = 'replace') {
     dbxDelete(pg, tbl_name)
     dbxInsert(pg, tbl_name, df)
   } else if (action == 'update') {
-    df$site_id = get_site_id(pg, df$site)
+    df$data_source_id = get_data_source_id(pg, df$site, df$data_source)
     df$site = NULL
+    df$data_source = NULL
     ## don't delete any rows, but erase values of unused rows
-    pg_meta = dbxSelect(pg, 'select site_id, data_source, name from measurement_types')
+    pg_meta = dbxSelect(pg, 'select data_source_id, name from measurement_types')
     merged_meta = merge(pg_meta, df, all = T)
-    idx_cols = c('site_id', 'data_source', 'name')
+    idx_cols = c('data_source_id', 'name')
     dbxUpsert(pg, tbl_name, merged_meta,
               where_cols = idx_cols)
   }
