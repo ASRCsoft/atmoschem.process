@@ -1,6 +1,7 @@
 
 load_file = function(obj, f, site, ds) {
-  if (ds == 'calibrations') {
+  is_calibration = ds == 'calibrations'
+  if (is_calibration) {
     tbl_name = 'manual_calibrations'
     ## fix the data_source for calibration files
     if (site == 'WFMS') {
@@ -20,6 +21,18 @@ load_file = function(obj, f, site, ds) {
     ncols = ncol(df)
     ## put the measurement type ID first
     df = df[, c(ncols, 1:(ncols - 1))]
+    file_id = get_file_id(obj$con, site, ds,
+                          f_i, is_calibration)
+    if (is.na(file_id)) {
+      ## add to file table
+      data_source_id = get_data_source_id(obj$con, site, ds)
+      file_df = data.frame(data_source_id = data_source_id,
+                           name = basename(f_i),
+                           calibration = is_calibration)
+      DBI::dbWriteTable(obj$con, 'files', file_df,
+                        row.names = FALSE, append = TRUE)
+    }
+    ## add measurements (or calibrations)
     DBI::dbWriteTable(obj$con, tbl_name, df,
                       row.names = FALSE, append = TRUE)
   }

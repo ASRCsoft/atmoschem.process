@@ -107,6 +107,21 @@ get_data_source_id = function(pg, site, data_source,
   res
 }
 
+get_file_id = function(pg, site, data_source, f,
+                       calibration) {
+  ds_id = get_data_source_id(pg, site, data_source)
+  df_in = data.frame(data_source_id = ds_id,
+                     name = f,
+                     calibration = calibration,
+                     order = 1:length(f))
+  files = DBI::dbGetQuery(pg, 'select * from files')
+  df2 = merge(df_in, files, all.x = TRUE)
+  ## df2 is sorted, have to unsort it
+  res = df2$id[order(df2$order)]
+  if (is.null(res)) return(NA)
+  res
+}
+
 add_new_measurement_types = function(pg, site, data_source,
                                      names) {
   ## since we only run this function for one data source at a time, no

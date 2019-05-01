@@ -21,6 +21,14 @@ create table data_sources (
   unique(site_id, name)
 );
 
+create table files (
+  id serial primary key,
+  data_source_id int references data_sources,
+  name text not null,
+  calibration boolean not null,
+  unique(data_source_id, name, calibration)
+);
+
 create table measurement_types (
   id serial primary key,
   data_source_id int references data_sources,
