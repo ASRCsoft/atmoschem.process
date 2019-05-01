@@ -17,7 +17,7 @@ values ('WFMS', 'Whiteface Mountain Summit'),
 create table data_sources (
   id serial primary key,
   site_id int references sites,
-  name text,
+  name text not null,
   unique(site_id, name)
 );
 
