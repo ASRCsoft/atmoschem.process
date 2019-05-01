@@ -32,7 +32,7 @@ CREATE or replace VIEW wind_looks_frozen AS
     from (select measurement_type_id,
 		 instrument_time,
 		 value < .2 as slow_wind
-	    from measurements
+	    from measurements2
 	   where measurement_type_id=any(anemometer_ids())) w1
 	   window w as (partition by measurement_type_id
 			order by instrument_time
@@ -65,7 +65,7 @@ CREATE or replace VIEW contiguous_cold_freezes AS
 	       on f1.measurement_type_id=mt1.id
 	   join measurement_types mt2
 	       on mt1.data_source_id=mt2.data_source_id
-	   join measurements m1
+	   join measurements2 m1
 	       on m1.measurement_type_id=mt2.id
 	       and m1.instrument_time=(lower(freezing_times) + interval '1 hour')
    where mt2.name='T'

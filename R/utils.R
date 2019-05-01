@@ -134,15 +134,14 @@ get_file_id = function(pg, site, data_source, f,
 
 add_new_obs = function(pg, file_id, record, time) {
   if (is.na(file_id)) stop('file_id cannot be NA')
-  obs = data.frame(file_id = file_id,
-                   line = record,
+  obs = data.frame(line = record,
                    time = time)
   uniq_obs = unique(obs)
   obs_ids = get_obs_id(pg, file_id, uniq_obs$line,
                        uniq_obs$time, add_new = FALSE)
-  if (sum(is.na(obs_ids)) > 0) {
+  missing_obs = uniq_obs[is.na(obs_ids), ]
+  if (nrow(missing_obs) > 0) {
     ## insert new measurement types
-    missing_obs = uniq_obs[is.na(obs_ids), ]
     new_obs = data.frame(file_id = file_id,
                          line = missing_obs$line,
                          time = missing_obs$time)

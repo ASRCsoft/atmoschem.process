@@ -19,10 +19,20 @@ even_smarter_upload = function(obj, f, site, ds,
       get_measurement_type_id(obj$con, site, ds,
                               df$measurement_name)
     df$measurement_name = NULL
-    add_new_obs(obj$con, file_id, df$record, df$instrument_time)
-    ncols = ncol(df)
-    ## put the measurement type ID first
-    df = df[, c(ncols, 1:(ncols - 1))]
+    if (is_calibration) {
+      ## put the measurement type ID first
+      ncols = ncol(df)
+      df = df[, c(ncols, 1:(ncols - 1))]
+    } else {
+      df$instrument_time = as.POSIXct(df$instrument_time)
+      df$observation_id =
+        get_obs_id(obj$con, file_id, df$record,
+                   df$instrument_time)
+      if (any(is.na(df$observation_id)))
+        stop('missing observation_ids')
+      df$record = NULL
+      df$instrument_time = NULL
+    }
     ## add measurements (or calibrations)
     DBI::dbWriteTable(obj$con, tbl_name, df,
                       row.names = FALSE, append = TRUE)

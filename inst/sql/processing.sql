@@ -16,7 +16,6 @@ drop view if exists calibrated_measurements cascade;
 create or replace view calibrated_measurements as
   select c.measurement_type_id,
 	 instrument_time,
-	 record,
 	 value,
 	 case when apply_ce then apply_calib(c.measurement_type_id, value, instrument_time) /
 		interpolate_ce(c.measurement_type_id, instrument_time)
@@ -27,7 +26,7 @@ create or replace view calibrated_measurements as
 	 mdl,
 	 remove_outliers,
 	 max_jump
-    from measurements c
+    from measurements2 c
 	   left join measurement_types m
 	       on c.measurement_type_id=m.id
    where apply_processing;

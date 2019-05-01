@@ -17,7 +17,7 @@ is_true = function(x) !is.na(x) & x
 
 ## retrieve data from table based on timerange and measure
 get_raw = function(measure, t1, t2) {
-  pgtbl = tbl(pg, 'measurements')
+  pgtbl = tbl(pg, 'measurements2')
   results = pgtbl %>%
     filter(measurement_type_id == measure &
            instrument_time >= t1 &

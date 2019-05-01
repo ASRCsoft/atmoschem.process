@@ -54,10 +54,18 @@ create table measurement_types (
 );
 
 create table measurements (
+  observation_id int references observations,
   measurement_type_id int references measurement_types,
-  instrument_time timestamp,
-  record int,
   value numeric,
   flagged boolean,
-  primary key(measurement_type_id, instrument_time)
+  primary key(observation_id, measurement_type_id)
 );
+
+-- other code will often want to see the measurements along with the
+-- time
+create or replace view measurements2 as
+  select time as instrument_time,
+	 m1.*
+    from measurements m1
+	   join observations o1
+	       on m1.observation_id=o1.id;
