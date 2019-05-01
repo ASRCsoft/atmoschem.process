@@ -12,6 +12,7 @@ function will update the processing for a single data source. */
 
 /* Apply calibration adjustments if needed, using functions from
    calibration.sql. */
+drop view if exists calibrated_measurements cascade;
 create or replace view calibrated_measurements as
   select c.measurement_type_id,
 	 instrument_time,
@@ -31,6 +32,7 @@ create or replace view calibrated_measurements as
 	       on c.measurement_type_id=m.id
    where apply_processing;
 
+drop function if exists process_measurements cascade;
 CREATE OR REPLACE FUNCTION process_measurements(measurement_type_ids int[])
   RETURNS TABLE (
     measurement_type_id int,
@@ -70,6 +72,7 @@ CREATE OR REPLACE FUNCTION process_measurements(measurement_type_ids int[])
 $$ language sql;
 
 /* Store processed results, before adding derived values */
+drop table if exists _processed_measurements cascade;
 create table _processed_measurements (
   measurement_type_id int references measurement_types,
   measurement_time timestamp,
@@ -78,6 +81,7 @@ create table _processed_measurements (
   primary key(measurement_type_id, measurement_time)
 );
 
+drop function if exists get_data_source_ids cascade;
 CREATE OR REPLACE FUNCTION get_data_source_ids(int, text)
   RETURNS int[] as $$
   select array_agg(mt.id)
@@ -88,6 +92,7 @@ CREATE OR REPLACE FUNCTION get_data_source_ids(int, text)
      and ds.name=$2;
 $$ language sql STABLE PARALLEL SAFE;
 
+drop function if exists update_processing cascade;
 CREATE OR REPLACE FUNCTION update_processing(int, text)
   RETURNS void as $$
   delete
@@ -99,6 +104,7 @@ CREATE OR REPLACE FUNCTION update_processing(int, text)
 $$ language sql;
 
 /* Add derived measurements to the processed measurements. */
+drop function if exists get_measurement_id cascade;
 CREATE OR REPLACE FUNCTION get_measurement_id(int, text)
   RETURNS int as $$
   select mt.id
@@ -111,6 +117,7 @@ $$ language sql STABLE PARALLEL SAFE;
 
 -- join two measurement types to make it easy to derive values from
 -- multiple measurements
+drop function if exists combine_measures cascade;
 CREATE OR REPLACE FUNCTION combine_measures(measurement_type_id1 int, measurement_type_id2 int)
   RETURNS TABLE (
     measurement_time timestamp,
@@ -134,6 +141,7 @@ CREATE OR REPLACE FUNCTION combine_measures(measurement_type_id1 int, measuremen
 	       on m1.measurement_time=m2.measurement_time;
 $$ language sql;
 
+drop view if exists wfms_no2 cascade;
 create or replace view wfms_no2 as
   select measurement_type_id,
 	 measurement_time,
@@ -153,6 +161,7 @@ create or replace view wfms_no2 as
 			ORDER BY measurement_time
 			rows between 120 preceding and 120 following);
 
+drop view if exists wfms_slp cascade;
 create or replace view wfms_slp as
   select get_measurement_id(1, 'SLP'),
 	 measurement_time,
@@ -163,6 +172,7 @@ create or replace view wfms_slp as
     from combine_measures(get_measurement_id(1, 'BP'),
 			  get_measurement_id(1, 'PTemp_C'));
 
+drop view if exists wfms_ws cascade;
 create or replace view wfms_ws as
   select get_measurement_id(1, 'WS'),
 	 measurement_time,
@@ -175,6 +185,7 @@ create or replace view wfms_ws as
 			  get_measurement_id(1, 'WS3CupB'));
 
 -- u and v vector wind speeds
+drop view if exists wfms_ws_components cascade;
 create or replace view wfms_ws_components as
   with wswd as (select ws1.measurement_time as measurement_time,
 		       ws1.value as ws,
@@ -197,6 +208,7 @@ create or replace view wfms_ws_components as
 	 flagged
     from wswd;
 
+drop view if exists wfms_ws_max cascade;
 create or replace view wfms_ws_max as
   select get_measurement_id(1, 'WS_Max'),
 	 measurement_time,
@@ -209,6 +221,7 @@ create or replace view wfms_ws_max as
 			  get_measurement_id(1, 'WS3CupB_Max'));
 
 /* Combine all processed data. */
+drop materialized view if exists processed_measurements cascade;
 CREATE materialized VIEW processed_measurements as
   select * from _processed_measurements
    union
@@ -225,6 +238,7 @@ create index processed_measurements_idx on processed_measurements(measurement_ty
 
 /* Aggregate the processed data by hour using a function from
    flags.sql. */
+drop materialized view if exists hourly_measurements cascade;
 CREATE materialized VIEW hourly_measurements as
   select measurement_type_id,
 	 measurement_time,
@@ -243,6 +257,7 @@ CREATE materialized VIEW hourly_measurements as
 create index hourly_measurements_idx on hourly_measurements(measurement_type_id, measurement_time);
 
 /* Update the processed data. */
+drop function if exists update_all cascade;
 CREATE OR REPLACE FUNCTION update_all()
   RETURNS void as $$
   refresh materialized view calibration_values;
