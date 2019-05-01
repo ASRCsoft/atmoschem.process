@@ -119,7 +119,7 @@ add_new_measurement_types = function(pg, site, data_source,
     ## insert new measurement types
     data_source_id = get_data_source_id(pg, site, data_source)
     new_mtypes = data.frame(data_source_id = data_source_id,
-                            measurement = uniq_names[is.na(m_ids)])
+                            name = uniq_names[is.na(m_ids)])
     DBI::dbWriteTable(pg, 'measurement_types', new_mtypes,
                       row.names = FALSE, append = TRUE)
   }
