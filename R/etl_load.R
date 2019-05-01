@@ -1,4 +1,31 @@
 
+## only load the data if the file hasn't been loaded already
+even_smarter_upload = function(obj, f, site, ds,
+                               tbl_name) {
+  is_calibration = ds == 'calibrations'
+  for (f_i in f) {
+    file_id = get_file_id(obj$con, site, ds,
+                          f_i, is_calibration)
+    if (is.na(file_id)) {
+      add_new_file(obj$con, site, ds, f_i,
+                   is_calibration)
+    } else {
+      next()
+    }
+    df = read.csv(f_i)
+    df$measurement_type_id =
+      get_measurement_type_id(obj$con, site, ds,
+                              df$measurement_name)
+    df$measurement_name = NULL
+    ncols = ncol(df)
+    ## put the measurement type ID first
+    df = df[, c(ncols, 1:(ncols - 1))]
+    ## add measurements (or calibrations)
+    DBI::dbWriteTable(obj$con, tbl_name, df,
+                      row.names = FALSE, append = TRUE)
+  }
+}
+
 load_file = function(obj, f, site, ds) {
   is_calibration = ds == 'calibrations'
   if (is_calibration) {
@@ -12,25 +39,7 @@ load_file = function(obj, f, site, ds) {
   } else {
     tbl_name = 'measurements'
   }
-  for (f_i in f) {
-    df = read.csv(f_i)
-    df$measurement_type_id =
-      get_measurement_type_id(obj$con, site, ds,
-                              df$measurement_name)
-    df$measurement_name = NULL
-    ncols = ncol(df)
-    ## put the measurement type ID first
-    df = df[, c(ncols, 1:(ncols - 1))]
-    file_id = get_file_id(obj$con, site, ds,
-                          f_i, is_calibration)
-    if (is.na(file_id)) {
-      add_new_file(obj$con, site, ds, f_i,
-                   is_calibration)
-    }
-    ## add measurements (or calibrations)
-    DBI::dbWriteTable(obj$con, tbl_name, df,
-                      row.names = FALSE, append = TRUE)
-  }
+  even_smarter_upload(obj, f, site, ds, tbl_name)
 }
 
 #' @import etl

@@ -121,7 +121,7 @@ get_file_id = function(pg, site, data_source, f,
                        calibration) {
   ds_id = get_data_source_id(pg, site, data_source)
   df_in = data.frame(data_source_id = ds_id,
-                     name = f,
+                     name = basename(f),
                      calibration = calibration,
                      order = 1:length(f))
   files = DBI::dbGetQuery(pg, 'select * from files')
