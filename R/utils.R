@@ -107,6 +107,16 @@ get_data_source_id = function(pg, site, data_source,
   res
 }
 
+add_new_file = function(pg, site, data_source, f,
+                        calibration) {
+  data_source_id = get_data_source_id(pg, site, data_source)
+  file_df = data.frame(data_source_id = data_source_id,
+                       name = basename(f),
+                       calibration = calibration)
+  DBI::dbWriteTable(pg, 'files', file_df,
+                    row.names = FALSE, append = TRUE)
+}
+
 get_file_id = function(pg, site, data_source, f,
                        calibration) {
   ds_id = get_data_source_id(pg, site, data_source)

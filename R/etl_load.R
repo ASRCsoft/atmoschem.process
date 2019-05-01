@@ -24,13 +24,8 @@ load_file = function(obj, f, site, ds) {
     file_id = get_file_id(obj$con, site, ds,
                           f_i, is_calibration)
     if (is.na(file_id)) {
-      ## add to file table
-      data_source_id = get_data_source_id(obj$con, site, ds)
-      file_df = data.frame(data_source_id = data_source_id,
-                           name = basename(f_i),
-                           calibration = is_calibration)
-      DBI::dbWriteTable(obj$con, 'files', file_df,
-                        row.names = FALSE, append = TRUE)
+      add_new_file(obj$con, site, ds, f_i,
+                   is_calibration)
     }
     ## add measurements (or calibrations)
     DBI::dbWriteTable(obj$con, tbl_name, df,
