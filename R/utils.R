@@ -68,9 +68,21 @@ extract_year = function(f, site, ds) {
   as.integer(year_str)
 }
 
+## match DB rows to a dataframe and return the corresponding ID's
+get_id_from_pg = function(pg, df, tbl_name) {
+  q1 = paste('select * from', tbl_name)
+  pg_df = DBI::dbGetQuery(pg, q1)
+  df$order = 1:nrow(df)
+  df2 = merge(df, pg_df, all.x = TRUE)
+  ## df2 is sorted, have to unsort it
+  res = df2$id[order(df2$order)]
+  if (is.null(res)) return(rep(NA, nrow(df)))
+  res
+}
+
 get_site_id = function(pg, x) {
-  sites = DBI::dbGetQuery(pg, 'select * from sites')
-  sites$id[match(x, sites$short_name)]
+  df = data.frame(short_name = x)
+  get_id_from_pg(pg, df, 'sites')
 }
 
 add_new_data_sources = function(pg, site, data_source) {
@@ -97,14 +109,8 @@ get_data_source_id = function(pg, site, data_source,
   }
   site_ids = get_site_id(pg, site)
   df_in = data.frame(site_id = site_ids,
-                     name = data_source,
-                     order = 1:length(data_source))
-  data_sources = DBI::dbGetQuery(pg, 'select * from data_sources')
-  df2 = merge(df_in, data_sources, all.x = TRUE)
-  ## df2 is sorted, have to unsort it
-  res = df2$id[order(df2$order)]
-  if (is.null(res)) return(NA)
-  res
+                     name = data_source)
+  get_id_from_pg(pg, df_in, 'data_sources')
 }
 
 add_new_file = function(pg, site, data_source, f,
@@ -122,14 +128,8 @@ get_file_id = function(pg, site, data_source, f,
   ds_id = get_data_source_id(pg, site, data_source)
   df_in = data.frame(data_source_id = ds_id,
                      name = basename(f),
-                     calibration = calibration,
-                     order = 1:length(f))
-  files = DBI::dbGetQuery(pg, 'select * from files')
-  df2 = merge(df_in, files, all.x = TRUE)
-  ## df2 is sorted, have to unsort it
-  res = df2$id[order(df2$order)]
-  if (is.null(res)) return(NA)
-  res
+                     calibration = calibration)
+  get_id_from_pg(pg, df_in, 'files')
 }
 
 add_new_measurement_types = function(pg, site, data_source,
@@ -161,14 +161,9 @@ get_measurement_type_id = function(pg, site,
                               name)
   }
   data_source_id = get_data_source_id(pg, site, data_source)
-  sql_txt = 'select * from measurement_types'
-  measurement_types = DBI::dbGetQuery(pg, sql_txt)
   df = data.frame(data_source_id = data_source_id,
-                  name = name,
-                  order = 1:length(name))
-  df2 = merge(df, measurement_types, all.x = TRUE)
-  ## df2 is sorted, have to unsort it
-  df2$id[order(df2$order)]
+                  name = name)
+  get_id_from_pg(pg, df, 'measurement_types')
 }
 
 #' @import shiny
