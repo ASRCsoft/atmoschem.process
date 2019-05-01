@@ -4,23 +4,19 @@ library(tidyr)
 library(ggplot2)
 library(DBI)
 
-## dbname = getShinyOption('dbname')
 pg = getShinyOption('pg')
 
 ## get measurement info
-## pg = dbConnect(RPostgreSQL::PostgreSQL(),
-##                dbname = dbname)
 measurements_df = tbl(pg, 'measurement_types') %>%
   collect()
-## dbDisconnect(pg)
+data_sources = tbl(pg, 'data_sources') %>%
+  collect()
 
 # get only true values
 is_true = function(x) !is.na(x) & x
 
 ## retrieve data from table based on timerange and measure
 get_raw = function(measure, t1, t2) {
-  ## pg = dbConnect(RPostgreSQL::PostgreSQL(),
-  ##                dbname = dbname)
   pgtbl = tbl(pg, 'measurements')
   results = pgtbl %>%
     filter(measurement_type_id == measure &
@@ -38,13 +34,10 @@ get_raw = function(measure, t1, t2) {
       mutate(instrument_time = as.POSIXct(instrument_time,
                                           tz = 'GMT'))
   }
-  ## dbDisconnect(pg)
   results
 }
 
 get_processed = function(measure, t1, t2) {
-  ## pg = dbConnect(RPostgreSQL::PostgreSQL(),
-  ##                dbname = dbname)
   pgtbl = tbl(pg, 'processed_measurements')
   results = pgtbl %>%
     filter(measurement_type_id == measure &
@@ -61,13 +54,10 @@ get_processed = function(measure, t1, t2) {
       mutate(measurement_time = as.POSIXct(measurement_time,
                                            tz = 'GMT'))
   }
-  ## dbDisconnect(pg)
   results
 }
 
 get_cals = function(measure, t1, t2) {
-  ## pg = dbConnect(RPostgreSQL::PostgreSQL(),
-  ##                dbname = dbname)
   pgtbl = tbl(pg, 'calibration_values')
   results = pgtbl %>%
     mutate(time = upper(cal_times)) %>%
@@ -84,24 +74,22 @@ get_cals = function(measure, t1, t2) {
       ## get the times back
       mutate(time = as.POSIXct(time, tz = 'GMT'))
   }
-  ## dbDisconnect(pg)
   results
 }
 
 get_ces = function(measure, t1, t2) {
   # check if m is NO2, and in that case replace with NOx
   m_info = measurements_df[measurements_df$id == measure, ]
-  m_name = m_info$measurement
-  m_site = m_info$site_id
+  m_name = m_info$name
+  m_ds_id = m_info$data_source_id
+  m_site = data_sources$site_id[data_sources$id == m_ds_id]
   if (m_name == 'NO2' & m_site == 1) {
     # find NOx
-    m2 = measurements_df[measurements_df$measurement == 'NOx' &
+    m2 = measurements_df[measurements_df$name == 'NOx' &
                          measurements_df$site_id == 1, ]
     # replace NO2 with NOx
     measure = m2$id
   }
-  ## pg = dbConnect(RPostgreSQL::PostgreSQL(),
-  ##                dbname = dbname)
   pgtbl = tbl(pg, 'conversion_efficiencies')
   results = pgtbl %>%
     mutate(time = upper(cal_times)) %>%
@@ -117,7 +105,6 @@ get_ces = function(measure, t1, t2) {
     mutate(time = as.POSIXct(time, tz = 'GMT')) %>%
     gather(filtered, efficiency, -time) %>%
     mutate(filtered = filtered == 'filtered_efficiency')
-  ## dbDisconnect(pg)
   results
 }
 
