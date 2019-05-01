@@ -132,6 +132,40 @@ get_file_id = function(pg, site, data_source, f,
   get_id_from_pg(pg, df_in, 'files')
 }
 
+add_new_obs = function(pg, file_id, record, time) {
+  if (is.na(file_id)) stop('file_id cannot be NA')
+  obs = data.frame(file_id = file_id,
+                   line = record,
+                   time = time)
+  uniq_obs = unique(obs)
+  obs_ids = get_obs_id(pg, file_id, uniq_obs$line,
+                       uniq_obs$time, add_new = FALSE)
+  if (sum(is.na(obs_ids)) > 0) {
+    ## insert new measurement types
+    missing_obs = uniq_obs[is.na(obs_ids), ]
+    new_obs = data.frame(file_id = file_id,
+                         line = missing_obs$line,
+                         time = missing_obs$time)
+    DBI::dbWriteTable(pg, 'observations', new_obs,
+                      row.names = FALSE, append = TRUE)
+  }
+}
+
+get_obs_id = function(pg, file_id, record, time,
+                      add_new = TRUE) {
+  ## safe to assume there's only one file here
+  if (is.na(file_id)) stop('file_id cannot be NA')
+  if (add_new) {
+    ## make sure we aren't asking for ID's that don't exist yet
+    add_new_obs(pg, file_id, record, time)
+  }
+  obs_df = data.frame(file_id = file_id,
+                      line = record,
+                      time = time)
+  tbl_sql = paste0('observations where file_id=', file_id)
+  get_id_from_pg(pg, obs_df, tbl_sql)
+}
+
 add_new_measurement_types = function(pg, site, data_source,
                                      names) {
   ## since we only run this function for one data source at a time, no

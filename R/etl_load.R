@@ -9,6 +9,8 @@ even_smarter_upload = function(obj, f, site, ds,
     if (is.na(file_id)) {
       add_new_file(obj$con, site, ds, f_i,
                    is_calibration)
+      file_id = get_file_id(obj$con, site, ds,
+                            f_i, is_calibration)
     } else {
       next()
     }
@@ -17,6 +19,7 @@ even_smarter_upload = function(obj, f, site, ds,
       get_measurement_type_id(obj$con, site, ds,
                               df$measurement_name)
     df$measurement_name = NULL
+    add_new_obs(obj$con, file_id, df$record, df$instrument_time)
     ncols = ncol(df)
     ## put the measurement type ID first
     df = df[, c(ncols, 1:(ncols - 1))]

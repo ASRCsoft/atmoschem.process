@@ -29,6 +29,14 @@ create table files (
   unique(data_source_id, name, calibration)
 );
 
+create table observations (
+  id serial primary key,
+  file_id int references files,
+  line int not null,
+  time timestamp not null,
+  unique(file_id, line)
+);
+
 create table measurement_types (
   id serial primary key,
   data_source_id int references data_sources,
