@@ -106,8 +106,8 @@ etl_init.etl_nysatmoschem = function(obj, script = NULL, schema_name = "init",
   update_dynamic_library_path(pg)
 
   ## set up tables and functions
-  sql_files = c('utilities', 'setup', 'filtering',
-                'calibration', 'flags', 'processing')
+  sql_files = c('utilities', 'setup', 'calibration',
+                'flags', 'processing')
   for (sql_file in sql_files) {
     sql_file = etl::find_schema(obj, sql_file, ext = 'sql')
     run_sql_script(pg, sql_file)
