@@ -151,7 +151,7 @@ create or replace view wfms_no2 as
 	 flagged or
 	   is_outlier(value, runmed(value) over w,
 		      runmad(value) over w) as flagged
-    from (select get_measurement_id(1, 'campbell', 'NO2') as measurement_type_id,
+    from (select get_measurement_id(1, 'derived', 'NO2') as measurement_type_id,
 		 measurement_time,
 		 (value2 - value1) /
 		   interpolate_ce(get_measurement_id(1, 'campbell', 'NOx'),
@@ -164,7 +164,7 @@ create or replace view wfms_no2 as
 
 drop view if exists wfms_slp cascade;
 create or replace view wfms_slp as
-  select get_measurement_id(1, 'campbell', 'SLP'),
+  select get_measurement_id(1, 'derived', 'SLP'),
 	 measurement_time,
 	 value1 *
 	   (1 - .0065 * 1483.5 /
@@ -174,7 +174,7 @@ create or replace view wfms_slp as
 
 drop view if exists wfms_ws cascade;
 create or replace view wfms_ws as
-  select get_measurement_id(1, 'campbell', 'WS'),
+  select get_measurement_id(1, 'derived', 'WS'),
 	 measurement_time,
 	 greatest(case when not flagged1 then value1
 		  else null end,
@@ -195,13 +195,13 @@ create or replace view wfms_ws_components as
 				 from _processed_measurements
 				where measurement_type_id=get_measurement_id(1, 'campbell', 'WindDir_D1_WVT')) wd1
 			     on ws1.measurement_time=wd1.measurement_time)
-  select get_measurement_id(1, 'campbell', 'WS_u'),
+  select get_measurement_id(1, 'derived', 'WS_u'),
 	 measurement_time,
 	 ws * sin(theta) as value,
 	 flagged
     from wswd
    union
-  select get_measurement_id(1, 'campbell', 'WS_v'),
+  select get_measurement_id(1, 'derived', 'WS_v'),
 	 measurement_time,
 	 ws * cos(theta) as value,
 	 flagged
@@ -209,7 +209,7 @@ create or replace view wfms_ws_components as
 
 drop view if exists wfms_ws_max cascade;
 create or replace view wfms_ws_max as
-  select get_measurement_id(1, 'campbell', 'WS_Max'),
+  select get_measurement_id(1, 'derived', 'WS_Max'),
 	 measurement_time,
 	 greatest(case when not flagged1 then value1
 		  else null end,
@@ -226,7 +226,7 @@ create or replace view psp_no2 as
 	 flagged or
 	   is_outlier(value, runmed(value) over w,
 		      runmad(value) over w) as flagged
-    from (select get_measurement_id(3, 'envidas', 'NO2') as measurement_type_id,
+    from (select get_measurement_id(3, 'derived', 'NO2') as measurement_type_id,
 		 measurement_time,
 		 (value2 - value1) /
 		   interpolate_ce(get_measurement_id(3, 'envidas', 'NOx'),
@@ -239,7 +239,7 @@ create or replace view psp_no2 as
 
 drop view if exists psp_hno3 cascade;
 create or replace view psp_hno3 as
-  select get_measurement_id(3, 'envidas', 'HNO3'),
+  select get_measurement_id(3, 'derived', 'HNO3'),
 	 measurement_time,
 	 value1 - value2 as value,
 	 flagged1 or flagged2 as flagged
@@ -247,7 +247,7 @@ create or replace view psp_hno3 as
 
 drop view if exists psp_precip cascade;
 create or replace view psp_precip as
-  select get_measurement_id(3, 'envidas', 'Precip'),
+  select get_measurement_id(3, 'derived', 'Precip'),
 	 measurement_time,
 	 case when value<=.02 then value + .5
 	 else value end as value,
@@ -262,7 +262,7 @@ create or replace view psp_precip as
 
 drop view if exists psp_teoma25_base cascade;
 create or replace view psp_teoma25_base as
-  select get_measurement_id(3, 'envidas', 'TEOMA(2.5)BaseMC'),
+  select get_measurement_id(3, 'derived', 'TEOMA(2.5)BaseMC'),
 	 measurement_time,
 	 value1 + value2 as value,
 	 flagged1 or flagged2 as flagged
@@ -270,7 +270,7 @@ create or replace view psp_teoma25_base as
 
 drop view if exists psp_teombcrs_base cascade;
 create or replace view psp_teombcrs_base as
-  select get_measurement_id(3, 'envidas', 'TEOMB(crs)BaseMC'),
+  select get_measurement_id(3, 'derived', 'TEOMB(crs)BaseMC'),
 	 measurement_time,
 	 value1 + value2 as value,
 	 flagged1 or flagged2 as flagged
@@ -278,7 +278,7 @@ create or replace view psp_teombcrs_base as
 
 drop view if exists psp_dichot10_base cascade;
 create or replace view psp_dichot10_base as
-  select get_measurement_id(3, 'envidas', 'Dichot(10)BaseMC'),
+  select get_measurement_id(3, 'derived', 'Dichot(10)BaseMC'),
 	 measurement_time,
 	 value1 + value2 as value,
 	 flagged1 or flagged2 as flagged
@@ -286,7 +286,7 @@ create or replace view psp_dichot10_base as
 
 drop view if exists psp_wood_smoke cascade;
 create or replace view psp_wood_smoke as
-  select get_measurement_id(3, 'envidas', 'Wood smoke'),
+  select get_measurement_id(3, 'derived', 'Wood smoke'),
 	 measurement_time,
 	 value1 - value2 as value,
 	 flagged1 or flagged2 as flagged
