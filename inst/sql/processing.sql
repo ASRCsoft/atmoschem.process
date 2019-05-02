@@ -218,20 +218,96 @@ create or replace view wfms_ws_max as
 	 flagged1 and flagged2 as flagged
     from combine_measures(1, 'campbell', 'WS3Cup_Max', 'WS3CupB_Max');
 
+drop view if exists psp_no2 cascade;
+create or replace view psp_no2 as
+  select measurement_type_id,
+	 measurement_time,
+	 value,
+	 flagged or
+	   is_outlier(value, runmed(value) over w,
+		      runmad(value) over w) as flagged
+    from (select get_measurement_id(3, 'envidas', 'NO2') as measurement_type_id,
+		 measurement_time,
+		 (value2 - value1) /
+		   interpolate_ce(get_measurement_id(3, 'envidas', 'NOx'),
+				  measurement_time) as value,
+		 flagged1 or flagged2 as flagged
+	    from combine_measures(3, 'envidas', 'NO', 'NOx')) cm1
+	   WINDOW w AS (partition by measurement_type_id
+			ORDER BY measurement_time
+			rows between 120 preceding and 120 following);
+
+drop view if exists psp_hno3 cascade;
+create or replace view psp_hno3 as
+  select get_measurement_id(3, 'envidas', 'HNO3'),
+	 measurement_time,
+	 value1 - value2 as value,
+	 flagged1 or flagged2 as flagged
+    from combine_measures(3, 'envidas', 'NOy', 'NOy-HNO3');
+
+drop view if exists psp_precip cascade;
+create or replace view psp_precip as
+  select get_measurement_id(3, 'envidas', 'Precip'),
+	 measurement_time,
+	 case when value<=.02 then value + .5
+	 else value end as value,
+	 flagged
+    from (select measurement_time,
+		 value - lag(value) over w as value,
+		 flagged or lag(flagged) over w as flagged
+	    from _processed_measurements
+	   where measurement_type_id=get_measurement_id(3, 'envidas', 'Rain')
+		 WINDOW w AS (partition by measurement_type_id
+			      ORDER BY measurement_time)) r1;
+
+drop view if exists psp_teoma25_base cascade;
+create or replace view psp_teoma25_base as
+  select get_measurement_id(3, 'envidas', 'TEOMA(2.5)BaseMC'),
+	 measurement_time,
+	 value1 + value2 as value,
+	 flagged1 or flagged2 as flagged
+    from combine_measures(3, 'envidas', 'TEOMA(2.5)MC', 'TEOMA(2.5)RefMC');
+
+drop view if exists psp_teombcrs_base cascade;
+create or replace view psp_teombcrs_base as
+  select get_measurement_id(3, 'envidas', 'TEOMB(crs)BaseMC'),
+	 measurement_time,
+	 value1 + value2 as value,
+	 flagged1 or flagged2 as flagged
+    from combine_measures(3, 'envidas', 'TEOMB(crs)MC', 'TEOMB(crs)RefMC');
+
+drop view if exists psp_dichot10_base cascade;
+create or replace view psp_dichot10_base as
+  select get_measurement_id(3, 'envidas', 'Dichot(10)BaseMC'),
+	 measurement_time,
+	 value1 + value2 as value,
+	 flagged1 or flagged2 as flagged
+    from combine_measures(3, 'envidas', 'Dichot(10)MC', 'Dichot(10)RefMC');
+
+drop view if exists psp_wood_smoke cascade;
+create or replace view psp_wood_smoke as
+  select get_measurement_id(3, 'envidas', 'Wood smoke'),
+	 measurement_time,
+	 value1 - value2 as value,
+	 flagged1 or flagged2 as flagged
+    from combine_measures(3, 'envidas', 'BC1', 'BC6');
+
 /* Combine all processed data. */
 drop materialized view if exists processed_measurements cascade;
 CREATE materialized VIEW processed_measurements as
   select * from _processed_measurements
-   union
-  select * from wfms_no2
-   union
-  select * from wfms_slp
-   union
-  select * from wfms_ws
-   union
-  select * from wfms_ws_max
-   union
-  select * from wfms_ws_components;
+   union select * from wfms_no2
+   union select * from wfms_slp
+   union select * from wfms_ws
+   union select * from wfms_ws_max
+   union select * from wfms_ws_components
+   union select * from psp_no2
+   union select * from psp_hno3
+   union select * from psp_precip
+   union select * from psp_teoma25_base
+   union select * from psp_teombcrs_base
+   union select * from psp_dichot10_base
+   union select * from psp_wood_smoke;
 create index processed_measurements_idx on processed_measurements(measurement_type_id, measurement_time);
 
 /* Aggregate the processed data by hour using a function from
