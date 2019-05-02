@@ -117,7 +117,9 @@ $$ language sql STABLE PARALLEL SAFE;
 -- join two measurement types to make it easy to derive values from
 -- multiple measurements
 drop function if exists combine_measures cascade;
-CREATE OR REPLACE FUNCTION combine_measures(measurement_type_id1 int, measurement_type_id2 int)
+CREATE OR REPLACE FUNCTION combine_measures(site_id int, data_source text,
+                                            measurement_name1 text,
+					    measurement_name2 text)
   RETURNS TABLE (
     measurement_time timestamp,
     value1 numeric,
@@ -132,11 +134,11 @@ CREATE OR REPLACE FUNCTION combine_measures(measurement_type_id1 int, measuremen
 	 coalesce(m2.flagged, false)
     from (select *
 	    from _processed_measurements
-	   where measurement_type_id=$1) m1
+	   where measurement_type_id=get_measurement_id(site_id, measurement_name1)) m1
 	   join
 	   (select *
 	      from _processed_measurements
-	     where measurement_type_id=$2) m2
+	     where measurement_type_id=get_measurement_id(site_id, measurement_name1)) m2
 	       on m1.measurement_time=m2.measurement_time;
 $$ language sql;
 
@@ -154,8 +156,7 @@ create or replace view wfms_no2 as
 		   interpolate_ce(get_measurement_id(1, 'NOx'),
 				  measurement_time) as value,
 		 flagged1 or flagged2 as flagged
-	    from combine_measures(get_measurement_id(1, 'NO'),
-				  get_measurement_id(1, 'NOx'))) cm1
+	    from combine_measures(1, 'campbell', 'NO', 'NOx')) cm1
 	   WINDOW w AS (partition by measurement_type_id
 			ORDER BY measurement_time
 			rows between 120 preceding and 120 following);
@@ -168,8 +169,7 @@ create or replace view wfms_slp as
 	   (1 - .0065 * 1483.5 /
 	   (value2 + .0065 * 1483.5 + 273.15))^(-5.257) as value,
 	 flagged1 or flagged2 as flagged
-    from combine_measures(get_measurement_id(1, 'BP'),
-			  get_measurement_id(1, 'PTemp_C'));
+    from combine_measures(1, 'campbell', 'BP', 'PTemp_C');
 
 drop view if exists wfms_ws cascade;
 create or replace view wfms_ws as
@@ -180,8 +180,7 @@ create or replace view wfms_ws as
 		  case when not flagged2 then value2
 		  else null end) as value,
 	 flagged1 and flagged2 as flagged
-    from combine_measures(get_measurement_id(1, 'WS3Cup'),
-			  get_measurement_id(1, 'WS3CupB'));
+    from combine_measures(1, 'campbell', 'WS3Cup', 'WS3CupB');
 
 -- u and v vector wind speeds
 drop view if exists wfms_ws_components cascade;
@@ -216,8 +215,7 @@ create or replace view wfms_ws_max as
 		  case when not flagged2 then value2
 		  else null end) as value,
 	 flagged1 and flagged2 as flagged
-    from combine_measures(get_measurement_id(1, 'WS3Cup_Max'),
-			  get_measurement_id(1, 'WS3CupB_Max'));
+    from combine_measures(1, 'campbell', 'WS3Cup_Max', 'WS3CupB_Max');
 
 /* Combine all processed data. */
 drop materialized view if exists processed_measurements cascade;
