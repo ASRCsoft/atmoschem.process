@@ -139,7 +139,7 @@ CREATE OR REPLACE FUNCTION combine_measures(site_id int, data_source text,
 	   join
 	   (select *
 	      from _processed_measurements
-	     where measurement_type_id=get_measurement_id(site_id, data_source, measurement_name1)) m2
+	     where measurement_type_id=get_measurement_id(site_id, data_source, measurement_name2)) m2
 	       on m1.measurement_time=m2.measurement_time;
 $$ language sql;
 
