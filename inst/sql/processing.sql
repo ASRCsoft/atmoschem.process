@@ -104,14 +104,15 @@ $$ language sql;
 
 /* Add derived measurements to the processed measurements. */
 drop function if exists get_measurement_id cascade;
-CREATE OR REPLACE FUNCTION get_measurement_id(int, text)
+CREATE OR REPLACE FUNCTION get_measurement_id(int, text, text)
   RETURNS int as $$
   select mt.id
     from measurement_types mt
 	   join data_sources ds
 	       on mt.data_source_id=ds.id
    where site_id=$1
-     and mt.name=$2;
+     and ds.name=$2
+     and mt.name=$3;
 $$ language sql STABLE PARALLEL SAFE;
 
 -- join two measurement types to make it easy to derive values from
@@ -134,11 +135,11 @@ CREATE OR REPLACE FUNCTION combine_measures(site_id int, data_source text,
 	 coalesce(m2.flagged, false)
     from (select *
 	    from _processed_measurements
-	   where measurement_type_id=get_measurement_id(site_id, measurement_name1)) m1
+	   where measurement_type_id=get_measurement_id(site_id, data_source, measurement_name1)) m1
 	   join
 	   (select *
 	      from _processed_measurements
-	     where measurement_type_id=get_measurement_id(site_id, measurement_name1)) m2
+	     where measurement_type_id=get_measurement_id(site_id, data_source, measurement_name1)) m2
 	       on m1.measurement_time=m2.measurement_time;
 $$ language sql;
 
@@ -150,10 +151,10 @@ create or replace view wfms_no2 as
 	 flagged or
 	   is_outlier(value, runmed(value) over w,
 		      runmad(value) over w) as flagged
-    from (select get_measurement_id(1, 'NO2') as measurement_type_id,
+    from (select get_measurement_id(1, 'campbell', 'NO2') as measurement_type_id,
 		 measurement_time,
 		 (value2 - value1) /
-		   interpolate_ce(get_measurement_id(1, 'NOx'),
+		   interpolate_ce(get_measurement_id(1, 'campbell', 'NOx'),
 				  measurement_time) as value,
 		 flagged1 or flagged2 as flagged
 	    from combine_measures(1, 'campbell', 'NO', 'NOx')) cm1
@@ -163,7 +164,7 @@ create or replace view wfms_no2 as
 
 drop view if exists wfms_slp cascade;
 create or replace view wfms_slp as
-  select get_measurement_id(1, 'SLP'),
+  select get_measurement_id(1, 'campbell', 'SLP'),
 	 measurement_time,
 	 value1 *
 	   (1 - .0065 * 1483.5 /
@@ -173,7 +174,7 @@ create or replace view wfms_slp as
 
 drop view if exists wfms_ws cascade;
 create or replace view wfms_ws as
-  select get_measurement_id(1, 'WS'),
+  select get_measurement_id(1, 'campbell', 'WS'),
 	 measurement_time,
 	 greatest(case when not flagged1 then value1
 		  else null end,
@@ -192,15 +193,15 @@ create or replace view wfms_ws_components as
 		  from wfms_ws ws1
   			 join (select *
 				 from _processed_measurements
-				where measurement_type_id=get_measurement_id(1, 'WindDir_D1_WVT')) wd1
+				where measurement_type_id=get_measurement_id(1, 'campbell', 'WindDir_D1_WVT')) wd1
 			     on ws1.measurement_time=wd1.measurement_time)
-  select get_measurement_id(1, 'WS_u'),
+  select get_measurement_id(1, 'campbell', 'WS_u'),
 	 measurement_time,
 	 ws * sin(theta) as value,
 	 flagged
     from wswd
    union
-  select get_measurement_id(1, 'WS_v'),
+  select get_measurement_id(1, 'campbell', 'WS_v'),
 	 measurement_time,
 	 ws * cos(theta) as value,
 	 flagged
@@ -208,7 +209,7 @@ create or replace view wfms_ws_components as
 
 drop view if exists wfms_ws_max cascade;
 create or replace view wfms_ws_max as
-  select get_measurement_id(1, 'WS_Max'),
+  select get_measurement_id(1, 'campbell', 'WS_Max'),
 	 measurement_time,
 	 greatest(case when not flagged1 then value1
 		  else null end,
