@@ -153,7 +153,7 @@ $$ LANGUAGE sql stable parallel safe;
 /* Get the NARSTO averaged data flag based on the number of
 measurements and average value. */
 CREATE OR REPLACE FUNCTION get_hourly_flag(measurement_type_id int, value numeric, n int) RETURNS text AS $$
-  SELECT case when n=0 then 'M1'
+  SELECT case when n<30 then 'M1'
 	 when is_below_mdl(measurement_type_id, value) then 'V1'
 	 when n<45 then 'V4'
 	 else 'V0' end;
