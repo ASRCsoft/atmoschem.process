@@ -55,7 +55,10 @@ create or replace view calibration_periods as
 	    from autocals) a1;
 
 CREATE or replace VIEW calibration_zeros AS
-  select *
+  select measurement_type_id,
+	 type,
+	 upper(cal_times) as cal_time,
+	 value
     from (select *,
 		 estimate_cal(measurement_type_id, type, cal_times) as value
 	    from calibration_periods
@@ -64,8 +67,7 @@ CREATE or replace VIEW calibration_zeros AS
   union
   select measurement_type_id,
 	 type,
-	 tsrange(cal_time - interval '1 hour',
-		 cal_time, '[]') as cal_times,
+	 cal_time,
 	 measured_value as value
     from manual_calibrations m1
 	   join measurement_types m2
@@ -75,29 +77,32 @@ CREATE or replace VIEW calibration_zeros AS
 CREATE OR REPLACE FUNCTION interpolate_cal_zero(measurement_type_id int, t timestamp)
   RETURNS numeric AS $$
   select interpolate(t0, t1, y0, y1, $2)
-    from (select upper(cal_times) as t0,
+    from (select cal_time as t0,
 		 value as y0
 	    from calibration_zeros
-	   where upper(cal_times)<=$2
+	   where cal_time<=$2
 	     and measurement_type_id=$1
 	     and value is not null
-	   order by upper(cal_times) desc
+	   order by cal_time desc
 	   limit 1) calib0
 	 full outer join
-	 (select upper(cal_times) as t1,
+	 (select cal_time as t1,
 		 value as y1
 	    from calibration_zeros
-	   where upper(cal_times)>$2
+	   where cal_time>$2
 	     and measurement_type_id=$1
 	     and value is not null
-	   order by upper(cal_times) asc
+	   order by cal_time asc
 	   limit 1) calib1
          on true;
 $$ LANGUAGE sql STABLE PARALLEL SAFE;
 
 CREATE or replace VIEW calibration_spans AS
-  select c1.*,
-	 m.span as provided_value
+  select c1.measurement_type_id,
+	 c1.type,
+	 upper(c1.cal_times) as cal_time,
+	 m.span as provided_value,
+	 c1.value as value
     from (select *,
 		 estimate_cal(measurement_type_id, type, cal_times) as value
 	    from calibration_periods
@@ -109,8 +114,7 @@ CREATE or replace VIEW calibration_spans AS
   union
   select measurement_type_id,
 	 type,
-	 tsrange(cal_time - interval '1 hour',
-		 cal_time, '[]') as cal_times,
+	 cal_time,
 	 provided_value,
 	 measured_value as value
     from manual_calibrations m1
@@ -128,41 +132,41 @@ $$ LANGUAGE sql STABLE PARALLEL SAFE;
 CREATE MATERIALIZED VIEW calibration_values AS
   select measurement_type_id,
 	 type,
-	 cal_times,
+	 cal_time,
 	 value
     from calibration_zeros
    union
   select measurement_type_id,
 	 type,
-	 cal_times,
+	 cal_time,
 	 calc_span(measurement_type_id, provided_value,
-		   value, upper(cal_times)) as value
+		   value, cal_time) as value
     from calibration_spans;
 -- to make the interpolate_cal function faster
-CREATE INDEX calibration_values_upper_time_idx ON calibration_values(measurement_type_id, type, upper(cal_times));
+CREATE INDEX calibration_values_upper_time_idx ON calibration_values(measurement_type_id, type, cal_time);
 
 /* Estimate calibration values using linear interpolation */
 CREATE OR REPLACE FUNCTION interpolate_cal(measurement_type_id int, type text, t timestamp)
   RETURNS numeric AS $$
   select interpolate(t0, t1, y0, y1, $3)
-    from (select upper(cal_times) as t0,
+    from (select cal_time as t0,
 		 value as y0
 	    from calibration_values
-	   where upper(cal_times)<=$3
+	   where cal_time<=$3
 	     and measurement_type_id=$1
 	     and type=$2
 	     and value is not null
-	   order by upper(cal_times) desc
+	   order by cal_time desc
 	   limit 1) calib0
 	 full outer join
-	 (select upper(cal_times) as t1,
+	 (select cal_time as t1,
 		 value as y1
 	    from calibration_values
-	   where upper(cal_times)>$3
+	   where cal_time>$3
 	     and measurement_type_id=$1
 	     and type=$2
 	     and value is not null
-	   order by upper(cal_times) asc
+	   order by cal_time asc
 	   limit 1) calib1
          on true;
 $$ LANGUAGE sql STABLE PARALLEL SAFE;
@@ -195,10 +199,11 @@ CREATE MATERIALIZED VIEW conversion_efficiencies AS
   select *,
 	 (median(efficiency) over w)::numeric as filtered_efficiency
     from (select measurement_type_id,
-		 cal_times,
+		 cal_time,
 		 apply_calib(measurement_type_id, value,
-			     upper(cal_times)) / max_ce as efficiency
+			     cal_time) / max_ce as efficiency
 	    from (select *,
+			 upper(cal_times) as cal_time,
 			 estimate_cal(measurement_type_id, type, cal_times) as value
 		    from calibration_periods
 		   where type='CE') c1
@@ -206,31 +211,31 @@ CREATE MATERIALIZED VIEW conversion_efficiencies AS
 		       on c1.measurement_type_id=m1.id
 	   where value is not null) ce1
 	 window w as (partition by measurement_type_id
-		      order by upper(cal_times)
+		      order by cal_time
 		      rows between 15 preceding and 15 following);
 -- to make the interpolate_ce function faster
-CREATE INDEX conversion_efficiencies_upper_time_idx ON conversion_efficiencies(upper(cal_times));
+CREATE INDEX conversion_efficiencies_upper_time_idx ON conversion_efficiencies(cal_time);
 
 /* Estimate conversion efficiencies using linear interpolation */
 CREATE OR REPLACE FUNCTION interpolate_ce(measurement_type_id int, t timestamp)
   RETURNS numeric AS $$
   select interpolate(t0, t1, y0, y1, $2)
-    from (select upper(cal_times) as t0,
+    from (select cal_time as t0,
 		 filtered_efficiency as y0
 	    from conversion_efficiencies
-	   where upper(cal_times)<=$2
+	   where cal_time<=$2
 	     and measurement_type_id=$1
 	     and filtered_efficiency is not null
-	   order by upper(cal_times) desc
+	   order by cal_time desc
 	   limit 1) ce0
          full outer join
-         (select upper(cal_times) as t1,
+         (select cal_time as t1,
 		 filtered_efficiency as y1
 	    from conversion_efficiencies
-	   where upper(cal_times)>$2
+	   where cal_time>$2
 	     and measurement_type_id=$1
 	     and filtered_efficiency is not null
-	   order by upper(cal_times) asc
+	   order by cal_time asc
 	   limit 1) ce1
          on true;
 $$ LANGUAGE sql STABLE PARALLEL SAFE;
