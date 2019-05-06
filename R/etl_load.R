@@ -15,8 +15,20 @@ even_smarter_upload = function(obj, f, site, ds,
       next()
     }
     df = read.csv(f_i)
+    if (nrow(df) == 0) next()
+    ## for calibration files, 'mds' is the data source of the
+    ## corresponding measurements
+    if (is_calibration) {
+      if (site == 'WFMS') {
+        mds = 'campbell'
+      } else if (site == 'PSP') {
+        mds = 'envidas'
+      }
+    } else {
+      mds = ds
+    }
     df$measurement_type_id =
-      get_measurement_type_id(obj$con, site, ds,
+      get_measurement_type_id(obj$con, site, mds,
                               df$measurement_name)
     df$measurement_name = NULL
     if (is_calibration) {
@@ -43,12 +55,6 @@ load_file = function(obj, f, site, ds) {
   is_calibration = ds == 'calibrations'
   if (is_calibration) {
     tbl_name = 'manual_calibrations'
-    ## fix the data_source for calibration files
-    if (site == 'WFMS') {
-      ds = 'campbell'
-    } else if (site == 'PSP') {
-      ds = 'envidas'
-    }
   } else {
     tbl_name = 'measurements'
   }
