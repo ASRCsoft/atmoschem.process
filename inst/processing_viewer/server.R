@@ -60,7 +60,7 @@ get_processed = function(measure, t1, t2) {
 get_cals = function(measure, t1, t2) {
   pgtbl = tbl(pg, 'calibration_values')
   results = pgtbl %>%
-    mutate(time = upper(cal_times)) %>%
+    mutate(time = cal_time) %>%
     filter(measurement_type_id == measure &
            time >= t1 &
            time <= t2) %>%
@@ -92,7 +92,7 @@ get_ces = function(measure, t1, t2) {
   }
   pgtbl = tbl(pg, 'conversion_efficiencies')
   results = pgtbl %>%
-    mutate(time = upper(cal_times)) %>%
+    mutate(time = cal_time) %>%
     filter(measurement_type_id == measure &
            time >= t1 &
            time <= t2) %>%
