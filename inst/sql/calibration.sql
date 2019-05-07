@@ -200,6 +200,68 @@ $$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 -- 	       interpolate_cal(site_id, measurement, 'span', t) as span) as cals;
 -- $$ LANGUAGE sql STABLE PARALLEL SAFE;
 
+/* Guess the calibration time period using the calibration value and a
+time range of possible times */
+-- CREATE OR REPLACE FUNCTION guess_cal_time(mtype int, times tsrange, val numeric,
+-- 					  threshold numeric)
+--   RETURNS numeric AS $$
+--   -- 1) select the mtype1 measurements within the time bounds
+--   with meas1 as (
+--     select *
+--       from measurements2
+--      where measurements_type_id=mtype
+--        and time <@ times
+--   )
+--   -- 2) use derivative to label groups of measurements
+--   meas_d1 as (
+--     select *,
+-- 	   value - lag(value) over w as d1
+--       from meas1
+-- 	     window w (order by time)
+--   )
+--   meas_disc as (
+--     select *,
+-- 	   abs(d1)>threshold as discontinuous
+--       from meas_d1
+--   )
+--   meas_new_group as (
+--     select *,
+-- 	   discontinuous and not lag(discontinuous) over w as new_group
+--       from meas_disc
+-- 	     window w (order by time)
+--   )
+--   meas_groups as (
+--     select *
+--       from (select *,
+-- 		   sum(new_group) over w as group
+-- 	      from meas_new_group
+-- 		     window w (order by time))
+--      where not discontinuous
+--   )
+--   -- 3) submit each group to `estimate_cal`
+--   est_cals as (
+--     select *,
+-- 	   estimate_cal(measurement_type_id, type, times) as measured_value
+--       from meas_groups
+--   )
+--   -- 4) get the group with the closest value to val
+--   select null;
+-- $$ LANGUAGE sql STABLE PARALLEL SAFE;
+
+create or replace view conversion_efficiency_inputs as
+  select *,
+	 upper(cal_times) as cal_time,
+	 max_ce as provided_value,
+	 estimate_cal(measurement_type_id, type, cal_times) as measured_value
+    from calibration_periods c1
+	   join measurement_types m1
+	       on c1.measurement_type_id=m1.id
+   where type='CE'
+   union
+  select *
+    from manual_calibrations
+   where type='CE';
+
 CREATE MATERIALIZED VIEW conversion_efficiencies AS
   select *,
 	 (median(efficiency) over w)::numeric as filtered_efficiency
@@ -217,7 +279,14 @@ CREATE MATERIALIZED VIEW conversion_efficiencies AS
 	   where value is not null) ce1
 	 window w as (partition by measurement_type_id
 		      order by cal_time
-		      rows between 15 preceding and 15 following);
+		      rows between 15 preceding and 15 following)
+   union
+  select measurement_type_id,
+	 cal_time,
+	 apply_calib(measurement_type_id, measured_value,
+		     cal_time) / provided_value as efficiency
+    from manual_calibrations
+   where type='CE';
 -- to make the interpolate_ce function faster
 CREATE INDEX conversion_efficiencies_upper_time_idx ON conversion_efficiencies(cal_time);
 
