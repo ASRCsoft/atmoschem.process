@@ -17,11 +17,16 @@ create table autocals (
 create table manual_calibrations (
   measurement_type_id int references measurement_types,
   type text,
-  cal_time timestamp,
+  times tsrange,
   provided_value numeric,
   measured_value numeric,
   corrected boolean not null,
-  primary key(measurement_type_id, type, cal_time)
+  primary key(measurement_type_id, type, times),
+  CONSTRAINT no_overlapping_manual_cals EXCLUDE USING GIST (
+    measurement_type_id WITH =,
+    type WITH =,
+    times WITH &&
+  )
 );
 
 create or replace function estimate_cal(measurement_type int, cal_type text, cal_times tsrange) returns numeric as $$
@@ -67,7 +72,7 @@ CREATE or replace VIEW calibration_zeros AS
   union
   select measurement_type_id,
 	 type,
-	 cal_time,
+	 upper(times) as cal_time,
 	 measured_value as value
     from manual_calibrations m1
 	   join measurement_types m2
@@ -114,7 +119,7 @@ CREATE or replace VIEW calibration_spans AS
   union
   select measurement_type_id,
 	 type,
-	 cal_time,
+	 upper(times) as cal_time,
 	 provided_value,
 	 measured_value as value
     from manual_calibrations m1

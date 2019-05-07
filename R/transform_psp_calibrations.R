@@ -27,17 +27,18 @@ read_psp_cal_times = function(f, date_cell = 'L11', start_cell = 'Z11',
   cal_start = parse_psp_cal_time(cal_date, start_time)
   cal_end = parse_psp_cal_time(cal_date, end_time)
   ## errors with end time render the calibration unusable
-  if (is.na(cal_end)) {
+  if (is.na(cal_end) || cal_end < cal_start) {
     warning(paste('Unable to retrieve calibration time from file', f))
-    return(list(start_time = NULL, end_time = NULL))
+    return(NULL)
   }
-  list(start_time = cal_start, end_time = cal_end)
+  time_strs = format(c(cal_start, cal_end), '%Y-%m-%d %H:%M:%S')
+  paste0('[', time_strs[1], ',', time_strs[2], ')')
 }
 
 ## get "zero and span checks" section
 read_psp_NO_cal_table = function(f, trange = 'F33:AD35',
                                  chem_names = c('NO', 'NOx'),
-                                 cal_end, ce_row = 42) {
+                                 cal_times, ce_row = 42) {
   ## gotta help out readxl a bit with the macro files
   if (endsWith(f, 'm')) {
     readf = readxl::read_xlsx
@@ -53,7 +54,7 @@ read_psp_NO_cal_table = function(f, trange = 'F33:AD35',
   names(cal_df) = c('measurement_name', 'type')
   res1 = data.frame(measurement_name = cal_df$measurement_name,
                     type = cal_df$type,
-                    cal_time = cal_end,
+                    times = cal_times,
                     provided_value = c(rep(0, 2), cals$cert_span),
                     measured_value = cals[as.matrix(cal_df[, 1:2])],
                     corrected = FALSE)
@@ -66,14 +67,14 @@ read_psp_NO_cal_table = function(f, trange = 'F33:AD35',
   if (length(responses) == 1) {
     res2 = data.frame(measurement_name = cal_df$measurement_name[2],
                       type = 'CE',
-                      cal_time = cal_end,
+                      times = cal_times,
                       provided_value = ces$calibrator,
                       measured_value = ces$response,
                       corrected = FALSE)
   } else if (length(responses) == 2) {
     res2 = data.frame(measurement_name = cal_df$measurement_name[1:2],
                       type = 'CE',
-                      cal_time = cal_end,
+                      times = cal_times,
                       provided_value = ces$calibrator,
                       measured_value = responses,
                       corrected = FALSE)
@@ -85,14 +86,14 @@ read_psp_NO_cal_table = function(f, trange = 'F33:AD35',
 
 ## get "zero, span and PC checks" section
 read_psp_cal_table = function(f, trange = 'U36:AA40',
-                              chem_name = 'CO', cal_end) {
+                              chem_name = 'CO', cal_times) {
   df = readxl::read_xlsx(f, range = trange, col_names = F)
   cals = as.data.frame(df[c(1, nrow(df)), c(1, ncol(df))])
   names(cals) = c('provided_value', 'measured_value')
   row.names(cals) = c('span', 'zero')
   data.frame(measurement_name = chem_name,
              type = row.names(cals),
-             cal_time = cal_end,
+             times = cal_times,
              provided_value = cals$provided_value,
              measured_value = cals$measured_value,
              corrected = FALSE)
@@ -101,7 +102,7 @@ read_psp_cal_table = function(f, trange = 'U36:AA40',
 empty_measurements = function() {
   data.frame(measurement_name = character(0),
              type = character(0),
-             cal_time = vector(),
+             times = character(0),
              provided_value = numeric(0),
              measured_value = numeric(0),
              corrected = logical(0))
@@ -112,26 +113,25 @@ transform_psp_NO_calibrations = function(f, date_cell = 'L11',
                                          trange = 'F33:AD35',
                                          chem_names = c('NO', 'NOx'),
                                          ce_row = 42) {
-  cal_end = read_psp_cal_times(f, date_cell, start_cell,
-                               end_cell)$end_time
-  if (is.null(cal_end)) {
+  cal_times = read_psp_cal_times(f, date_cell, start_cell,
+                                 end_cell)
+  if (is.null(cal_times)) {
     return(empty_measurements())
   }
   read_psp_NO_cal_table(f, trange, chem_names,
-                        cal_end, ce_row)
+                        cal_times, ce_row)
 }
 
 transform_psp_single_calibrations = function(f, date_cell = 'L11',
                                              start_cell = 'Z11', end_cell = 'AE11',
                                              trange = 'U36:AA40',
                                              chem_name = 'CO') {  
-  cal_end = read_psp_cal_times(f, date_cell, start_cell,
-                               end_cell)$end_time
-  if (is.null(cal_end)) {
+  cal_times = read_psp_cal_times(f, date_cell, start_cell,
+                                 end_cell)
+  if (is.null(cal_times)) {
     return(empty_measurements())
   }
-  read_psp_cal_table(f, trange, chem_name,
-                     cal_end)
+  read_psp_cal_table(f, trange, chem_name, cal_times)
 }
 
 transform_psp_42C_calibrations = function(f) {

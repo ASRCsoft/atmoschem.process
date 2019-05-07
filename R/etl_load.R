@@ -46,8 +46,17 @@ even_smarter_upload = function(obj, f, site, ds,
       df$instrument_time = NULL
     }
     ## add measurements (or calibrations)
-    DBI::dbWriteTable(obj$con, tbl_name, df,
-                      row.names = FALSE, append = TRUE)
+    
+    ## for now just print a warning for key conflicts
+    tryCatch(DBI::dbWriteTable(obj$con, tbl_name, df,
+                               row.names = FALSE, append = TRUE),
+             error = function(e) {
+               if (grepl('conflicting key value violates exclusion constraint', e)) {
+                 warning(e)
+               } else {
+                 stop(e)
+               }
+             })
   }
 }
 
