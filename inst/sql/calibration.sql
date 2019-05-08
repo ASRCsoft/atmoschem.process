@@ -41,7 +41,7 @@ select case when cal_type='zero' then min(moving_average)
 	   and instrument_time between (lower(cal_times) - interval '2 minutes') and (upper(cal_times) + interval '2 minutes')) moving_averages
   -- ignore first 15 minutes of span calibration data due to spikes I
   -- think?
-  where instrument_time <@ case when cal_type='zero' then cal_times
+  where instrument_time <@ case when cal_type!='span' then cal_times
 			   else tsrange(lower(cal_times) + interval '15 minutes', upper(cal_times)) end;
 $$ language sql STABLE PARALLEL SAFE;
 
@@ -202,51 +202,73 @@ $$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 
 /* Guess the calibration time period using the calibration value and a
 time range of possible times */
--- CREATE OR REPLACE FUNCTION guess_cal_time(mtype int, times tsrange, val numeric,
--- 					  threshold numeric)
---   RETURNS numeric AS $$
---   -- 1) select the mtype1 measurements within the time bounds
---   with meas1 as (
---     select *
---       from measurements2
---      where measurements_type_id=mtype
---        and time <@ times
---   )
---   -- 2) use derivative to label groups of measurements
---   meas_d1 as (
---     select *,
--- 	   value - lag(value) over w as d1
---       from meas1
--- 	     window w (order by time)
---   )
---   meas_disc as (
---     select *,
--- 	   abs(d1)>threshold as discontinuous
---       from meas_d1
---   )
---   meas_new_group as (
---     select *,
--- 	   discontinuous and not lag(discontinuous) over w as new_group
---       from meas_disc
--- 	     window w (order by time)
---   )
---   meas_groups as (
---     select *
---       from (select *,
--- 		   sum(new_group) over w as group
--- 	      from meas_new_group
--- 		     window w (order by time))
---      where not discontinuous
---   )
---   -- 3) submit each group to `estimate_cal`
---   est_cals as (
---     select *,
--- 	   estimate_cal(measurement_type_id, type, times) as measured_value
---       from meas_groups
---   )
---   -- 4) get the group with the closest value to val
---   select null;
--- $$ LANGUAGE sql STABLE PARALLEL SAFE;
+CREATE OR REPLACE FUNCTION guess_cal_time(mtype int, type text, cal_times tsrange, val numeric,
+					  threshold numeric, maxdif numeric)
+  RETURNS tsrange AS $$
+  -- 1) select the mtype1 measurements within the time bounds
+  with meas1 as (
+    select *
+      from measurements2
+     where measurement_type_id=mtype
+       and instrument_time <@ cal_times
+  ),		       
+  -- 2) use derivative to label groups of measurements
+  meas_d1 as (
+    select *,
+	   value - lag(value) over w as d1
+      from meas1
+	     window w as (order by instrument_time)
+  ),
+  meas_disc as (
+    select *,
+	   abs(d1)>threshold as discontinuous
+      from meas_d1
+  ),
+  meas_new_group as (
+    select *,
+	   discontinuous and not lag(discontinuous) over w as new_group
+      from meas_disc
+	     window w as (order by instrument_time)
+  ),
+  meas_groups as (
+    select *
+      from (select *,
+		   sum(new_group::int) over w as group_id
+	      from meas_new_group
+		     window w as (order by instrument_time)) m1
+     where not discontinuous
+  ),
+  -- 3) submit each group to `estimate_cal`
+  group_times as (
+    select measurement_type_id,
+	   group_id,
+	   tsrange(min(instrument_time), max(instrument_time), '[)') as times
+      from meas_groups
+     group by measurement_type_id, group_id
+  ),
+  group_cals as (
+    select *,
+	   estimate_cal(measurement_type_id, type, times) as measured_value
+      from (select *
+	      from group_times
+	     where (upper(times) - lower(times))>='5 min') g1
+  )
+  -- 4) get the group with the closest value to val
+  select case when dif>maxdif then null
+	 else times end
+    from (select *,
+		 abs(measured_value - val) as dif
+	    from group_cals) g1
+   order by dif asc
+   limit 1;
+$$ LANGUAGE sql STABLE PARALLEL SAFE;
+
+/* Guess the NOx/NO2 conversion efficiency calibration time period for
+   using the calibration value and a time range of possible times */
+CREATE OR REPLACE FUNCTION guess_no_ce_time(mtype int, cal_times tsrange, val numeric)
+  RETURNS tsrange AS $$
+  select guess_cal_time(mtype, 'CE', cal_times, val + 10, 1, 15);
+$$ LANGUAGE sql STABLE PARALLEL SAFE;
 
 create or replace view conversion_efficiency_inputs as
   select *,
