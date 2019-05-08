@@ -271,7 +271,8 @@ CREATE OR REPLACE FUNCTION guess_no_ce_time(mtype int, cal_times tsrange, val nu
 $$ LANGUAGE sql STABLE PARALLEL SAFE;
 
 create or replace view conversion_efficiency_inputs as
-  select *,
+  select measurement_type_id,
+	 type,
 	 upper(cal_times) as cal_time,
 	 max_ce as provided_value,
 	 estimate_cal(measurement_type_id, type, cal_times) as measured_value
@@ -280,7 +281,15 @@ create or replace view conversion_efficiency_inputs as
 	       on c1.measurement_type_id=m1.id
    where type='CE'
    union
-  select *
+  select measurement_type_id,
+	 type,
+	 upper(times) as cal_time,
+	 provided_value,
+	 case when measurement_type_id=get_measurement_id(3, 'envidas', 'NOx')
+	 then measured_value - estimate_cal(get_measurement_id(3, 'envidas', 'NO'),
+					    'CE', guess_no_ce_time(measurement_type_id,
+								   times, measured_value))
+	 else measured_value end as measured_value
     from manual_calibrations
    where type='CE';
 

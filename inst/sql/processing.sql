@@ -80,17 +80,6 @@ create table _processed_measurements (
   primary key(measurement_type_id, measurement_time)
 );
 
-drop function if exists get_data_source_ids cascade;
-CREATE OR REPLACE FUNCTION get_data_source_ids(int, text)
-  RETURNS int[] as $$
-  select array_agg(mt.id)
-    from measurement_types mt
-	   join data_sources ds
-	   on mt.data_source_id=ds.id
-   where site_id=$1
-     and ds.name=$2;
-$$ language sql STABLE PARALLEL SAFE;
-
 drop function if exists update_processing cascade;
 CREATE OR REPLACE FUNCTION update_processing(int, text)
   RETURNS void as $$
@@ -103,17 +92,6 @@ CREATE OR REPLACE FUNCTION update_processing(int, text)
 $$ language sql;
 
 /* Add derived measurements to the processed measurements. */
-drop function if exists get_measurement_id cascade;
-CREATE OR REPLACE FUNCTION get_measurement_id(int, text, text)
-  RETURNS int as $$
-  select mt.id
-    from measurement_types mt
-	   join data_sources ds
-	       on mt.data_source_id=ds.id
-   where site_id=$1
-     and ds.name=$2
-     and mt.name=$3;
-$$ language sql STABLE PARALLEL SAFE;
 
 -- join two measurement types to make it easy to derive values from
 -- multiple measurements
