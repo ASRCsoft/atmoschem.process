@@ -313,8 +313,7 @@ create or replace view derived_conversion_efficiencies AS
 	 c2.cal_time,
 	 (apply_calib(c3.measurement_type_id, c3.measured_value, c3.cal_time) -
 	  apply_calib(c2.measurement_type_id, c2.measured_value, c2.cal_time)) /
-	   (c3.provided_value -
-	    apply_calib(c2.measurement_type_id, c2.measured_value, c2.cal_time)) as efficiency
+	   c3.provided_value as efficiency
     from conversion_efficiency_inputs c2
 	   join conversion_efficiency_inputs c3
 	       on c2.cal_time=c3.cal_time

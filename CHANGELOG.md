@@ -18,3 +18,4 @@
   'Service Reminder' flag (4000).
 - Account for zero offsets when estimating calibration spans.
 - Correct miscalculated WFMS wind speeds from 2016 to 2019.
+- Fix PSP NO2 conversion efficiency calculations.
