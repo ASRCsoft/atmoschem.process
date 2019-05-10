@@ -285,41 +285,52 @@ create or replace view conversion_efficiency_inputs as
 	 type,
 	 upper(times) as cal_time,
 	 provided_value,
-	 case when measurement_type_id=get_measurement_id(3, 'envidas', 'NOx')
-	 then measured_value - estimate_cal(get_measurement_id(3, 'envidas', 'NO'),
-					    'CE', guess_no_ce_time(measurement_type_id,
-								   times, measured_value))
-	 else measured_value end as measured_value
+	 measured_value
     from manual_calibrations
-   where type='CE';
-
-CREATE MATERIALIZED VIEW conversion_efficiencies AS
-  select *,
-	 (median(efficiency) over w)::numeric as filtered_efficiency
-    from (select measurement_type_id,
-		 cal_time,
-		 apply_calib(measurement_type_id, value,
-			     cal_time) / max_ce as efficiency
-	    from (select *,
-			 upper(cal_times) as cal_time,
-			 estimate_cal(measurement_type_id, type, cal_times) as value
-		    from calibration_periods
-		   where type='CE') c1
-		   join measurement_types m1
-		       on c1.measurement_type_id=m1.id
-	   where value is not null) ce1
-	 window w as (partition by measurement_type_id
-		      order by cal_time
-		      rows between 15 preceding and 15 following)
+   where type='CE'
    union
+  select get_measurement_id(3, 'envidas', 'NO'),
+	 type,
+	 upper(times) as cal_time,
+	 provided_value,
+	 estimate_cal(get_measurement_id(3, 'envidas', 'NO'), 'CE',
+		      guess_no_ce_time(measurement_type_id, times,
+				       measured_value)) as measured_value
+    from manual_calibrations
+   where measurement_type_id=get_measurement_id(3, 'envidas', 'NOx')
+     and type='CE';
+
+create or replace view _conversion_efficiencies AS
   select measurement_type_id,
 	 cal_time,
 	 apply_calib(measurement_type_id, measured_value,
 		     cal_time) / provided_value as efficiency
-    from manual_calibrations
-   where type='CE';
+    from conversion_efficiency_inputs
+   where measured_value is not null;
+
+create or replace view derived_conversion_efficiencies AS
+  select get_measurement_id(3, 'derived', 'NO2'),
+	 c2.cal_time,
+	 (apply_calib(c3.measurement_type_id, c3.measured_value, c3.cal_time) -
+	  apply_calib(c2.measurement_type_id, c2.measured_value, c2.cal_time)) /
+	   (c3.provided_value -
+	    apply_calib(c2.measurement_type_id, c2.measured_value, c2.cal_time)) as efficiency
+    from conversion_efficiency_inputs c2
+	   join conversion_efficiency_inputs c3
+	       on c2.cal_time=c3.cal_time
+   where c2.measurement_type_id=get_measurement_id(3, 'envidas', 'NO')
+     and c3.measurement_type_id=get_measurement_id(3, 'envidas', 'NOx');
+
+CREATE MATERIALIZED VIEW conversion_efficiencies AS
+  select *,
+	 (median(efficiency) over w)::numeric as filtered_efficiency
+    from (select * from _conversion_efficiencies
+	   union select * from derived_conversion_efficiencies) ce1
+  window w as (partition by measurement_type_id
+	       order by cal_time
+	       rows between 15 preceding and 15 following);
 -- to make the interpolate_ce function faster
-CREATE INDEX conversion_efficiencies_upper_time_idx ON conversion_efficiencies(cal_time);
+CREATE INDEX conversion_efficiencies_time_idx ON conversion_efficiencies(cal_time);
 
 /* Estimate conversion efficiencies using linear interpolation */
 CREATE OR REPLACE FUNCTION interpolate_ce(measurement_type_id int, t timestamp)
