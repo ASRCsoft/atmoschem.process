@@ -41,6 +41,7 @@ create table measurement_types (
   id serial primary key,
   data_source_id int references data_sources,
   name text not null,
+  units text,
   apply_processing boolean,
   valid_range numrange,
   mdl numeric,
