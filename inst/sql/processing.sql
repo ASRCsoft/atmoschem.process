@@ -227,8 +227,8 @@ drop view if exists psp_precip cascade;
 create or replace view psp_precip as
   select get_measurement_id(3, 'derived', 'Precip'),
 	 measurement_time,
-	 case when value<=-.02 then value + .5
-	 else value end as value,
+	 (case when value<=-.02 then value + .5
+	  else value end) * 25.4 as value,
 	 flagged
     from (select measurement_time,
 		 value - lag(value) over w as value,
