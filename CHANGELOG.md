@@ -12,6 +12,7 @@
 - Use 3-minute moving averages for all calibration estimates.
 - Treat zero WindDir\_SD1\_WVT as an indicator of wind direction
   instrument malfunction.
+- Apply M1 flag to hours with >50% missing data.
 
 ### Fixed
 - Fix bug ignoring ultrafine 'Nozzle Pressure' flag (400) instead of
