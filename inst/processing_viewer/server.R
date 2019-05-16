@@ -180,7 +180,6 @@ make_processing_plot = function(m, t1, t2, logt = F,
 
   ## plot
   df$Type[is.na(df$Type)] = ''
-  print(table(df$group))
   ggplot(df, aes(Time, Value,
                  group = interaction(Type, Filtered),
                  color = Flag, linetype = Filtered)) +
