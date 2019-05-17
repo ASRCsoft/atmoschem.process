@@ -167,17 +167,18 @@ get_obs_id = function(pg, file_id, record, time,
 
 add_new_measurement_types = function(pg, site, data_source,
                                      names) {
-  ## since we only run this function for one data source at a time, no
-  ## need to have a data source for each row in the data frame
-  uniq_names = unique(names)
-  m_ids = get_measurement_type_id(pg, site, data_source,
-                                  uniq_names,
+  mtype_df = data.frame(site = site, data_source = data_source,
+                        name = names)
+  uniq_mtypes = unique(mtype_df)
+  m_ids = get_measurement_type_id(pg, uniq_mtypes$site,
+                                  uniq_mtypes$data_source,
+                                  uniq_mtypes$name,
                                   add_new = FALSE)
   if (sum(is.na(m_ids)) > 0) {
     ## insert new measurement types
-    data_source_id = get_data_source_id(pg, site, data_source)
-    new_mtypes = data.frame(data_source_id = data_source_id,
-                            name = uniq_names[is.na(m_ids)])
+    uniq_mtypes$data_source_id = get_data_source_id(pg, uniq_mtypes$site,
+                                                    uniq_mtypes$data_source)
+    new_mtypes = uniq_mtypes[is.na(m_ids), c('data_source_id', 'name')]
     DBI::dbWriteTable(pg, 'measurement_types', new_mtypes,
                       row.names = FALSE, append = TRUE)
   }

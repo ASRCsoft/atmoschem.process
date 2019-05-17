@@ -47,8 +47,7 @@ update_metadata_tbl = function(pg, tbl_name, df, action = 'replace') {
     df$measurement_type_id =
       get_measurement_type_id(pg, df$site,
                               df$data_source,
-                              df$measurement_name,
-                              add_new = FALSE)
+                              df$measurement_name)
     df$site = NULL
     df$data_source = NULL
     df$measurement_name = NULL
@@ -81,6 +80,17 @@ update_manual_flags = function(pg, df) {
   update_metadata_tbl(pg, 'manual_flags', df)
 }
 
+update_clock_audits = function(pg, df) {
+  df$data_source_id =
+    get_data_source_id(pg, df$site,
+                       df$data_source)
+  df$site = NULL
+  df$data_source = NULL
+  ## purge old data then add new data
+  dbxDelete(pg, 'clock_audits')
+  dbxInsert(pg, 'clock_audits', df)
+}
+
 #' My ETL functions
 #' @import etl
 #' @inheritParams etl::etl_init
@@ -106,8 +116,8 @@ etl_init.etl_nysatmoschem = function(obj, script = NULL, schema_name = "init",
   update_dynamic_library_path(pg)
 
   ## set up tables and functions
-  sql_files = c('utilities', 'setup', 'calibration',
-                'flags', 'processing')
+  sql_files = c('utilities', 'setup', #'clock_errors',
+                'calibration', 'flags', 'processing')
   for (sql_file in sql_files) {
     sql_file = etl::find_schema(obj, sql_file, ext = 'sql')
     run_sql_script(pg, sql_file)
@@ -120,6 +130,8 @@ etl_init.etl_nysatmoschem = function(obj, script = NULL, schema_name = "init",
   update_autocals(pg, autocals)
   manual_flags = read_meta_csv('manual_flags')
   update_manual_flags(pg, manual_flags)
+  clock_audits = read_meta_csv('clock_audits')
+  update_clock_audits(pg, clock_audits)
   
   invisible(obj)
 }
