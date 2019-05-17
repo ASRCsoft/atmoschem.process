@@ -11,7 +11,7 @@ CREATE TYPE timerange AS RANGE (
 /* create a sourcerow composite data type and supporting functions to
 document the origin of a measurement in a data file */
 CREATE TYPE sourcerow AS (
-  file_date timestamp,
+  file_time timestamp,
   file_number int,
   file_row int);
 CREATE TYPE sourcerange AS RANGE (
