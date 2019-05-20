@@ -10,10 +10,10 @@ create or replace view observations2 as
     from observations obs
 	   join files
 	       on obs.file_id=files.id
-   where files.data_source_id=(select id
-				 from data_sources
-				where site_id=3
-				  and name='envidas');
+	   join data_sources ds
+	       on files.data_source_id=ds.id
+   where ds.site_id=3
+     and ds.name='envidas';
 
 /* Get info about the chronological order of files from file names */
 create or replace function get_psp_envidas_file_time(f text)
@@ -39,8 +39,6 @@ create or replace view observation_sourcerows as
 		 get_psp_envidas_file_index(fname) as tiebreaker
 	    from observations2) obs1;
 
-
-
 /* Match clock audits with the corresponding file/row from the raw
    data */
 CREATE MATERIALIZED VIEW matched_clock_audits as
@@ -57,10 +55,10 @@ CREATE MATERIALIZED VIEW matched_clock_audits as
 		   and obs.data_source_id=ca.data_source_id) ca1
    group by data_source_id, data_source_time, audit_time, corrected;
 
-/* Correct ultrafine instrument time using linear interpolation */
-CREATE OR REPLACE FUNCTION interpolate_time(measurement_type_id int,
-					    source_row_in sourcerow,
-					    t timestamp)
+/* Correct PSP file time using linear interpolation */
+CREATE OR REPLACE FUNCTION correct_time(data_source_in int,
+					source_row_in sourcerow,
+					t timestamp)
   RETURNS timestamp AS $$
 select interpolate(t0, t1, y0, y1, $3)
   from (select case when corrected then audit_time
@@ -68,7 +66,7 @@ select interpolate(t0, t1, y0, y1, $3)
 	       audit_time as y0
 	  from matched_clock_audits
 	 where source_row<=$2
-	   and measurement_type_id=$1
+	   and data_source_id=$1
 	 order by source_row desc
 	 limit 1) ca0
   full outer join
@@ -76,7 +74,7 @@ select interpolate(t0, t1, y0, y1, $3)
 		 audit_time as y1
 	    from matched_clock_audits
 	   where source_row>$2
-	     and measurement_type_id=$1
+	     and data_source_id=$1
 	   order by source_row asc
 	   limit 1) ca1
   on true;

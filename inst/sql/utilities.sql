@@ -84,11 +84,9 @@ $$ LANGUAGE plpgsql IMMUTABLE PARALLEL SAFE;
 CREATE OR REPLACE FUNCTION interpolate(t0 timestamp, t1 timestamp, y0 timestamp, y1 timestamp, t timestamp)
   RETURNS timestamp AS $$
   BEGIN
-    -- subtract y0 while doing calculations to keep the numbers from
-    -- getting too large
-    return (interpolate(t0, t1, 0,
-			EXTRACT(epoch FROM (y1 - y0))::numeric,
-			t) || ' seconds')::timestamp + y0;
+    -- subtract x-value times while doing calculations to keep the
+    -- numbers from getting too large
+    return interpolate(t0, t1, y0 - t0, y1 - t1, t) + t;
   END;
 $$ LANGUAGE plpgsql IMMUTABLE PARALLEL SAFE;
 

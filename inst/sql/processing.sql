@@ -10,25 +10,45 @@ I also split the processing by data source so that a new data file
 does not require reprocessing all data. The `update_processing`
 function will update the processing for a single data source. */
 
+/* Correct the instrument clock times, where needed. */
+drop materialized view if exists processed_observations cascade;
+CREATE materialized VIEW processed_observations as
+  select id,
+	 correct_time(data_source_id, source_row,
+		      time) as time
+    from observation_sourcerows
+   union
+  select obs.id,
+	 time
+    from observations obs
+	   join files
+	       on obs.file_id=files.id
+	   join data_sources ds
+	       on files.data_source_id=ds.id
+   where not (ds.site_id=3 and ds.name='envidas');
+create index processed_observations_idx on processed_observations(id);
+
 /* Apply calibration adjustments if needed, using functions from
    calibration.sql. */
 drop view if exists calibrated_measurements cascade;
 create or replace view calibrated_measurements as
-  select c.measurement_type_id,
-	 instrument_time,
+  select measurement_type_id,
+	 time as instrument_time,
 	 value,
-	 case when apply_ce then apply_calib(c.measurement_type_id, value, instrument_time) /
-		interpolate_ce(c.measurement_type_id, instrument_time)
-	 when has_calibration then apply_calib(c.measurement_type_id, value, instrument_time)
+	 case when apply_ce then apply_calib(measurement_type_id, value, time) /
+		interpolate_ce(measurement_type_id, time)
+	 when has_calibration then apply_calib(measurement_type_id, value, time)
 	 else value end as calibrated_value,
 	 flagged,
 	 valid_range,
 	 mdl,
 	 remove_outliers,
 	 max_jump
-    from measurements2 c
-	   left join measurement_types m
-	       on c.measurement_type_id=m.id
+    from measurements m
+	   left join measurement_types mt
+	       on m.measurement_type_id=mt.id
+	   join processed_observations obs
+	       on m.observation_id=obs.id
    where apply_processing;
 
 drop function if exists process_measurements cascade;
@@ -312,6 +332,7 @@ create index hourly_measurements_idx on hourly_measurements(measurement_type_id,
 drop function if exists update_all cascade;
 CREATE OR REPLACE FUNCTION update_all()
   RETURNS void as $$
+  refresh materialized view processed_observations;
   refresh materialized view calibration_values;
   refresh materialized view conversion_efficiencies;
   refresh materialized view freezing_clusters;
