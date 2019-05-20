@@ -337,8 +337,7 @@ CREATE OR REPLACE FUNCTION update_all()
   refresh materialized view conversion_efficiencies;
   refresh materialized view freezing_clusters;
   select update_processing(site_id, name)
-    from (select *
-	    from data_sources) ds1;
+    from data_sources;
   refresh materialized view processed_measurements;
   refresh materialized view hourly_measurements;
 $$ language sql;
