@@ -39,69 +39,45 @@ create or replace view observation_sourcerows as
 		 get_psp_envidas_file_index(fname) as tiebreaker
 	    from observations2) obs1;
 
+
+
 /* Match clock audits with the corresponding file/row from the raw
    data */
--- CREATE MATERIALIZED VIEW matched_clock_audits as
---   select *,
--- 	 case when instrument='EPC'
--- 	 then (select min(source)
--- 		 from ultrafine
--- 		where site_id=3
--- 		  and date_trunc('minute', ultrafine.instrument_time)=clock_audits.instrument_time)
--- 	 else (select min(source)
--- 		 from envidas
--- 		where site_id=3
--- 		  and date_trunc('minute', envidas.instrument_time)=clock_audits.instrument_time) end as data_source
---     from clock_audits
---    where instrument in ('EPC', 'DRDAS PC');
+CREATE MATERIALIZED VIEW matched_clock_audits as
+  select data_source_id,
+	 min(source_row) as source_row,
+	 data_source_time,
+	 audit_time,
+	 corrected
+    from (select ca.*,
+		 source_row
+	    from observation_sourcerows obs
+		   join clock_audits ca
+		       on date_trunc('minute', obs.time)=ca.data_source_time
+		   and obs.data_source_id=ca.data_source_id) ca1
+   group by data_source_id, data_source_time, audit_time, corrected;
 
-
--- /* Correct ultrafine instrument time using linear interpolation */
--- CREATE OR REPLACE FUNCTION correct_instrument_time(site_id int, instrument text, sr sourcerow, t timestamp)
---   RETURNS timestamp AS $$
---   #variable_conflict use_variable
---   DECLARE
---   matching_audit_time timestamp;
---   x0 timestamp;
---   x1 timestamp;
---   y0 interval;
---   y1 interval;
---   BEGIN
---     -- only applies to PSP for now
---     if site_id!=3 then
---       return t;
---     end if;
---     -- 1) Find the closest clock audits.
---     select audit_time
---       from matched_clock_audits
---      where matched_clock_audits.instrument=instrument
---        and data_source=sr
---       into matching_audit_time;
---     if found then
---       return matching_audit_time;
---     end if;
---     -- if the clock error was corrected, then the new instrument_time is
---     -- the same as the audit_time and the new clock error is zero. If it
---     -- wasn't corrected then the instrument_time and clock errors don't
---     -- change.
---     select case when corrected then audit_time
---            else instrument_time end,
---            case when corrected then '0'
---            else audit_time - instrument_time end
---       from matched_clock_audits
---      where matched_clock_audits.instrument=instrument
---        and data_source<sr
---      order by data_source desc
---      limit 1
---       into x0, y0;
---     select instrument_time,
--- 	   audit_time - instrument_time
---       from matched_clock_audits
---      where matched_clock_audits.instrument=instrument
---        and data_source>sr
---      order by data_source asc
---      limit 1
---       into x1, y1;
---     return t + interpolate(x0, x1, y0, y1, t);
---   END;
--- $$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
+/* Correct ultrafine instrument time using linear interpolation */
+CREATE OR REPLACE FUNCTION interpolate_time(measurement_type_id int,
+					    source_row_in sourcerow,
+					    t timestamp)
+  RETURNS timestamp AS $$
+select interpolate(t0, t1, y0, y1, $3)
+  from (select case when corrected then audit_time
+	       else data_source_time end as t0,
+	       audit_time as y0
+	  from matched_clock_audits
+	 where source_row<=$2
+	   and measurement_type_id=$1
+	 order by source_row desc
+	 limit 1) ca0
+  full outer join
+	 (select data_source_time as t1,
+		 audit_time as y1
+	    from matched_clock_audits
+	   where source_row>$2
+	     and measurement_type_id=$1
+	   order by source_row asc
+	   limit 1) ca1
+  on true;
+$$ LANGUAGE sql STABLE PARALLEL SAFE;

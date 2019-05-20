@@ -80,6 +80,18 @@ CREATE OR REPLACE FUNCTION interpolate(t0 timestamp, t1 timestamp, y0 interval, 
   END;
 $$ LANGUAGE plpgsql IMMUTABLE PARALLEL SAFE;
 
+/* also allow timestamps as y values */
+CREATE OR REPLACE FUNCTION interpolate(t0 timestamp, t1 timestamp, y0 timestamp, y1 timestamp, t timestamp)
+  RETURNS timestamp AS $$
+  BEGIN
+    -- subtract y0 while doing calculations to keep the numbers from
+    -- getting too large
+    return (interpolate(t0, t1, 0,
+			EXTRACT(epoch FROM (y1 - y0))::numeric,
+			t) || ' seconds')::timestamp + y0;
+  END;
+$$ LANGUAGE plpgsql IMMUTABLE PARALLEL SAFE;
+
 /* Delete a value from an array at the given index */
 CREATE OR REPLACE FUNCTION remove_at(arr numeric[], n int)
   RETURNS numeric[] AS $$
