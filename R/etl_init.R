@@ -9,6 +9,15 @@ update_dynamic_library_path = function(pg) {
   ## add median C library location if needed
   lib_path = system.file('libs',
                          package = 'nysatmoschem')
+
+  if (!dir.exists(lib_path)) {
+    ## is this a unit test?
+    lib_path = system.file('src',
+                           package = 'nysatmoschem')
+    if (!dir.exists(lib_path)) {
+      stop('Could not find median file.')
+    }
+  }
   if (!grepl(lib_path, cur_paths, fixed = TRUE)) {
     if(.Platform$OS.type == "unix") {
       path_sep = ':'
@@ -91,6 +100,25 @@ update_clock_audits = function(pg, df) {
   dbxInsert(pg, 'clock_audits', df)
 }
 
+## Very weird issue-- this is find_schema from `etl`. But it must be
+## defined here to work with devtools, which makes adjustments to
+## `system.file` to run unit tests. devtools can't change the
+## `system.file` called by etl, so if I use etl's find_schema, my unit
+## tests break. *head explodes*
+find_schema <- function(obj, schema_name = "init",
+                        pkg = attr(obj, "pkg"), ext = NULL, ...) {
+  if (is.null(ext)) {
+    ext <- db_type(obj)
+  }
+  sql <- file.path("sql", paste0(schema_name, ".", ext))
+  file <- system.file(sql, package = pkg, mustWork = FALSE)
+  if (!file.exists(file)) {
+    message("Could not find schema initialization script")
+    return(NULL)
+  }
+  return(file)
+}
+
 #' My ETL functions
 #' @import etl
 #' @inheritParams etl::etl_init
@@ -119,7 +147,8 @@ etl_init.etl_nysatmoschem = function(obj, script = NULL, schema_name = "init",
   sql_files = c('utilities', 'setup', 'clock_errors',
                 'calibration', 'flags', 'processing')
   for (sql_file in sql_files) {
-    sql_file = etl::find_schema(obj, sql_file, ext = 'sql')
+    ## sql_file = etl::find_schema(obj, sql_file, ext = 'sql')
+    sql_file = find_schema(obj, sql_file, ext = 'sql')
     run_sql_script(pg, sql_file)
   }
 
