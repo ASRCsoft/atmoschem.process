@@ -8,6 +8,13 @@ library(nysatmoschem)
 dbname = basename(tempfile(pattern=''))
 system2('createdb', dbname)
 
+## make sure the temporary database is dropped even if there's an
+## error
+on.exit({
+  try(dbDisconnect(dbcon$con))
+  system2('dropdb', dbname)
+})
+
 ## set up the nysatmoschem schema
 dbcon = src_postgres(dbname = dbname)
 nysac = etl('nysatmoschem', db = dbcon, dir = 'data')
@@ -19,7 +26,3 @@ nysacdb_schema = dbGetQuery(dbcon$con, sQuery)
 ## don't include intermediate processing tables in this schema
 nysacdb_schema = subset(nysacdb_schema, !startsWith(table, '_'))
 save(nysacdb_schema, file = 'inst/extdata/nysacdb_schema.rda')
-
-## delete the temporary database
-dbDisconnect(dbcon$con)
-system2('dropdb', dbname)
