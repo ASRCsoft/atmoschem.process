@@ -29,8 +29,8 @@ median_transfn(PG_FUNCTION_ARGS)
   } else {
     state = (median_state *)PG_GETARG_POINTER(0);
   }
-  /* MediatorInsert(state->mediator, PG_GETARG_INT32(1)); */
-  MediatorInsert(state->mediator, PG_GETARG_FLOAT8(1));
+  MediatorInsert(state->mediator, PG_GETARG_FLOAT8(1),
+		 PG_ARGISNULL(1));
   PG_RETURN_POINTER(state);
 }
 
@@ -47,6 +47,8 @@ median_invtransfn(PG_FUNCTION_ARGS)
     elog(ERROR, "median_invtransfn called in non-aggregate context");
   }
   state = (median_state *)PG_GETARG_POINTER(0);
+  // do I need to pop anything?
+  // ...
   PG_RETURN_POINTER(state);
 }
 
@@ -86,6 +88,8 @@ mad_transfn(PG_FUNCTION_ARGS)
   mad_state *state;
   float new_median;
   float abs_dev;
+  int p_i;
+  int isnull;
   if (!AggCheckCallContext(fcinfo, &aggContext)) {
     elog(ERROR, "mad_transfn called in non-aggregate context");
   }
@@ -97,14 +101,16 @@ mad_transfn(PG_FUNCTION_ARGS)
   } else {
     state = (mad_state *)PG_GETARG_POINTER(0);
   }
-  MediatorInsert(state->median_mediator, PG_GETARG_FLOAT8(1));
+  MediatorInsert(state->median_mediator, PG_GETARG_FLOAT8(1),
+		 PG_ARGISNULL(1));
   new_median = MediatorMedian(state->median_mediator);
 
   if ((!PG_ARGISNULL(0)) &&
       new_median == state->previous_median) {
     /* update the running MAD */
     abs_dev = fabs(PG_GETARG_FLOAT8(1) - new_median);
-    MediatorInsert(state->mad_mediator, abs_dev);
+    MediatorInsert(state->mad_mediator, abs_dev,
+		   PG_ARGISNULL(1));
   } else {
     /* restart MAD calculations */
     free(state->mad_mediator);
@@ -112,9 +118,12 @@ mad_transfn(PG_FUNCTION_ARGS)
     /* refill with raw values which are stored in the
        median_mediator */
     for (int i=0; i<241; i++) {
+      // check that the value is not null
+      p_i = state->median_mediator->pos[i];
+      isnull = MediatorPosIsNull(state->median_mediator, p_i);
       abs_dev = fabs(state->median_mediator->data[i] -
   		     new_median);
-      MediatorInsert(state->mad_mediator, abs_dev);
+      MediatorInsert(state->mad_mediator, abs_dev, isnull);
     }
   }
   state->previous_median = new_median;
