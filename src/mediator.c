@@ -1,5 +1,5 @@
 //Copyright (c) 2011 ashelly.myopenid.com under <http://www.opensource.org/licenses/mit-license>
- 
+
 #include <stdlib.h>
  
 //Customize for your data Item type
@@ -134,16 +134,18 @@ void MediatorPopIdx(Mediator* m, int p)
        maxSortDown(m,-1);
      } else {
        minSortDown(m,p*2);
-     };
+     }
    }
    else if (p<0)   //item was in maxheap
    {
      if (switches_sides) {
+       printf("switches sides \n");
        maxSortUp(m,p);
-       minSortDown(m,-1);
+       minSortDown(m, 1);
      } else {
+       printf("not switching \n");
        maxSortDown(m,p*2);
-     };
+     }
    }
    else            //item was at median
    {
@@ -269,4 +271,14 @@ int main(int argc, char* argv[])
       printf("Median = %3f.\n\n",v);
       ShowTree(m);
    }
+
+   for (i=1;i<=3;i++)
+     {
+       printf("Popping oldest \n");
+       MediatorPopOldest(m);
+       v=MediatorMedian(m);
+       printf("Median = %3f.\n\n",v);
+       ShowTree(m);
+     }
+   
 } */

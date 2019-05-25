@@ -8,6 +8,7 @@ PG_MODULE_MAGIC;
 
 typedef struct median_state {
   Mediator *mediator;
+  int needs_inv;
 } median_state;
 
 
@@ -26,11 +27,14 @@ median_transfn(PG_FUNCTION_ARGS)
     // if the state hasn't been initialized yet
     state = MemoryContextAlloc(aggContext, sizeof(median_state));
     state->mediator = MediatorNew(241);
+    state->needs_inv = 0;
   } else {
     state = (median_state *)PG_GETARG_POINTER(0);
   }
   MediatorInsert(state->mediator, PG_GETARG_FLOAT8(1),
 		 PG_ARGISNULL(1));
+
+  state->needs_inv = 0;
   PG_RETURN_POINTER(state);
 }
 
@@ -47,8 +51,14 @@ median_invtransfn(PG_FUNCTION_ARGS)
     elog(ERROR, "median_invtransfn called in non-aggregate context");
   }
   state = (median_state *)PG_GETARG_POINTER(0);
-  // do I need to pop anything?
-  // ...
+
+  // When the window is shifted, invtransfn is called before transfn,
+  // but transfn does invtransfn's job in most cases. In the other
+  // cases, the finalfn can use this indicator to realize that
+  // invtransfn still needs to be run and do that before returning the
+  // final value. Also the inverse function only has an effect for
+  // non-null values.
+  state->needs_inv = !PG_ARGISNULL(1);
   PG_RETURN_POINTER(state);
 }
 
@@ -65,7 +75,15 @@ median_finalfn(PG_FUNCTION_ARGS)
   }
   state = PG_ARGISNULL(0) ? NULL : (median_state *)PG_GETARG_POINTER(0);
   if (state == NULL) PG_RETURN_NULL();
-  /* PG_RETURN_INT32(MediatorMedian(state->mediator)); */
+
+  if (state->needs_inv) {
+    // didn't run invtransfn because I was expecting transfn to run
+    // right afterward, but apparently that didn't happen. This is
+    // probably near the end of the sequence. So we'll just do the
+    // invtransfn here.
+    MediatorPopOldest(state->mediator);
+    state->needs_inv = 0;
+  }
   PG_RETURN_FLOAT8(MediatorMedian(state->mediator));
 }
 
