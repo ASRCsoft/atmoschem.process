@@ -349,16 +349,28 @@ CREATE materialized VIEW hourly_measurements as
 	   group by measurement_type_id, date_trunc('hour', measurement_time)) c1;
 create index hourly_measurements_idx on hourly_measurements(measurement_type_id, measurement_time);
 
-/* Update the processed data. */
-drop function if exists update_all cascade;
-CREATE OR REPLACE FUNCTION update_all()
+drop function if exists update_processing_inputs cascade;
+CREATE OR REPLACE FUNCTION update_processing_inputs()
   RETURNS void as $$
   refresh materialized view processed_observations;
   refresh materialized view calibration_values;
   refresh materialized view conversion_efficiencies;
   refresh materialized view freezing_clusters;
-  select update_processing(site_id, name)
-    from data_sources;
+$$ language sql;
+
+drop function if exists update_processing_outputs cascade;
+CREATE OR REPLACE FUNCTION update_processing_outputs()
+  RETURNS void as $$
   refresh materialized view processed_measurements;
   refresh materialized view hourly_measurements;
+$$ language sql;
+       
+/* Update the processed data. */
+drop function if exists update_all cascade;
+CREATE OR REPLACE FUNCTION update_all()
+  RETURNS void as $$
+  select update_processing_inputs();
+  select update_processing(site_id, name)
+    from data_sources;
+  select update_processing_outputs();
 $$ language sql;
