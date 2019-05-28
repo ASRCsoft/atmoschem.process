@@ -290,6 +290,26 @@ create or replace view psp_wood_smoke as
 	 flagged1 or flagged2 as flagged
     from combine_measures(3, 'envidas', 'BC1', 'BC6');
 
+-- u and v vector wind speeds
+drop view if exists psp_ws_components cascade;
+create or replace view psp_ws_components as
+  with wswd as (select measurement_time,
+		       value1 as ws,
+		       pi() * (270 - value2) / 180 as theta,
+		       flagged1 or flagged2 as flagged
+		  from combine_measures(3, 'envidas', 'VWS', 'VWD'))
+  select get_measurement_id(3, 'derived', 'WS_u'),
+	 measurement_time,
+	 ws * sin(theta) as value,
+	 flagged
+    from wswd
+   union
+  select get_measurement_id(3, 'derived', 'WS_v'),
+	 measurement_time,
+	 ws * cos(theta) as value,
+	 flagged
+    from wswd;
+
 /* Combine all processed data. */
 drop materialized view if exists processed_measurements cascade;
 CREATE materialized VIEW processed_measurements as
@@ -305,7 +325,8 @@ CREATE materialized VIEW processed_measurements as
    union select * from psp_teoma25_base
    union select * from psp_teombcrs_base
    union select * from psp_dichot10_base
-   union select * from psp_wood_smoke;
+   union select * from psp_wood_smoke
+   union select * from psp_ws_components;
 create index processed_measurements_idx on processed_measurements(measurement_type_id, measurement_time);
 
 /* Aggregate the processed data by hour using a function from
