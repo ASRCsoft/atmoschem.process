@@ -52,8 +52,10 @@ create or replace view calibrated_measurements as
    where apply_processing;
 
 drop function if exists process_measurements cascade;
-CREATE OR REPLACE FUNCTION process_measurements(measurement_type_ids int[])
-  RETURNS TABLE (
+CREATE OR REPLACE FUNCTION process_measurements(measurement_type_ids int[],
+						start_time timestamp,
+						end_time timestamp)
+RETURNS TABLE (
     measurement_type_id int,
     measurement_time timestamp,
     value numeric,
@@ -63,6 +65,8 @@ CREATE OR REPLACE FUNCTION process_measurements(measurement_type_ids int[])
     select *
       from calibrated_measurements
      where measurement_type_id = any(measurement_type_ids)
+       and (start_time is null or instrument_time>=(start_time - interval '1 day'))
+       and (end_time is null or instrument_time<=(end_time + interval '1 day'))
   ), measurement_medians as (
     /* Calculate running medians and running Median Absolute
        Deviations (MAD) using functions from filtering.sql. These
@@ -75,6 +79,9 @@ CREATE OR REPLACE FUNCTION process_measurements(measurement_type_ids int[])
 	   case when max_jump is not null then abs(value - lag(value) over w) > max_jump
 	   else false end as is_jump
       from calibrated_measurements_subset
+	   -- remove unneeded extra measurements
+     where (start_time is null or instrument_time>=start_time)
+       and (end_time is null or instrument_time<=end_time)
 	     WINDOW w AS (partition by measurement_type_id
 			  ORDER BY instrument_time
 			  rows between 120 preceding and 120 following)
@@ -146,14 +153,16 @@ CREATE OR REPLACE FUNCTION update_processing_inputs()
 $$ language sql;
 
 drop function if exists update_processing cascade;
-CREATE OR REPLACE FUNCTION update_processing(int, text)
+CREATE OR REPLACE FUNCTION update_processing(int, text, timestamp, timestamp)
   RETURNS void as $$
   delete
     from _processed_measurements
-   where measurement_type_id=any(get_data_source_ids($1, $2));
+   where measurement_type_id=any(get_data_source_ids($1, $2))
+     and ($3 is null or measurement_time>=$3)
+     and ($4 is null or measurement_time<=$4);
   insert into _processed_measurements
   select *
-    from process_measurements(get_data_source_ids($1, $2));
+    from process_measurements(get_data_source_ids($1, $2), $3, $4);
 $$ language sql;
 
 drop function if exists update_processing_outputs cascade;
@@ -164,10 +173,10 @@ CREATE OR REPLACE FUNCTION update_processing_outputs()
 $$ language sql;
 
 drop function if exists update_all cascade;
-CREATE OR REPLACE FUNCTION update_all()
+CREATE OR REPLACE FUNCTION update_all(timestamp, timestamp)
   RETURNS void as $$
   select update_processing_inputs();
-  select update_processing(site_id, name)
+  select update_processing(site_id, name, $1, $2)
     from data_sources;
   select update_processing_outputs();
 $$ language sql;
