@@ -6,8 +6,9 @@ create table manual_flags (
   aqs_flag text not null,
   explanation text,
   primary key(measurement_type_id, times),
-  CONSTRAINT no_overlapping_times EXCLUDE USING GIST (
+  CONSTRAINT no_duplicated_flags EXCLUDE USING GIST (
     measurement_type_id WITH =,
+    explanation WITH =,
     times WITH &&
   )
 );
