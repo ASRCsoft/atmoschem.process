@@ -77,6 +77,11 @@ CREATE or replace VIEW calibration_zeros AS
     from manual_calibrations m1
 	   join measurement_types m2
 	       on m1.measurement_type_id=m2.id
+  -- A few of these manual zero calibration values are bad and need to
+  -- be excluded. This seems like the least awkward way to do that for
+  -- now.
+   where not (measurement_type_id=get_measurement_id(3, 'envidas', 'NO-DEC')
+	      and upper(times)::date between '2018-10-23' and '2018-11-08')
      and type = 'zero';
 
 CREATE OR REPLACE FUNCTION interpolate_cal_zero(measurement_type_id int, t timestamp)
