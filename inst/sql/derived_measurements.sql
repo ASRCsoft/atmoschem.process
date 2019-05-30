@@ -144,16 +144,35 @@ drop view if exists psp_precip cascade;
 create or replace view psp_precip as
   select get_measurement_id(3, 'derived', 'Precip'),
 	 measurement_time,
-	 (case when value<=-.02 then value + .5
-	  else value end) * 25.4 as value,
-	 flagged
-    from (select measurement_time,
-		 value - lag(value) over w as value,
-		 flagged or lag(flagged) over w as flagged
-	    from _processed_measurements
-	   where measurement_type_id=get_measurement_id(3, 'envidas', 'Rain')
-		 WINDOW w AS (partition by measurement_type_id
-			      ORDER BY measurement_time)) r1;
+	 precip_value as value,
+	 (not precip_value<@(select valid_range
+			       from measurement_types
+			      where id=get_measurement_id(3, 'derived', 'Precip'))) or
+	   precip_value is null or
+	   precip_flagged as flagged
+    from (select *,
+                 -- carefully deal with value resets from 0.5 back to
+                 -- 0, which usually happens in only one minute, but
+                 -- sometimes takes two minutes with an average
+                 -- measurement (of the previous value and zero) in
+                 -- between
+		 (case when resetting
+			and not lag(resetting) over w
+			and not lead(resetting) over w then d1 + .5
+		  when resetting and lead(resetting) over w then .5 - lag(value) over w
+		  when resetting and lag(resetting) over w then value
+		  else d1 end) * 25.4 as precip_value,
+		 flagged or lag(flagged) over w as precip_flagged
+	    from (select *,
+			 d1<=-.02 as resetting
+		    from (select *,
+				 value - lag(value) over w as d1
+			    from _processed_measurements
+			   where measurement_type_id=get_measurement_id(3, 'envidas', 'Rain')
+				 WINDOW w AS (partition by measurement_type_id
+					      ORDER BY measurement_time)) r1) r2
+		   WINDOW w AS (partition by measurement_type_id
+				ORDER BY measurement_time)) r3;
 
 drop view if exists psp_teoma25_base cascade;
 create or replace view psp_teoma25_base as
