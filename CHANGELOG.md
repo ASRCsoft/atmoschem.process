@@ -13,6 +13,7 @@
 - Treat zero WindDir\_SD1\_WVT as an indicator of wind direction
   instrument malfunction.
 - Apply M1 flag to hours with >50% missing data.
+- Simplify data report format.
 
 ### Fixed
 - Fix bug ignoring ultrafine 'Nozzle Pressure' flag (400) instead of
@@ -20,3 +21,4 @@
 - Account for zero offsets when estimating calibration spans.
 - Correct miscalculated WFMS wind speeds from 2016 to 2019.
 - Fix PSP NO2 conversion efficiency calculations.
+- Fix PSP solar radiation zero offset.
