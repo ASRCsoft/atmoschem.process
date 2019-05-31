@@ -125,7 +125,7 @@ create or replace view wfms_hourly_winds as
    union
   select get_measurement_id(1, 'derived', 'WD_hourly') as measurement_type_id,
 	 measurement_time,
-	 (270 - (180 / pi()) * atan2(v, u))::numeric as value,
+	 (270 - (180 / pi()) * atan2(v, u))::numeric % 360 as value,
 	 get_hourly_flag(get_measurement_id(1, 'derived', 'WD_hourly'),
 			 0, n_values::int) as flag
     from windspeeds;
@@ -282,7 +282,7 @@ create or replace view psp_hourly_winds as
    union
   select get_measurement_id(3, 'derived', 'WD_hourly') as measurement_type_id,
 	 measurement_time,
-	 (270 - (180 / pi()) * atan2(v, u))::numeric as value,
+	 (270 - (180 / pi()) * atan2(v, u))::numeric % 360 as value,
 	 get_hourly_flag(get_measurement_id(3, 'derived', 'WD_hourly'),
 			 0, n_values::int) as flag
     from windspeeds;
