@@ -108,6 +108,36 @@ organize_report_data = function(con, site_name, dsname, vars,
       df2[df2[, col_n] == 'NA', col_n] = NA
     }
   }
+
+  ## if the report includes ultrafine data, need to include an AQS
+  ## flag column
+  if (freq == 'hourly' && 'Concentration' %in% vars) {
+    ultra_id = mtypes_df$id[match('Concentration', mtypes_df$name)]
+    q_ultra = paste0('select lower(times) as start_time, upper(times) as end_time, aqs_flag from manual_flags where measurement_type_id=',
+                     ultra_id, " and times&&'[", start_time,
+                     ",", end_time, "]'::tsrange order by lower(times) asc")
+    conc_flags = DBI::dbGetQuery(con, q_ultra)
+    df2$`Ultrafine (AQS)` = ''
+    if (nrow(conc_flags) > 0) {
+      for (n in 1:nrow(conc_flags)) {
+        affected_rows =
+          which(df2$`Time (EST)` >= conc_flags$start_time[n] &
+                df2$`Time (EST)` <= conc_flags$end_time[n] &
+                df2$`Ultrafine (NARSTO)` == 'M1')
+        if (length(affected_rows) > 0) {
+          df2$`Ultrafine (AQS)`[affected_rows] = conc_flags$aqs_flag[n]
+        }
+      }
+    }
+    ## if there are any unflagged M1 values left, give them a
+    ## miscellaneous void (AM)
+    df2$`Ultrafine (AQS)`[df2$`Ultrafine (NARSTO)` == 'M1' &
+                          df2$`Ultrafine (AQS)` == ''] = 'AM'
+    ## fix the column ordering
+    ultra_n = which(vars == 'Concentration')
+    df2 = df2[, c(1:(1 + ultra_n * 2), ncol(df2),
+                  (2 + ultra_n * 2):(ncol(df2) - 1))]
+  }
   
   df2
 }
