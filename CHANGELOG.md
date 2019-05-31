@@ -1,9 +1,16 @@
 # Changelog
 
+## [Unreleased]
+### Added
+- Add WFMS 2018 4th quarter data annotations.
+
 ## [0.1.0] - 2019-05-31
-### Changed
+### Added
 - Move raw data into PostgreSQL.
 - Automate data processing.
+- Add PSP 2018 4th quarter data annotations.
+
+### Changed
 - Correct for clock errors using linear interpolation rather than by
   discarding measurements with overlapping times.
 - Ignore ultrafine low pulse height flag.
