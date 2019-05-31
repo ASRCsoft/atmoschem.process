@@ -143,14 +143,14 @@ CREATE materialized VIEW hourly_measurements as
 	 get_hourly_flag(measurement_type_id, value::numeric, n_values::int) as flag
     from (select measurement_type_id,
 		 date_trunc('hour', measurement_time) as measurement_time,
-		 case when (select name like '%\_Max'
-			      from measurement_types
-			     where id=measurement_type_id)
-		   then max(value) FILTER (WHERE not flagged)
+		 case when name like '%\_Max' then max(value) FILTER (WHERE not flagged)
+		 when name='Precip' then sum(value) FILTER (WHERE not flagged)
 		 else avg(value) FILTER (WHERE not flagged) end as value,
 		 count(value) FILTER (WHERE not flagged) as n_values
-	    from processed_measurements
-	   group by measurement_type_id, date_trunc('hour', measurement_time)) c1
+	    from processed_measurements pm
+		   join measurement_types mt
+		       on pm.measurement_type_id=mt.id
+	   group by measurement_type_id, name, date_trunc('hour', measurement_time)) c1
    union select * from hourly_derived_measurements;
 create index hourly_measurements_idx on hourly_measurements(measurement_type_id, measurement_time);
 
