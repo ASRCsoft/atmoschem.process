@@ -50,6 +50,7 @@ create table measurement_types (
   data_source_id int references data_sources,
   name text not null,
   units text,
+  report_decimals int,
   apply_processing boolean,
   valid_range numrange,
   mdl numeric,

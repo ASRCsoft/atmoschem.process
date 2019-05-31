@@ -1,5 +1,7 @@
 ## generate reports
 
+fmt_decimals = function(x, k) format(round(x, k), trim = TRUE, nsmall = k)
+
 order_report_cols = function(df, vars, fill = NA) {
   for (v in vars) {
     if (!v %in% names(df)) {
@@ -96,6 +98,14 @@ organize_report_data = function(con, site_name, dsname, vars,
   ## reorder columns
   nvars = length(vars)
   df2 = df2[, c(1, rep(1:nvars, each=2) + 1 + rep(c(0, nvars), nvars))]
+  ## format number decimals
+  var_decimals = mtypes_df$report_decimals[match(vars, mtypes_df$name)]
+  for (n in 1:nvars) {
+    col_n = n * 2
+    if (!is.na(var_decimals[n])) {
+      df2[, col_n] = fmt_decimals(df2[, col_n], var_decimals[n])
+    }
+  }
   
   df2
 }
