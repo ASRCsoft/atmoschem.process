@@ -4,40 +4,24 @@ library(dplyr)
 library(DBI)
 
 pg = getShinyOption('pg')
-print('got pg')
 
 ## get sites and measurements
 measurements = as.data.frame(tbl(pg, 'measurement_types'))
-print(names(measurements))
-print(measurements)
 data_sources = as.data.frame(tbl(pg, 'data_sources'))
-print(data_sources)
 sites = as.data.frame(tbl(pg, 'sites'))
-print('got tables')
 measurements$data_source_name =
   data_sources$name[match(measurements$data_source_id, data_sources$id)]
-print(measurements$data_source_id)
-print('got data source names')
-print(measurements$data_source_name)
 measurements$site_id =
   data_sources$site_id[match(measurements$data_source_id, data_sources$id)]
-print('got site ids')
-print(measurements$site_id)
 measurements$site_name =
   sites$short_name[match(measurements$site_id, sites$id)]
-print('got site names')
-print(measurements$site_name)
 measurements$label = paste(measurements$site_name,
                            measurements$data_source_name,
                            measurements$name,
                            sep = ' / ')
-print('got labels')
 measurements = measurements[order(measurements$label), ]
-print('reordered measurements')
 measurements_dict = setNames(measurements$id,
                              measurements$label)
-print('created dict')
-print(measurements_dict)
 
 shinyUI(fluidPage(
     fluidRow(
