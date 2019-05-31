@@ -70,3 +70,9 @@ PSP,envidas,Concentration,"[2018-10-01 00:00, 2018-10-16 12:28)",AN,M651 (replac
 PSP,envidas,NOy,"[2018-11-02 10:45, 2018-11-02 11:06)",AT,calibration
 PSP,envidas,NO-DEC,"[2018-12-12 09:45, 2018-12-14 10:39)",AN,bypass pump box power cable pulled out - power off
 PSP,envidas,NOy-DEC,"[2018-12-12 09:45, 2018-12-14 10:39)",AN,bypass pump box power cable pulled out - power off
+PSP,envidas,Dichot(10)MC,"[2018-12-04 20:27, 2018-12-05 10:15)",AM,anomalous jumps
+PSP,envidas,Dichot(10)RefMC,"[2018-12-04 20:30, 2018-12-05 10:15)",AM,anomalous jumps
+PSP,envidas,TEOMA(2.5)MC,"[2018-12-04 20:30, 2018-12-05 10:15)",AM,anomalous jumps
+PSP,envidas,TEOMA(2.5)RefMC,"[2018-12-04 20:30, 2018-12-05 10:15)",AM,anomalous jumps
+PSP,envidas,TEOMB(crs)MC,"[2018-12-04 20:30, 2018-12-05 10:15)",AM,anomalous jumps
+PSP,envidas,TEOMB(crs)RefMC,"[2018-12-04 20:30, 2018-12-05 10:15)",AM,anomalous jumps
