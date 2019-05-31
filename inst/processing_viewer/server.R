@@ -100,12 +100,15 @@ get_ces = function(measure, t1, t2) {
     ## prevent RPostgreSQL from mucking with the time zones
     mutate(time = as.character(time)) %>%
     arrange(time) %>%
-    collect() %>%
+    collect()
+  if (nrow(results) == 0) {
+    return(NULL)
+  }
+  results = results %>%
     ## get the times back
     mutate(time = as.POSIXct(time, tz = 'GMT')) %>%
     gather(filtered, efficiency, -time) %>%
     mutate(filtered = filtered == 'filtered_efficiency')
-  results
 }
 
 make_processing_plot = function(m, t1, t2, logt = F,
@@ -139,7 +142,7 @@ make_processing_plot = function(m, t1, t2, logt = F,
     cals$filtered = F
     df_list$cals = cals
   }
-  if (has_ce && nrow(ces) > 0) {
+  if (has_ce && !is.null(ces) > 0) {
     ces$type = NA
     ces$label = 'Conversion Efficiency'
     ces$flagged = F
