@@ -111,6 +111,26 @@ get_ces = function(measure, t1, t2) {
     mutate(filtered = filtered == 'filtered_efficiency')
 }
 
+get_hourly = function(measure, t1, t2) {
+  pgtbl = tbl(pg, 'hourly_measurements')
+  results = pgtbl %>%
+    filter(measurement_type_id == measure &
+           measurement_time >= t1 &
+           measurement_time <= t2) %>%
+    select(measurement_time, value) %>%
+    ## prevent RPostgreSQL from mucking with the time zones
+    mutate(measurement_time = as.character(measurement_time)) %>%
+    arrange(measurement_time) %>%
+    collect()
+  if (nrow(results) > 0) {
+    results = results %>%
+      ## get the times back
+      mutate(measurement_time = as.POSIXct(measurement_time,
+                                           tz = 'GMT'))
+  }
+  results
+}
+
 make_processing_plot = function(m, t1, t2, logt = F,
                                 show_flagged = T) {
   ## get measurement info
@@ -125,7 +145,7 @@ make_processing_plot = function(m, t1, t2, logt = F,
   if (has_processing) processed = get_processed(m, t1, t2)
   if (has_cal) cals = get_cals(m, t1, t2)
   if (has_ce) ces = get_ces(m, t1, t2)
-  ## hourly = get_data(m, t1, t2)
+  if (has_processing) hourly = get_hourly(m, t1, t2)
 
   ## organize for ggplot2
   df_list = list()
@@ -156,12 +176,13 @@ make_processing_plot = function(m, t1, t2, logt = F,
     processed$filtered = F
     df_list$processed = processed
   }
-  ## if (nrow(hourly) > 0) {
-  ##   hourly$type = NA
-  ##   hourly$label = 'Hourly'
-  ##   hourly$flag = F
-  ##   df_list[['hourly']] = hourly
-  ## }
+  if (has_processing && nrow(hourly) > 0) {
+    hourly$type = NA
+    hourly$label = 'Hourly'
+    hourly$flag = FALSE
+    hourly$filtered = FALSE
+    df_list$hourly = hourly
+  }
   df_names = c('Time', 'Value', 'Type', 'Label', 'Flag', 'Filtered')
   for (df_name in names(df_list)) {
     names(df_list[[df_name]]) = df_names
