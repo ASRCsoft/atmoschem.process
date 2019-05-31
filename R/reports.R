@@ -98,15 +98,17 @@ organize_report_data = function(con, site_name, dsname, vars,
   ## reorder columns
   nvars = length(vars)
   df2 = df2[, c(1, rep(1:nvars, each=2) + 1 + rep(c(0, nvars), nvars))]
-  ## format number decimals
   var_decimals = mtypes_df$report_decimals[match(vars, mtypes_df$name)]
   for (n in 1:nvars) {
     col_n = n * 2
+    ## format number decimals
     if (!is.na(var_decimals[n])) {
       df2[, col_n] = fmt_decimals(df2[, col_n], var_decimals[n])
       ## replace NA strings with real NA's
       df2[df2[, col_n] == 'NA', col_n] = NA
     }
+    ## remove values with M1 flag
+    df2[df2[, col_n + 1] == 'M1', col_n] = NA
   }
 
   ## if the report includes ultrafine data, need to include an AQS
