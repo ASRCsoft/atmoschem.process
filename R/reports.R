@@ -104,6 +104,8 @@ organize_report_data = function(con, site_name, dsname, vars,
     col_n = n * 2
     if (!is.na(var_decimals[n])) {
       df2[, col_n] = fmt_decimals(df2[, col_n], var_decimals[n])
+      ## replace NA strings with real NA's
+      df2[df2[, col_n] == 'NA', col_n] = NA
     }
   }
   
@@ -121,16 +123,16 @@ generate_psp_report = function(con, start_time, end_time, freq = 'raw') {
   }
   vars = c('Thermo_O3', 'NO', 'NO-DEC', 'NO2', 'NOy', 'NOy-DEC', 'HNO3',
            'CO', 'SO2', 'WS_raw', ws, 'WD_raw', wd, 'AmbTemp',
-           'AmbRH', 'Precip', 'SR', 'BP', 'TEOMA(2.5)MC', 'TMD',
+           'AmbRH', 'Precip', 'SR2', 'BP', 'TEOMA(2.5)MC', 'TMD',
            'NGN3a-BScatt', 'Concentration', 'SLP', 'BC1', 'BC6',
            'Wood smoke')
   var_dict = c(Thermo_O3 = 'Ozone', `NO-DEC` = 'DEC_NO',
                `NOy-DEC` = 'DEC_NOy', VWS = 'WS', VWD = 'WD',
                WS_hourly = 'WS', WD_hourly = 'WD',
-               AmbTemp = 'Temp', AmbRH = 'RH', `TEOMA(2.5)MC` = 'TMC',
-               `NGN3a-BScatt` = 'Nephscat', Concentration = 'Ultrafine',
-               BC1 = 'BC1_370nm', BC6 = 'BC6_880nm',
-               `Wood smoke` = 'Woodsmoke')
+               AmbTemp = 'Temp', AmbRH = 'RH', SR2 = 'SR',
+               `TEOMA(2.5)MC` = 'TMC', `NGN3a-BScatt` = 'Nephscat',
+               Concentration = 'Ultrafine', BC1 = 'BC1_370nm',
+               BC6 = 'BC6_880nm', `Wood smoke` = 'Woodsmoke')
   unit_dict = c(WS_raw = 'm/s', WD_raw = 'degrees', TMD = 'ug/m3')
   organize_report_data(con, 'PSP', 'envidas', vars, start_time, end_time,
                        freq = freq, var_dict, unit_dict)

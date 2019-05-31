@@ -109,12 +109,14 @@ create or replace view wfms_hourly_winds as
   with windspeeds as (select date_trunc('hour', ws1.measurement_time) as measurement_time,
 			     avg(ws1.value) as u,
 			     avg(ws2.value) as v,
-			     count(*) FILTER (WHERE not ws1.flagged and not ws2.flagged) as n_values
+			     count(*) as n_values
 			from processed_measurements ws1 join
 			       processed_measurements ws2
 						       on ws1.measurement_time=ws2.measurement_time
 		       where ws1.measurement_type_id=get_measurement_id(1, 'derived', 'WS_u')
 			 and ws2.measurement_type_id=get_measurement_id(1, 'derived', 'WS_v')
+			 and not ws1.flagged
+			 and not ws2.flagged
 		       group by date_trunc('hour', ws1.measurement_time))
   select get_measurement_id(1, 'derived', 'WS_hourly') as measurement_type_id,
 	 measurement_time,
@@ -261,17 +263,28 @@ create or replace view psp_slp as
 	 flagged1 or flagged2 as flagged
     from combine_measures(3, 'envidas', 'BP', 'AmbTemp');
 
+drop view if exists psp_sr2 cascade;
+create or replace view psp_sr2 as
+  select get_measurement_id(3, 'derived', 'SR2'),
+	 measurement_time,
+	 value + 17.7 as value,
+	 flagged
+    from _processed_measurements
+   where measurement_type_id=get_measurement_id(3, 'envidas', 'SR');
+
 drop view if exists psp_hourly_winds cascade;
 create or replace view psp_hourly_winds as
   with windspeeds as (select date_trunc('hour', ws1.measurement_time) as measurement_time,
 			     avg(ws1.value) as u,
 			     avg(ws2.value) as v,
-			     count(*) FILTER (WHERE not ws1.flagged and not ws2.flagged) as n_values
+			     count(*) as n_values
 			from processed_measurements ws1 join
 			       processed_measurements ws2
 				 on ws1.measurement_time=ws2.measurement_time
 		       where ws1.measurement_type_id=get_measurement_id(3, 'derived', 'WS_u')
 			 and ws2.measurement_type_id=get_measurement_id(3, 'derived', 'WS_v')
+			 and not ws1.flagged
+			 and not ws2.flagged
 		       group by date_trunc('hour', ws1.measurement_time))
   select get_measurement_id(3, 'derived', 'WS_hourly') as measurement_type_id,
 	 measurement_time,
@@ -297,7 +310,8 @@ create or replace view derived_psp_measurements as
    union select * from psp_dichot10_base
    union select * from psp_wood_smoke
    union select * from psp_ws_components
-   union select * from psp_slp;
+   union select * from psp_slp
+   union select * from psp_sr2;
 
 /* Combine all derived measurements. */
 create or replace view derived_measurements as
