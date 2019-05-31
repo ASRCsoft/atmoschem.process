@@ -225,6 +225,16 @@ create or replace view psp_ws_components as
 	 flagged
     from wswd;
 
+drop view if exists psp_slp cascade;
+create or replace view psp_slp as
+  select get_measurement_id(3, 'derived', 'SLP'),
+	 measurement_time,
+	 value1 *
+	   (1 - .0065 * 504 /
+	   (value2 + .0065 * 504 + 273.15))^(-5.257) as value,
+	 flagged1 or flagged2 as flagged
+    from combine_measures(3, 'envidas', 'BP', 'AmbTemp');
+
 drop view if exists derived_psp_measurements cascade;
 create or replace view derived_psp_measurements as
   select * from psp_no2
@@ -234,7 +244,8 @@ create or replace view derived_psp_measurements as
    union select * from psp_teombcrs_base
    union select * from psp_dichot10_base
    union select * from psp_wood_smoke
-   union select * from psp_ws_components;
+   union select * from psp_ws_components
+   union select * from psp_slp;
 
 /* Combine all derived measurements. */
 create or replace view derived_measurements as
