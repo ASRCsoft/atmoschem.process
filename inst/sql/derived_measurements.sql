@@ -81,13 +81,13 @@ create or replace view wfms_ws_components as
 				 from _processed_measurements
 				where measurement_type_id=get_measurement_id(1, 'campbell', 'WindDir_D1_WVT')) wd1
 			     on ws1.measurement_time=wd1.measurement_time)
-  select get_measurement_id(1, 'derived', 'WS_u'),
+  select get_measurement_id(1, 'derived', 'WS_u') as measurement_type_id,
 	 measurement_time,
 	 (ws * sin(theta))::numeric as value,
 	 flagged
     from wswd
    union
-  select get_measurement_id(1, 'derived', 'WS_v'),
+  select get_measurement_id(1, 'derived', 'WS_v') as measurement_type_id,
 	 measurement_time,
 	 (ws * cos(theta))::numeric as value,
 	 flagged
@@ -103,6 +103,32 @@ create or replace view wfms_ws_max as
 		  else null end) as value,
 	 flagged1 and flagged2 as flagged
     from combine_measures(1, 'campbell', 'WS3Cup_Max', 'WS3CupB_Max');
+
+drop view if exists wfms_hourly_winds cascade;
+create or replace view wfms_hourly_winds as
+  with windspeeds as (select date_trunc('hour', ws1.measurement_time) as measurement_time,
+			     avg(ws1.value) as u,
+			     avg(ws2.value) as v,
+			     count(*) FILTER (WHERE not ws1.flagged and not ws2.flagged) as n_values
+			from processed_measurements ws1 join
+			       processed_measurements ws2
+						       on ws1.measurement_time=ws2.measurement_time
+		       where ws1.measurement_type_id=get_measurement_id(1, 'derived', 'WS_u')
+			 and ws2.measurement_type_id=get_measurement_id(1, 'derived', 'WS_v')
+		       group by date_trunc('hour', ws1.measurement_time))
+  select get_measurement_id(1, 'derived', 'WS_hourly') as measurement_type_id,
+	 measurement_time,
+	 sqrt(u^2 + v^2)::numeric as value,
+	 get_hourly_flag(get_measurement_id(1, 'derived', 'WS_hourly'),
+			 0, n_values::int) as flag
+    from windspeeds
+   union
+  select get_measurement_id(1, 'derived', 'WD_hourly') as measurement_type_id,
+	 measurement_time,
+	 (270 - (180 / pi()) * atan2(v, u))::numeric as value,
+	 get_hourly_flag(get_measurement_id(1, 'derived', 'WD_hourly'),
+			 0, n_values::int) as flag
+    from windspeeds;
 
 drop view if exists derived_wfms_measurements cascade;
 create or replace view derived_wfms_measurements as
@@ -213,13 +239,13 @@ create or replace view psp_ws_components as
 		       pi() * (270 - value2) / 180 as theta,
 		       flagged1 or flagged2 as flagged
 		  from combine_measures(3, 'envidas', 'VWS', 'VWD'))
-  select get_measurement_id(3, 'derived', 'WS_u'),
+  select get_measurement_id(3, 'derived', 'WS_u') as measurement_type_id,
 	 measurement_time,
 	 (ws * sin(theta))::numeric as value,
 	 flagged
     from wswd
    union
-  select get_measurement_id(3, 'derived', 'WS_v'),
+  select get_measurement_id(3, 'derived', 'WS_v') as measurement_type_id,
 	 measurement_time,
 	 (ws * cos(theta))::numeric as value,
 	 flagged
@@ -234,6 +260,32 @@ create or replace view psp_slp as
 	   (value2 + .0065 * 504 + 273.15))^(-5.257) as value,
 	 flagged1 or flagged2 as flagged
     from combine_measures(3, 'envidas', 'BP', 'AmbTemp');
+
+drop view if exists psp_hourly_winds cascade;
+create or replace view psp_hourly_winds as
+  with windspeeds as (select date_trunc('hour', ws1.measurement_time) as measurement_time,
+			     avg(ws1.value) as u,
+			     avg(ws2.value) as v,
+			     count(*) FILTER (WHERE not ws1.flagged and not ws2.flagged) as n_values
+			from processed_measurements ws1 join
+			       processed_measurements ws2
+				 on ws1.measurement_time=ws2.measurement_time
+		       where ws1.measurement_type_id=get_measurement_id(3, 'derived', 'WS_u')
+			 and ws2.measurement_type_id=get_measurement_id(3, 'derived', 'WS_v')
+		       group by date_trunc('hour', ws1.measurement_time))
+  select get_measurement_id(3, 'derived', 'WS_hourly') as measurement_type_id,
+	 measurement_time,
+	 sqrt(u^2 + v^2)::numeric as value,
+	 get_hourly_flag(get_measurement_id(3, 'derived', 'WS_hourly'),
+			 0, n_values::int) as flag
+    from windspeeds
+   union
+  select get_measurement_id(3, 'derived', 'WD_hourly') as measurement_type_id,
+	 measurement_time,
+	 (270 - (180 / pi()) * atan2(v, u))::numeric as value,
+	 get_hourly_flag(get_measurement_id(3, 'derived', 'WD_hourly'),
+			 0, n_values::int) as flag
+    from windspeeds;
 
 drop view if exists derived_psp_measurements cascade;
 create or replace view derived_psp_measurements as
@@ -251,3 +303,7 @@ create or replace view derived_psp_measurements as
 create or replace view derived_measurements as
   select * from derived_wfms_measurements
    union select * from derived_psp_measurements;
+
+create or replace view hourly_derived_measurements as
+  select * from wfms_hourly_winds
+   union select * from psp_hourly_winds;

@@ -124,6 +124,17 @@ create index processed_measurements_idx on processed_measurements(measurement_ty
 
 /* Aggregate the processed data by hour using a function from
    flags.sql. */
+
+/* This is another placeholder for derived values. */
+drop view if exists hourly_derived_measurements cascade;
+create or replace view hourly_derived_measurements as
+  select *
+    from (select 1 as measurement_type_id,
+		 '2099-01-01'::timestamp as measurement_time,
+		 1.5 as value,
+		 'M1' as flag) t1
+   limit 0;
+
 drop materialized view if exists hourly_measurements cascade;
 CREATE materialized VIEW hourly_measurements as
   select measurement_type_id,
@@ -139,7 +150,8 @@ CREATE materialized VIEW hourly_measurements as
 		 else avg(value) FILTER (WHERE not flagged) end as value,
 		 count(value) FILTER (WHERE not flagged) as n_values
 	    from processed_measurements
-	   group by measurement_type_id, date_trunc('hour', measurement_time)) c1;
+	   group by measurement_type_id, date_trunc('hour', measurement_time)) c1
+   union select * from hourly_derived_measurements;
 create index hourly_measurements_idx on hourly_measurements(measurement_type_id, measurement_time);
 
 /* Update the processed data. */
