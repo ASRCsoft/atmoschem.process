@@ -36,6 +36,7 @@ create table observations (
   time timestamp not null,
   unique(file_id, line)
 );
+CREATE INDEX observations_time_idx ON observations(time);
 
 create table clock_audits (
   data_source_id int references data_sources,

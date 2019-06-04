@@ -61,7 +61,7 @@ create or replace view calibration_periods as
 		 times as cal_times
 	    from autocals) a1;
 
-CREATE or replace VIEW calibration_zeros AS
+CREATE materialized VIEW calibration_zeros AS
   select measurement_type_id,
 	 type,
 	 upper(cal_times) as cal_time,
@@ -85,6 +85,7 @@ CREATE or replace VIEW calibration_zeros AS
    where not (measurement_type_id=get_measurement_id(3, 'envidas', 'NO-DEC')
 	      and upper(times)::date between '2018-10-23' and '2018-11-08')
      and type = 'zero';
+CREATE INDEX calibration_zeros_time_idx ON calibration_zeros(measurement_type_id, type, cal_time);
 
 CREATE OR REPLACE FUNCTION interpolate_cal_zero(measurement_type_id int, t timestamp)
   RETURNS numeric AS $$
