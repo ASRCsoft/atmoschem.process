@@ -30,20 +30,22 @@ create table manual_calibrations (
 );
 
 create or replace function estimate_cal(measurement_type int, cal_type text, cal_times tsrange) returns numeric as $$
-select case when cal_type='zero' then min(moving_average)
-       else max(moving_average) end
-  from (select instrument_time,
-	       AVG(value) OVER(partition by measurement_type_id
-			       ORDER BY instrument_time
-			       ROWS BETWEEN 1 PRECEDING AND 1 following) as moving_average
-	  from measurements2
-	 where measurement_type_id=$1
-	   and instrument_time between (lower(cal_times) - interval '2 minutes') and (upper(cal_times) + interval '2 minutes')) moving_averages
-  -- ignore first 15 minutes of span calibration data due to spikes I
-  -- think?
-  where instrument_time <@ case when cal_type!='span' then cal_times
-			   else tsrange(lower(cal_times) + interval '15 minutes', upper(cal_times)) end;
-$$ language sql STABLE PARALLEL SAFE;
+  begin
+    return case when cal_type='zero' then min(moving_average)
+	   else max(moving_average) end
+      from (select instrument_time,
+		   AVG(value) OVER(partition by measurement_type_id
+				   ORDER BY instrument_time
+				   ROWS BETWEEN 1 PRECEDING AND 1 following) as moving_average
+	      from measurements2
+	     where measurement_type_id=$1
+	       and instrument_time between (lower(cal_times) - interval '2 minutes') and (upper(cal_times) + interval '2 minutes')) moving_averages
+      -- ignore first 15 minutes of span calibration data due to spikes I
+      -- think?
+     where instrument_time <@ case when cal_type!='span' then cal_times
+	   else tsrange(lower(cal_times) + interval '15 minutes', upper(cal_times)) end;
+  end;
+$$ language plpgsql STABLE PARALLEL SAFE;
 
 create or replace view calibration_periods as
   select measurement_type_id,
