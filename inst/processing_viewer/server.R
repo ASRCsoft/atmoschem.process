@@ -78,18 +78,10 @@ get_cals = function(measure, t1, t2) {
 }
 
 get_ces = function(measure, t1, t2) {
-  # check if m is NO2, and in that case replace with NOx
   m_info = measurements_df[measurements_df$id == measure, ]
   m_name = m_info$name
   m_ds_id = m_info$data_source_id
   m_site = data_sources$site_id[data_sources$id == m_ds_id]
-  if (m_name == 'NO2' & m_site == 1) {
-    # find NOx
-    m2 = measurements_df[measurements_df$name == 'NOx' &
-                         measurements_df$site_id == 1, ]
-    # replace NO2 with NOx
-    measure = m2$id
-  }
   pgtbl = tbl(pg, 'conversion_efficiencies')
   results = pgtbl %>%
     mutate(time = cal_time) %>%

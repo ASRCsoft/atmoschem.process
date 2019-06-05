@@ -317,6 +317,12 @@ create or replace view _conversion_efficiencies AS
    where measured_value is not null;
 
 create or replace view derived_conversion_efficiencies AS
+  select get_measurement_id(1, 'derived', 'NO2'),
+	 cal_time,
+	 efficiency
+    from _conversion_efficiencies
+   where measurement_type_id=get_measurement_id(1, 'campbell', 'NOx')
+   union
   select get_measurement_id(3, 'derived', 'NO2'),
 	 c2.cal_time,
 	 (apply_calib(c3.measurement_type_id, c3.measured_value, c3.cal_time) -

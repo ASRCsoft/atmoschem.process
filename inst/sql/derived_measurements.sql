@@ -40,7 +40,7 @@ create or replace view wfms_no2 as
     from (select get_measurement_id(1, 'derived', 'NO2') as measurement_type_id,
 		 measurement_time,
 		 (value2 - value1) /
-		   interpolate_ce(get_measurement_id(1, 'campbell', 'NOx'),
+		   interpolate_ce(get_measurement_id(1, 'derived', 'NO2'),
 				  measurement_time) as value,
 		 flagged1 or flagged2 as flagged
 	    from combine_measures(1, 'campbell', 'NO', 'NOx')) cm1
