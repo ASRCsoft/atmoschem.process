@@ -104,6 +104,14 @@ create or replace view wfms_ws_max as
 	 flagged1 and flagged2 as flagged
     from combine_measures(1, 'campbell', 'WS3Cup_Max', 'WS3CupB_Max');
 
+drop view if exists wfms_wood_smoke cascade;
+create or replace view wfms_wood_smoke as
+  select get_measurement_id(1, 'derived', 'Wood smoke'),
+	 measurement_time,
+	 value1 - value2 as value,
+	 flagged1 or flagged2 as flagged
+    from combine_measures(1, 'aethelometer', 'concentration_370', 'concentration_880');
+
 drop view if exists wfms_hourly_winds cascade;
 create or replace view wfms_hourly_winds as
   with windspeeds as (select date_trunc('hour', ws1.measurement_time) as measurement_time,
@@ -138,7 +146,8 @@ create or replace view derived_wfms_measurements as
    union select * from wfms_slp
    union select * from wfms_ws
    union select * from wfms_ws_max
-   union select * from wfms_ws_components;
+   union select * from wfms_ws_components
+   union select * from wfms_wood_smoke;
 
 /* PSP */
 drop view if exists psp_no2 cascade;
