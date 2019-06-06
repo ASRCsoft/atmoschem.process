@@ -194,7 +194,8 @@ get_measurement_type_id = function(pg, site,
     add_new_measurement_types(pg, site, data_source,
                               name)
   }
-  data_source_id = get_data_source_id(pg, site, data_source)
+  data_source_id = get_data_source_id(pg, site, data_source,
+                                      add_new)
   df = data.frame(data_source_id = data_source_id,
                   name = name)
   get_id_from_pg(pg, df, 'measurement_types')
