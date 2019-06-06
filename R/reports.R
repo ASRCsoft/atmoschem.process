@@ -22,13 +22,23 @@ organize_report_data = function(con, site_name, dsname, vars,
 
   ## get the measurement type ID's
   mtype_ids = get_measurement_type_id(con, site_name,
-                                      dsname, vars,
+                                      dsname[1], vars,
                                       add_new = FALSE)
+  if (length(dsname) > 1) {
+    for (n in 2:length(dsname)) {
+      mtype_ids2 = get_measurement_type_id(con, site_name,
+                                           dsname[n], vars,
+                                           add_new = FALSE)
+      print(mtype_ids2)
+      mtype_ids[is.na(mtype_ids)] = mtype_ids2[is.na(mtype_ids)]
+    }
+  }
   ## also look in the derived values at the site
   mtype_derived_ids = get_measurement_type_id(con, site_name,
                                               'derived', vars,
                                               add_new = FALSE)
   mtype_ids[is.na(mtype_ids)] = mtype_derived_ids[is.na(mtype_ids)]
+  print(mtype_ids)
 
   ## get measurement units
   mtypes_df = DBI::dbReadTable(con, 'measurement_types')
@@ -142,6 +152,31 @@ organize_report_data = function(con, site_name, dsname, vars,
   }
   
   df2
+}
+
+#' @export
+generate_wfms_report = function(con, start_time, end_time, freq = 'raw') {
+  if (freq == 'raw') {
+    ws = 'WS'
+    wd = 'WindDir_D1_WVT'
+  } else {
+    ws = 'WS_hourly'
+    wd = 'WD_hourly'
+  }
+  vars = c('NO', 'NO2', 'NOy', 'Ozone', 'CO', 'SO2',
+           'T', 'RH', ws, 'WD', wd, 'WS_Max', 'BP',
+           'SLP', 'Concentration',
+           'concentration_370', 'concentration_880',
+           'Wood smoke')
+  var_dict = c(WindDir_D1_WVT = 'WD_V',
+               WS_hourly = 'WS', WD_hourly = 'WD_V',
+               Concentration = 'Ultrafine PM',
+               concentration_370 = 'BC1_370nm',
+               concentration_880 = 'BC6_880nm',
+               `Wood smoke` = 'Woodsmoke')
+  data_sources = c('campbell', 'ultrafine', 'aethelometer')
+  organize_report_data(con, 'WFMS', data_sources, vars, start_time, end_time,
+                       freq = freq, var_dict, unit_dict)
 }
 
 #' @export
