@@ -1,7 +1,7 @@
 
 ## only load the data if the file hasn't been loaded already
 even_smarter_upload = function(obj, f, site, ds,
-                               tbl_name) {
+                               tbl_name, clobber = FALSE) {
   is_calibration = ds == 'calibrations'
   for (f_i in f) {
     file_id = get_file_id(obj$con, site, ds,
@@ -12,7 +12,19 @@ even_smarter_upload = function(obj, f, site, ds,
       file_id = get_file_id(obj$con, site, ds,
                             f_i, is_calibration)
     } else {
-      next()
+      if (clobber) {
+        ## remove the existing file data
+        rmv_meas_sql = paste0('delete from measurements where observation_id in (select id from observations where file_id=',
+                              file_id, ')')
+        print(rmv_meas_sql)
+        DBI::dbSendQuery(obj$con, rmv_meas_sql)
+        rmv_obs_sql = paste0('delete from observations where file_id=',
+                             file_id)
+        print(rmv_obs_sql)
+        DBI::dbSendQuery(obj$con, rmv_obs_sql)
+      } else {
+        next()
+      }
     }
     df = read.csv(f_i)
     if (nrow(df) == 0) next()
@@ -60,14 +72,15 @@ even_smarter_upload = function(obj, f, site, ds,
   }
 }
 
-load_file = function(obj, f, site, ds) {
+load_file = function(obj, f, site, ds, ...) {
   is_calibration = ds == 'calibrations'
   if (is_calibration) {
     tbl_name = 'manual_calibrations'
   } else {
     tbl_name = 'measurements'
   }
-  even_smarter_upload(obj, f, site, ds, tbl_name)
+  even_smarter_upload(obj, f, site, ds,
+                      tbl_name, ...)
 }
 
 #' @import etl
@@ -101,7 +114,7 @@ etl_load.etl_nysatmoschem = function(obj, sites = NULL, data_sources = NULL, yea
       f_paths = file.path(attr(obj, 'load_dir'), site,
                           ds, year_files)
       message(paste('Loading', site, '/', ds, 'files...'))
-      load_file(obj, f_paths, site, ds)
+      load_file(obj, f_paths, site, ds, ...)
     }
   }
   
