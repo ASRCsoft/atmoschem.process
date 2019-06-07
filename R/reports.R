@@ -174,6 +174,7 @@ generate_wfms_report = function(con, start_time, end_time, freq = 'raw') {
                concentration_370 = 'BC1_370nm',
                concentration_880 = 'BC6_880nm',
                `Wood smoke` = 'Woodsmoke')
+  unit_dict = c(WD = 'degrees')
   data_sources = c('campbell', 'ultrafine', 'aethelometer')
   organize_report_data(con, 'WFMS', data_sources, vars, start_time, end_time,
                        freq = freq, var_dict, unit_dict)

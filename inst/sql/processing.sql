@@ -146,7 +146,12 @@ CREATE materialized VIEW hourly_measurements as
 		 case when name like '%\_Max' then max(value) FILTER (WHERE not flagged)
 		 when name='Precip' then sum(value) FILTER (WHERE not flagged)
 		 else avg(value) FILTER (WHERE not flagged) end as value,
-		 count(value) FILTER (WHERE not flagged) as n_values
+		 case when pm.measurement_type_id=any(get_data_source_ids(1, 'aethelometer'))
+			or pm.measurement_type_id=get_measurement_id(1, 'derived', 'Wood smoke')
+		 -- the aethelometer only records values every 15
+		 -- minutes, have to adjust the count to compensate
+		   then (count(value) FILTER (WHERE not flagged)) * 15
+		 else count(value) FILTER (WHERE not flagged) end as n_values
 	    from processed_measurements pm
 		   join measurement_types mt
 		       on pm.measurement_type_id=mt.id

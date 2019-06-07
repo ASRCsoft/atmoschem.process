@@ -1,4 +1,8 @@
 site,data_source,measurement_name,times,aqs_flag,explanation
+WFMS,campbell,CO,"[2018-10-03 08:50, 2018-10-03 09:05)",AT,calibration
+WFMS,campbell,CO,"[2018-10-09 06:26, 2018-10-09 06:32)",AT,calibration
+WFMS,campbell,CO,"[2018-10-10 08:45, 2018-10-10 08:52)",AT,calibration
+WFMS,campbell,NOy,"[2018-10-01 00:00, 2018-10-03 12:00)",AN,instrument malfunction
 WFMS,campbell,NO,"[2018-12-05 10:13, 2018-12-05 11:28)",AT,manual calibration
 WFMS,campbell,NOx,"[2018-12-05 10:13, 2018-12-05 11:28)",AT,manual calibration
 WFMS,campbell,NOy,"[2018-12-05 10:13, 2018-12-05 11:28)",AT,manual calibration
@@ -41,6 +45,7 @@ WFMS,campbell,SO2,"[2018-11-20 00:00, 2018-11-23 00:00)",AC,elevator constructio
 WFMS,campbell,SO2,"[2018-11-29 00:00, 2018-12-01 00:00)",AC,elevator construction
 WFMS,campbell,Ozone,"[2018-10-15 21:30, 2018-10-15 23:45)",AT,manual calibration
 WFMS,campbell,NOy,"[2018-09-27 13:00, 2018-10-03 10:00)",AN,unknown error
+WFMS,campbell,CO,"[2018-12-27 14:26, 2018-12-27 14:38)",AT,calibration
 PSP,envidas,CO,"[2018-10-03 07:08, 2018-10-03 08:00)",AN,instrument reset
 PSP,envidas,Dichot(10)MC,"[2018-10-04 12:01, 2018-10-04 14:46)",AT,calibration
 PSP,envidas,Dichot(10)RefMC,"[2018-10-04 12:01, 2018-10-04 14:46)",AT,calibration
