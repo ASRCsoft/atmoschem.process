@@ -48,12 +48,12 @@ organize_report_data = function(con, site_name, dsname, vars,
   sql_mtypes = paste(na.omit(mtype_ids), collapse = ', ')
   if (freq == 'raw') {
     q1 = paste0('select * from processed_measurements where measurement_type_id in (',
-                sql_mtypes, ") and measurement_time>='",
-                start_time, "' and measurement_time<'", end_time, "'")
+                sql_mtypes, ") and time>='",
+                start_time, "' and time<'", end_time, "'")
   } else {
     q1 = paste0('select * from hourly_measurements where measurement_type_id in (',
-                sql_mtypes, ") and measurement_time>='",
-                start_time, "' and measurement_time<'", end_time, "'")
+                sql_mtypes, ") and time>='",
+                start_time, "' and time<'", end_time, "'")
   }
 
   df1 = DBI::dbGetQuery(con, q1)
@@ -163,11 +163,6 @@ generate_wfms_report = function(con, start_time, end_time, freq = 'raw') {
     ws = 'WS_hourly'
     wd = 'WD_hourly'
   }
-  vars = c('NO', 'NO2', 'NOy', 'Ozone', 'CO', 'SO2',
-           'T', 'RH', ws, 'WD', wd, 'WS_Max', 'BP',
-           'SLP', 'Concentration',
-           'concentration_370', 'concentration_880',
-           'Wood smoke')
   var_dict = c(WindDir_D1_WVT = 'WD_V',
                WS_hourly = 'WS', WD_hourly = 'WD_V',
                Concentration = 'Ultrafine PM',
@@ -175,9 +170,35 @@ generate_wfms_report = function(con, start_time, end_time, freq = 'raw') {
                concentration_880 = 'BC6_880nm',
                `Wood smoke` = 'Woodsmoke')
   unit_dict = c(WD = 'degrees')
-  data_sources = c('campbell', 'ultrafine', 'aethelometer')
-  organize_report_data(con, 'WFMS', data_sources, vars, start_time, end_time,
-                       freq = freq, var_dict, unit_dict)
+  if (freq == 'hourly') {
+    vars = c('NO', 'NO2', 'NOy', 'Ozone', 'CO', 'SO2',
+             'T', 'RH', ws, 'WD', wd, 'WS_Max', 'BP',
+             'SLP', 'Concentration',
+             'concentration_370', 'concentration_880',
+             'Wood smoke')
+    data_sources = c('campbell', 'ultrafine', 'aethelometer')
+    organize_report_data(con, 'WFMS', data_sources, vars, start_time, end_time,
+                         freq = freq, var_dict, unit_dict)
+  } else if (freq == 'raw') {
+    ## return one data frame per data source
+    vars = c('NO', 'NO2', 'NOy', 'Ozone', 'CO', 'SO2',
+             'T', 'RH', ws, 'WD', wd, 'WS_Max', 'BP',
+             'SLP')
+    campbell_df = organize_report_data(con, 'WFMS', 'campbell',
+                                       vars, start_time, end_time,
+                                       freq = freq, var_dict, unit_dict)
+    vars = 'Concentration'
+    ultrafine_df = organize_report_data(con, 'WFMS', 'ultrafine',
+                                        vars, start_time, end_time,
+                                        freq = freq, var_dict, unit_dict)
+    vars = c('concentration_370', 'concentration_880',
+             'Wood smoke')
+    aeth_df = organize_report_data(con, 'WFMS', 'aethelometer',
+                                       vars, start_time, end_time,
+                                   freq = freq, var_dict, unit_dict)
+    list(campbell = campbell_df, ultrafine = ultrafine_df,
+         aethelometer = aeth_df)
+  }
 }
 
 #' @export
