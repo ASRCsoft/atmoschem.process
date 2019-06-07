@@ -28,31 +28,31 @@ $$ LANGUAGE sql stable parallel safe;
 -- see if the anemometers look frozen
 CREATE or replace VIEW wind_looks_frozen AS
   select measurement_type_id,
-	 instrument_time,
+	 time,
 	 (bit_and(slow_wind::int) over w)::boolean as looks_frozen
     from (select measurement_type_id,
-		 instrument_time,
+		 time,
 		 value < .2 as slow_wind
 	    from measurements2
 	   where measurement_type_id=any(anemometer_ids())) w1
 	   window w as (partition by measurement_type_id
-			order by instrument_time
+			order by time
 			rows between current row and 30 following);
 
 -- get contiguous periods of frozen anemometer times
 CREATE or replace VIEW contiguous_freezes AS
   select measurement_type_id,
-	 tsrange(min(instrument_time) - interval '1 hour',
-		 max(instrument_time) + interval '40 minutes') as freezing_times
+	 tsrange(min(time) - interval '1 hour',
+		 max(time) + interval '40 minutes') as freezing_times
     from (select *,
 		 sum(freeze_starts::int) over w as freeze_group
 	    from (select *,
 			 looks_frozen and not lag(looks_frozen) over w as freeze_starts
 		    from wind_looks_frozen
 			   window w as (partition by measurement_type_id
-					order by instrument_time)) w1
+					order by time)) w1
 		   window w as (partition by measurement_type_id
-				order by instrument_time)) w2
+				order by time)) w2
    where looks_frozen
    group by measurement_type_id, freeze_group;
 
@@ -68,7 +68,7 @@ CREATE or replace VIEW contiguous_cold_freezes AS
 	       on mt1.data_source_id=mt2.data_source_id
 	   join measurements2 m1
 	       on m1.measurement_type_id=mt2.id
-	       and m1.instrument_time=(lower(freezing_times) + interval '1 hour')
+	       and m1.time=(lower(freezing_times) + interval '1 hour')
    where mt2.name='T'
      and m1.value<5;
 

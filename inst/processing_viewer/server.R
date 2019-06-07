@@ -20,19 +20,18 @@ get_raw = function(measure, t1, t2) {
   pgtbl = tbl(pg, 'measurements2')
   results = pgtbl %>%
     filter(measurement_type_id == measure &
-           instrument_time >= t1 &
-           instrument_time <= t2) %>%
-    select(instrument_time, value, flagged) %>%
+           time >= t1 &
+           time <= t2) %>%
+    select(time, value, flagged) %>%
     mutate(flagged = !is.na(flagged) & flagged,
            ## prevent RPostgreSQL from mucking with the time zones
-           instrument_time = as.character(instrument_time)) %>%
-    arrange(instrument_time) %>%
+           time = as.character(time)) %>%
+    arrange(time) %>%
     collect()
   if (nrow(results) > 0) {
     results = results %>%
       ## get the times back
-      mutate(instrument_time = as.POSIXct(instrument_time,
-                                          tz = 'GMT'))
+      mutate(time = as.POSIXct(time, tz = 'GMT'))
   }
   results
 }
@@ -41,18 +40,17 @@ get_processed = function(measure, t1, t2) {
   pgtbl = tbl(pg, 'processed_measurements')
   results = pgtbl %>%
     filter(measurement_type_id == measure &
-           measurement_time >= t1 &
-           measurement_time <= t2) %>%
-    select(measurement_time, value, flagged) %>%
+           time >= t1 &
+           time <= t2) %>%
+    select(time, value, flagged) %>%
     ## prevent RPostgreSQL from mucking with the time zones
-    mutate(measurement_time = as.character(measurement_time)) %>%
-    arrange(measurement_time) %>%
+    mutate(time = as.character(time)) %>%
+    arrange(time) %>%
     collect()
   if (nrow(results) > 0) {
     results = results %>%
       ## get the times back
-      mutate(measurement_time = as.POSIXct(measurement_time,
-                                           tz = 'GMT'))
+      mutate(time = as.POSIXct(time, tz = 'GMT'))
   }
   results
 }
@@ -60,7 +58,6 @@ get_processed = function(measure, t1, t2) {
 get_cals = function(measure, t1, t2) {
   pgtbl = tbl(pg, 'calibration_values')
   results = pgtbl %>%
-    mutate(time = cal_time) %>%
     filter(measurement_type_id == measure &
            time >= t1 &
            time <= t2) %>%
@@ -84,7 +81,6 @@ get_ces = function(measure, t1, t2) {
   m_site = data_sources$site_id[data_sources$id == m_ds_id]
   pgtbl = tbl(pg, 'conversion_efficiencies')
   results = pgtbl %>%
-    mutate(time = cal_time) %>%
     filter(measurement_type_id == measure &
            time >= t1 &
            time <= t2) %>%
@@ -107,18 +103,17 @@ get_hourly = function(measure, t1, t2) {
   pgtbl = tbl(pg, 'hourly_measurements')
   results = pgtbl %>%
     filter(measurement_type_id == measure &
-           measurement_time >= t1 &
-           measurement_time <= t2) %>%
-    select(measurement_time, value) %>%
+           time >= t1 &
+           time <= t2) %>%
+    select(time, value) %>%
     ## prevent RPostgreSQL from mucking with the time zones
-    mutate(measurement_time = as.character(measurement_time)) %>%
-    arrange(measurement_time) %>%
+    mutate(time = as.character(time)) %>%
+    arrange(time) %>%
     collect()
   if (nrow(results) > 0) {
     results = results %>%
       ## get the times back
-      mutate(measurement_time = as.POSIXct(measurement_time,
-                                           tz = 'GMT'))
+      mutate(time = as.POSIXct(time, tz = 'GMT'))
   }
   results
 }

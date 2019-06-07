@@ -75,7 +75,7 @@ create table measurements (
 -- other code will often want to see the measurements along with the
 -- time
 create or replace view measurements2 as
-  select time as instrument_time,
+  select time,
 	 m1.*
     from measurements m1
 	   join observations o1
