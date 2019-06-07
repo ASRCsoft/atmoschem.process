@@ -18,9 +18,11 @@ transform_wfms_aethelometer = function(f) {
   names(df)[c(3, 6:11)] = paste(ae_col_names, '880', sep = '_')
   names(df)[c(4, 12:17)] = paste(ae_col_names, '370', sep = '_')
   names(df)[5] = 'flow'
+  ## set simultaneous zero 370nm and 880nm to NA
+  df[which(df[, 3] == 0 & df[, 4] == 0), 3:4] = NA
   long_df = tidyr::gather(df[, -(1:2)], measurement_name, value,
                           -c(instrument_time, record))
-  long_df$flagged = FALSE
+  long_df$flagged = is.na(long_df$value)
   long_df[, c('measurement_name', 'instrument_time',
               'record', 'value', 'flagged')]
 }
