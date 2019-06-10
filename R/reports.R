@@ -29,7 +29,6 @@ organize_report_data = function(con, site_name, dsname, vars,
       mtype_ids2 = get_measurement_type_id(con, site_name,
                                            dsname[n], vars,
                                            add_new = FALSE)
-      print(mtype_ids2)
       mtype_ids[is.na(mtype_ids)] = mtype_ids2[is.na(mtype_ids)]
     }
   }
@@ -38,7 +37,6 @@ organize_report_data = function(con, site_name, dsname, vars,
                                               'derived', vars,
                                               add_new = FALSE)
   mtype_ids[is.na(mtype_ids)] = mtype_derived_ids[is.na(mtype_ids)]
-  print(mtype_ids)
 
   ## get measurement units
   mtypes_df = DBI::dbReadTable(con, 'measurement_types')
