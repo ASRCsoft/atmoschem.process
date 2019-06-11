@@ -51,8 +51,10 @@ extract_wfms_aethelometer_year = function(f) {
 extract_year = function(f, site, ds) {
   year_str = if (ds == 'ultrafine') {
                paste0('20', substr(basename(f), 1, 2))
-             } else if (site == 'WFMS' && ds == 'campbell') {
+             } else if (ds == 'campbell') {
                substr(gsub('^.*Table1_', '', f), 1, 4)
+             } else if (ds == 'mesonet') {
+               substr(gsub('^.*MESONET_', '', f), 1, 4)
              } else if (site == 'WFMS' && ds == 'calibrations') {
                paste0('20', substr(gsub('^.*_', '', f), 1, 2))
              } else if (site == 'PSP' && ds == 'envidas') {
@@ -61,6 +63,10 @@ extract_year = function(f, site, ds) {
                sapply(f, extract_psp_calibrations_year)
              } else if (site == 'WFMS' && ds == 'aethelometer') {
                sapply(f, extract_wfms_aethelometer_year)
+             } else if (site == 'WFML' && ds == 'envidas') {
+               substr(gsub('^[^ ]*-', '', f), 1, 4)
+             } else if (site == 'WFML' && ds == 'calibrations') {
+               paste0('20', substr(gsub('^.*_', '', f), 1, 2))
              } else {
                stop(paste('extract_year not implemented for',
                           site, 'and', ds))
