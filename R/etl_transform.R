@@ -12,6 +12,8 @@ transform_file = function(f, out_file, site, ds) {
          transform_psp_calibrations(f)
        } else if (site == 'WFMS' && ds == 'aethelometer') {
          transform_wfms_aethelometer(f)
+       } else if (site == 'WFML' && ds == 'envidas') {
+         transform_wfml_envidas(f)
        }
   write.csv(df, file = out_file, na = '',
             row.names = FALSE)
@@ -20,6 +22,7 @@ transform_file = function(f, out_file, site, ds) {
   ## write.table(df, file = out_file, sep = ',', na = '',
   ##             row.names = FALSE,  col.names = FALSE)
 }
+
 
 ## Only transform new files, similar to `smart_download` from etl
 smart_transform = function(raw, cleaned, site, ds, clobber = FALSE) {
