@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 ### Added
+- Add WFML 2018 4th quarter data annotations.
+
+## [0.1.1] - 2019-06-10
+### Added
 - Add WFMS 2018 4th quarter data annotations.
 - Flag negative WFMS 370nm black carbon and wood smoke values as below
   the method detection limit.
