@@ -6,6 +6,8 @@ transform_file = function(f, out_file, site, ds) {
          transform_campbell(f)
        } else if (ds == 'ultrafine') {
          transform_ultrafine(f)
+       } else if (ds == 'mesonet') {
+         transform_mesonet(f)
        } else if (site == 'PSP' & ds == 'envidas') {
          transform_psp_envidas(f)
        } else if (site == 'PSP' && ds == 'calibrations') {
@@ -22,7 +24,6 @@ transform_file = function(f, out_file, site, ds) {
   ## write.table(df, file = out_file, sep = ',', na = '',
   ##             row.names = FALSE,  col.names = FALSE)
 }
-
 
 ## Only transform new files, similar to `smart_download` from etl
 smart_transform = function(raw, cleaned, site, ds, clobber = FALSE) {
