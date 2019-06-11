@@ -14,7 +14,8 @@ fast_lookup = function(vals, dict) {
 wfms_flags = c(NO = 'NOX', NOx = 'NOX', T = 'TRH',
                RH = 'TRH', NOy = 'NOY', SO2 = 'SO2',
                CO = 'CO')
-wfml_flags = c(CO = 'CO', NO = 'NOX', NO2 = 'NOX')
+wfml_flags = c(CO = 'CO', NO = 'NOX', NO2 = 'NOX',
+               NGN3 = 'NGN')
 
 
 read_campbell = function(f) {
@@ -69,8 +70,10 @@ transform_campbell = function(f) {
     tidyr::gather(measurement_name, value, -c(instrument_time, RECORD))
   if (site == 'WFMS') {
     flag_mat = as.matrix(campbell[, is_flag]) != 1
+    flag_dict = wfms_flags
   } else if (site == 'WFML') {
     flag_mat = as.matrix(campbell[, is_flag]) != 0
+    flag_dict = wfml_flags
   }
   row.names(flag_mat) = campbell$instrument_time
   campbell_long$measurement_name =
@@ -79,7 +82,7 @@ transform_campbell = function(f) {
                     campbell$instrument_time)
   flag_cols = match(paste('F',
                           fast_lookup(campbell_long$measurement_name,
-                                      wfms_flags),
+                                      flag_dict),
                           'Avg', sep = '_'),
                     colnames(flag_mat))
   campbell_long$flagged = flag_mat[cbind(flag_rows, flag_cols)]
