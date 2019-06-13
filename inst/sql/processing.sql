@@ -145,12 +145,17 @@ CREATE materialized VIEW hourly_measurements as
 		 date_trunc('hour', time) as time,
 		 case when name like '%\_Max' then max(value) FILTER (WHERE not flagged)
 		 when name='Precip' then sum(value) FILTER (WHERE not flagged)
+		 when pm.measurement_type_id=get_measurement_id(2, 'mesonet', 'precip_since_00Z [mm]')
+		 -- just get the value at the top of the hour for now
+		   then max(value) FILTER (WHERE extract(minute from time)=0)
 		 else avg(value) FILTER (WHERE not flagged) end as value,
 		 case when pm.measurement_type_id=any(get_data_source_ids(1, 'aethelometer'))
 			or pm.measurement_type_id=get_measurement_id(1, 'derived', 'Wood smoke')
 		 -- the aethelometer only records values every 15
 		 -- minutes, have to adjust the count to compensate
 		   then (count(value) FILTER (WHERE not flagged)) * 15
+		   when pm.measurement_type_id=any(get_data_source_ids(2, 'mesonet'))
+		   then (count(value) FILTER (WHERE not flagged)) * 5
 		 else count(value) FILTER (WHERE not flagged) end as n_values
 	    from processed_measurements pm
 		   join measurement_types mt
