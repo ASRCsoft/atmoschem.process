@@ -119,25 +119,30 @@ get_hourly = function(measure, t1, t2) {
   results
 }
 
-make_processing_plot = function(m, t1, t2, logt = F,
-                                show_flagged = T) {
+make_processing_plot = function(m, t1, t2, plot_types,
+                                logt = F, show_flagged = T) {
   ## get measurement info
   m_info = subset(measurements_df, id == m)
-  has_processing = is_true(m_info$apply_processing)
-  has_cal = is_true(m_info$has_calibration)
-  has_ce = is_true(m_info$apply_ce)
+  has_raw = 'raw' %in% plot_types
+  has_processing = is_true(m_info$apply_processing) &
+    'processed' %in% plot_types
+  has_cal = is_true(m_info$has_calibration) &
+    any(c('zero','span') %in% plot_types)
+  has_ce = is_true(m_info$apply_ce) &
+    'ce' %in% plot_types
+  has_hourly = is_true(m_info$apply_processing) &
+    'hourly' %in% plot_types
 
   ## get the data
-  raw = get_raw(m, t1, t2)
-  ## has_processing = F
+  if (has_raw) raw = get_raw(m, t1, t2)
   if (has_processing) processed = get_processed(m, t1, t2)
   if (has_cal) cals = get_cals(m, t1, t2)
   if (has_ce) ces = get_ces(m, t1, t2)
-  if (has_processing) hourly = get_hourly(m, t1, t2)
+  if (has_hourly) hourly = get_hourly(m, t1, t2)
 
   ## organize for ggplot2
   df_list = list()
-  if (nrow(raw) > 0) {
+  if (has_raw && nrow(raw) > 0) {
     raw$label = 'Raw'
     raw = raw[, c(1:2, 4, 3)]
     raw$filtered = F
@@ -146,6 +151,11 @@ make_processing_plot = function(m, t1, t2, logt = F,
   if (has_cal && nrow(cals) > 0) {
     cals$flagged = F
     cals$filtered = F
+    if (!'zero' %in% plot_types) {
+      cals = subset(cals, label != 'zero')
+    } else if (!'span' %in% plot_types) {
+      cals = subset(cals, label != 'span')
+    }
     df_list$cals = cals
   }
   if (has_ce && !is.null(ces) > 0) {
@@ -160,7 +170,7 @@ make_processing_plot = function(m, t1, t2, logt = F,
     processed$filtered = F
     df_list$processed = processed
   }
-  if (has_processing && nrow(hourly) > 0) {
+  if (has_hourly && nrow(hourly) > 0) {
     hourly$label = 'Hourly'
     hourly$flag = FALSE
     hourly$filtered = FALSE
@@ -187,7 +197,7 @@ make_processing_plot = function(m, t1, t2, logt = F,
 
   ## plot
   ggplot(df, aes(Time, Value, color = Flag,
-                 linetype = Filtered)) +
+                 linetype = Filtered, group = Filtered)) +
     geom_line(size = .2) +
     xlim(as.POSIXct(as.character(c(t1, t2)))) +
     scale_color_manual(values = c('black', 'red')) +
@@ -202,7 +212,7 @@ shinyServer(function(input, output) {
                             tz = 'GMT')
     measure = as.integer(input$measure)
     make_processing_plot(measure, date_range[1],
-                         date_range[2],
+                         date_range[2], input$plotTypes,
                          input$log, input$showFlagged)
   },
   height = 700, res = 100)

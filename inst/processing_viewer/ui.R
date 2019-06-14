@@ -23,13 +23,19 @@ measurements = measurements[order(measurements$label), ]
 measurements_dict = setNames(measurements$id,
                              measurements$label)
 
+plotTypes = c(Raw = 'raw', `Calibration Zero` = 'zero',
+              `Calibration Span` = 'span',
+              `Conversion Efficiency` = 'ce',
+              Processed = 'processed',
+              `Hourly Processed` = 'hourly')
+
 shinyUI(fluidPage(
     fluidRow(
         ## 4 columns
         column(3,
                h3('Data Processing Viewer')
                ),
-        column(3,
+        column(2,
                airDatepickerInput('dateRange',
                                   label = 'Time range:',
                                   value = as.POSIXct(c('2018-12-01 00:00',
@@ -43,10 +49,16 @@ shinyUI(fluidPage(
                selectInput('measure', 'Measure:',
                            measurements_dict)
                ),
-        column(3,
+        column(2,
                checkboxInput("log", "Log", FALSE),
                checkboxInput("showFlagged", "Show Flagged Data",
                              TRUE)
+               ),
+        column(2,
+               pickerInput('plotTypes', 'Plots:',
+                           choices = plotTypes,
+                           selected = plotTypes,
+                           multiple = TRUE)
                )
     ),
     hr(),
