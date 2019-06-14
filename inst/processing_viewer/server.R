@@ -61,7 +61,8 @@ get_cals = function(measure, t1, t2) {
     filter(measurement_type_id == measure &
            time >= t1 &
            time <= t2) %>%
-    select(time, value, type) %>%
+    mutate(label = type) %>%
+    select(time, value, label) %>%
     ## prevent RPostgreSQL from mucking with the time zones
     mutate(time = as.character(time)) %>%
     arrange(time) %>%
@@ -137,52 +138,47 @@ make_processing_plot = function(m, t1, t2, logt = F,
   ## organize for ggplot2
   df_list = list()
   if (nrow(raw) > 0) {
-    raw$type = NA
     raw$label = 'Raw'
-    raw = raw[, c(1:2, 4:5, 3)]
+    raw = raw[, c(1:2, 4, 3)]
     raw$filtered = F
     df_list$raw = raw
   }
   if (has_cal && nrow(cals) > 0) {
-    cals$label = 'Calibrations'
     cals$flagged = F
     cals$filtered = F
     df_list$cals = cals
   }
   if (has_ce && !is.null(ces) > 0) {
-    ces$type = NA
     ces$label = 'Conversion Efficiency'
     ces$flagged = F
-    ces = ces[, c(1, 3:6, 2)]
+    ces = ces[, c(1, 3:5, 2)]
     df_list$ces = ces
   }
   if (has_processing && nrow(processed) > 0) {
-    processed$type = NA
     processed$label = 'Processed'
-    processed = processed[, c(1:2, 4:5, 3)]
+    processed = processed[, c(1:2, 4, 3)]
     processed$filtered = F
     df_list$processed = processed
   }
   if (has_processing && nrow(hourly) > 0) {
-    hourly$type = NA
     hourly$label = 'Hourly'
     hourly$flag = FALSE
     hourly$filtered = FALSE
     df_list$hourly = hourly
   }
-  df_names = c('Time', 'Value', 'Type', 'Label', 'Flag', 'Filtered')
+  df_names = c('Time', 'Value', 'Label', 'Flag', 'Filtered')
   for (df_name in names(df_list)) {
     names(df_list[[df_name]]) = df_names
   }
   df = do.call(rbind, df_list)
   if (nrow(df) == 0) return(NULL)
   df$Label = factor(df$Label,
-                    levels=c('Raw', 'Calibrations',
+                    levels=c('Raw', 'zero', 'span',
                              'Conversion Efficiency',
                              'Processed', 'Hourly'))
   if (logt) {
-    df[df$Label != 'Calibrations', 'Value'] =
-      log(df$Value[df$Label != 'Calibrations'])
+    is_cal = df$Label %in% c('zero', 'span')
+    df[!is_cal, 'Value'] = log(df$Value[!is_cal])
   }
   if (!show_flagged) {
     # remove flagged data, but only from the processed data
@@ -190,10 +186,8 @@ make_processing_plot = function(m, t1, t2, logt = F,
   }
 
   ## plot
-  df$Type[is.na(df$Type)] = ''
-  ggplot(df, aes(Time, Value,
-                 group = interaction(Type, Filtered),
-                 color = Flag, linetype = Filtered)) +
+  ggplot(df, aes(Time, Value, color = Flag,
+                 linetype = Filtered)) +
     geom_line(size = .2) +
     xlim(as.POSIXct(as.character(c(t1, t2)))) +
     scale_color_manual(values = c('black', 'red')) +
