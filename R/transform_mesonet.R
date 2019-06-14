@@ -3,6 +3,7 @@ transform_mesonet = function(f) {
   df$instrument_time = as.POSIXct(df$datetime,
                                   format = '%Y%m%dT%H%M%S',
                                   tz = 'UTC')
+  attributes(df$instrument_time)$tzone = 'EST'
   df$record = 1:nrow(df) + 1
 
   ## get data frame of values
