@@ -4,6 +4,9 @@
 ### Added
 - Add WFML 2018 4th quarter data annotations.
 
+### Fixed
+- Convert NYS Mesonet data times to EST.
+
 ## [0.1.1] - 2019-06-10
 ### Added
 - Add WFMS 2018 4th quarter data annotations.
