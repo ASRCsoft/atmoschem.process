@@ -23,7 +23,7 @@ update_raw_data = function(obj, mesonet_api_url) {
   tnow = Sys.time()
   attributes(tnow)$tzone = 'UTC'
   dnow = as.Date(tnow) - 1
-  d = seq(as.Date('2016-01-29'), dnow)
+  d = seq(as.Date('2016-01-29'), dnow, 'day')
   message('Downloading NYS Mesonet files...')
   download_mesonet(obj, mesonet_api_url, d)
 }
