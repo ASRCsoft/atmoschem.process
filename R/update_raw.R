@@ -17,6 +17,12 @@ download_mesonet = function(obj, mesonet_api_url, d) {
   etl::smart_download(obj, mes_url, out_path)
 }
 
+list_remote_files = function(sshcon, path) {
+  ls_command = paste('ls', path)
+  ls_res = ssh_exec_internal(sshcon, ls_command)
+  strsplit(rawToChar(ls_res$stdout), '\n')[[1]]
+}
+
 #' @export
 update_raw_data = function(obj, mesonet_api_url) {
   ## get NYS Mesonet data from the first recorded data to yesterday
