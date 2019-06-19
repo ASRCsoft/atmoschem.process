@@ -17,6 +17,7 @@ Imports:
     RPostgreSQL,
     rvest,
     R.utils,
+    ssh,
     tidyr,
     xml2
 Depends:

@@ -23,8 +23,29 @@ list_remote_files = function(sshcon, path) {
   strsplit(rawToChar(ls_res$stdout), '\n')[[1]]
 }
 
+update_campbell = function(obj, site, sshcon, remote_path) {
+  remote_files = list_remote_files(sshcon, remote_path)
+  ## we only want the 'Table1' files
+  remote_files = remote_files[grep('Table1', remote_files)]
+  raw_campbell_glob = file.path(attr(obj, 'raw_dir'), site, 'measurements', 'campbell', '*', '*')
+  old_files = Sys.glob(raw_campbell_glob)
+  new_files = remote_files[!remote_files %in% basename(old_files)]
+  if (length(new_files) > 0) {
+    new_file_years = substring(gsub('^.*Table1_', '', new_files), 1, 4)
+    new_remote_paths = file.path(remote_path, new_files)
+    new_local_paths = file.path(attr(obj, 'raw_dir'), site, 'measurements', 'campbell',
+                                new_file_years)
+    for (f in unique(new_local_paths)) {
+      dir.create(f, showWarnings = FALSE, recursive = TRUE)
+    }
+    for (n in 1:length(new_remote_paths)) {
+      ssh::scp_download(sshcon, new_remote_paths[n], to = new_local_paths[n])
+    }
+  }
+}
+
 #' @export
-update_raw_data = function(obj, mesonet_api_url) {
+update_raw_data = function(obj, mesonet_api_url, campbell_ssh) {
   ## get NYS Mesonet data from the first recorded data to yesterday
   tnow = Sys.time()
   attributes(tnow)$tzone = 'UTC'
@@ -32,4 +53,8 @@ update_raw_data = function(obj, mesonet_api_url) {
   d = seq(as.Date('2016-01-29'), dnow, 'day')
   message('Downloading NYS Mesonet files...')
   download_mesonet(obj, mesonet_api_url, d)
+  message('Downloading WFMS Campbell files...')
+  update_campbell(obj, 'WFMS', campbell_ssh, '/RA1/loggernet/summit')
+  message('Downloading WFML Campbell files...')
+  update_campbell(obj, 'WFML', campbell_ssh, '/RA1/loggernet/lodge')
 }
