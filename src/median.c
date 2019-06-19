@@ -106,6 +106,7 @@ mad_transfn(PG_FUNCTION_ARGS)
   mad_state *state;
   float new_median;
   float abs_dev;
+  int i;
   int p_i;
   int isnull;
   if (!AggCheckCallContext(fcinfo, &aggContext)) {
@@ -135,7 +136,7 @@ mad_transfn(PG_FUNCTION_ARGS)
     state->mad_mediator = MediatorNew(241);
     /* refill with raw values which are stored in the
        median_mediator */
-    for (int i=0; i<241; i++) {
+    for (i=0; i<241; i++) {
       // check that the value is not null
       p_i = state->median_mediator->pos[i];
       isnull = MediatorPosIsNull(state->median_mediator, p_i);
