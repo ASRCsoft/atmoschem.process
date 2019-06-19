@@ -4,6 +4,10 @@
 transform_calibration = function(f, site, ds) {
   if (site == 'PSP') {
     transform_psp_calibrations(f)
+  } else if (site == 'WFML' && ds == 'Thermo_42i') {
+    transform_wfm_no_calibration(f, c('NO', 'NOX'))
+  } else if (site == 'WFML' && ds == 'Thermo_48C') {
+    transform_wfml_48C(f)
   }
 }
 
