@@ -16,64 +16,6 @@ is_psp_TEI43i_SO2_cal = function(f)
 is_psp_TEI49i_O3_49i_cal = function(f)
   startsWith(basename(f), 'Pinnacle_TEI49i_O3_49i_Weekly')
 
-extract_psp_calibrations_year = function(f) {
-  if (is_psp_42C_cal(f)) {
-    paste0('20', substr(gsub('^.*[ _]', '', f), 1, 2))
-  } else if (is_psp_API300EU_cal(f)) {
-    gsub('^.*Weekly_|_[^_]*$', '', f)
-  } else if (is_psp_ASRC_TEI42i_Y_NOy_cal(f)) {
-    substr(gsub('^.*Weekly_', '', f), 1, 4)
-  } else if (is_psp_DEC_TEI42i_NOy_cal(f)) {
-    gsub('^.*Weekly[ _]|_[^_]*$', '', f)
-  } else if (is_psp_TEI43i_SO2_cal(f)) {
-    gsub('^.*Weekly_|_[^_]*$', '', f)
-  } else if (is_psp_TEI49i_O3_49i_cal(f)) {
-    gsub('^.*Weekly_|_[^_]*$', '', f)
-  } else {
-    warning(paste('extract_year not implemented for PSP calibration', f))
-    NA
-  }
-}
-
-extract_wfms_aethelometer_year = function(f) {
-  fbase = basename(f)
-  if (startsWith(fbase, 'ae')) {
-    paste0('20', substr(fbase, 3, 4))
-  } else if (startsWith(fbase, 'BC')) {
-    paste0('20', substr(fbase, 7, 8))
-  } else {
-    warning(paste('extract_year not implemented for WFMS aethelometer file', f))
-    NA
-  }
-}
-
-## get the file year given the filename, site, and data source
-extract_year = function(f, site, ds) {
-  year_str = if (ds == 'ultrafine') {
-               paste0('20', substr(basename(f), 1, 2))
-             } else if (ds == 'campbell') {
-               substr(gsub('^.*Table1_', '', f), 1, 4)
-             } else if (ds == 'mesonet') {
-               substr(gsub('^.*MESONET_', '', f), 1, 4)
-             } else if (site == 'WFMS' && ds == 'calibrations') {
-               paste0('20', substr(gsub('^.*_', '', f), 1, 2))
-             } else if (site == 'PSP' && ds == 'envidas') {
-               paste0('20', substr(gsub('^.*-', '', f), 1, 2))
-             } else if (site == 'PSP' && ds == 'calibrations') {
-               sapply(f, extract_psp_calibrations_year)
-             } else if (site == 'WFMS' && ds == 'aethelometer') {
-               sapply(f, extract_wfms_aethelometer_year)
-             } else if (site == 'WFML' && ds == 'envidas') {
-               substr(gsub('^[^ ]*-', '', f), 1, 4)
-             } else if (site == 'WFML' && ds == 'calibrations') {
-               paste0('20', substr(gsub('^.*_', '', f), 1, 2))
-             } else {
-               stop(paste('extract_year not implemented for',
-                          site, 'and', ds))
-             }
-  as.integer(year_str)
-}
-
 star_if_null = function(x) {
   if (is.null(x)) {
     '*'
