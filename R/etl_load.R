@@ -73,41 +73,24 @@ even_smarter_upload = function(obj, f, site, measurement,
   }
 }
 
-load_glob = function(obj, glob_str, clobber) {
-  f_paths = Sys.glob(glob_str)
-  if (length(f_paths) > 0) {
-    ## help even_smarter_upload by getting site, file type, and data
-    ## source from the file path
-    trunc_path = gsub(paste0('^', attr(obj, 'load_dir')), '', f_paths)
-    sites = gsub('/([^/]+)/.*$', '\\1', trunc_path)
-    site_regex = paste(paste0('^/', unique(sites)), collapse = '|')
-    trunc_path = gsub(site_regex, '', trunc_path)
-    is_measurement = grepl('^/measurements', trunc_path)
-    trunc_path = gsub('^/measurements|^/calibrations', '', trunc_path)
-    dss = gsub('/([^/]+)/.*$', '\\1', trunc_path)
-    even_smarter_upload(obj, f_paths, sites,
-                        is_measurement, dss, clobber)
-  }
-}
-
 #' @import etl
 #' @inheritParams etl::etl_load
 #' @export
 etl_load.etl_nysatmoschem = function(obj, sites = NULL, data_sources = NULL,
                                      years = NULL, clobber = FALSE, ...) {
-  ## put together a file glob(s)
-  site_str = star_if_null(sites)
-  ds_str = star_if_null(data_sources)
-  year_str = star_if_null(years)
-
-  glob_df_m = expand.grid(site_str, ds_str, year_str)
-  m_glob_str = file.path(attr(obj, 'load_dir'), glob_df_m[, 1], 'measurements',
-                         glob_df_m[, 2], glob_df_m[, 3], '*')
-  glob_df_c = expand.grid(site_str, year_str)
-  c_glob_str = file.path(attr(obj, 'load_dir'), glob_df_c[, 1], 'calibrations',
-                         '*', glob_df_c[, 2], '*')
-  glob_strs = c(m_glob_str, c_glob_str)
-  load_glob(obj, glob_strs, clobber)
+  glob_strs = make_file_globs(attr(obj, 'load_dir'),
+                              sites, data_sources, years)
+  f_paths = Sys.glob(glob_strs)
+  if (length(f_paths) > 0) {
+    ## help even_smarter_upload by getting site, file type, and data
+    ## source from the file path
+    sites = get_site_from_path(attr(obj, 'load_dir'), f_paths)
+    is_measurement =
+      get_type_from_path(attr(obj, 'load_dir'), f_paths) == 'measurements'
+    dss = get_data_source_from_path(attr(obj, 'load_dir'), f_paths)
+    even_smarter_upload(obj, f_paths, sites,
+                        is_measurement, dss, clobber)
+  }
   
   invisible(obj)
 }

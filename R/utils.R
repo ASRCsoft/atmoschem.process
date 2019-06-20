@@ -74,6 +74,44 @@ extract_year = function(f, site, ds) {
   as.integer(year_str)
 }
 
+star_if_null = function(x) {
+  if (is.null(x)) {
+    '*'
+  } else {
+    x
+  }
+}
+
+## get a vector of file glob that will find the specified files
+make_file_globs = function(root_folder, sites = NULL,
+                           data_sources = NULL, years = NULL) {
+  site_str = star_if_null(sites)
+  ds_str = star_if_null(data_sources)
+  year_str = star_if_null(years)
+  glob_df_m = expand.grid(site_str, ds_str, year_str)
+  m_glob_str = file.path(root_folder, glob_df_m[, 1], 'measurements',
+                         glob_df_m[, 2], glob_df_m[, 3], '*')
+  glob_df_c = expand.grid(site_str, year_str)
+  c_glob_str = file.path(root_folder, glob_df_c[, 1], 'calibrations',
+                         '*', glob_df_c[, 2], '*')
+  c(m_glob_str, c_glob_str)
+}
+
+get_site_from_path = function(base, f) {
+  re_str = paste0('^', base, '/([^/]+)/.*$')
+  sites = gsub(re_str, '\\1', f)
+}
+
+get_type_from_path = function(base, f) {
+  re_str = paste0('^', base, '/[^/]+/([^/]+)/.*$')
+  sites = gsub(re_str, '\\1', f)
+}
+
+get_data_source_from_path = function(base, f) {
+  re_str = paste0('^', base, '/[^/]+/[^/]+/([^/]+)/.*$')
+  sites = gsub(re_str, '\\1', f)
+}
+
 ## match DB rows to a dataframe and return the corresponding ID's
 get_id_from_pg = function(pg, df, tbl_name) {
   q1 = paste('select * from', tbl_name)

@@ -58,14 +58,6 @@ smart_transform = function(raw, cleaned, site, measurement,
          site[missing], measurement[missing], ds[missing])
 }
 
-star_if_null = function(x) {
-  if (is.null(x)) {
-    '*'
-  } else {
-    x
-  }
-}
-
 get_load_path = function(obj, raw_path) {
   raw_path %>%
     tools::file_path_sans_ext() %>%
@@ -73,44 +65,29 @@ get_load_path = function(obj, raw_path) {
     paste0('.csv')
 }
 
-transform_glob = function(obj, glob_str, clobber) {
-  f_paths = Sys.glob(glob_str)
-  out_files = get_load_path(obj, f_paths)
-  out_paths = unique(dirname(out_files))
-  for (out_path in out_paths) {
-    dir.create(out_path, showWarnings = FALSE, recursive = TRUE)
-  }
-  ## help smart_transform by getting site, file type, and data source
-  ## from the file path
-  trunc_path = gsub(paste0('^', attr(obj, 'raw_dir')), '', f_paths)
-  sites = gsub('/([^/]+)/.*$', '\\1', trunc_path)
-  site_regex = paste(paste0('^/', unique(sites)), collapse = '|')
-  trunc_path = gsub(site_regex, '', trunc_path)
-  is_measurement = grepl('^/measurements', trunc_path)
-  trunc_path = gsub('^/measurements|^/calibrations', '', trunc_path)
-  dss = gsub('/([^/]+)/.*$', '\\1', trunc_path)
-  smart_transform(f_paths, out_files, sites, is_measurement,
-                  dss, clobber)
-}
-
 #' @import etl
 #' @inheritParams etl::etl_transform
 #' @export
 etl_transform.etl_nysatmoschem = function(obj, sites = NULL, data_sources = NULL,
                                           years = NULL, clobber = FALSE) {
-  ## put together a file glob(s)
-  site_str = star_if_null(sites)
-  ds_str = star_if_null(data_sources)
-  year_str = star_if_null(years)
-
-  glob_df_m = expand.grid(site_str, ds_str, year_str)
-  m_glob_str = file.path(attr(obj, 'raw_dir'), glob_df_m[, 1], 'measurements',
-                         glob_df_m[, 2], glob_df_m[, 3], '*')
-  glob_df_c = expand.grid(site_str, year_str)
-  c_glob_str = file.path(attr(obj, 'raw_dir'), glob_df_c[, 1], 'calibrations',
-                         '*', glob_df_c[, 2], '*')
-  glob_strs = c(m_glob_str, c_glob_str)
-  transform_glob(obj, glob_strs, clobber)
+  glob_strs = make_file_globs(attr(obj, 'raw_dir'),
+                              sites, data_sources, years)
+  f_paths = Sys.glob(glob_strs)
+  if (length(f_paths) > 0) {
+    out_files = get_load_path(obj, f_paths)
+    out_paths = unique(dirname(out_files))
+    for (out_path in out_paths) {
+      dir.create(out_path, showWarnings = FALSE, recursive = TRUE)
+    }
+    ## help smart_transform by getting site, file type, and data source
+    ## from the file path
+    sites = get_site_from_path(attr(obj, 'raw_dir'), f_paths)
+    is_measurement =
+      get_type_from_path(attr(obj, 'raw_dir'), f_paths) == 'measurements'
+    dss = get_data_source_from_path(attr(obj, 'raw_dir'), f_paths)
+    smart_transform(f_paths, out_files, sites, is_measurement,
+                    dss, clobber)
+  }
   
   invisible(obj)
 }
