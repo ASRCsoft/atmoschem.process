@@ -18,6 +18,7 @@ Imports:
     rvest,
     R.utils,
     ssh,
+    staplr,
     tidyr,
     xml2
 Depends:
