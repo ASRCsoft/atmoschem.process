@@ -4,8 +4,17 @@
 read_pdf_form = function(f) {
   f1 = staplr::get_fields(f)
   ## simplify the list
-  lapply(f1, function(x) x$value)
+  lapply(f1, function(x) {
+    if (x$value == '') {
+      NA
+    } else {
+      x$value
+    }
+  })
 }
+
+## return the first non-NA value
+first_non_na = function(x) x[!is.na(x)][1]
 
 ## return True if the box is checked, otherwise False
 box_checked = function(box) !is.na(box) & box == 'On'
@@ -15,12 +24,12 @@ format_pdf_time = function(date_str, time_str)
 
 ## return a list of calibration information
 organize_cal = function(pdf, type, calibrated,
-                        start_time, end_time,
+                        start_time, measured_time,
                         provided, measured, corrected) {
   list(type = type,
        calibrated = box_checked(pdf[[calibrated]]),
        start_time = pdf[[start_time]],
-       end_time = pdf[[end_time]],
+       measured_time = pdf[[measured_time]],
        provided = provided,
        measured = pdf[[measured]],
        corrected = corrected %in% names(pdf) &&
@@ -41,49 +50,61 @@ transform_cal_section = function(measurement_name, cal_type,
 
 transform_wfm_single_calibration = function(f, measurement_name,
                                             date = 'date',
-                                            zero_cal = 'zero_cal_mode_2',
-                                            zero_start_time = 'time_log_2',
-                                            zero_end_time = 'time_log_3',
-                                            zero_corrected = 'set_42ctls_to_zero_3',
-                                            zero_provided = 0,
-                                            zero_measured = 'measured_zero_noy_a_3',
-                                            span_cal = 'span_cal_mode_4',
-                                            span_start_time = 'time_log_4',
-                                            span_end_time = 'time_log_5',
-                                            span_corrected = 'set_span_noy_a_5',
-                                            span_provided = 14,
-                                            span_measured = 'measured_span_noy_a_5',
-                                            zero_check_cal = 'zero_check_7',
-                                            zero_check_start_time = 'time_log_4',
-                                            zero_check_end_time = 'time_log_5',
-                                            zero_check_corrected = 'set_42ctls_to_zero_7',
-                                            zero_check_provided = 0, 
-                                            zero_check_measured = 'zero_check_7') {
+                                            calibrated = c('zero_cal_mode_2',
+                                                           'span_cal_mode_4',
+                                                           'zero_check_7'),
+                                            start_time = c('time_log_2',
+                                                           'time_log_4',
+                                                           'time_log_4'),
+                                            measured_time = c('time_log_3',
+                                                              'time_log_5',
+                                                              'time_log_5'),
+                                            corrected = c('set_42ctls_to_zero_3',
+                                                          'set_span_noy_a_5',
+                                                          'set_42ctls_to_zero_7'),
+                                            provided = c(0, 14, 0),
+                                            measured = c('measured_zero_noy_a_3',
+                                                         'measured_span_noy_a_5',
+                                                         'zero_check_7')) {
   pdf = read_pdf_form(f)
   res = data.frame()
-  zero_vals = organize_cal(pdf, 'zero', zero_cal,
-                           zero_start_time,
-                           zero_end_time, zero_provided,
-                           zero_measured, zero_corrected)
-  span_vals = organize_cal(pdf, 'span', span_cal,
-                           span_start_time,
-                           span_end_time, span_provided,
-                           span_measured, span_corrected)
-  zero_check_vals = organize_cal(pdf, 'zero check', zero_check_cal,
-                                 zero_check_start_time,
-                                 zero_check_end_time, zero_check_provided,
-                                 zero_check_measured, zero_check_corrected)
-  pdf_cals = list(zero = zero_vals, span = span_vals,
-                  zero_check = zero_check_vals)
-  for (cal in pdf_cals) {
-    if (cal$calibrated && !is.na(cal$end_time)) {
-      start_time = format_pdf_time(pdf[[date]], cal$start_time)
-      end_time = format_pdf_time(pdf[[date]], cal$end_time)
-      res1 = transform_cal_section(measurement_name, cal$type,
-                                   start_time, end_time,
-                                   cal$provided, cal$measured,
-                                   cal$corrected)
-      res = rbind(res, res1)
+  caldf = data.frame(calibrated, start_time,
+                     measured_time, corrected,
+                     provided, measured,
+                     end_time = NA,
+                     row.names = c('zero', 'span', 'zero check'))
+  for (n in 1:nrow(caldf)) {
+    if (calibrated[n]) {
+      cal = organize_cal(pdf, row.names(caldf[n]),
+                         calibrated[n], start_time[n],
+                         measured_time[n], provided[n],
+                         measured[n], corrected[n])
+      ## get the end time, guessing if needed
+      if (n < 3 && !all(is.na(caldf[(n + 1):3, 'start_time']))) {
+        ## get the next start time if one is available
+        cal$end_time =
+          format_pdf_time(pdf[[date]],
+                          first_non_na(caldf[(n + 1):3, 'start_time']))
+      } else if (!is.na(pdf[[flag_online]])) {
+        ## get the switch flag online time
+        cal$end_time = format_pdf_time(pdf[[date]], pdf[[flag_online]])
+      } else if (!is.na(cal$measured_time)) {
+        ## get the measured time + 10 minutes
+        cal$end_time = format_pdf_time(pdf[[date]], cal$measured_time) +
+          as.difftime(10, units = 'minutes')
+      } else if (!is.na(cal$start_time)) {
+        ## get the start time + 40 minutes
+        cal$end_time = format_pdf_time(pdf[[date]], cal$start_time) +
+          as.difftime(40, units = 'minutes')
+      }
+      if ('end_time' %in% names(cal)) {
+        start_time = format_pdf_time(pdf[[date]], cal$start_time)
+        res1 = transform_cal_section(measurement_name, cal$type,
+                                     start_time, cal$end_time,
+                                     cal$provided, cal$measured,
+                                     cal$corrected)
+        res = rbind(res, res1)
+      }
     }
   }
   res
