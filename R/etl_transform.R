@@ -4,8 +4,16 @@
 transform_calibration = function(f, site, ds) {
   if (site == 'PSP') {
     transform_psp_calibrations(f)
+  } else if (site == 'WFMS' && ds == 'Teledyne_300EU') {
+    transform_wfms_300EU(f)
+  } else if (site == 'WFMS' && ds == 'Thermo_42C') {
+    transform_wfms_42C(f)
+  } else if (site == 'WFMS' && ds == 'Thermo_42Cs') {
+    transform_wfms_42Cs(f)
+  } else if (site == 'WFMS' && ds == 'Thermo_43C') {
+    transform_wfms_43C(f)
   } else if (site == 'WFML' && ds == 'Thermo_42i') {
-    transform_wfm_no_calibration(f, c('NO', 'NOX'))
+    transform_wfml_42i(f)
   } else if (site == 'WFML' && ds == 'Thermo_48C') {
     transform_wfml_48C(f)
   }

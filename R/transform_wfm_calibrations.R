@@ -38,24 +38,29 @@ get_cal_end_time = function(start_times, online_time, measured_time) {
 }
 
 transform_wfm_cal_list = function(pdf, measurement_name,
+                                  offline_time = 'time_log_1',
                                   calibrated = c('zero_cal_mode_2',
                                                  'span_cal_mode_4',
-                                                 'zero_cal_check_6'),
+                                                 'zero_mode_6'),
+                                  start_time = c('time_log_2',
+                                                 'time_log_4',
+                                                 'time_log_6'),
+                                  measured_time = c('time_log_3',
+                                                    'time_log_5',
+                                                    'time_log_7'),
                                   corrected = c('set_42ctls_to_zero_3',
                                                 'set_span_noy_a_5',
                                                 NA),
                                   provided = c(0, 14, 0),
                                   measured = c('measured_zero_3',
                                                'measured_span_5',
-                                               'zero_check_7')) {
-  ## the time labels don't change
-  offline_time = format_pdf_time(pdf, 'time_log_1')
-  online_time = format_pdf_time(pdf, 'time_log_8')
+                                               'zero_check_7'),
+                                  online_time = 'time_log_8') {
+  offline_time = format_pdf_time(pdf, offline_time)
+  online_time = format_pdf_time(pdf, online_time)
   types = c('zero', 'span', 'zero check')
-  start_times =
-    format_pdf_time(pdf, c('time_log_2', 'time_log_4', 'time_log_6'))
-  measured_times =
-    format_pdf_time(pdf, c('time_log_3', 'time_log_5', 'time_log_7'))
+  start_times = format_pdf_time(pdf, start_time)
+  measured_times = format_pdf_time(pdf, measured_time)
   res = data.frame()
   for (n in 1:3) {
     performed_cal = box_checked(pdf[[calibrated[n]]])
@@ -84,37 +89,81 @@ transform_wfm_single_cal = function(f, ...) {
   transform_wfm_cal_list(pdf, ...)
 }
 
-transform_wfm_no_calibration = function(f, measurement_names) {
+transform_wfm_no_cal = function(f, measurement_names, provided_span) {
   ## this is based on the "42Cs_calsheet_v04" format
   pdf = read_pdf_form(f)
   ## this one has different cal checkbox labels
-  calibrated = c('zero_cal_mode_2', 'span_cal_mode_4',
-                 'zero_mode_6')
+  provided = c(0, provided_span, 0)
   res1 = transform_wfm_cal_list(pdf, measurement_names[1],
-                                calibrated = calibrated,
                                 measured = c('measured_zero_noy_a_3',
                                              'measured_span_noy_a_5',
                                              '42ctls_zero_noy_a_7'),
                                 corrected = c('set_42ctls_to_zero_3',
                                               'set_span_noy_a_5',
                                               NA),
-                                provided = c(0, 14, 0))
+                                provided = provided)
   res2 = transform_wfm_cal_list(pdf, measurement_names[2],
-                                calibrated = calibrated,
                                 measured = c('measured_zero_noy_b_3',
                                              'measured_span_noy_b_5',
                                              '42ctls_zero_noy_b_7'),
                                 corrected = c('set_42ctls_to_zero_3',
                                               'set_span_noy_b_5',
                                               NA),
-                                provided = c(0, 14, 0))
+                                provided = provided)
   rbind(res1, res2)
+}
+
+transform_wfml_42i = function(f) {
+  transform_wfm_no_cal(f, c('NO', 'NOX'), 14)
 }
 
 transform_wfml_48C = function(f) {
   transform_wfm_single_cal(f, 'CO',
+                           calibrated = c('zero_cal_mode_2',
+                                          'span_cal_mode_4',
+                                          'zero_cal_check_6'),
                            corrected = c('set_48C_zero_offset_ 3',
                                          'set_48C_span_5',
                                          NA),
                            provided = c(0, .786, 0))
+}
+
+transform_wfms_300EU = function(f) {
+  transform_wfm_single_cal(f, 'CO',
+                           calibrated = c('zero_cal_mode_2',
+                                          'span cal mode 4',
+                                          'zero cal check 6'),
+                           start_time = c('time_log_2',
+                                          'time log 4',
+                                          'time log 6'),
+                           measured_time = c('time log 3',
+                                             'time log 5',
+                                             'time log 7'),
+                           corrected = c('set 300EU to zero 3',
+                                         'set 300EU span 5',
+                                         NA),
+                           provided = c(0, 452, 0),
+                           measured = c('measured zero 3',
+                                        'measured span 5',
+                                        'zero check 300EU ppb'),
+                           online_time = 'time log 8')
+}
+
+transform_wfms_42C = function(f) {
+  transform_wfm_no_cal(f, c('NO', 'NOx'), 4)
+}
+
+transform_wfms_42Cs = function(f) {
+  transform_wfm_no_cal(f, c('NO', 'NOy'), 4)
+}
+
+transform_wfms_43C = function(f) {
+  transform_wfm_single_cal(f, 'SO2',
+                           corrected = c('set_43c_to_zero_3',
+                                         'set_span_so2_5',
+                                         NA),
+                           measured = c('measured_zero_so2_3',
+                                        'measured_span_so2_5',
+                                        '43c_zero_7'),
+                           provided = c(0, 5.9, 0))
 }
