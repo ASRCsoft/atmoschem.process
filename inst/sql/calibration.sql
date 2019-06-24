@@ -15,6 +15,7 @@ create table autocals (
 );
 
 create table manual_calibrations (
+  file_id int references files on delete cascade,
   measurement_type_id int references measurement_types,
   type text,
   times tsrange,

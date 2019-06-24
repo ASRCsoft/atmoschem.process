@@ -31,7 +31,7 @@ create table files (
 
 create table observations (
   id serial primary key,
-  file_id int references files,
+  file_id int references files on delete cascade,
   line int not null,
   time timestamp not null,
   unique(file_id, line)
@@ -65,7 +65,7 @@ create table measurement_types (
 );
 
 create table measurements (
-  observation_id int references observations,
+  observation_id int references observations on delete cascade,
   measurement_type_id int references measurement_types,
   value numeric,
   flagged boolean,

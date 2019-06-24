@@ -16,24 +16,21 @@ even_smarter_upload = function(obj, f, site, measurement,
     }
     file_id = get_file_id(obj$con, site, ds_i,
                           f_i, is_calibration)
-    if (is.na(file_id)) {
-      add_new_file(obj$con, site[i], ds_i, f_i,
-                   is_calibration)
-      file_id = get_file_id(obj$con, site[i], ds_i,
-                            f_i, is_calibration)
-    } else {
+    if (!is.na(file_id)) {
       if (clobber) {
-        ## remove the existing file data
-        rmv_meas_sql = paste0('delete from measurements where observation_id in (select id from observations where file_id=',
-                              file_id, ')')
-        DBI::dbSendQuery(obj$con, rmv_meas_sql)
-        rmv_obs_sql = paste0('delete from observations where file_id=',
-                             file_id)
-        DBI::dbSendQuery(obj$con, rmv_obs_sql)
+        ## remove the existing file data -- removing the file will
+        ## remove all its associated data thanks to cascade options in
+        ## postgres
+        rmv_file_sql = paste0('delete from files where id=', file_id)
+        DBI::dbSendQuery(obj$con, rmv_file_sql)
       } else {
         next()
       }
     }
+    add_new_file(obj$con, site[i], ds_i, f_i,
+                 is_calibration)
+    file_id = get_file_id(obj$con, site[i], ds_i,
+                          f_i, is_calibration)
     df = read.csv(f_i)
     if (nrow(df) == 0) next()
     df$measurement_type_id =
@@ -41,9 +38,10 @@ even_smarter_upload = function(obj, f, site, measurement,
                               df$measurement_name)
     df$measurement_name = NULL
     if (is_calibration) {
-      ## put the measurement type ID first
+      df$file_id = file_id
+      ## put the file ID and measurement type ID first
       ncols = ncol(df)
-      df = df[, c(ncols, 1:(ncols - 1))]
+      df = df[, c((ncols - 1):ncols, 1:(ncols - 2))]
     } else {
       df$instrument_time = as.POSIXct(df$instrument_time)
       df$observation_id =
