@@ -164,3 +164,16 @@ CREATE AGGREGATE runmad(double precision) (
   mfinalfunc = runmad_finalfn,
   PARALLEL = SAFE
 );
+
+/* A few functions to help with time ranges */
+CREATE AGGREGATE range_union(anyrange) (
+  stype = anyrange,
+  sfunc = range_union,
+  PARALLEL = SAFE
+);
+
+CREATE AGGREGATE range_intersect(anyrange) (
+  stype = anyrange,
+  sfunc = range_intersect,
+  PARALLEL = SAFE
+);

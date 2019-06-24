@@ -47,12 +47,27 @@ create or replace function estimate_cal(measurement_type int, cal_type text, cal
   end;
 $$ language plpgsql STABLE PARALLEL SAFE;
 
-create or replace view calibration_periods as
+-- get manual calibration periods, grouped regardless of cal type
+CREATE or replace VIEW manual_calibration_sessions AS
+  select measurement_type_id,
+	 range_union(times) as times
+    from (select *,
+		 sum(new_session::int) over w as session_number
+	    from (select *,
+			 isempty(times * lag(times) over w) as new_session
+		    from manual_calibrations
+			   window w as (partition by measurement_type_id
+					order by lower(times))) w1
+		   window w as (partition by measurement_type_id
+				order by lower(times))) w2
+   group by measurement_type_id, session_number;
+
+create or replace view scheduled_autocals as
   select measurement_type_id,
 	 type,
 	 tsrange(cal_day + lower(cal_times),
 		 cal_day + upper(cal_times),
-		 '[]') as cal_times
+		 '[]') as times
     from (select measurement_type_id,
 		 type,
 		 generate_series(lower(dates),
@@ -60,16 +75,34 @@ create or replace view calibration_periods as
 				 interval '1 day')::date as cal_day,
 		 times as cal_times
 	    from autocals) a1;
+	 
+create or replace view calibration_periods as
+  select *
+    from (select measurement_type_id,
+		 type,
+		 range_intersect(times) as times
+	    from (select sa.measurement_type_id,
+			 type,
+			 sa.times as scheduled_times,
+			 case when mc.times is null then sa.times
+			 else sa.times - mc.times end as times
+		    from scheduled_autocals sa
+			   left join manual_calibration_sessions mc
+			       on sa.measurement_type_id = mc.measurement_type_id
+			       and sa.times && mc.times) sa1
+	   group by measurement_type_id, type, scheduled_times) sa2
+   where not isempty(times);
 
 CREATE materialized VIEW calibration_zeros AS
   select measurement_type_id,
 	 type,
-	 upper(cal_times) as time,
+	 upper(times) as time,
 	 value
     from (select *,
-		 estimate_cal(measurement_type_id, type, cal_times) as value
+		 estimate_cal(measurement_type_id, type, times) as value
 	    from calibration_periods
-	   where type = 'zero') c1
+	   where type = 'zero'
+	     and upper(times) - lower(times) > interval '5 min') c1
    where value is not null
   union
   select measurement_type_id,
@@ -113,13 +146,14 @@ $$ LANGUAGE sql STABLE PARALLEL SAFE;
 CREATE or replace VIEW calibration_spans AS
   select c1.measurement_type_id,
 	 c1.type,
-	 upper(c1.cal_times) as time,
+	 upper(c1.times) as time,
 	 m.span as provided_value,
 	 c1.value as value
     from (select *,
-		 estimate_cal(measurement_type_id, type, cal_times) as value
+		 estimate_cal(measurement_type_id, type, times) as value
 	    from calibration_periods
-	   where type = 'span') c1
+	   where type = 'span'
+	     and upper(times) - lower(times) > interval '10 min') c1
 	   join
 	   measurement_types m
 	   on c1.measurement_type_id=m.id
@@ -281,9 +315,9 @@ $$ LANGUAGE sql STABLE PARALLEL SAFE;
 create or replace view conversion_efficiency_inputs as
   select measurement_type_id,
 	 type,
-	 upper(cal_times) as time,
+	 upper(times) as time,
 	 max_ce as provided_value,
-	 estimate_cal(measurement_type_id, type, cal_times) as measured_value
+	 estimate_cal(measurement_type_id, type, times) as measured_value
     from calibration_periods c1
 	   join measurement_types m1
 	       on c1.measurement_type_id=m1.id
