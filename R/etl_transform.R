@@ -21,7 +21,7 @@ transform_calibration = function(f, site, ds) {
 
 transform_measurement = function(f, site, ds) {
   if (ds == 'campbell') {
-    transform_campbell(f)
+    transform_campbell(f, site)
   } else if (ds == 'ultrafine') {
     transform_ultrafine(f)
   } else if (ds == 'mesonet') {
