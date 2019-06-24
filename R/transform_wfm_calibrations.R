@@ -139,14 +139,18 @@ transform_wfml_42i = function(f) {
 }
 
 transform_wfml_48C = function(f) {
-  transform_wfm_single_cal(f, 'CO',
-                           calibrated = c('zero_cal_mode_2',
-                                          'span_cal_mode_4',
-                                          'zero_cal_check_6'),
-                           corrected = c('set_48C_zero_offset_ 3',
-                                         'set_48C_span_5',
-                                         NA),
-                           provided = c(0, .786, 0))
+  df48C = transform_wfm_single_cal(f, 'CO',
+                                   calibrated = c('zero_cal_mode_2',
+                                                  'span_cal_mode_4',
+                                                  'zero_cal_check_6'),
+                                   corrected = c('set_48C_zero_offset_ 3',
+                                                 'set_48C_span_5',
+                                                 NA),
+                                   provided = c(0, 786, 0))
+  ## need to multiply by 1000 because cal values are recorded in
+  ## different units than the measurements!
+  df48C$measured_value = as.numeric(df48C$measured_value) * 1000
+  df48C
 }
 
 transform_wfms_300EU = function(f) {
