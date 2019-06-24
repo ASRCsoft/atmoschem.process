@@ -19,6 +19,25 @@ box_checked = function(box) !is.na(box) & box == 'On'
 format_pdf_time = function(pdf, time_label)
   strptime(paste(pdf$date, unlist(pdf[time_label])), '%d-%b-%y %H:%M', tz = 'EST')
 
+get_cal_start_time = function(start_time, offline_time, measured_times) {
+  ## get the start time, guessing if needed
+  prev_measured_times = measured_times[1:(length(measured_times) - 1)]
+  cur_measured_time = tail(measured_times, 1)
+  if (!is.na(start_time)) {
+    start_time
+  } else if (length(measured_times) > 1 &&
+             !all(is.na(prev_measured_times))) {
+    ## get the previous measured time if one is available
+    tail(na.omit(prev_measured_times), 1)
+  } else if (!is.na(offline_time)) {
+    ## get the switch flag offline time
+    offline_time
+  } else if (!is.na(cur_measured_time)) {
+    ## get the measured time - 40 minutes
+    measured_time - as.difftime(40, units = 'mins')
+  }
+}
+
 get_cal_end_time = function(start_times, online_time, measured_time) {
   ## get the end time, guessing if needed
   next_start_times = start_times[2:length(start_times)]
@@ -65,10 +84,12 @@ transform_wfm_cal_list = function(pdf, measurement_name,
   for (n in 1:3) {
     performed_cal = box_checked(pdf[[calibrated[n]]])
     if (performed_cal) {
+      start_time = get_cal_start_time(start_times[n], offline_time,
+                                      measured_times[1:n])
       end_time = get_cal_end_time(start_times[n:3], online_time,
                                   measured_times[n])
-      if (!is.null(end_time)) {
-        times_str = paste0('[', start_times[n], ', ', end_time, ']')
+      if (!is.null(start_time) && !is.null(end_time)) {
+        times_str = paste0('[', start_time, ', ', end_time, ']')
         bool_corrected = !is.na(corrected[n]) &&
           corrected[n] %in% names(pdf) &&
           box_checked(pdf[[corrected[n]]])
