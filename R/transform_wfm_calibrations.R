@@ -146,7 +146,7 @@ transform_wfml_48C = function(f) {
                                    corrected = c('set_48C_zero_offset_ 3',
                                                  'set_48C_span_5',
                                                  NA),
-                                   provided = c(0, 786, 0))
+                                   provided = c(0, 450, 0))
   ## need to multiply by 1000 because cal values are recorded in
   ## different units than the measurements!
   df48C$measured_value =
