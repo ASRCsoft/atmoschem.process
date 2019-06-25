@@ -58,12 +58,25 @@ get_data_source_from_path = function(base, f) {
 get_id_from_pg = function(pg, df, tbl_name) {
   q1 = paste('select * from', tbl_name)
   pg_df = DBI::dbGetQuery(pg, q1)
-  df$order = 1:nrow(df)
-  df2 = merge(df, pg_df, all.x = TRUE)
-  ## df2 is sorted, have to unsort it
-  res = df2$id[order(df2$order)]
-  if (is.null(res)) return(rep(NA, nrow(df)))
-  res
+  if (ncol(df) == 1) {
+    ## if there's only one column to match this becomes easy and fast
+    colname = names(df)
+    if (!colname %in% names(pg_df)) {
+      rep(NA, nrow(df))
+    } else {
+      pg_df$id[match(df[, colname], pg_df[, colname])]
+    }
+  } else {
+    ## otherwise do some fancy merging to match multiple columns
+    df$order = 1:nrow(df)
+    df2 = merge(df, pg_df, all.x = TRUE)
+    if (!'id' %in% names(df2)) {
+      rep(NA, nrow(df))
+    } else {
+      ## df2 is sorted, have to unsort it
+      df2$id[order(df2$order)]
+    }
+  }
 }
 
 get_site_id = function(pg, x) {
@@ -144,9 +157,7 @@ get_obs_id = function(pg, file_id, record, time,
     ## make sure we aren't asking for ID's that don't exist yet
     add_new_obs(pg, file_id, record, time)
   }
-  obs_df = data.frame(file_id = file_id,
-                      line = record,
-                      time = time)
+  obs_df = data.frame(line = record)
   tbl_sql = paste0('observations where file_id=', file_id)
   get_id_from_pg(pg, obs_df, tbl_sql)
 }
