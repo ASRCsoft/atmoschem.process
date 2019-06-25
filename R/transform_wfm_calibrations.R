@@ -149,7 +149,8 @@ transform_wfml_48C = function(f) {
                                    provided = c(0, 786, 0))
   ## need to multiply by 1000 because cal values are recorded in
   ## different units than the measurements!
-  df48C$measured_value = as.numeric(df48C$measured_value) * 1000
+  df48C$measured_value =
+    as.numeric(as.character(df48C$measured_value)) * 1000
   df48C
 }
 
