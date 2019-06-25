@@ -86,8 +86,17 @@ etl_load.etl_nysatmoschem = function(obj, sites = NULL, data_sources = NULL,
     is_measurement =
       get_type_from_path(attr(obj, 'load_dir'), f_paths) == 'measurements'
     dss = get_data_source_from_path(attr(obj, 'load_dir'), f_paths)
+    ## start a DB transaction and drop a few constraints to make
+    ## loading substantially faster
+    DBI::dbBegin(obj$con)
+    DBI::dbSendQuery(obj$con, 'alter table measurements drop constraint measurements_observation_id_fkey')
+    DBI::dbSendQuery(obj$con, 'alter table measurements drop constraint measurements_measurement_type_id_fkey')
     even_smarter_upload(obj, f_paths, sites,
                         is_measurement, dss, clobber)
+    ## recreate the constraints and end the transaction
+    DBI::dbSendQuery(obj$con, 'alter table measurements add constraint measurements_observation_id_fkey foreign key (observation_id) references observations on delete cascade')
+    DBI::dbSendQuery(obj$con, 'alter table measurements add constraint measurements_measurement_type_id_fkey foreign key (observation_id) references observations on delete cascade')
+    DBI::dbCommit(obj$con)
   }
   
   invisible(obj)
