@@ -90,24 +90,46 @@ CREATE materialized VIEW freezing_clusters AS
    group by measurement_type_id, freeze_cluster;
 CREATE INDEX freezing_clusters_idx ON freezing_clusters using gist(measurement_type_id, freeze_period);
 
+-- gather all flagged periods
+CREATE or replace VIEW _flagged_periods AS
+  select measurement_type_id,
+	 times
+    from manual_calibrations
+   union
+  select measurement_type_id,
+	 times
+    from scheduled_autocals
+   union
+  select measurement_type_id,
+	 times
+    from manual_flags
+   union
+  select measurement_type_id,
+	 freeze_period as times
+    from freezing_clusters;
+
+-- combine overlapping periods
+CREATE materialized VIEW flagged_periods AS
+  select measurement_type_id,
+	 range_union(times) as times
+    from (select *,
+		 sum(new_period::int) over w as period_number
+	    from (select *,
+			 isempty(times * lag(times) over w) as new_period
+		    from _flagged_periods
+			   window w as (partition by measurement_type_id
+					order by lower(times))) w1
+		   window w as (partition by measurement_type_id
+				order by lower(times))) w2
+   group by measurement_type_id, period_number;
+CREATE INDEX flagged_periods_idx ON flagged_periods using gist(measurement_type_id, times);
+
 /* Check for flags */
-create or replace function has_manual_flag(measurement_type int, measurement_time timestamp) RETURNS bool AS $$
+create or replace function in_flagged_period(measurement_type int, measurement_time timestamp) RETURNS bool AS $$
   select exists(select *
-		  from manual_flags
+		  from flagged_periods
 		 where measurement_type_id=$1
 		   and $2 <@ times);
-$$ LANGUAGE sql stable parallel safe;
-
-create or replace function has_calibration_flag(measurement_type_id int, measurement_time timestamp) RETURNS bool AS $$
-  -- check to see if a measurement occurred in a calibration period,
-  -- or immediately after one
-  -- (need to add a check for manual calibrations here)
-  select exists(select *
-		  from autocals
-		 where measurement_type_id=$1
-		   and $2::date <@ dates
-		   and $2::time <@ timerange(lower(times),
-					     upper(times) + interval '5 minutes'));
 $$ LANGUAGE sql stable parallel safe;
 
 create or replace function is_valid_value(measurement_type_id int, value numeric) RETURNS bool AS $$
@@ -130,25 +152,14 @@ create or replace function is_below_mdl(measurement_type_id int, value numeric) 
 			    where id=$1), false);
 $$ LANGUAGE sql stable parallel safe;
 
-create or replace function is_frozen(measurement_type_id int, measurement_time timestamp) RETURNS bool AS $$
-  select exists(select *
-		  from freezing_clusters
-		 where measurement_type_id=$1
-		   and $2 <@ freeze_period);
-$$ LANGUAGE sql stable parallel safe;
-  
 /* Determine if a measurement is flagged. */
 create or replace function is_flagged(measurement_type_id int, source sourcerow, measurement_time timestamp, value numeric, flagged boolean, median double precision, mad double precision) RETURNS bool AS $$
-  -- Check for: 1) manual flags, 2) instrument flags, 3) calibrations,
-  -- 4) invalid values, 5) outliers (based on the Hampel filter), and
-  -- 6) freezing anemometers
-  select has_manual_flag(measurement_type_id, measurement_time)
-	   or coalesce(flagged, false)
-	   or has_calibration_flag(measurement_type_id, measurement_time)
+  -- Check for: 1) instrument flags, 2) flagged periods,
+  -- 3) invalid values, and 4) outliers (based on the Hampel filter)
+  select coalesce(flagged, false)
+	   or in_flagged_period(measurement_type_id, measurement_time)
 	   or not is_valid_value(measurement_type_id, value)
-	   or coalesce(is_outlier(value, median, mad), false)
-	   or case when measurement_type_id=any(anemometer_ids()) then is_frozen(measurement_type_id, measurement_time)
-	      else false end;
+	   or coalesce(is_outlier(value, median, mad), false);
 $$ LANGUAGE sql stable parallel safe;
 
 /* Get the NARSTO averaged data flag based on the number of
