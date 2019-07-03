@@ -30,6 +30,13 @@ create table manual_calibrations (
   )
 );
 
+create table calibration_flags (
+  measurement_type_id int references measurement_types,
+  type text,
+  times tsrange,
+  primary key(measurement_type_id, type, times)
+);
+
 create or replace function estimate_cal(measurement_type int, cal_type text, cal_times tsrange) returns numeric as $$
   begin
     return case when cal_type='zero' then min(moving_average)
@@ -95,30 +102,38 @@ create or replace view calibration_periods as
    where not isempty(times);
 
 CREATE materialized VIEW calibration_zeros AS
-  select measurement_type_id,
-	 type,
-	 upper(times) as time,
-	 value
-    from (select *,
-		 estimate_cal(measurement_type_id, type, times) as value
-	    from calibration_periods
-	   where type = 'zero'
-	     and upper(times) - lower(times) > interval '5 min') c1
-   where value is not null
-  union
-  select measurement_type_id,
-	 type,
-	 upper(times) as time,
-	 measured_value as value
-    from manual_calibrations m1
-	   join measurement_types m2
-	       on m1.measurement_type_id=m2.id
-  -- A few of these manual zero calibration values are bad and need to
-  -- be excluded. This seems like the least awkward way to do that for
-  -- now.
-   where not (measurement_type_id=get_measurement_id(3, 'envidas', 'NO-DEC')
-	      and upper(times)::date between '2018-10-23' and '2018-11-08')
-     and type = 'zero';
+  select cz.*
+    from (select measurement_type_id,
+		 type,
+		 upper(times) as time,
+		 value
+	    from (select *,
+			 estimate_cal(measurement_type_id, type, times) as value
+		    from calibration_periods
+		   where type = 'zero'
+		     and upper(times) - lower(times) > interval '5 min') c1
+	   where value is not null
+	   union
+	  select measurement_type_id,
+		 type,
+		 upper(times) as time,
+		 measured_value as value
+	    from manual_calibrations m1
+		   join measurement_types m2
+		       on m1.measurement_type_id=m2.id
+	   where type = 'zero') cz
+	   left join calibration_flags cf
+	       on cz.measurement_type_id=cf.measurement_type_id
+	       and cz.type = cf.type
+	       and cz.time <@ cf.times
+   where cf.times is null;
+
+  -- -- A few of these manual zero calibration values are bad and need to
+  -- -- be excluded. This seems like the least awkward way to do that for
+  -- -- now.
+  --  where not (measurement_type_id=get_measurement_id(3, 'envidas', 'NO-DEC')
+  -- 	      and upper(times)::date between '2018-10-23' and '2018-11-08')
+  --    and type = 'zero';
 CREATE INDEX calibration_zeros_time_idx ON calibration_zeros(measurement_type_id, type, time);
 
 CREATE OR REPLACE FUNCTION interpolate_cal_zero(measurement_type_id int, t timestamp)
