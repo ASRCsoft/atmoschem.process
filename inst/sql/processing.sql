@@ -174,6 +174,7 @@ CREATE OR REPLACE FUNCTION update_processing_inputs()
   refresh materialized view calibration_values;
   refresh materialized view conversion_efficiencies;
   refresh materialized view freezing_clusters;
+  refresh materialized VIEW flagged_periods;
 $$ language sql;
 
 drop function if exists update_processing cascade;
