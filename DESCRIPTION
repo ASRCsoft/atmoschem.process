@@ -17,6 +17,7 @@ Imports:
     RPostgreSQL,
     rvest,
     R.utils,
+    shiny,
     ssh,
     staplr,
     tidyr,
@@ -38,7 +39,7 @@ Suggests:
     reshape2,
     rmarkdown,
     rsvg,
-    shiny,
+    shinyWidgets,
     testthat
 Remotes: bergant/datamodelr
 VignetteBuilder: knitr
