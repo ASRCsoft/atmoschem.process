@@ -21,7 +21,7 @@ Imports:
     seismicRoll,
     shiny,
     ssh,
-    staplr,
+    staplr (>= 2.10),
     tidyr,
     xml2
 Depends:
@@ -43,6 +43,8 @@ Suggests:
     rsvg,
     shinyWidgets,
     testthat
-Remotes: bergant/datamodelr
+Remotes:
+    bergant/datamodelr,
+    pridiltal/staplr
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
