@@ -1,5 +1,7 @@
 ## process data
 
+#' @importFrom lubridate %within%
+
 get_mtype_params = function(obj, m_id) {
   obj %>% tbl('measurement_types') %>%
     filter(id == m_id) %>%
