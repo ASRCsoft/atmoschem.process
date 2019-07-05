@@ -103,7 +103,7 @@ create table _processed_measurements (
   measurement_type_id int references measurement_types,
   time timestamp,
   value numeric,
-  flagged boolean,
+  flagged boolean not null,
   primary key(measurement_type_id, time)
 );
 
