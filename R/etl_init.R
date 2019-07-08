@@ -15,8 +15,11 @@ update_dynamic_library_path = function(pg) {
     lib_path = system.file('src',
                            package = 'nysatmoschem')
     if (!dir.exists(lib_path)) {
-      stop('Could not find median file.')
+      stop('Could not find C library path.')
     }
+  }
+  if (!file.exists(file.path(lib_path, 'median.so'))) {
+    stop('Could not find median file.')
   }
   if (!grepl(lib_path, cur_paths, fixed = TRUE)) {
     if(.Platform$OS.type == "unix") {
