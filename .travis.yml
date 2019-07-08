@@ -7,3 +7,4 @@ apt_packages:
   - libv8-dev
   - libssh-dev
   - postgresql-server-dev-all
+  - ghostscript
