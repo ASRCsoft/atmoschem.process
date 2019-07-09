@@ -8,5 +8,7 @@ apt_packages:
   - libssh-dev
   - postgresql-server-dev-9.6
   - ghostscript
+services:
+  - postgresql
 addons:
   postgresql: "9.6"
