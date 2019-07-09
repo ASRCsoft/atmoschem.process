@@ -39,6 +39,7 @@ update_dynamic_library_path = function(pg) {
                      new_paths, "'")
     DBI::dbExecute(pg, sql_txt)
   }
+  lib_path
 }
 
 ## this works better than dbRunScript in the default method
@@ -144,7 +145,13 @@ etl_init.etl_nysatmoschem = function(obj, script = NULL, schema_name = "init",
   pg = obj$con
   
   ## add to postgres' libdir so it can find compiled code
-  update_dynamic_library_path(pg)
+  dynlib_path = update_dynamic_library_path(pg)
+
+  ## print diagnostic info about dynamic_library_path
+  print(paste('dynamic_library_path:',
+              DBI::dbGetQuery(pg, 'show dynamic_library_path')))
+  print(paste('Found median.so:',
+              file.exists(file.path(dynlib_path, 'median.so'))))
 
   ## set up tables and functions
   sql_files = c('utilities', 'setup', 'clock_errors',
