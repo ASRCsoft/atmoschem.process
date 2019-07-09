@@ -42,7 +42,8 @@ Suggests:
     rmarkdown,
     rsvg,
     shinyWidgets,
-    testthat
+    testthat,
+    zoo
 Remotes:
     bergant/datamodelr,
     pridiltal/staplr
