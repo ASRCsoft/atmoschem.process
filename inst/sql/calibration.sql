@@ -118,6 +118,12 @@ CREATE materialized VIEW calibration_zeros AS
   -- now.
    where not (measurement_type_id=get_measurement_id(3, 'envidas', 'NO-DEC')
 	      and upper(times)::date between '2018-10-23' and '2018-11-08')
+  -- the WFML manual cals in general seem questionable
+     and not measurement_type_id in (select id
+				       from measurement_types
+				      where data_source_id in (select id
+								 from data_sources
+								where site_id=2))
      and type = 'zero';
 CREATE INDEX calibration_zeros_time_idx ON calibration_zeros(measurement_type_id, type, time);
 
@@ -168,6 +174,12 @@ CREATE or replace VIEW calibration_spans AS
     from manual_calibrations m1
 	   join measurement_types m2
 	       on m1.measurement_type_id=m2.id
+  -- the WFML manual cals in general seem questionable
+   where not measurement_type_id in (select id
+				       from measurement_types
+				      where data_source_id in (select id
+								 from data_sources
+								where site_id=2))
      and type = 'span';
 
 CREATE OR REPLACE FUNCTION calc_span(measurement_type_id int, provided_val numeric, val numeric, ts timestamp)
