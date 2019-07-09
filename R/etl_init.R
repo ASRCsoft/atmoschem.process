@@ -147,11 +147,16 @@ etl_init.etl_nysatmoschem = function(obj, script = NULL, schema_name = "init",
   ## add to postgres' libdir so it can find compiled code
   dynlib_path = update_dynamic_library_path(pg)
 
-  ## print diagnostic info about dynamic_library_path
-  print(paste('dynamic_library_path:',
-              DBI::dbGetQuery(pg, 'show dynamic_library_path')))
-  print(paste('Found median.so:',
-              file.exists(file.path(dynlib_path, 'median.so'))))
+  if ('TRAVIS' %in% names(Sys.getenv())) {
+    ## print postgres diagnostic info
+    print(paste('dynamic_library_path:',
+                DBI::dbGetQuery(pg, 'show dynamic_library_path')))
+    print(paste('Found median.so:',
+                file.exists(file.path(dynlib_path, 'median.so'))))
+    print(paste('data_directory:',
+                DBI::dbGetQuery(pg, 'show data_directory')))
+    print(system2('pg_lsclusters', stdout = TRUE))
+  }
 
   ## set up tables and functions
   sql_files = c('utilities', 'setup', 'clock_errors',
