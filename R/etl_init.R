@@ -149,13 +149,23 @@ etl_init.etl_nysatmoschem = function(obj, script = NULL, schema_name = "init",
 
   if ('TRAVIS' %in% names(Sys.getenv())) {
     ## print postgres diagnostic info
-    print(paste('dynamic_library_path:',
-                DBI::dbGetQuery(pg, 'show dynamic_library_path')))
-    print(paste('Found median.so:',
-                file.exists(file.path(dynlib_path, 'median.so'))))
     print(paste('data_directory:',
                 DBI::dbGetQuery(pg, 'show data_directory')))
     print(system2('pg_lsclusters', stdout = TRUE))
+    print(paste('dynamic_library_path:',
+                DBI::dbGetQuery(pg, 'show dynamic_library_path')))
+    median_file = file.path(dynlib_path, 'median.so')
+    median_file_exists = file.exists(median_file)
+    print(paste('Found median.so:', median_file_exists))
+    if (median_file_exists) {
+      median_info = file.info(median_file)
+      print(median_info[, c('uname', 'mode')])
+      Sys.chmod(median_file, mode = '744')
+      median_info = file.info(median_file)
+      print('Changed median.so permissions to')
+      print(median_info[, c('uname', 'mode')])
+    }
+
   }
 
   ## set up tables and functions
