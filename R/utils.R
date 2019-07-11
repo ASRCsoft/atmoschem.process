@@ -1,5 +1,7 @@
 ## useful functions
 
+is_true = function(x) !is.na(x) & x
+
 is_psp_42C_cal = function(f)
   startsWith(basename(f), 'Pinnacle_42C')
 is_psp_API300EU_cal = function(f)

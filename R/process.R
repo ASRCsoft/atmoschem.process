@@ -73,17 +73,27 @@ is_flagged = function(obj, m_id, times, x) {
 }
 
 process = function(obj, m_id, start_time, end_time) {
-  msmts = obj %>%
-    tbl('calibrated_measurements') %>%
-    filter(measurement_type_id == m_id,
-           time >= start_time, time <= end_time) %>%
-    mutate(value = calibrated_value) %>%
+  m_params = get_mtype_params(obj, m_id)
+  obs = tbl(obj, 'processed_observations')
+  msmts = tbl(obj, 'measurements') %>%
+    filter(measurement_type_id == m_id) %>%
+    left_join(obs, c('observation_id' = 'id')) %>%
+    filter(time >= start_time, time <= end_time) %>%
     collect()
   if (nrow(msmts) == 0) {
+    warning('No measurements found.')
     return(data.frame())
   }
+  if (is_true(m_params$has_calibration)) {
+    msmts = msmts %>%
+      mutate(value = apply_cal(obj, m_id, time, value))
+  }
+  if (is_true(m_params$apply_ce)) {
+    msmts = msmts %>%
+      mutate(value = value / get_ces(obj, m_id, time))
+  }
   msmts %>%
-    mutate(flagged = (!is.na(flagged) & flagged) |
+    mutate(flagged = is_true(flagged) |
              is_flagged(obj, m_id, time, value)) %>%
     select(measurement_type_id, time, value, flagged)
 }
@@ -116,9 +126,7 @@ update_processing = function(obj, site, data_source, start_time,
     for (n in 1:nrow(mtypes)) {
       message('Processing ', mtypes$name[n], '...')
       msmts = process(obj, mtypes$id[n], start_time, end_time)
-      if (nrow(msmts) == 0) {
-        warning('No ', mtypes$name[n], ' measurements found')
-      } else {
+      if (nrow(msmts) > 0) {
         DBI::dbWriteTable(obj$con, '_processed_measurements', msmts,
                           row.names = FALSE, append = TRUE)
       }
