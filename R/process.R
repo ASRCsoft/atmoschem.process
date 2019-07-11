@@ -72,18 +72,21 @@ is_flagged = function(obj, m_id, times, x) {
   in_flagged_period | is_outlier | !is_valid
 }
 
-process = function(obj, m_id, start_time, end_time) {
-  m_params = get_mtype_params(obj, m_id)
+get_measurements = function(obj, m_id, start_time, end_time) {
   obs = tbl(obj, 'processed_observations')
   msmts = tbl(obj, 'measurements') %>%
     filter(measurement_type_id == m_id) %>%
     left_join(obs, c('observation_id' = 'id')) %>%
     filter(time >= start_time, time <= end_time) %>%
     collect()
-  if (nrow(msmts) == 0) {
-    warning('No measurements found.')
-    return(data.frame())
-  }
+}
+
+process = function(msmts, m_id) {
+  m_params = get_mtype_params(obj, m_id)
+  ## if (nrow(msmts) == 0) {
+  ##   warning('No measurements found.')
+  ##   return(data.frame())
+  ## }
   if (is_true(m_params$has_calibration)) {
     msmts = msmts %>%
       mutate(value = apply_cal(obj, m_id, time, value))
@@ -125,10 +128,34 @@ update_processing = function(obj, site, data_source, start_time,
     ## add new measurements
     for (n in 1:nrow(mtypes)) {
       message('Processing ', mtypes$name[n], '...')
-      msmts = process(obj, mtypes$id[n], start_time, end_time)
+      msmts = get_measurements(obj, mtypes$id[n], start_time,
+                               end_time)
       if (nrow(msmts) > 0) {
-        DBI::dbWriteTable(obj$con, '_processed_measurements', msmts,
-                          row.names = FALSE, append = TRUE)
+        pr_msmts = process(msmts, mtypes$id[n])
+        DBI::dbWriteTable(obj$con, '_processed_measurements',
+                          pr_msmts, row.names = FALSE, append = TRUE)
+      } else {
+        warning('No measurements found.')
+      }
+    }
+
+    ## add derived measurements
+    if (site %in% names(derived_vals)) {
+      derive_list = derived_vals[[site]]
+      for (n in 1:length(derive_list)) {
+        f_n = derive_list[[n]]
+        msmts = f_n(obj, start_time, end_time)
+        if (nrow(msmts) > 0) {
+          ## some functions return multiple derived measurements
+          un_id = unique(msmts$measurement_type_id)
+          for (id in un_id) {
+            id_msmts = subset(msmts, measurement_type_id == id)
+            pr_msmts = process(id_msmts, id)
+            DBI::dbWriteTable(obj$con, '_processed_measurements',
+                              pr_msmts, row.names = FALSE,
+                              append = TRUE)
+          }
+        }
       }
     }
 
