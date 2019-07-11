@@ -42,7 +42,16 @@ get_cal_spans = function(obj, m_id, times) {
 apply_cal = function(obj, m_id, times, x) {
   zeros = get_cal_zeros(obj, m_id, times)
   spans = get_cal_spans(obj, m_id, times)
-  ifelse(is.na(spans[0]), x - zeros, (x - zeros) / spans)
+  if (!is.na(spans[1])) {
+    ## (spans depend on zeros so this is actually a check that both
+    ## exist)
+    (x - zeros) / spans
+  } else if (!is.na(zeros[1])) {
+    x - zeros
+  } else {
+    warning('No calibration data found.')
+    x
+  }
 }
 
 get_ces = function(obj, m_id, times) {
