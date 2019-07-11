@@ -8,6 +8,10 @@ get_cal_zeros = function(obj, m_id, times) {
     select(time, value) %>%
     arrange(time) %>%
     collect()
+  if (nrow(zeros) == 0) {
+    warning('No zeros found.')
+    return(rep(NA, length(times)))
+  }
   m_params = get_mtype_params(obj, m_id)
   zeros$smoothed_value = runmed(zeros$value, m_params$zero_smooth_window)
   approx(zeros$time, zeros$smoothed_value,
@@ -22,6 +26,10 @@ get_cal_spans = function(obj, m_id, times) {
     select(time, value, provided_value) %>%
     arrange(time) %>%
     collect()
+  if (nrow(spans) == 0) {
+    warning('No spans found.')
+    return(rep(NA, length(times)))
+  }
   ## get the estimated zero values at the corresponding times
   spans$zero = get_cal_zeros(obj, m_id, spans$time)
   spans$ratio = (spans$value - spans$zero) / spans$provided_value
@@ -42,15 +50,19 @@ get_ces = function(obj, m_id, times) {
   ces = obj %>%
     tbl('conversion_efficiency_inputs') %>%
     filter(measurement_type_id == m_id) %>%
-    select(time, value, provided_value) %>%
+    select(time, measured_value, provided_value) %>%
     arrange(time) %>%
     collect()
+  if (nrow(ces) == 0) {
+    warning('No conversion efficiencies found.')
+    return(rep(NA, length(times)))
+  }
   m_params = get_mtype_params(obj, m_id)
-  if (m_params$has_calibration) {
-    ces$efficiency = apply_cal(obj, m_id, ces$time, ces$value) /
+  if (!is.na(m_params$has_calibration) && m_params$has_calibration) {
+    ces$efficiency = apply_cal(obj, m_id, ces$time, ces$measured_value) /
       ces$provided_value
   } else {
-    ces$efficiency = ces$value / ces$provided_value
+    ces$efficiency = ces$measured_value / ces$provided_value
   }
   ces$smoothed_value = runmed(ces$efficiency, 31)
   approx(ces$time, ces$smoothed_value,
