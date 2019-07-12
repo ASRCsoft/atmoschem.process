@@ -5,10 +5,10 @@ sudo: true
 dist: xenial
 cache: packages
 apt_packages:
+  - libv8-dev
   - ghostscript
 r_binary_packages:
-  - DiagrammeRsvg
-  - etl
+  - dplyr
   - ggplot2
   - Rcpp
   - RPostgreSQL
