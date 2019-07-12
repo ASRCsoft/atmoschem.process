@@ -8,6 +8,7 @@ apt_packages:
   - libv8-dev
   - ghostscript
 r_binary_packages:
+  - bookdown
   - DiagrammeR
   - dplyr
   - ggplot2
