@@ -30,8 +30,6 @@ install.packages('remotes')
 remotes::install_github('ASRCsoft/nysatmoschem')
 ```
 
-The package requires the PostgreSQL server to be running locally, and the database user account must have the required postgres privileges.
-
 ## License
 
 `nysatmoschem` is released under the open source MIT license.
