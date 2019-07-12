@@ -117,7 +117,7 @@ update_processing = function(obj, site, data_source, start_time,
   DBI::dbWithTransaction(obj$con, {
     ## delete old measurements
     q1 = '  delete
-    from _processed_measurements
+    from processed_measurements
    where measurement_type_id=any(get_data_source_ids(?site, ?ds))
      and (?start is null or time>=?start)
      and (?end is null or time<=?end)'
@@ -132,7 +132,7 @@ update_processing = function(obj, site, data_source, start_time,
                                end_time)
       if (nrow(msmts) > 0) {
         pr_msmts = process(obj, msmts, ds_mtypes$id[n])
-        DBI::dbWriteTable(obj$con, '_processed_measurements',
+        DBI::dbWriteTable(obj$con, 'processed_measurements',
                           pr_msmts, row.names = FALSE, append = TRUE)
       } else {
         warning('No measurements found.')
@@ -154,7 +154,7 @@ update_processing = function(obj, site, data_source, start_time,
             message('Processing ', name, '...')
             ## delete old measurements
             q2 = '  delete
-    from _processed_measurements
+    from processed_measurements
    where measurement_type_id=?id
      and (?start is null or time>=?start)
      and (?end is null or time<=?end)'
@@ -163,7 +163,7 @@ update_processing = function(obj, site, data_source, start_time,
             DBI::dbExecute(obj$con, sql2)
             id_msmts = subset(msmts, measurement_type_id == id)
             pr_msmts = process(obj, id_msmts, id)
-            DBI::dbWriteTable(obj$con, '_processed_measurements',
+            DBI::dbWriteTable(obj$con, 'processed_measurements',
                               pr_msmts, row.names = FALSE,
                               append = TRUE)
           }
