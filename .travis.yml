@@ -12,3 +12,6 @@ services:
   - postgresql
 addons:
   postgresql: "10"
+env:
+  global:
+  - PGPORT=5433
