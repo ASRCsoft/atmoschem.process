@@ -2,46 +2,6 @@
 
 #' @import dbx
 
-update_dynamic_library_path = function(pg) {
-  ## get the current paths
-  cur_paths = DBI::dbGetQuery(pg, 'show dynamic_library_path')
-  
-  ## add median C library location if needed
-  lib_path = system.file('libs',
-                         package = 'nysatmoschem')
-
-  if (!dir.exists(lib_path)) {
-    ## is this a unit test?
-    lib_path = system.file('src',
-                           package = 'nysatmoschem')
-    if (!dir.exists(lib_path)) {
-      stop('Could not find C library path.')
-    }
-  }
-  if (!file.exists(file.path(lib_path, 'median.so'))) {
-    stop('Could not find median file.')
-  }
-  if (!grepl(lib_path, cur_paths, fixed = TRUE)) {
-    if(.Platform$OS.type == "unix") {
-      path_sep = ':'
-    } else {
-      path_sep = ';'
-    }
-    new_paths = paste(cur_paths, lib_path, sep = path_sep)
-    ## set dynamic_library_path, but only for the current session
-    sql_txt = paste0("set dynamic_library_path to '",
-                     new_paths, "'")
-    DBI::dbExecute(pg, sql_txt)
-    ## set dynamic_library_path for future sessions
-    dbname = DBI::dbGetInfo(pg)$dbname
-    sql_txt = paste0('alter database "', dbname,
-                     "\" set dynamic_library_path to '",
-                     new_paths, "'")
-    DBI::dbExecute(pg, sql_txt)
-  }
-  lib_path
-}
-
 ## this works better than dbRunScript in the default method
 run_sql_script = function(pg, f) {
   sql_txt = paste(readLines(f), collapse = "\n")
@@ -143,30 +103,6 @@ etl_init.etl_nysatmoschem = function(obj, script = NULL, schema_name = "init",
     stop("Invalid connection to database.")
   }
   pg = obj$con
-  
-  ## add to postgres' libdir so it can find compiled code
-  dynlib_path = update_dynamic_library_path(pg)
-
-  if ('TRAVIS' %in% names(Sys.getenv())) {
-    ## print postgres diagnostic info
-    print(paste('data_directory:',
-                DBI::dbGetQuery(pg, 'show data_directory')))
-    print(system2('pg_lsclusters', stdout = TRUE))
-    print(paste('dynamic_library_path:',
-                DBI::dbGetQuery(pg, 'show dynamic_library_path')))
-    median_file = file.path(dynlib_path, 'median.so')
-    median_file_exists = file.exists(median_file)
-    print(paste('Found median.so:', median_file_exists))
-    if (median_file_exists) {
-      median_info = file.info(median_file)
-      print(median_info[, c('uname', 'mode')])
-      Sys.chmod(median_file, mode = '744')
-      median_info = file.info(median_file)
-      print('Changed median.so permissions to')
-      print(median_info[, c('uname', 'mode')])
-    }
-
-  }
 
   ## set up tables and functions
   sql_files = c('utilities', 'setup', 'clock_errors',
