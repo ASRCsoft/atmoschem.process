@@ -13,21 +13,24 @@ The `nysatmoschem` R package provides utilities to reproduce the database, along
 ```R
 library(nysatmoschem)
 
-# create a postgres database connection and nysatmoschem dataset object
+# Create a postgres database connection and nysatmoschem dataset object
 dbcon = src_postgres(dbname = 'nysacdb', user = 'user')
 nysac = etl('nysatmoschem', db = dbcon, dir = 'data')
 
 # Set up the database and add data from the ASRC's atmoschem server--
 # this example collects the campbell datalogger files from the
-# Whiteface Mountain lodge site.
+# Whiteface Mountain lodge site
 nysac %>% etl_create(user = 'user', password = 'pass', sites = 'WFML',
                      data_sources = 'campbell', years = 2018)
 
-# Process the Whiteface Mountain lodge campbell data and add it to the
-# database
+# Process the Whiteface Mountain lodge campbell data and add the
+# results to the database
 nysac %>% update_processing(site = 'WFML', data_source = 'campbell',
                             start_time = '2018-01-01',
                             end_time = '2019-01-01')
+
+# View the processing steps in a Shiny app
+view_processing(nysac)
 ```
 
 ## Installation
