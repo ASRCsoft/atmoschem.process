@@ -1,7 +1,7 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
 language: R
-sudo: false
+dist: xenial
 cache: packages
 apt_packages:
   - ghostscript
@@ -9,6 +9,7 @@ r_binary_packages:
   - DiagrammeRsvg
   - etl
   - ggplot2
+  - Rcpp
   - RPostgreSQL
   - rvest
   - shiny
