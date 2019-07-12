@@ -81,7 +81,7 @@ get_measurements = function(obj, m_id, start_time, end_time) {
     collect()
 }
 
-process = function(msmts, m_id) {
+process = function(obj, msmts, m_id) {
   m_params = get_mtype_params(obj, m_id)
   ## if (nrow(msmts) == 0) {
   ##   warning('No measurements found.')
@@ -110,14 +110,14 @@ update_processing = function(obj, site, data_source, start_time,
   ## get measurement type ID's
   mtypes = obj %>%
     tbl('measurement_types') %>%
-    filter(data_source_id == ds_id & !is.na(apply_processing) & apply_processing) %>%
-    select(id, name) %>%
     collect()
+  ds_mtypes = mtypes %>%
+    filter(data_source_id == ds_id & !is.na(apply_processing) & apply_processing)
   
   DBI::dbWithTransaction(obj$con, {
     ## delete old measurements
     q1 = '  delete
-    from _processed_measurements
+    from processed_measurements
    where measurement_type_id=any(get_data_source_ids(?site, ?ds))
      and (?start is null or time>=?start)
      and (?end is null or time<=?end)'
@@ -126,13 +126,13 @@ update_processing = function(obj, site, data_source, start_time,
     DBI::dbExecute(obj$con, sql1)
 
     ## add new measurements
-    for (n in 1:nrow(mtypes)) {
-      message('Processing ', mtypes$name[n], '...')
-      msmts = get_measurements(obj, mtypes$id[n], start_time,
+    for (n in 1:nrow(ds_mtypes)) {
+      message('Processing ', ds_mtypes$name[n], '...')
+      msmts = get_measurements(obj, ds_mtypes$id[n], start_time,
                                end_time)
       if (nrow(msmts) > 0) {
-        pr_msmts = process(msmts, mtypes$id[n])
-        DBI::dbWriteTable(obj$con, '_processed_measurements',
+        pr_msmts = process(obj, msmts, ds_mtypes$id[n])
+        DBI::dbWriteTable(obj$con, 'processed_measurements',
                           pr_msmts, row.names = FALSE, append = TRUE)
       } else {
         warning('No measurements found.')
@@ -140,7 +140,8 @@ update_processing = function(obj, site, data_source, start_time,
     }
 
     ## add derived measurements
-    if (site %in% names(derived_vals)) {
+    if (site %in% names(derived_vals) &&
+        length(derived_vals[[site]]) > 0) {
       derive_list = derived_vals[[site]]
       for (n in 1:length(derive_list)) {
         f_n = derive_list[[n]]
@@ -149,9 +150,11 @@ update_processing = function(obj, site, data_source, start_time,
           ## some functions return multiple derived measurements
           un_id = unique(msmts$measurement_type_id)
           for (id in un_id) {
+            name = mtypes$name[match(id, mtypes$id)]
+            message('Processing ', name, '...')
             id_msmts = subset(msmts, measurement_type_id == id)
-            pr_msmts = process(id_msmts, id)
-            DBI::dbWriteTable(obj$con, '_processed_measurements',
+            pr_msmts = process(obj, id_msmts, id)
+            DBI::dbWriteTable(obj$con, 'processed_measurements',
                               pr_msmts, row.names = FALSE,
                               append = TRUE)
           }

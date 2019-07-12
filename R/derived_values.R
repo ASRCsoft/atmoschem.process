@@ -96,17 +96,17 @@ derived_wfms = list(wfms_no2, wfms_slp, wfms_ws, wfms_ws_components,
 
 
 ## WFML functions
-wfml_slp = function(obj, start_time, end_time) {
-  combine_measures(obj, 'WFML', 'campbell', 'BP', 'PTemp_C',
-                   start_time, end_time) %>%
-    mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'WFML', 'derived', 'SLP'),
-           value = sea_level_pressure(value1, value2, 604),
-           flagged = flagged1 | flagged2) %>%
-    select(measurement_type_id, time, value, flagged)
-}
+## wfml_slp = function(obj, start_time, end_time) {
+##   combine_measures(obj, 'WFML', 'campbell', 'BP', 'PTemp_C',
+##                    start_time, end_time) %>%
+##     mutate(measurement_type_id =
+##              get_measurement_type_id(obj$con, 'WFML', 'derived', 'SLP'),
+##            value = sea_level_pressure(value1, value2, 604),
+##            flagged = flagged1 | flagged2) %>%
+##     select(measurement_type_id, time, value, flagged)
+## }
 
-derived_wfml = list(wfml_slp)
+derived_wfml = list()
 
 
 ## PSP functions
