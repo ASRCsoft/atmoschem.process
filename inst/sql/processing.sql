@@ -193,7 +193,7 @@ $$ language sql;
 drop function if exists update_processing_outputs cascade;
 CREATE OR REPLACE FUNCTION update_processing_outputs()
   RETURNS void as $$
-  -- refresh materialized view processed_measurements;
+  refresh materialized view processed_measurements;
   refresh materialized view hourly_measurements;
 $$ language sql;
 
