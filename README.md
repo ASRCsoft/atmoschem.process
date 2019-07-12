@@ -17,8 +17,11 @@ library(nysatmoschem)
 dbcon = src_postgres(dbname = 'nysacdb', user = 'user')
 nysac = etl('nysatmoschem', db = dbcon, dir = 'data')
 
-# set up the database and add data from the ASRC's atmoschem server
-nysac %>% etl_create(user = 'user', password = 'pass')
+# Set up the database and add data from the ASRC's atmoschem server--
+# this example collects the campbell datalogger files from the
+# Whiteface Mountain lodge site.
+nysac %>% etl_create(user = 'user', password = 'pass', sites = 'WFML',
+                     data_sources = 'campbell', years = 2018)
 ```
 
 ## Installation
