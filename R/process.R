@@ -115,6 +115,9 @@ update_processing = function(obj, site, data_source, start_time,
     filter(data_source_id == ds_id & !is.na(apply_processing) & apply_processing)
   
   DBI::dbWithTransaction(obj$con, {
+    message('Updating processing inputs ...')
+    DBI::dbExecute(obj$con, 'select update_processing_inputs()')
+    
     ## delete old measurements
     q1 = '  delete
     from processed_measurements
@@ -171,7 +174,6 @@ update_processing = function(obj, site, data_source, start_time,
       }
     }
 
-    ## update processing outputs
     message('Updating processing outputs ...')
     DBI::dbExecute(obj$con, 'select update_processing_outputs()')
   })
