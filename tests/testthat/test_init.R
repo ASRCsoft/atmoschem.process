@@ -8,7 +8,7 @@ if (db_res == 0) {
   has_temp_db = TRUE
   dbcon = src_postgres(dbname = dbname)
 } else {
-  warning('Unable to create database.')
+  warning('Unable to create database for testing.')
   has_temp_db = FALSE
 }
 
