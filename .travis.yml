@@ -23,3 +23,4 @@ addons:
 env:
   global:
   - PGPORT=5433
+warnings_are_errors: false
