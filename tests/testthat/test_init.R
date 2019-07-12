@@ -3,8 +3,12 @@ library(nysatmoschem)
 
 ## create temp database
 dbname = basename(tempfile(pattern=''))
-db_res = try(system2('createdb', dbname))
-if (class(db_res) == 'try-error') {
+if ('TRAVIS' %in% names(Sys.getenv())) {
+  db_res = system2('createdb', dbname, env = 'PGPORT=5433')
+} else {
+  db_res = try(system2('createdb', dbname))
+}
+if (is(db_res, 'try-error')) {
   has_temp_db = FALSE
 } else {
   has_temp_db = TRUE
