@@ -22,6 +22,12 @@ nysac = etl('nysatmoschem', db = dbcon, dir = 'data')
 # Whiteface Mountain lodge site.
 nysac %>% etl_create(user = 'user', password = 'pass', sites = 'WFML',
                      data_sources = 'campbell', years = 2018)
+
+# Process the Whiteface Mountain lodge campbell data and add it to the
+# database
+nysac %>% update_processing(site = 'WFML', data_source = 'campbell',
+                            start_time = '2018-01-01',
+                            end_time = '2019-01-01')
 ```
 
 ## Installation
