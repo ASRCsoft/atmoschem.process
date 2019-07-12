@@ -6,9 +6,9 @@ cache: packages
 apt_packages:
   - libv8-dev
   - libssh-dev
-  - postgresql-server-dev-9.6
+  - postgresql-server-dev-10
   - ghostscript
 services:
   - postgresql
 addons:
-  postgresql: "9.6"
+  postgresql: "10"
