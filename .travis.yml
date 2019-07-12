@@ -4,10 +4,15 @@ language: R
 sudo: false
 cache: packages
 apt_packages:
-  - libv8-dev
-  - libssh-dev
-  - postgresql-server-dev-10
   - ghostscript
+r_binary_packages:
+  - DiagrammeRsvg
+  - etl
+  - ggplot2
+  - RPostgreSQL
+  - rvest
+  - shiny
+  - ssh
 services:
   - postgresql
 addons:
