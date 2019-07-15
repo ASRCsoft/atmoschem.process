@@ -4,17 +4,18 @@ even_smarter_upload = function(obj, f, site, measurement,
                                ds, clobber = FALSE) {
   for (i in 1:length(f)) {
     f_i = f[i]
+    site_i = site[i]
     is_calibration = !measurement[i]
     if (is_calibration) {
-      if (site %in% c('WFMS', 'WFML')) {
+      if (site_i %in% c('WFMS', 'WFML')) {
         ds_i = 'campbell'
-      } else if (site == 'PSP') {
+      } else if (site_i == 'PSP') {
         ds_i = 'envidas'
       }
     } else {
       ds_i = ds[i]
     }
-    file_id = get_file_id(obj$con, site, ds_i,
+    file_id = get_file_id(obj$con, site_i, ds_i,
                           f_i, is_calibration)
     if (!is.na(file_id)) {
       if (clobber) {
@@ -27,14 +28,14 @@ even_smarter_upload = function(obj, f, site, measurement,
         next()
       }
     }
-    add_new_file(obj$con, site[i], ds_i, f_i,
+    add_new_file(obj$con, site_i, ds_i, f_i,
                  is_calibration)
-    file_id = get_file_id(obj$con, site[i], ds_i,
+    file_id = get_file_id(obj$con, site_i, ds_i,
                           f_i, is_calibration)
     df = read.csv(f_i)
     if (nrow(df) == 0) next()
     df$measurement_type_id =
-      get_measurement_type_id(obj$con, site[i], ds_i,
+      get_measurement_type_id(obj$con, site_i, ds_i,
                               df$measurement_name)
     df$measurement_name = NULL
     if (is_calibration) {
