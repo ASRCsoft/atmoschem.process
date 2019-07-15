@@ -1,5 +1,7 @@
 ## useful functions
 
+is_true = function(x) !is.na(x) & x
+
 is_psp_42C_cal = function(f)
   startsWith(basename(f), 'Pinnacle_42C')
 is_psp_API300EU_cal = function(f)
@@ -200,7 +202,7 @@ get_measurement_type_id = function(pg, site,
 
 #' @import shiny
 #' @export
-view_processing = function(...) {
-  shinyOptions(pg = dplyr::src_postgres(...))
+view_processing = function(obj) {
+  shinyOptions(pg = obj$con)
   runApp(system.file('processing_viewer', package = 'nysatmoschem'))
 }

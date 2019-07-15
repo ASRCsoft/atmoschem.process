@@ -57,6 +57,8 @@ create table measurement_types (
   mdl numeric,
   span numeric,
   has_calibration boolean,
+  zero_smooth_window int,
+  span_smooth_window int,
   remove_outliers boolean,
   max_jump numeric,
   apply_ce boolean,

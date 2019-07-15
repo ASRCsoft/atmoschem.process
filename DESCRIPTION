@@ -13,12 +13,15 @@ Imports:
     dbplyr,
     dbx,
     httr,
+    lubridate,
     readxl,
     RPostgreSQL,
     rvest,
     R.utils,
+    seismicRoll,
+    shiny,
     ssh,
-    staplr,
+    staplr (>= 2.10),
     tidyr,
     xml2
 Depends:
@@ -38,8 +41,11 @@ Suggests:
     reshape2,
     rmarkdown,
     rsvg,
-    shiny,
-    testthat
-Remotes: bergant/datamodelr
+    shinyWidgets,
+    testthat,
+    zoo
+Remotes:
+    bergant/datamodelr,
+    pridiltal/staplr
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1

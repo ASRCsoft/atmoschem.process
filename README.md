@@ -1,5 +1,7 @@
 # The ASRC NYS Atmospheric Chemistry Database
 
+[![Build Status](https://travis-ci.org/ASRCsoft/nysatmoschem.svg?branch=master)](https://travis-ci.org/ASRCsoft/nysatmoschem)
+
 The ASRC NYS Atmospheric Chemistry Database is a PostgreSQL database containing atmospheric chemistry data from ASRC sites in New York State.
 
 The `nysatmoschem` R package provides utilities to reproduce the database, along with functions to generate various reports and processed datasets, and tools to visualize the data.
@@ -11,12 +13,24 @@ The `nysatmoschem` R package provides utilities to reproduce the database, along
 ```R
 library(nysatmoschem)
 
-# create a postgres database connection and nysatmoschem dataset object
+# Create a postgres database connection and nysatmoschem dataset object
 dbcon = src_postgres(dbname = 'nysacdb', user = 'user')
 nysac = etl('nysatmoschem', db = dbcon, dir = 'data')
 
-# set up the database and add data from the ASRC's atmoschem server
-nysac %>% etl_create(user = 'user', password = 'pass')
+# Set up the database and add data from the ASRC's atmoschem server--
+# this example collects the campbell datalogger files from the
+# Whiteface Mountain lodge site
+nysac %>% etl_create(user = 'user', password = 'pass', sites = 'WFML',
+                     data_sources = 'campbell', years = 2018)
+
+# Process the Whiteface Mountain lodge campbell data and add the
+# results to the database
+nysac %>% update_processing(site = 'WFML', data_source = 'campbell',
+                            start_time = '2018-01-01',
+                            end_time = '2019-01-01')
+
+# View the processing steps in a Shiny app
+view_processing(nysac)
 ```
 
 ## Installation
@@ -27,8 +41,6 @@ Install `nysatmoschem` from R using the `remotes` package:
 install.packages('remotes')
 remotes::install_github('ASRCsoft/nysatmoschem')
 ```
-
-The package requires the PostgreSQL server to be running locally, and the database user account must have the required postgres privileges.
 
 ## License
 

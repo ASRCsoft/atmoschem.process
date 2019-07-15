@@ -1,0 +1,26 @@
+# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+
+language: R
+sudo: required
+dist: xenial
+cache: packages
+apt_packages:
+  - libv8-dev
+  - ghostscript
+r_binary_packages:
+  - rmarkdown
+  - DiagrammeR
+  - dplyr
+  - ggplot2
+  - Rcpp
+  - RPostgreSQL
+  - rvest
+  - shiny
+  - ssh
+services:
+  - postgresql
+addons:
+  postgresql: "10"
+env:
+  - R_REMOTES_NO_ERRORS_FROM_WARNINGS=true
+warnings_are_errors: false

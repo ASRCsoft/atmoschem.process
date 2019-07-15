@@ -10,12 +10,12 @@
 ## [0.1.1] - 2019-06-10
 ### Added
 - Add WFMS 2018 4th quarter data annotations.
-- Flag negative WFMS 370nm black carbon and wood smoke values as below
-  the method detection limit.
-- Treat zero WFMS 370nm and 880nm black carbon as missing data.
 
 ### Changed
 - Create separate minute files for each data source.
+- Flag negative WFMS 370nm black carbon and wood smoke values as below
+  the method detection limit.
+- Treat zero WFMS 370nm and 880nm black carbon as missing data.
 
 ## [0.1.0] - 2019-05-31
 ### Added
