@@ -183,5 +183,6 @@ transform_psp_calibrations = function(f) {
     transform_psp_TEI49i_O3_49i_calibrations(f)
   } else {
     warning(paste('Transform not implemented for', f))
+    NULL
   }
 }
