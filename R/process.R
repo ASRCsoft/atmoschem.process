@@ -88,17 +88,14 @@ process = function(obj, msmts, m_id) {
   ##   return(data.frame())
   ## }
   if (is_true(m_params$has_calibration)) {
-    msmts = msmts %>%
-      mutate(value = apply_cal(obj, m_id, time, value))
+    msmts$value = apply_cal(obj, m_id, msmts$time, msmts$value)
   }
   if (is_true(m_params$apply_ce)) {
-    msmts = msmts %>%
-      mutate(value = value / get_ces(obj, m_id, time))
+    msmts$value = msmts$value / get_ces(obj, m_id, msmts$time)
   }
-  msmts %>%
-    mutate(flagged = is_true(flagged) |
-             is_flagged(obj, m_id, time, value)) %>%
-    select(measurement_type_id, time, value, flagged)
+  msmts$flagged = is_true(msmts$flagged) |
+    is_flagged(obj, m_id, msmts$time, msmts$value)
+  msmts[, c('measurement_type_id', 'time', 'value', 'flagged')]
 }
 
 #' @export
