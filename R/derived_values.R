@@ -124,7 +124,7 @@ psp_hno3 = function(obj, start_time, end_time) {
   combine_measures(obj, 'PSP', 'envidas', 'NOy', 'NOy-HNO3',
                    start_time, end_time) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'PSP', 'derived', 'NO2'),
+             get_measurement_type_id(obj$con, 'PSP', 'derived', 'HNO3'),
            value = value1 - value2,
            flagged = flagged1 | flagged2) %>%
     select(measurement_type_id, time, value, flagged)
@@ -132,17 +132,24 @@ psp_hno3 = function(obj, start_time, end_time) {
 
 ## fix this one!
 psp_precip = function(obj, start_time, end_time) {
-  obj %>%
-    tbl('measurements') %>%
-    filter(measurement_type_id =
-             get_measurement_type_id(obj$con, 'PSP', 'envidas', 'Rain'))
-    collect()
-  combine_measures(obj, 'PSP', 'envidas', 'NOy', 'NOy-HNO3',
-                   start_time, end_time) %>%
+  rain_id = get_measurement_type_id(obj$con, 'PSP', 'envidas', 'Rain')
+  ## carefully deal with value resets from 0.5 back to 0, which
+  ## usually happens in only one minute, but sometimes takes two
+  ## minutes with an average measurement (of the previous value and
+  ## zero) in between
+  get_measurements(obj, rain_id, start_time, end_time) %>%
+    arrange(time) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'PSP', 'derived', 'NO2'),
-           value = value1 - value2,
-           flagged = flagged1 | flagged2) %>%
+             get_measurement_type_id(obj$con, 'PSP', 'derived', 'Precip'),
+           d1 = c(NA, diff(value)),
+           resetting = d1 <= -.02,
+           value = case_when(
+               resetting & !lag(resetting) & !lead(resetting) ~ d1 + .5,
+               resetting & lead(resetting) ~ .5 - lag(value),
+               resetting & lag(resetting) ~ value,
+               TRUE ~ d1
+           ) * 25.4,
+           flagged = is_true(flagged | lag(flagged))) %>%
     select(measurement_type_id, time, value, flagged)
 }
 
@@ -199,7 +206,7 @@ psp_ws_components = function(obj, start_time, end_time) {
     mutate(u = ws * sin(theta),
            v = ws * cos(theta)) %>%
     select(time, u, v, flagged) %>%
-    tidyr::spread(component, value, -time, -flagged) %>%
+    tidyr::gather(component, value, -time, -flagged) %>%
     mutate(measurement_type_id =
              ifelse(component == 'u',
                     get_measurement_type_id(obj$con, 'PSP', 'derived', 'WS_u'),
@@ -218,9 +225,8 @@ psp_slp = function(obj, start_time, end_time) {
 }
 
 psp_sr2 = function(obj, start_time, end_time) {
-    tbl(obj, 'measurements') %>%
-    filter(measurement_type_id =
-             get_measurement_type_id(obj$con, 'PSP', 'envidas', 'SR')) %>%
+  sr_id = get_measurement_type_id(obj$con, 'PSP', 'envidas', 'SR')
+  get_measurements(obj, sr_id, start_time, end_time) %>%
     mutate(measurement_type_id =
              get_measurement_type_id(obj$con, 'PSP', 'derived', 'SR2'),
            value = value + 17.7) %>%
