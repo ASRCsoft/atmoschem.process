@@ -4,7 +4,8 @@ get_cal_zeros = function(obj, m_id, times) {
   if (!is(times, 'POSIXct')) stop("'times' must be of class POSIXct.")
   zeros = obj %>%
     tbl('calibration_zeros') %>%
-    filter(measurement_type_id == m_id) %>%
+    filter(measurement_type_id == m_id,
+           !is.na(value)) %>%
     select(time, value) %>%
     arrange(time) %>%
     collect()
@@ -26,7 +27,9 @@ get_cal_spans = function(obj, m_id, times) {
   if (!is(times, 'POSIXct')) stop("'times' must be of class POSIXct.")
   spans = obj %>%
     tbl('calibration_spans') %>%
-    filter(measurement_type_id == m_id) %>%
+    filter(measurement_type_id == m_id,
+           !is.na(value),
+           !is.na(provided_value)) %>%
     select(time, value, provided_value) %>%
     arrange(time) %>%
     collect()
@@ -66,7 +69,9 @@ get_ces = function(obj, m_id, times) {
   if (!is(times, 'POSIXct')) stop("'times' must be of class POSIXct.")
   ces = obj %>%
     tbl('conversion_efficiency_inputs') %>%
-    filter(measurement_type_id == m_id) %>%
+    filter(measurement_type_id == m_id,
+           !is.na(measured_value),
+           !is.na(provided_value)) %>%
     select(time, measured_value, provided_value) %>%
     arrange(time) %>%
     collect()
@@ -82,6 +87,5 @@ get_ces = function(obj, m_id, times) {
     ces$efficiency = ces$measured_value / ces$provided_value
   }
   ces$smoothed_value = runmed(ces$efficiency, 31)
-  approx(ces$time, ces$smoothed_value,
-         times, rule = 2)$y
+  approx(ces$time, ces$smoothed_value, times, rule = 2)$y
 }
