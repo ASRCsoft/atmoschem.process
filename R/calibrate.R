@@ -13,7 +13,11 @@ get_cal_zeros = function(obj, m_id, times) {
     return(rep(NA, length(times)))
   }
   m_params = get_mtype_params(obj, m_id)
-  zeros$smoothed_value = runmed(zeros$value, m_params$zero_smooth_window)
+  if (is.na(m_params$zero_smooth_window)) {
+    zeros$smoothed_value = zeros$value
+  } else {
+    zeros$smoothed_value = runmed(zeros$value, m_params$zero_smooth_window)
+  }
   approx(zeros$time, zeros$smoothed_value,
          times, rule = 2)$y
 }
@@ -34,7 +38,11 @@ get_cal_spans = function(obj, m_id, times) {
   spans$zero = get_cal_zeros(obj, m_id, spans$time)
   spans$ratio = (spans$value - spans$zero) / spans$provided_value
   m_params = get_mtype_params(obj, m_id)
-  spans$smoothed_value = runmed(spans$ratio, m_params$span_smooth_window)
+  if (is.na(m_params$zero_smooth_window)) {
+    spans$smoothed_value = spans$ratio
+  } else {
+    spans$smoothed_value = runmed(spans$ratio, m_params$span_smooth_window)
+  }
   approx(spans$time, spans$smoothed_value,
          times, rule = 2)$y
 }
