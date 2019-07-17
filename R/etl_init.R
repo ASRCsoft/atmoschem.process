@@ -53,6 +53,10 @@ update_manual_flags = function(pg, df) {
   update_metadata_tbl(pg, 'manual_flags', df)
 }
 
+update_cal_flags = function(pg, df) {
+  update_metadata_tbl(pg, 'calibration_flags', df)
+}
+
 update_clock_audits = function(pg, df) {
   df$data_source_id =
     get_data_source_id(pg, df$site,
@@ -121,6 +125,8 @@ etl_init.etl_nysatmoschem = function(obj, script = NULL, schema_name = "init",
   update_autocals(pg, autocals)
   manual_flags = read_meta_csv('manual_flags')
   update_manual_flags(pg, manual_flags)
+  cal_flags = read_meta_csv('cal_flags')
+  update_cal_flags(pg, cal_flags)
   clock_audits = read_meta_csv('clock_audits')
   update_clock_audits(pg, clock_audits)
   

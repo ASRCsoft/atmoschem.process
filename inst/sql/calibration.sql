@@ -34,6 +34,7 @@ create table calibration_flags (
   measurement_type_id int references measurement_types,
   type text,
   times tsrange,
+  explanation text,
   primary key(measurement_type_id, type, times)
 );
 
