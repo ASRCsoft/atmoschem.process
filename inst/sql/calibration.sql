@@ -102,175 +102,6 @@ create or replace view calibration_periods as
 	   group by measurement_type_id, type, scheduled_times) sa2
    where not isempty(times);
 
-CREATE materialized VIEW calibration_zeros AS
-  select cz.*
-    from (select measurement_type_id,
-		 type,
-		 upper(times) as time,
-		 value
-	    from (select *,
-			 estimate_cal(measurement_type_id, type, times) as value
-		    from calibration_periods
-		   where type = 'zero'
-		     and upper(times) - lower(times) > interval '5 min') c1
-	   where value is not null
-	   union
-	  select measurement_type_id,
-		 type,
-		 upper(times) as time,
-		 measured_value as value
-	    from manual_calibrations m1
-		   join measurement_types m2
-		       on m1.measurement_type_id=m2.id
-		   -- the WFML manual cals in general seem questionable
-	   where not measurement_type_id in (select id
-					       from measurement_types
-					      where data_source_id in (select id
-									 from data_sources
-									where site_id=2))
-	     and type = 'zero') cz
-	   left join calibration_flags cf
-	       on cz.measurement_type_id=cf.measurement_type_id
-	       and cz.type = cf.type
-	       and cz.time <@ cf.times
-   where cf.times is null;
-
-  -- -- A few of these manual zero calibration values are bad and need to
-  -- -- be excluded. This seems like the least awkward way to do that for
-  -- -- now.
-  --  where not (measurement_type_id=get_measurement_id(3, 'envidas', 'NO-DEC')
-  -- 	      and upper(times)::date between '2018-10-23' and '2018-11-08')
-  --    and type = 'zero';
-CREATE INDEX calibration_zeros_time_idx ON calibration_zeros(measurement_type_id, type, time);
-
-CREATE OR REPLACE FUNCTION interpolate_cal_zero(measurement_type_id int, t timestamp)
-  RETURNS numeric AS $$
-  select interpolate(t0, t1, y0, y1, $2)
-    from (select time as t0,
-		 value as y0
-	    from calibration_zeros
-	   where time<=$2
-	     and measurement_type_id=$1
-	     and value is not null
-	   order by time desc
-	   limit 1) calib0
-	 full outer join
-	 (select time as t1,
-		 value as y1
-	    from calibration_zeros
-	   where time>$2
-	     and measurement_type_id=$1
-	     and value is not null
-	   order by time asc
-	   limit 1) calib1
-         on true;
-$$ LANGUAGE sql STABLE PARALLEL SAFE;
-
-CREATE or replace VIEW calibration_spans AS
-  select c1.measurement_type_id,
-	 c1.type,
-	 upper(c1.times) as time,
-	 m.span as provided_value,
-	 c1.value as value
-    from (select *,
-		 estimate_cal(measurement_type_id, type, times) as value
-	    from calibration_periods
-	   where type = 'span'
-	     and upper(times) - lower(times) > interval '10 min') c1
-	   join
-	   measurement_types m
-	   on c1.measurement_type_id=m.id
-   where value is not null
-  union
-  select measurement_type_id,
-	 type,
-	 upper(times) as time,
-	 provided_value,
-	 measured_value as value
-    from manual_calibrations m1
-	   join measurement_types m2
-	       on m1.measurement_type_id=m2.id
-  -- the WFML manual cals in general seem questionable
-   where not measurement_type_id in (select id
-				       from measurement_types
-				      where data_source_id in (select id
-								 from data_sources
-								where site_id=2))
-     and type = 'span';
-
-CREATE OR REPLACE FUNCTION calc_span(measurement_type_id int, provided_val numeric, val numeric, ts timestamp)
-  RETURNS numeric AS $$
-  select (val - interpolate_cal_zero(measurement_type_id, ts)) / provided_val;
-$$ LANGUAGE sql STABLE PARALLEL SAFE;
-
-/* Store calibration estimates derived from the raw instrument values
- */
-CREATE MATERIALIZED VIEW calibration_values AS
-  select measurement_type_id,
-	 type,
-	 time,
-	 value
-    from calibration_zeros
-   union
-  select measurement_type_id,
-	 type,
-	 time,
-	 calc_span(measurement_type_id, provided_value,
-		   value, time) as value
-    from calibration_spans;
--- to make the interpolate_cal function faster
-CREATE INDEX calibration_values_upper_time_idx ON calibration_values(measurement_type_id, type, time);
-
-/* Estimate calibration values using linear interpolation */
-CREATE OR REPLACE FUNCTION interpolate_cal(measurement_type_id int, type text, t timestamp)
-  RETURNS numeric AS $$
-  select interpolate(t0, t1, y0, y1, $3)
-    from (select time as t0,
-		 value as y0
-	    from calibration_values
-	   where time<=$3
-	     and measurement_type_id=$1
-	     and type=$2
-	     and value is not null
-	   order by time desc
-	   limit 1) calib0
-	 full outer join
-	 (select time as t1,
-		 value as y1
-	    from calibration_values
-	   where time>$3
-	     and measurement_type_id=$1
-	     and type=$2
-	     and value is not null
-	   order by time asc
-	   limit 1) calib1
-         on true;
-$$ LANGUAGE sql STABLE PARALLEL SAFE;
-
-CREATE OR REPLACE FUNCTION apply_calib(measurement_type_id int, val numeric, t timestamp)
-  RETURNS numeric AS $$
-  DECLARE
-  zero numeric = interpolate_cal(measurement_type_id, 'zero', t);
-  span numeric = interpolate_cal(measurement_type_id, 'span', t);
-  BEGIN
-    return case when span is null then val - zero
-      else (val - zero) / span end;
-  END;
-$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
--- for whatever reason this is faster as a plpgsql function
-
--- CREATE OR REPLACE FUNCTION apply_calib(site_id int, measurement text, val numeric, t timestamp)
---   RETURNS numeric AS $$
---   select case when span is null then val - zero
--- 	 else (val - zero) / (span - zero) *
--- 	   (select m.span
--- 	      from measurements m
--- 	     where m.site_id=$1
--- 	       and m.measurement=$2) end
---   from (select interpolate_cal(site_id, measurement, 'zero', t) as zero,
--- 	       interpolate_cal(site_id, measurement, 'span', t) as span) as cals;
--- $$ LANGUAGE sql STABLE PARALLEL SAFE;
-
 /* Guess the calibration time period using the calibration value and a
 time range of possible times */
 CREATE OR REPLACE FUNCTION guess_cal_time(mtype int, type text, cal_times tsrange, val numeric,
@@ -341,100 +172,48 @@ CREATE OR REPLACE FUNCTION guess_no_ce_time(mtype int, cal_times tsrange, val nu
   select guess_cal_time(mtype, 'CE', cal_times, val + 10, 1, 15);
 $$ LANGUAGE sql STABLE PARALLEL SAFE;
 
-create or replace view _conversion_efficiency_inputs as
-  select measurement_type_id,
-	 upper(times) as time,
-	 max_ce as provided_value,
-	 estimate_cal(measurement_type_id, type, times) as measured_value
-    from calibration_periods c1
-	   join measurement_types m1
-	       on c1.measurement_type_id=m1.id
-   where type='CE'
-   union
-  select measurement_type_id,
-	 upper(times) as time,
-	 provided_value,
-	 measured_value
-    from manual_calibrations
-   where type='CE'
-   union
-  select get_measurement_id(3, 'envidas', 'NO'),
-	 upper(times) as time,
-	 provided_value,
-	 estimate_cal(get_measurement_id(3, 'envidas', 'NO'), 'CE',
-		      guess_no_ce_time(measurement_type_id, times,
-				       measured_value)) as measured_value
-    from manual_calibrations
-   where measurement_type_id=get_measurement_id(3, 'envidas', 'NOx')
-     and type='CE';
-
-create or replace view _derived_conversion_efficiency_inputs AS
-  select get_measurement_id(1, 'derived', 'NO2'),
-	 time,
-	 provided_value,
-	 apply_calib(measurement_type_id, measured_value,
-		     time) as measured_value
-    from _conversion_efficiency_inputs
-   where measurement_type_id=get_measurement_id(1, 'campbell', 'NOx')
-   union
-  select get_measurement_id(3, 'derived', 'NO2'),
-	 ce_nox.time,
-	 ce_nox.provided_value,
-	 apply_calib(ce_nox.measurement_type_id, ce_nox.measured_value,
-		     ce_nox.time) -
-	   apply_calib(ce_no.measurement_type_id, ce_no.measured_value,
-		       ce_no.time) as measured_value
-    from _conversion_efficiency_inputs ce_no
-	   join _conversion_efficiency_inputs ce_nox
-	       on ce_no.time=ce_nox.time
-   where ce_no.measurement_type_id=get_measurement_id(3, 'envidas', 'NO')
-     and ce_nox.measurement_type_id=get_measurement_id(3, 'envidas', 'NOx');
-
-create or replace view conversion_efficiency_inputs as
-  select * from _conversion_efficiency_inputs
-   union select * from _derived_conversion_efficiency_inputs;
-
-CREATE MATERIALIZED VIEW conversion_efficiencies AS
-  select *,
-	 (median(efficiency) over w)::numeric as filtered_efficiency
+create materialized view calibration_results as
+  select cr1.*,
+	 cf.times is not null as flagged
     from (select measurement_type_id,
-		 time,
-		 calibrated_value / provided_value as efficiency
-	    from (select ce0.*,
-			 case when has_calibration
-			   then apply_calib(measurement_type_id, measured_value,
-					    time)
-			 else measured_value end as calibrated_value
-		    from conversion_efficiency_inputs ce0
-			   join measurement_types mt
-			   on ce0.measurement_type_id=mt.id
-		   where measured_value is not null) ce1) ce2
-  window w as (partition by measurement_type_id
-	       order by time
-	       rows between 15 preceding and 15 following);
--- to make the interpolate_ce function faster
-CREATE INDEX conversion_efficiencies_time_idx ON conversion_efficiencies(time);
-
-/* Estimate conversion efficiencies using linear interpolation */
-CREATE OR REPLACE FUNCTION interpolate_ce(measurement_type_id int, t timestamp)
-  RETURNS numeric AS $$
-  select interpolate(t0, t1, y0, y1, $2)
-    from (select time as t0,
-		 filtered_efficiency as y0
-	    from conversion_efficiencies
-	   where time<=$2
-	     and measurement_type_id=$1
-	     and filtered_efficiency is not null
-	   order by time desc
-	   limit 1) ce0
-         full outer join
-         (select time as t1,
-		 filtered_efficiency as y1
-	    from conversion_efficiencies
-	   where time>$2
-	     and measurement_type_id=$1
-	     and filtered_efficiency is not null
-	   order by time asc
-	   limit 1) ce1
-         on true;
-$$ LANGUAGE sql STABLE PARALLEL SAFE;
+		 type,
+		 upper(times) as time,
+		 m.span as provided_value,
+		 estimate_cal(measurement_type_id, type, times) as measured_value
+	    from calibration_periods cp1
+		   join measurement_types m
+		       on cp1.measurement_type_id=m.id
+	   where ((type='zero' and upper(times) - lower(times) > interval '5 min')
+		  or upper(times) - lower(times) > interval '10 min')
+	   union
+	  select measurement_type_id,
+		 type,
+		 upper(times) as time,
+		 provided_value,
+		 measured_value
+	    from manual_calibrations
+		 -- the WFML manual cals in general seem questionable
+	   where not measurement_type_id in (select id
+					       from measurement_types
+					      where data_source_id in (select id
+									 from data_sources
+									where site_id=2))
+	   union
+	         -- find NO conversion efficiency results, which
+	         -- weren't recorded in the PSP cal sheets
+	  select get_measurement_id(3, 'envidas', 'NO'),
+		 type,
+		 upper(times) as time,
+		 provided_value,
+		 estimate_cal(get_measurement_id(3, 'envidas', 'NO'), 'CE',
+			      guess_no_ce_time(measurement_type_id, times,
+					       measured_value)) as measured_value
+	    from manual_calibrations
+	   where measurement_type_id=get_measurement_id(3, 'envidas', 'NOx')
+	     and type='CE') cr1
+	   left join calibration_flags cf
+	       on cr1.measurement_type_id=cf.measurement_type_id
+	       and cr1.type = cf.type
+	       and cr1.time <@ cf.times
+   where cr1.type in ('zero', 'span', 'CE');
+CREATE INDEX calibration_results_idx ON calibration_results(measurement_type_id, type, flagged, time);
