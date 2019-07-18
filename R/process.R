@@ -91,7 +91,7 @@ process = function(obj, msmts, m_id) {
     msmts$value = apply_cal(obj, m_id, msmts$time, msmts$value)
   }
   if (is_true(m_params$apply_ce)) {
-    msmts$value = msmts$value / get_ces(obj, m_id, msmts$time)
+    msmts$value = msmts$value / estimate_ces(obj, m_id, msmts$time)
   }
   msmts$flagged = is_true(msmts$flagged) |
     is_flagged(obj, m_id, msmts$time, msmts$value)

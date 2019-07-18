@@ -3,7 +3,9 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(DBI)
+library(nysatmoschem)
 
+obj = getShinyOption('obj')
 pg = getShinyOption('pg')
 
 ## get measurement info
@@ -66,48 +68,46 @@ get_processed = function(measure, t1, t2) {
 }
 
 get_cals = function(measure, t1, t2) {
-  pgtbl = tbl(pg, 'calibration_values')
-  results = pgtbl %>%
-    filter(measurement_type_id == measure &
-           time >= t1 &
-           time <= t2) %>%
-    mutate(label = type) %>%
-    select(time, value, label) %>%
-    ## prevent RPostgreSQL from mucking with the time zones
-    mutate(time = as.character(time)) %>%
-    arrange(time) %>%
-    collect()
-  if (nrow(results) > 0) {
-    results = results %>%
-      ## get the times back
-      mutate(time = as.POSIXct(time, tz = 'GMT'))
+  zeros = obj %>%
+    nysatmoschem:::get_cal_zeros(measure)
+  if (nrow(zeros) > 0) {
+    zeros = zeros %>%
+      mutate(filtered_value =
+               nysatmoschem:::estimate_zeros(obj, measure, time)) %>%
+      gather(filtered, value, -time, -flagged) %>%
+      mutate(filtered = filtered == 'filtered_value',
+             flagged = ifelse(filtered, FALSE, flagged),
+             label = 'zero')
   }
-  results
+  ## now the spans
+  spans = obj %>%
+    nysatmoschem:::get_cal_spans(measure) %>%
+    select(time, ratio, flagged)
+  if (nrow(spans) > 0) {
+    spans = spans %>%
+      mutate(filtered_value =
+               nysatmoschem:::estimate_spans(obj, measure, time)) %>%
+      gather(filtered, value, -time, -flagged) %>%
+      mutate(filtered = filtered == 'filtered_value',
+             flagged = ifelse(filtered, FALSE, flagged),
+             label = 'span')
+  }
+  rbind(zeros, spans)
 }
 
 get_ces = function(measure, t1, t2) {
-  m_info = measurements[measurements$id == measure, ]
-  m_name = m_info$name
-  m_ds_id = m_info$data_source_id
-  m_site = data_sources$site_id[data_sources$id == m_ds_id]
-  pgtbl = tbl(pg, 'conversion_efficiencies')
-  results = pgtbl %>%
-    filter(measurement_type_id == measure &
-           time >= t1 &
-           time <= t2) %>%
-    select(time, efficiency, filtered_efficiency) %>%
-    ## prevent RPostgreSQL from mucking with the time zones
-    mutate(time = as.character(time)) %>%
-    arrange(time) %>%
-    collect()
-  if (nrow(results) == 0) {
-    return(NULL)
+  ces = obj %>%
+    nysatmoschem:::get_ces(measure) %>%
+    select(time, efficiency, flagged)
+  if (nrow(ces) > 0) {
+    ces = ces %>%
+      mutate(filtered_value =
+               nysatmoschem:::estimate_ces(obj, measure, time)) %>%
+      gather(filtered, value, -time, -flagged) %>%
+      mutate(filtered = filtered == 'filtered_value',
+             flagged = ifelse(filtered, FALSE, flagged))
   }
-  results = results %>%
-    ## get the times back
-    mutate(time = as.POSIXct(time, tz = 'GMT')) %>%
-    gather(filtered, efficiency, -time) %>%
-    mutate(filtered = filtered == 'filtered_efficiency')
+  ces
 }
 
 get_hourly = function(measure, t1, t2) {
@@ -159,8 +159,7 @@ make_processing_plot = function(m, t1, t2, plot_types,
     df_list$raw = raw
   }
   if (has_cal && nrow(cals) > 0) {
-    cals$flagged = F
-    cals$filtered = F
+    cals = cals[, c('time', 'value', 'label', 'flagged', 'filtered')]
     if (!'zero' %in% plot_types) {
       cals = subset(cals, label != 'zero')
     } else if (!'span' %in% plot_types) {
@@ -170,8 +169,7 @@ make_processing_plot = function(m, t1, t2, plot_types,
   }
   if (has_ce && !is.null(ces) > 0) {
     ces$label = 'Conversion Efficiency'
-    ces$flagged = F
-    ces = ces[, c(1, 3:5, 2)]
+    ces = ces[, c('time', 'value', 'label', 'flagged', 'filtered')]
     df_list$ces = ces
   }
   if (has_processing && nrow(processed) > 0) {
@@ -186,7 +184,7 @@ make_processing_plot = function(m, t1, t2, plot_types,
     hourly$filtered = FALSE
     df_list$hourly = hourly
   }
-  df_names = c('Time', 'Value', 'Label', 'Flag', 'Filtered')
+  df_names = c('Time', 'Value', 'Label', 'Flagged', 'Filtered')
   for (df_name in names(df_list)) {
     names(df_list[[df_name]]) = df_names
   }
@@ -202,17 +200,39 @@ make_processing_plot = function(m, t1, t2, plot_types,
   }
   if (!show_flagged) {
     # remove flagged data, but only from the processed data
-    df$Value[df$Flag] = NA
+    df$Value[df$Flagged] = NA
   }
 
-  ## plot
-  ggplot(df, aes(Time, Value, color = Flag,
-                 linetype = Filtered, group = Filtered)) +
-    geom_line(size = .2) +
-    xlim(as.POSIXct(as.character(c(t1, t2)))) +
-    scale_color_manual(values = c('black', 'red')) +
-    scale_linetype_manual(values = c('solid', 'twodash')) +
-    facet_grid(Label ~ ., scales = 'free_y')
+  raw_df = subset(df, !Filtered)
+  filtered_df = subset(df, Filtered)
+  if (nrow(filtered_df) > 0) {
+    ## getting ggplot2 to plot different linetypes along with
+    ## different colors, and create correct legends, requires an
+    ## elaborate ruse with a fake dataset
+    df_fake = df[1:2, ]
+    df_fake$Filtered = factor(c('Original', 'Filtered'),
+                              c('Original', 'Filtered'))
+    ltype_values = c('Original' = 'solid', 'Filtered' = 'twodash')
+    ggplot(raw_df, aes(Time, Value)) +
+      geom_line(aes(color = Flagged, group = 1), size = .2) +
+      geom_line(data = filtered_df,
+                linetype = 'twodash', size = .2) +
+      ## I'm adding this invisible line to trick ggplot2 into showing
+      ## the legend for the linetype
+      geom_line(aes(linetype = Filtered), df_fake,
+                color = NA, size = .2) +
+      xlim(as.POSIXct(as.character(c(t1, t2)))) +
+      scale_color_manual(values = c('black', 'red')) +
+      scale_linetype_manual('Data', values = ltype_values) +
+      facet_grid(Label ~ ., scales = 'free_y') +
+      guides(linetype = guide_legend(override.aes = list(color = 'black')))
+  } else {
+    ggplot(df, aes(Time, Value, color = Flagged, group = 1)) +
+      geom_line(size = .2) +
+      xlim(as.POSIXct(as.character(c(t1, t2)))) +
+      scale_color_manual(values = c('black', 'red')) +
+      facet_grid(Label ~ ., scales = 'free_y')
+  }
 }
 
 shinyServer(function(input, output) {

@@ -200,9 +200,9 @@ get_measurement_type_id = function(pg, site,
   get_id_from_pg(pg, df, 'measurement_types')
 }
 
-#' @import shiny
 #' @export
 view_processing = function(obj) {
+  shinyOptions(obj = obj)
   shinyOptions(pg = obj$con)
-  runApp(system.file('processing_viewer', package = 'nysatmoschem'))
+  shiny::runApp(system.file('processing_viewer', package = 'nysatmoschem'))
 }

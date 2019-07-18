@@ -1,16 +1,20 @@
 ## organize calibration
 
-get_cal_zeros = function(obj, m_id, times) {
-  if (!is(times, 'POSIXct')) stop("'times' must be of class POSIXct.")
-  zeros = obj %>%
+get_cal_zeros = function(obj, m_id) {
+  obj %>%
     tbl('calibration_results') %>%
     filter(measurement_type_id == m_id,
            type == 'zero',
-           !flagged,
            !is.na(measured_value)) %>%
-    select(time, measured_value) %>%
+    select(time, measured_value, flagged) %>%
     arrange(time) %>%
     collect()
+}
+
+estimate_zeros = function(obj, m_id, times) {
+  if (!is(times, 'POSIXct')) stop("'times' must be of class POSIXct.")
+  zeros = get_cal_zeros(obj, m_id) %>%
+    filter(!flagged)
   if (nrow(zeros) == 0) {
     warning('No zeros found.')
     return(rep(NA, length(times)))
@@ -26,26 +30,33 @@ get_cal_zeros = function(obj, m_id, times) {
          times, rule = 2)$y
 }
 
-get_cal_spans = function(obj, m_id, times) {
-  if (!is(times, 'POSIXct')) stop("'times' must be of class POSIXct.")
+get_cal_spans = function(obj, m_id) {
   spans = obj %>%
     tbl('calibration_results') %>%
     filter(measurement_type_id == m_id,
            type == 'span',
-           !flagged,
            !is.na(measured_value),
            !is.na(provided_value)) %>%
-    select(time, measured_value, provided_value) %>%
+    select(time, measured_value, provided_value, flagged) %>%
     arrange(time) %>%
     collect()
+  if (nrow(spans) == 0) {
+    return(spans)
+  }
+  ## get the estimated zero values at the corresponding times
+  spans %>%
+    mutate(zero = estimate_zeros(obj, m_id, time),
+           ratio = (measured_value - zero) / provided_value)
+}
+
+estimate_spans = function(obj, m_id, times) {
+  if (!is(times, 'POSIXct')) stop("'times' must be of class POSIXct.")
+  spans = get_cal_spans(obj, m_id) %>%
+    filter(!flagged)
   if (nrow(spans) == 0) {
     warning('No spans found.')
     return(rep(NA, length(times)))
   }
-  ## get the estimated zero values at the corresponding times
-  spans$zero = get_cal_zeros(obj, m_id, spans$time)
-  spans$ratio = (spans$measured_value - spans$zero) /
-    spans$provided_value
   m_params = get_mtype_params(obj, m_id)
   if (is.na(m_params$zero_smooth_window)) {
     spans$smoothed_value = spans$ratio
@@ -58,8 +69,8 @@ get_cal_spans = function(obj, m_id, times) {
 }
 
 apply_cal = function(obj, m_id, times, x) {
-  zeros = get_cal_zeros(obj, m_id, times)
-  spans = get_cal_spans(obj, m_id, times)
+  zeros = estimate_zeros(obj, m_id, times)
+  spans = estimate_spans(obj, m_id, times)
   if (!is.na(spans[1])) {
     ## (spans depend on zeros so this is actually a check that both
     ## exist)
@@ -79,7 +90,6 @@ wfms_no2_ce_inputs = function(obj) {
     tbl('calibration_results') %>%
     filter(measurement_type_id == wfms_nox_id,
            type == 'CE',
-           !flagged,
            !is.na(measured_value),
            !is.na(provided_value)) %>%
     mutate(measurement_type_id =
@@ -87,7 +97,7 @@ wfms_no2_ce_inputs = function(obj) {
                                      'NO2'),
            measured_value =
              apply_cal(obj$con, wfms_nox_id, time, measured_value)) %>%
-    select(time, measured_value, provided_value) %>%
+    select(time, measured_value, provided_value, flagged) %>%
     arrange(time) %>%
     collect()
 }
@@ -104,38 +114,38 @@ psp_no2_ce_inputs = function(obj) {
            !is.na(measured_value),
            !is.na(provided_value)) %>%
     mutate(measured_no =
-             apply_cal(obj$con, psp_no_id, time, measured_value)) %>%
-    select(time, measured_no)
+             apply_cal(obj$con, psp_no_id, time, measured_value),
+           no_flagged = flagged) %>%
+    select(time, measured_no, no_flagged)
   nox_tbl = obj %>%
     tbl('calibration_results') %>%
     filter(measurement_type_id == psp_nox_id,
            type == 'CE',
-           !flagged,
            !is.na(measured_value),
            !is.na(provided_value)) %>%
     mutate(measured_nox =
-             apply_cal(obj$con, psp_nox_id, time, measured_value)) %>%
-    select(time, measured_nox, provided_value)
+             apply_cal(obj$con, psp_nox_id, time, measured_value),
+           nox_flagged = flagged) %>%
+    select(time, measured_nox, provided_value, flagged)
   no_tbl %>%
     inner_join(nox_tbl) %>%
     mutate(measurement_type_id =
              get_measurement_type_id(obj$con, 'PSP', 'derived', 'NO2'),
-           measured_value = measured_nox - measured_no) %>%
-    select(time, measured_value, provided_value) %>%
+           measured_value = measured_nox - measured_no,
+           flagged = no_flagged | nox_flagged) %>%
+    select(time, measured_value, provided_value, flagged) %>%
     arrange(time) %>%
     collect()
 }
 
-get_ces = function(obj, m_id, times) {
-  if (!is(times, 'POSIXct')) stop("'times' must be of class POSIXct.")
+get_ces = function(obj, m_id) {
   ces = obj %>%
     tbl('calibration_results') %>%
     filter(measurement_type_id == m_id,
            type == 'CE',
-           !flagged,
            !is.na(measured_value),
            !is.na(provided_value)) %>%
-    select(time, measured_value, provided_value) %>%
+    select(time, measured_value, provided_value, flagged) %>%
     arrange(time) %>%
     collect()
   if (nrow(ces) == 0) {
@@ -150,8 +160,7 @@ get_ces = function(obj, m_id, times) {
     }
   }
   if (nrow(ces) == 0) {
-    warning('No conversion efficiencies found.')
-    return(rep(NA, length(times)))
+    return(spans)
   }
   m_params = get_mtype_params(obj, m_id)
   if (!is.na(m_params$has_calibration) && m_params$has_calibration) {
@@ -160,6 +169,18 @@ get_ces = function(obj, m_id, times) {
   } else {
     ces$efficiency = ces$measured_value / ces$provided_value
   }
+  ces
+}
+
+estimate_ces = function(obj, m_id, times) {
+  if (!is(times, 'POSIXct')) stop("'times' must be of class POSIXct.")
+  ces = get_ces(obj, m_id) %>%
+    filter(!flagged)
+  if (nrow(ces) == 0) {
+    warning('No conversion efficiencies found.')
+    return(rep(NA, length(times)))
+  }
+  m_params = get_mtype_params(obj, m_id)
   ces$smoothed_value = runmed(ces$efficiency, 31)
   approx(ces$time, ces$smoothed_value, times, rule = 2)$y
 }
