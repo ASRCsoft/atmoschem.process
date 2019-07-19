@@ -203,9 +203,9 @@ make_processing_plot = function(m, t1, t2, plot_types,
     df$Value[df$Flagged] = NA
   }
 
-  raw_df = subset(df, !Filtered)
-  filtered_df = subset(df, Filtered)
-  if (nrow(filtered_df) > 0) {
+  if (any(df$Filtered)) {
+    raw_df = subset(df, !Filtered)
+    filtered_df = subset(df, Filtered)
     ## getting ggplot2 to plot different linetypes along with
     ## different colors, and create correct legends, requires an
     ## elaborate ruse with a fake dataset
@@ -221,16 +221,18 @@ make_processing_plot = function(m, t1, t2, plot_types,
       ## the legend for the linetype
       geom_line(aes(linetype = Filtered), df_fake,
                 color = NA, size = .2) +
-      xlim(as.POSIXct(as.character(c(t1, t2)))) +
       scale_color_manual(values = c('black', 'red')) +
       scale_linetype_manual('Data', values = ltype_values) +
+      coord_cartesian(xlim = as.POSIXct(as.character(c(t1, t2))),
+                      expand = FALSE) +
       facet_grid(Label ~ ., scales = 'free_y') +
       guides(linetype = guide_legend(override.aes = list(color = 'black')))
   } else {
     ggplot(df, aes(Time, Value, color = Flagged, group = 1)) +
       geom_line(size = .2) +
-      xlim(as.POSIXct(as.character(c(t1, t2)))) +
       scale_color_manual(values = c('black', 'red')) +
+      coord_cartesian(xlim = as.POSIXct(as.character(c(t1, t2))),
+                      expand = FALSE) +
       facet_grid(Label ~ ., scales = 'free_y')
   }
 }
