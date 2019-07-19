@@ -1,11 +1,2 @@
 YEAR: 2019
 COPYRIGHT HOLDER: SUNY RF
-
-
-
---- Included Software ---
-
-Name: mediator.c
-Source: https://gist.github.com/ashelly/5665911
-Files: src/mediator.c
-License: MIT
