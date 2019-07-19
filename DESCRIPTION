@@ -36,7 +36,7 @@ Suggests:
     datamodelr,
     DiagrammeR,
     DiagrammeRsvg,
-    ggplot2,
+    ggplot2 (>= 3.0),
     knitr,
     reshape2,
     rmarkdown,

@@ -74,6 +74,13 @@ get_cals = function(measure, t1, t2) {
     zeros = zeros %>%
       mutate(filtered_value =
                nysatmoschem:::estimate_zeros(obj, measure, time)) %>%
+      ## If we keep the values before and after the time range
+      ## [t1,t2], they will influence ggplot2's y-axis bounds
+      ## calculations, which we don't want. But we also want the
+      ## preceding and succeeding points so that the zero/span lines
+      ## can be drawn to the edges of the graph.
+      filter(ifelse(is.na(lead(time)), time > t1, lead(time) > t1),
+             ifelse(is.na(lag(time)), time < t2, lag(time) < t2)) %>%
       gather(filtered, value, -time, -flagged) %>%
       mutate(filtered = filtered == 'filtered_value',
              flagged = ifelse(filtered, FALSE, flagged),
@@ -87,6 +94,8 @@ get_cals = function(measure, t1, t2) {
     spans = spans %>%
       mutate(filtered_value =
                nysatmoschem:::estimate_spans(obj, measure, time)) %>%
+      filter(ifelse(is.na(lead(time)), time > t1, lead(time) > t1),
+             ifelse(is.na(lag(time)), time < t2, lag(time) < t2)) %>%
       gather(filtered, value, -time, -flagged) %>%
       mutate(filtered = filtered == 'filtered_value',
              flagged = ifelse(filtered, FALSE, flagged),
@@ -103,6 +112,8 @@ get_ces = function(measure, t1, t2) {
     ces = ces %>%
       mutate(filtered_value =
                nysatmoschem:::estimate_ces(obj, measure, time)) %>%
+      filter(ifelse(is.na(lead(time)), time > t1, lead(time) > t1),
+             ifelse(is.na(lag(time)), time < t2, lag(time) < t2)) %>%
       gather(filtered, value, -time, -flagged) %>%
       mutate(filtered = filtered == 'filtered_value',
              flagged = ifelse(filtered, FALSE, flagged))
@@ -221,18 +232,18 @@ make_processing_plot = function(m, t1, t2, plot_types,
       ## the legend for the linetype
       geom_line(aes(linetype = Filtered), df_fake,
                 color = NA, size = .2) +
+      scale_x_datetime(expand = expand_scale(mult = .01)) +
       scale_color_manual(values = c('black', 'red')) +
       scale_linetype_manual('Data', values = ltype_values) +
-      coord_cartesian(xlim = as.POSIXct(as.character(c(t1, t2))),
-                      expand = FALSE) +
+      coord_cartesian(xlim = as.POSIXct(as.character(c(t1, t2)))) +
       facet_grid(Label ~ ., scales = 'free_y') +
       guides(linetype = guide_legend(override.aes = list(color = 'black')))
   } else {
     ggplot(df, aes(Time, Value, color = Flagged, group = 1)) +
       geom_line(size = .2) +
+      scale_x_datetime(expand = expand_scale(mult = .01)) +
       scale_color_manual(values = c('black', 'red')) +
-      coord_cartesian(xlim = as.POSIXct(as.character(c(t1, t2))),
-                      expand = FALSE) +
+      coord_cartesian(xlim = as.POSIXct(as.character(c(t1, t2)))) +
       facet_grid(Label ~ ., scales = 'free_y')
   }
 }
