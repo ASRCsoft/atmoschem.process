@@ -3,6 +3,10 @@
 ## [Unreleased]
 ### Added
 - Add WFML 2018 4th quarter data annotations.
+- Add manual flags for calibrations.
+
+### Changed
+- Apply smoothing to zero and span calibration values.
 
 ### Fixed
 - Convert NYS Mesonet data times to EST.
