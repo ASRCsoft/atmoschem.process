@@ -75,9 +75,7 @@ CREATE OR REPLACE FUNCTION update_processing_inputs()
   RETURNS void as $$
   refresh materialized view matched_clock_audits;
   refresh materialized view processed_observations;
-  refresh materialized view calibration_zeros;
-  refresh materialized view calibration_values;
-  refresh materialized view conversion_efficiencies;
+  refresh materialized view calibration_results;
   refresh materialized view freezing_clusters;
   refresh materialized VIEW flagged_periods;
 $$ language sql;
