@@ -1,5 +1,60 @@
 ## organize calibration
 
+## interpolate a function with discontinuities at `breaks`
+piecewise_approx = function(x, y, xout, breaks, ...) {
+  x_segments = findInterval(x, breaks)
+  x_list = split(x, x_segments)
+  y_list = split(y, x_segments)
+  xout_segments = findInterval(xout, breaks)
+  xout_list = split(xout, xout_segments)
+  ## match x and y lists with xout
+  x_list = x_list[names(xout_list)]
+  y_list = y_list[names(xout_list)]
+  res_list = mapply(approx, x_list, y_list, xout_list,
+                    MoreArgs = list(...), SIMPLIFY = FALSE)
+  unlist(lapply(res_list, function(x) x$y), use.names = FALSE)
+}
+
+## running median with observations split into independent groups
+## given by `segments`
+piecewise_runmed = function(x, k, segments, ...) {
+  res_list = by(x, segments, runmed, k = k, ...)
+  unlist(res_list, use.names = FALSE)
+}
+
+get_cal_breaks = function(obj, m_id, cal_type) {
+  obj %>%
+    tbl('manual_calibrations') %>%
+    filter(measurement_type_id == m_id,
+           type == cal_type,
+           corrected) %>%
+    mutate(time = upper(times)) %>%
+    arrange(time) %>%
+    pull(time)
+}
+
+estimate_cals = function(x, y, k, xout, breaks) {
+  has_smoothing = !is.na(k) && k > 1
+  has_breaks = length(breaks) > 0 &&
+    !(length(breaks) == 1 && is.na(breaks))
+  if (!has_smoothing) {
+    ## no smoothing
+    smoothed_y = y
+  } else if (has_breaks) {
+    ## smoothing separated by breaks
+    segment = findInterval(x, breaks)
+    smoothed_y = piecewise_runmed(y, k, segment)
+  } else {
+    ## regular smoothing
+    smoothed_y = runmed(y, k)
+  }
+  if (has_breaks) {
+    piecewise_approx(x, smoothed_y, xout, breaks, rule = 2)
+  } else {
+    approx(x, smoothed_y, xout, rule = 2)$y
+  }
+}
+
 get_cal_zeros = function(obj, m_id) {
   obj %>%
     tbl('calibration_results') %>%
@@ -19,15 +74,10 @@ estimate_zeros = function(obj, m_id, times) {
     warning('No zeros found.')
     return(rep(NA, length(times)))
   }
+  breaks = get_cal_breaks(obj, m_id, 'zero')
   m_params = get_mtype_params(obj, m_id)
-  if (is.na(m_params$zero_smooth_window)) {
-    zeros$smoothed_value = zeros$measured_value
-  } else {
-    zeros$smoothed_value = runmed(zeros$measured_value,
-                                  m_params$zero_smooth_window)
-  }
-  approx(zeros$time, zeros$smoothed_value,
-         times, rule = 2)$y
+  estimate_cals(zeros$time, zeros$measured_value,
+                m_params$zero_smooth_window, times, breaks)
 }
 
 get_cal_spans = function(obj, m_id) {
@@ -57,15 +107,10 @@ estimate_spans = function(obj, m_id, times) {
     warning('No spans found.')
     return(rep(NA, length(times)))
   }
+  breaks = get_cal_breaks(obj, m_id, 'span')
   m_params = get_mtype_params(obj, m_id)
-  if (is.na(m_params$zero_smooth_window)) {
-    spans$smoothed_value = spans$ratio
-  } else {
-    spans$smoothed_value = runmed(spans$ratio,
-                                  m_params$span_smooth_window)
-  }
-  approx(spans$time, spans$smoothed_value,
-         times, rule = 2)$y
+  estimate_cals(spans$time, spans$ratio,
+                m_params$span_smooth_window, times, breaks)
 }
 
 apply_cal = function(obj, m_id, times, x) {
@@ -180,7 +225,6 @@ estimate_ces = function(obj, m_id, times) {
     warning('No conversion efficiencies found.')
     return(rep(NA, length(times)))
   }
-  m_params = get_mtype_params(obj, m_id)
-  ces$smoothed_value = runmed(ces$efficiency, 31)
-  approx(ces$time, ces$smoothed_value, times, rule = 2)$y
+  breaks = numeric() # currently no way to adjust CE values
+  estimate_cals(ces$time, ces$efficiency, 31, times, breaks)
 }
