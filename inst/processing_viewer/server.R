@@ -67,13 +67,49 @@ get_processed = function(measure, t1, t2) {
   results
 }
 
+get_filtered_cals = function(m, times, type) {
+  if (type == 'zero') {
+    cals = nysatmoschem:::estimate_zeros(obj, m, times)
+  } else if (type == 'span') {
+    cals = nysatmoschem:::estimate_spans(obj, m, times)
+  } else {
+    stop('calibration type not recognized')
+  }
+  breaks = nysatmoschem:::get_cal_breaks(obj, m, type)
+  if (length(breaks) > 0) {
+    segments = findInterval(times, breaks)
+    time_list = split(times, segments)
+    cal_list = split(cals, segments)
+    break_ind = as.integer(names(cal_list))
+    lower = breaks[replace(break_ind, break_ind == 0, NA)]
+    upper = breaks[replace(break_ind, break_ind == length(breaks), NA) + 1]
+    cal_df_list = mapply(function(x, y, l, u) {
+      if (!is.na(l)) {
+        x = c(l, x)
+        y = c(y[1], y)
+      }
+      if (!is.na(u)) {
+        x = c(x, u)
+        y = c(y, tail(y, 1))
+      }
+      data.frame(time = x, value = y)
+    }, time_list, cal_list, lower, upper, SIMPLIFY = FALSE)
+    cal_df = do.call(rbind, cal_df_list)
+    row.names(cal_df) = NULL
+  } else {
+    cal_df = data.frame(time = times, value = cals)
+  }
+  cal_df$flagged = FALSE
+  cal_df$filtered = TRUE
+  cal_df$label = type
+  cal_df
+}
+
 get_cals = function(measure, t1, t2) {
   zeros = obj %>%
     nysatmoschem:::get_cal_zeros(measure)
   if (nrow(zeros) > 0) {
     zeros = zeros %>%
-      mutate(filtered_value =
-               nysatmoschem:::estimate_zeros(obj, measure, time)) %>%
       ## If we keep the values before and after the time range
       ## [t1,t2], they will influence ggplot2's y-axis bounds
       ## calculations, which we don't want. But we also want the
@@ -81,10 +117,10 @@ get_cals = function(measure, t1, t2) {
       ## can be drawn to the edges of the graph.
       filter(ifelse(is.na(lead(time)), time > t1, lead(time) > t1),
              ifelse(is.na(lag(time)), time < t2, lag(time) < t2)) %>%
-      gather(filtered, value, -time, -flagged) %>%
-      mutate(filtered = filtered == 'filtered_value',
-             flagged = ifelse(filtered, FALSE, flagged),
-             label = 'zero')
+      mutate(value = measured_value, filtered = FALSE, label = 'zero') %>%
+      select(time, value, flagged, filtered, label)
+    filtered_zeros = get_filtered_cals(measure, zeros$time, 'zero')
+    zeros = rbind(zeros, filtered_zeros)
   }
   ## now the spans
   spans = obj %>%
@@ -92,14 +128,12 @@ get_cals = function(measure, t1, t2) {
     select(time, ratio, flagged)
   if (nrow(spans) > 0) {
     spans = spans %>%
-      mutate(filtered_value =
-               nysatmoschem:::estimate_spans(obj, measure, time)) %>%
       filter(ifelse(is.na(lead(time)), time > t1, lead(time) > t1),
              ifelse(is.na(lag(time)), time < t2, lag(time) < t2)) %>%
-      gather(filtered, value, -time, -flagged) %>%
-      mutate(filtered = filtered == 'filtered_value',
-             flagged = ifelse(filtered, FALSE, flagged),
-             label = 'span')
+      mutate(value = ratio, filtered = FALSE, label = 'span') %>%
+      select(time, value, flagged, filtered, label)
+    filtered_spans = get_filtered_cals(measure, spans$time, 'span')
+    spans = rbind(spans, filtered_spans)
   }
   rbind(zeros, spans)
 }
@@ -217,6 +251,11 @@ make_processing_plot = function(m, t1, t2, plot_types,
   if (any(df$Filtered)) {
     raw_df = subset(df, !Filtered)
     filtered_df = subset(df, Filtered)
+    zero_breaks = nysatmoschem:::get_cal_breaks(obj, m, 'zero')
+    span_breaks = nysatmoschem:::get_cal_breaks(obj, m, 'span')
+    breaks_df = data.frame(breaks = c(zero_breaks, span_breaks),
+                           Label = c(rep('zero', length(zero_breaks)),
+                                     rep('span', length(span_breaks))))
     ## getting ggplot2 to plot different linetypes along with
     ## different colors, and create correct legends, requires an
     ## elaborate ruse with a fake dataset
@@ -228,6 +267,8 @@ make_processing_plot = function(m, t1, t2, plot_types,
       geom_line(aes(color = Flagged, group = 1), size = .2) +
       geom_line(data = filtered_df,
                 linetype = 'twodash', size = .2) +
+      geom_vline(aes(xintercept = breaks), breaks_df,
+                 color = 'darkgray', size = .3) +
       ## I'm adding this invisible line to trick ggplot2 into showing
       ## the legend for the linetype
       geom_line(aes(linetype = Filtered), df_fake,
