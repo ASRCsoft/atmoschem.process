@@ -124,42 +124,10 @@ CREATE materialized VIEW flagged_periods AS
    group by measurement_type_id, period_number;
 CREATE INDEX flagged_periods_idx ON flagged_periods using gist(measurement_type_id, times);
 
-/* Check for flags */
-create or replace function in_flagged_period(measurement_type int, measurement_time timestamp) RETURNS bool AS $$
-  select exists(select *
-		  from flagged_periods
-		 where measurement_type_id=$1
-		   and $2 <@ times);
-$$ LANGUAGE sql stable parallel safe;
-
-create or replace function is_valid_value(measurement_type_id int, value numeric) RETURNS bool AS $$
-  select coalesce(value <@ (select valid_range
-			      from measurement_types
-			     where id=$1), true);
-$$ LANGUAGE sql stable parallel safe;
-
-create or replace function is_outlier(value numeric, median double precision, mad double precision) RETURNS bool AS $$
-  -- Decide if a value is an outlier using the method from the Hampel
-  -- filter. The term (1.4826 * MAD) estimates the standard
-  -- deviation. See
-  -- https://en.wikipedia.org/wiki/Median_absolute_deviation#Relation_to_standard_deviation
-  select abs(value - median) / (1.4826 * nullif(mad, 0)) > 3.5;
-$$ LANGUAGE sql immutable RETURNS NULL ON NULL INPUT parallel safe;
-
 create or replace function is_below_mdl(measurement_type_id int, value numeric) RETURNS bool AS $$
   select coalesce(value < (select mdl
 			     from measurement_types
 			    where id=$1), false);
-$$ LANGUAGE sql stable parallel safe;
-
-/* Determine if a measurement is flagged. */
-create or replace function is_flagged(measurement_type_id int, source sourcerow, measurement_time timestamp, value numeric, flagged boolean, median double precision, mad double precision) RETURNS bool AS $$
-  -- Check for: 1) instrument flags, 2) flagged periods,
-  -- 3) invalid values, and 4) outliers (based on the Hampel filter)
-  select coalesce(flagged, false)
-	   or in_flagged_period(measurement_type_id, measurement_time)
-	   or not is_valid_value(measurement_type_id, value)
-	   or coalesce(is_outlier(value, median, mad), false);
 $$ LANGUAGE sql stable parallel safe;
 
 /* Get the NARSTO averaged data flag based on the number of
