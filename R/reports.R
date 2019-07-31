@@ -230,3 +230,32 @@ generate_psp_report = function(con, start_time, end_time, freq = 'raw') {
   organize_report_data(con, 'PSP', 'envidas', vars, start_time, end_time,
                        freq = freq, var_dict, unit_dict)
 }
+
+#' @export
+generate_wfml_report = function(con, start_time, end_time, freq = 'raw') {
+  ## if (freq == 'raw') {
+  ##   ws = 'VWS'
+  ##   wd = 'VWD'
+  ## } else {
+  ##   ws = 'WS_hourly'
+  ##   wd = 'WD_hourly'
+  ## }
+  vars = c('NO', 'NO2', 'Ozone_ppbv', 'CO', 'SO2', 'CH4', 'NMHC',
+           'temperature_2m [degC]', 'relative_humidity [%]', 'WS',
+           'wind_speed [m/s]', 'wind_maximum [m/s]', 'WD', 'WD_V',
+           'wind_direction [degrees]', 'BP', 'SLP', 'PM25C', 'Bscatt',
+           'BLK-CARBON-1', 'precip_since_00Z [mm]')
+  var_dict = c(Ozone_ppbv = 'Ozone', `temperature_2m [degC]` = 'T',
+               `relative_humidity [%]` = 'RH',
+               `wind_speed [m/s]` = 'WS_MESO',
+               `wind_maximum [m/s]` = 'WS_MAX_MESO',
+               `wind_direction [degrees]` = 'WD_MESO', PM25C = 'PM25',
+               `BLK-CARBON-1` = 'Black Carbon',
+               `precip_since_00Z [mm]` = 'Precip')
+  unit_dict = c(CH4 = 'ppmv', NMHC = 'ppmv', WS = 'm/s',
+                WD = 'degrees', WD_V = 'degrees', Bscatt = 'Mm-1')
+  organize_report_data(con, 'WFML',
+                       c('envidas', 'campbell', 'mesonet'), vars,
+                       start_time, end_time, freq = freq, var_dict,
+                       unit_dict)
+}

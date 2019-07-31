@@ -61,7 +61,7 @@ wfms_ws_components = function(obj, start_time, end_time) {
     mutate(u = ws * sin(theta),
            v = ws * cos(theta)) %>%
     select(time, u, v, flagged) %>%
-    tidyr::spread(component, value, -time, -flagged) %>%
+    tidyr::gather(component, value, -time, -flagged) %>%
     mutate(measurement_type_id =
              ifelse(component == 'u',
                     get_measurement_type_id(obj$con, 'WFMS', 'derived', 'WS_u'),
@@ -96,6 +96,27 @@ derived_wfms = list(wfms_no2, wfms_slp, wfms_ws, wfms_ws_components,
 
 
 ## WFML functions
+wfml_no2 = function(obj, start_time, end_time) {
+  combine_measures(obj, 'WFML', 'campbell', 'NO', 'NOX',
+                   start_time, end_time) %>%
+    mutate(measurement_type_id =
+             get_measurement_type_id(obj$con, 'WFML', 'derived', 'NO2'),
+           value = value2 - value1,
+           flagged = flagged1 | flagged2) %>%
+    select(measurement_type_id, time, value, flagged)
+}
+
+wfml_ozone = function(obj, start_time, end_time) {
+  ## convert ozone to ppbv
+  o3_id = get_measurement_type_id(obj$con, 'WFML', 'envidas',
+                                  'API-T400-OZONE')
+  get_measurements(obj, o3_id, start_time, end_time) %>%
+    mutate(measurement_type_id =
+             get_measurement_type_id(obj$con, 'WFML', 'derived', 'Ozone_ppbv'),
+           value = value * 1000) %>%
+    select(measurement_type_id, time, value, flagged)
+}
+
 wfml_slp = function(obj, start_time, end_time) {
   combine_measures(obj, 'WFML', 'campbell', 'BP2', 'PTemp_C',
                    start_time, end_time) %>%
@@ -106,7 +127,26 @@ wfml_slp = function(obj, start_time, end_time) {
     select(measurement_type_id, time, value, flagged)
 }
 
-derived_wfml = list(wfml_slp)
+wfml_ws_components = function(obj, start_time, end_time) {
+  ws = combine_measures(obj, 'WFML', 'mesonet', 'wind_speed [m/s]',
+                        'wind_direction [degrees]', start_time,
+                        end_time) %>%
+    mutate(ws = value1,
+           theta = pi * (270 - value2) / 180,
+           flagged = flagged1 | flagged2) %>%
+    mutate(u = ws * sin(theta),
+           v = ws * cos(theta)) %>%
+    select(time, u, v, flagged) %>%
+    tidyr::gather(component, value, -time, -flagged) %>%
+    mutate(measurement_type_id =
+             ifelse(component == 'u',
+                    get_measurement_type_id(obj$con, 'WFML', 'derived', 'WS_u'),
+                    get_measurement_type_id(obj$con, 'WFML', 'derived', 'WS_v'))) %>%
+    select(measurement_type_id, time, value, flagged)
+}
+
+derived_wfml = list(wfml_no2, wfml_ozone, wfml_slp,
+                    wfml_ws_components)
 
 
 ## PSP functions
