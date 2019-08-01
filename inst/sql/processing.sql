@@ -48,7 +48,7 @@ CREATE materialized VIEW hourly_measurements as
 	 get_hourly_flag(measurement_type_id, value::numeric, n_values::int) as flag
     from (select measurement_type_id,
 		 date_trunc('hour', time) as time,
-		 case when name like '%\_Max' then max(value) FILTER (WHERE not flagged)
+		 case when name ilike '%\_Max%' then max(value) FILTER (WHERE not flagged)
 		 when name='Precip' then sum(value) FILTER (WHERE not flagged)
 		 when pm.measurement_type_id=get_measurement_id(2, 'mesonet', 'precip_since_00Z [mm]')
 		 -- just get the value at the top of the hour for now
