@@ -1,2 +1,6 @@
 site,data_source,measurement_name,type,times,explanation
 PSP,envidas,NO-DEC,zero,"[2018-10-23, 2018-11-09)",calibration
+WFML,campbell,NO,zero,"[2018-12-14, 2018-12-18)",
+WFML,campbell,NOX,zero,"[2018-12-14, 2018-12-18)",
+WFML,campbell,CO,zero,"[2018-12-14, 2018-12-18)",
+WFML,campbell,CO,span,"[2018-12-14, 2018-12-18)",
