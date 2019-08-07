@@ -28,7 +28,7 @@ get_cal_breaks = function(obj, m_id, cal_type) {
     filter(measurement_type_id == m_id,
            type == cal_type,
            corrected) %>%
-    mutate(time = upper(times)) %>%
+    mutate(time = timezone('EST', upper(times))) %>%
     arrange(time) %>%
     pull(time)
 }
@@ -61,6 +61,7 @@ get_cal_zeros = function(obj, m_id) {
     filter(measurement_type_id == m_id,
            type == 'zero',
            !is.na(measured_value)) %>%
+    mutate(time = timezone('EST', time)) %>%
     select(time, measured_value, flagged) %>%
     arrange(time) %>%
     collect()
@@ -87,6 +88,7 @@ get_cal_spans = function(obj, m_id) {
            type == 'span',
            !is.na(measured_value),
            !is.na(provided_value)) %>%
+    mutate(time = timezone('EST', time)) %>%
     select(time, measured_value, provided_value, flagged) %>%
     arrange(time) %>%
     collect()
@@ -140,6 +142,7 @@ wfms_no2_ce_inputs = function(obj) {
     mutate(measurement_type_id =
              get_measurement_type_id(obj$con, 'WFMS', 'derived',
                                      'NO2'),
+           time = timezone('EST', time),
            measured_value =
              apply_cal(obj$con, wfms_nox_id, time, measured_value)) %>%
     select(time, measured_value, provided_value, flagged) %>%
@@ -177,6 +180,7 @@ psp_no2_ce_inputs = function(obj) {
     mutate(measurement_type_id =
              get_measurement_type_id(obj$con, 'PSP', 'derived', 'NO2'),
            measured_value = measured_nox - measured_no,
+           time = timezone('EST', time),
            flagged = no_flagged | nox_flagged) %>%
     select(time, measured_value, provided_value, flagged) %>%
     arrange(time) %>%
@@ -190,6 +194,7 @@ get_ces = function(obj, m_id) {
            type == 'CE',
            !is.na(measured_value),
            !is.na(provided_value)) %>%
+    mutate(time = timezone('EST', time)) %>%
     select(time, measured_value, provided_value, flagged) %>%
     arrange(time) %>%
     collect()
@@ -205,7 +210,7 @@ get_ces = function(obj, m_id) {
     }
   }
   if (nrow(ces) == 0) {
-    return(spans)
+    return(ces)
   }
   m_params = get_mtype_params(obj, m_id)
   if (!is.na(m_params$has_calibration) && m_params$has_calibration) {

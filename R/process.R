@@ -74,9 +74,10 @@ is_flagged = function(obj, m_id, times, x) {
 
 get_measurements = function(obj, m_id, start_time, end_time) {
   obs = tbl(obj, 'processed_observations')
-  msmts = tbl(obj, 'measurements') %>%
+  tbl(obj, 'measurements') %>%
     filter(measurement_type_id == m_id) %>%
     left_join(obs, c('observation_id' = 'id')) %>%
+    mutate(time = timezone('EST', time)) %>%
     filter(time >= start_time, time <= end_time) %>%
     collect()
 }
@@ -132,6 +133,7 @@ update_processing = function(obj, site, data_source, start_time,
                                end_time)
       if (nrow(msmts) > 0) {
         pr_msmts = process(obj, msmts, ds_mtypes$id[n])
+        attributes(pr_msmts$time)$tzone = 'EST'
         DBI::dbWriteTable(obj$con, 'processed_measurements',
                           pr_msmts, row.names = FALSE, append = TRUE)
       } else {
@@ -163,6 +165,7 @@ update_processing = function(obj, site, data_source, start_time,
             DBI::dbExecute(obj$con, sql2)
             id_msmts = subset(msmts, measurement_type_id == id)
             pr_msmts = process(obj, id_msmts, id)
+            attributes(pr_msmts$time)$tzone = 'EST'
             DBI::dbWriteTable(obj$con, 'processed_measurements',
                               pr_msmts, row.names = FALSE,
                               append = TRUE)

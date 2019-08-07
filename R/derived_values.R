@@ -8,6 +8,7 @@ combine_measures = function(obj, site, data_source, m1, m2,
                              m1 = m1, m2 = m2, start = start_time, end = end_time)
   obj %>%
     tbl(sql(sql1)) %>%
+    mutate(time = timezone('EST', time)) %>%
     collect()
 }
 
@@ -130,7 +131,9 @@ wfml_slp = function(obj, start_time, end_time) {
 wfml_ws_components = function(obj, start_time, end_time) {
   ws = combine_measures(obj, 'WFML', 'mesonet', 'wind_speed [m/s]',
                         'wind_direction [degrees]', start_time,
-                        end_time) %>%
+                        end_time)
+  if (nrow(ws) == 0) return(ws)
+  ws %>%
     mutate(ws = value1,
            theta = pi * (270 - value2) / 180,
            flagged = flagged1 | flagged2) %>%

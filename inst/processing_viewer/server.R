@@ -29,42 +29,26 @@ is_true = function(x) !is.na(x) & x
 
 ## retrieve data from table based on timerange and measure
 get_raw = function(measure, t1, t2) {
-  pgtbl = tbl(pg, 'measurements2')
-  results = pgtbl %>%
+  tbl(pg, 'measurements2') %>%
+    mutate(time = timezone('EST', time)) %>%
     filter(measurement_type_id == measure &
            time >= t1 &
            time <= t2) %>%
     select(time, value, flagged) %>%
-    mutate(flagged = !is.na(flagged) & flagged,
-           ## prevent RPostgreSQL from mucking with the time zones
-           time = as.character(time)) %>%
+    mutate(flagged = !is.na(flagged) & flagged) %>%
     arrange(time) %>%
     collect()
-  if (nrow(results) > 0) {
-    results = results %>%
-      ## get the times back
-      mutate(time = as.POSIXct(time, tz = 'GMT'))
-  }
-  results
 }
 
 get_processed = function(measure, t1, t2) {
-  pgtbl = tbl(pg, 'processed_measurements')
-  results = pgtbl %>%
+  tbl(pg, 'processed_measurements') %>%
+    mutate(time = timezone('EST', time)) %>%
     filter(measurement_type_id == measure &
            time >= t1 &
            time <= t2) %>%
     select(time, value, flagged) %>%
-    ## prevent RPostgreSQL from mucking with the time zones
-    mutate(time = as.character(time)) %>%
     arrange(time) %>%
     collect()
-  if (nrow(results) > 0) {
-    results = results %>%
-      ## get the times back
-      mutate(time = as.POSIXct(time, tz = 'GMT'))
-  }
-  results
 }
 
 get_filtered_cals = function(m, times, type) {
@@ -156,22 +140,14 @@ get_ces = function(measure, t1, t2) {
 }
 
 get_hourly = function(measure, t1, t2) {
-  pgtbl = tbl(pg, 'hourly_measurements')
-  results = pgtbl %>%
+  tbl(pg, 'hourly_measurements') %>%
+    mutate(time = timezone('EST', time)) %>%
     filter(measurement_type_id == measure &
            time >= t1 &
            time <= t2) %>%
     select(time, value) %>%
-    ## prevent RPostgreSQL from mucking with the time zones
-    mutate(time = as.character(time)) %>%
     arrange(time) %>%
     collect()
-  if (nrow(results) > 0) {
-    results = results %>%
-      ## get the times back
-      mutate(time = as.POSIXct(time, tz = 'GMT'))
-  }
-  results
 }
 
 make_processing_plot = function(m, t1, t2, plot_types,
@@ -235,6 +211,7 @@ make_processing_plot = function(m, t1, t2, plot_types,
   }
   df = do.call(rbind, df_list)
   if (nrow(df) == 0) return(NULL)
+  attributes(df$Time)$tzone = 'EST'
   df$Label = factor(df$Label,
                     levels=c('Raw', 'zero', 'span',
                              'Conversion Efficiency',
@@ -301,7 +278,7 @@ shinyServer(function(input, output) {
   output$plots = renderPlot({
     ## to make sure the time zone is handled correctly
     date_range = as.POSIXct(as.character(input$dateRange),
-                            tz = 'GMT')
+                            tz = 'EST')
     make_processing_plot(input$measurement,
                          date_range[1], date_range[2],
                          input$plotTypes,
