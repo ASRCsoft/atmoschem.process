@@ -73,12 +73,14 @@ is_flagged = function(obj, m_id, times, x) {
 }
 
 get_measurements = function(obj, m_id, start_time, end_time) {
+  if (is(start_time, 'POSIXt')) attributes(start_time)$tzone = 'EST'
+  if (is(end_time, 'POSIXt')) attributes(end_time)$tzone = 'EST'
   obs = tbl(obj, 'processed_observations')
   tbl(obj, 'measurements') %>%
     filter(measurement_type_id == m_id) %>%
     left_join(obs, c('observation_id' = 'id')) %>%
-    mutate(time = timezone('EST', time)) %>%
     filter(time >= start_time, time <= end_time) %>%
+    mutate(time = timezone('EST', time)) %>%
     collect()
 }
 
@@ -117,6 +119,8 @@ update_processing = function(obj, site, data_source, start_time,
     DBI::dbExecute(obj$con, 'select update_processing_inputs()')
     
     ## delete old measurements
+    if (is(start_time, 'POSIXt')) attributes(start_time)$tzone = 'EST'
+    if (is(end_time, 'POSIXt')) attributes(end_time)$tzone = 'EST'
     q1 = '  delete
     from processed_measurements
    where measurement_type_id=any(get_data_source_ids(?site, ?ds))
