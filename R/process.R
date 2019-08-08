@@ -16,7 +16,8 @@ get_mtype_params = function(obj, m_id) {
 get_flagged_periods = function(obj, m_id) {
   fp = obj %>% tbl('flagged_periods') %>%
     filter(measurement_type_id == m_id) %>%
-    mutate(start_time = lower(times), end_time = upper(times)) %>%
+    mutate(start_time = timezone('EST', lower(times)),
+           end_time = timezone('EST', upper(times))) %>%
     select(start_time, end_time) %>%
     arrange(start_time) %>%
     collect()
