@@ -111,3 +111,5 @@ PSP,envidas,TEOMA(2.5)MC,"[2018-12-04 20:30, 2018-12-05 10:15)",AM,anomalous jum
 PSP,envidas,TEOMA(2.5)RefMC,"[2018-12-04 20:30, 2018-12-05 10:15)",AM,anomalous jumps
 PSP,envidas,TEOMB(crs)MC,"[2018-12-04 20:30, 2018-12-05 10:15)",AM,anomalous jumps
 PSP,envidas,TEOMB(crs)RefMC,"[2018-12-04 20:30, 2018-12-05 10:15)",AM,anomalous jumps
+WFML,campbell,NO,"[2018-10-28 12:00, 2018-10-30 12:00)",AM,cal gases left on
+WFML,campbell,NOX,"[2018-10-28 11:00, 2018-10-30 12:00)",AM,cal gases left on
