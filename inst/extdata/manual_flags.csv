@@ -111,5 +111,15 @@ PSP,envidas,TEOMA(2.5)MC,"[2018-12-04 20:30, 2018-12-05 10:15)",AM,anomalous jum
 PSP,envidas,TEOMA(2.5)RefMC,"[2018-12-04 20:30, 2018-12-05 10:15)",AM,anomalous jumps
 PSP,envidas,TEOMB(crs)MC,"[2018-12-04 20:30, 2018-12-05 10:15)",AM,anomalous jumps
 PSP,envidas,TEOMB(crs)RefMC,"[2018-12-04 20:30, 2018-12-05 10:15)",AM,anomalous jumps
+WFML,campbell,NO,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
+WFML,campbell,NOX,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
+WFML,campbell,CO,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
 WFML,campbell,NO,"[2018-10-28 12:00, 2018-10-30 12:00)",AM,cal gases left on
 WFML,campbell,NOX,"[2018-10-28 11:00, 2018-10-30 12:00)",AM,cal gases left on
+WFML,envidas,API-T400-OZONE,"[2018-10-28 11:00, 2018-10-30 12:00)",AM,cal gases left on
+WFML,campbell,NO,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
+WFML,campbell,NOX,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
+WFML,campbell,CO,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
+WFML,envidas,PM25C,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
+WFML,envidas,SO2,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
+WFML,envidas,API-T400-OZONE,"[2018-12-11 05:03, 2018-12-11 05:21)",AM,unknown
