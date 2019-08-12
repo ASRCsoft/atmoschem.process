@@ -56,6 +56,7 @@ is_flagged = function(obj, m_id, times, x) {
   flagged_periods = as.list(get_flagged_periods(obj, m_id))
   in_flagged_period = times %within% flagged_periods
 
+  ## check for outliers
   if (!is.na(mtype$remove_outliers) && mtype$remove_outliers) {
     is_outlier = seismicRoll::roll_hampel(x, 241) > 3.5
     is_outlier[is.na(is_outlier)] = FALSE
@@ -63,6 +64,7 @@ is_flagged = function(obj, m_id, times, x) {
     is_outlier = FALSE
   }
 
+  ## check for invalid numbers
   if (!is.na(mtype$valid_range)) {
     is_valid = in_interval(x, mtype$lower_range, mtype$upper_range,
                            mtype$lower_inc, mtype$upper_inc)
@@ -70,7 +72,15 @@ is_flagged = function(obj, m_id, times, x) {
   } else {
     is_valid = TRUE
   }
-  in_flagged_period | is_outlier | !is_valid
+
+  ## check for abrupt jumps
+  if (!is.na(mtype$max_jump)) {
+    is_jump = c(FALSE, abs(diff(x)) > mtype$max_jump)
+    is_jump[is.na(is_jump)] = FALSE
+  } else {
+    is_jump = FALSE
+  }
+  in_flagged_period | is_outlier | !is_valid | is_jump
 }
 
 get_measurements = function(obj, m_id, start_time, end_time) {
@@ -81,6 +91,7 @@ get_measurements = function(obj, m_id, start_time, end_time) {
     filter(measurement_type_id == m_id) %>%
     left_join(obs, c('observation_id' = 'id')) %>%
     filter(time >= start_time, time <= end_time) %>%
+    arrange(time) %>%
     mutate(time = timezone('EST', time)) %>%
     collect()
 }
