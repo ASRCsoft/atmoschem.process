@@ -240,22 +240,43 @@ generate_wfml_report = function(con, start_time, end_time, freq = 'raw') {
     ws = 'WS_hourly'
     wd = 'WD_hourly'
   }
-  vars = c('NO', 'NO2', 'Ozone_ppbv', 'CO', 'SO2', 'CH4', 'NMHC',
-           'temperature_2m [degC]', 'relative_humidity [%]', 'WS', ws,
-           'wind_maximum [m/s]', 'WD', 'WD_V', wd, 'BP2', 'SLP',
-           'PM25C', 'Bscatt', 'BLK-CARBON-1', 'precip_since_00Z [mm]')
+  unit_dict = c(CH4 = 'ppmv', NMHC = 'ppmv', WS = 'm/s',
+                WD = 'degrees', WD_V = 'degrees', Bscatt = 'Mm-1')
   var_dict = c(Ozone_ppbv = 'Ozone', `temperature_2m [degC]` = 'T',
                `relative_humidity [%]` = 'RH',
                `wind_speed [m/s]` = 'WS_MESO', WS_hourly = 'WS_MESO',
                `wind_maximum [m/s]` = 'WS_MAX_MESO',
                `wind_direction [degrees]` = 'WD_MESO',
                WD_hourly = 'WD_MESO', BP2 = 'BP', PM25C = 'PM25',
+               NGN3 = 'Bscatt',
                `BLK-CARBON-1` = 'Black Carbon',
                `precip_since_00Z [mm]` = 'Precip')
-  unit_dict = c(CH4 = 'ppmv', NMHC = 'ppmv', WS = 'm/s',
-                WD = 'degrees', WD_V = 'degrees', Bscatt = 'Mm-1')
-  organize_report_data(con, 'WFML',
-                       c('envidas', 'campbell', 'mesonet'), vars,
-                       start_time, end_time, freq = freq, var_dict,
-                       unit_dict)
+  if (freq == 'hourly') {
+    vars = c('NO', 'NO2', 'Ozone_ppbv', 'CO', 'SO2', 'CH4', 'NMHC',
+             'temperature_2m [degC]', 'relative_humidity [%]', 'WS',
+             ws, 'wind_maximum [m/s]', 'WD', 'WD_V', wd, 'BP2', 'SLP',
+             'PM25C', 'NGN3', 'BLK-CARBON-1', 'precip_since_00Z [mm]')
+    organize_report_data(con, 'WFML',
+                         c('envidas', 'campbell', 'mesonet'), vars,
+                         start_time, end_time, freq = freq, var_dict,
+                         unit_dict)
+  } else if (freq == 'raw') {
+    ## return one data frame per data source
+    vars = c('NO', 'NO2', 'CO', 'BP2', 'SLP')
+    campbell_df = organize_report_data(con, 'WFML', 'campbell', vars,
+                                       start_time, end_time,
+                                       freq = freq, var_dict,
+                                       unit_dict)
+    vars = c('Ozone_ppbv', 'SO2', 'PM25C', 'BLK-CARBON-1')
+    env_df = organize_report_data(con, 'WFML', 'envidas', vars,
+                                  start_time, end_time, freq = freq,
+                                  var_dict, unit_dict)
+    vars = c('temperature_2m [degC]', 'relative_humidity [%]', ws,
+             'wind_maximum [m/s]', wd, 'precip_since_00Z [mm]')
+    meso_df = organize_report_data(con, 'WFML', 'mesonet', vars,
+                                   start_time, end_time, freq = freq,
+                                   var_dict, unit_dict)
+    list(campbell = campbell_df, envidas = env_df,
+         mesonet = meso_df)
+  }
 }
