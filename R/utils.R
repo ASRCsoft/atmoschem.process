@@ -202,7 +202,7 @@ get_measurement_type_id = function(pg, site,
 
 #' @export
 view_processing = function(obj) {
-  shinyOptions(obj = obj)
-  shinyOptions(pg = obj$con)
+  shiny::shinyOptions(obj = obj)
+  shiny::shinyOptions(pg = obj$con)
   shiny::runApp(system.file('processing_viewer', package = 'nysatmoschem'))
 }
