@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 ### Added
+- Add 2019 1st and 2nd quarter data annotations.
+
+## [0.1.2]
+### Added
 - Add WFML 2018 4th quarter data annotations.
 - Add manual flags for calibrations.
 
