@@ -1,9 +1,15 @@
 read_wfml_envidas = function(f, ...) {
   na_strings = c('NA', 'NAN', 'NANN', '-9999')
-  read.csv(f, header = T, na.strings = na_strings,
-           skip = 1, check.names = F,
-           fileEncoding = 'UTF-8',
-           stringsAsFactors = F, ...)
+  ## Sometimes the files have extra commas at the end of the
+  ## lines. (Seriously Envidas, get your act together.) We can fix
+  ## this by getting values and headers separately, then removing
+  ## lines with no header
+  headers = strsplit(readLines(f, n = 2)[2], ',')[[1]]
+  df1 = read.csv(f, header = F, na.strings = na_strings, skip = 2,
+                 fileEncoding = 'UTF-8', stringsAsFactors = F, ...)
+  df1 = df1[, 1:length(headers)]
+  names(df1) = headers
+  df1
 }
 
 transform_wfml_envidas = function(f) {

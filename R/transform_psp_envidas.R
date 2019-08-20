@@ -17,6 +17,18 @@ read_psp_envidas = function(f, ...) {
 
 transform_psp_envidas = function(f) {
   df = read_psp_envidas(f)
+  ## files from 2019 forward are in the same format as the WFML
+  ## envidas files
+  date_re = '[0-9]{1,2}-[0-9]{1,2}-[0-9]{4}'
+  new_file_re = paste0(date_re, ' - ', date_re)
+  is_new_format = grep(new_file_re, basename(f))
+  if (is_new_format) {
+    date1_str = strsplit(basename(f), ' - ')[[1]][1]
+    f_date = strptime(date1_str, '%m-%d-%Y')
+    f_year = as.integer(format(f_date, '%Y'))
+    if (f_year >= 2019) return(transform_wfml_envidas(f))
+  }
+  
   ## check for newer files with the absurd date format
   file_date = gsub('.*envi_rpt-|\\.csv', '', f)
   if (file_date >= '1809') {
