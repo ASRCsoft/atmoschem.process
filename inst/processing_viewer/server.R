@@ -112,7 +112,6 @@ get_cals = function(measure, t1, t2) {
   ## now the spans
   spans = obj %>%
     nysatmoschem:::get_cal_spans(measure)
-  print(head(spans))
   if (nrow(spans) > 0) {
     spans = spans %>%
       select(time, ratio, flagged) %>%
@@ -195,7 +194,7 @@ make_processing_plot = function(m, t1, t2, plot_types,
     }
     df_list$cals = cals
   }
-  if (has_ce && !is.null(ces) > 0) {
+  if (has_ce && nrow(ces) > 0) {
     ces$label = 'Conversion Efficiency'
     ces = ces[, c('time', 'value', 'label', 'flagged', 'filtered')]
     df_list$ces = ces
@@ -227,11 +226,11 @@ make_processing_plot = function(m, t1, t2, plot_types,
     is_cal = df$Label %in% c('zero', 'span')
     df[!is_cal, 'Value'] = log(df$Value[!is_cal])
   }
-  if (!show_flagged) {
+  if (!show_flagged && any(df$Flagged)) {
     # remove flagged data, but only from the processed data
     df$Value[df$Flagged] = NA
   }
-
+  
   if (any(df$Filtered)) {
     raw_df = subset(df, !Filtered)
     filtered_df = subset(df, Filtered)
