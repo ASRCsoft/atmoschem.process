@@ -100,34 +100,41 @@ get_cals = function(measure, t1, t2) {
       ## preceding and succeeding points so that the zero/span lines
       ## can be drawn to the edges of the graph.
       filter(ifelse(is.na(lead(time)), time > t1, lead(time) > t1),
-             ifelse(is.na(lag(time)), time < t2, lag(time) < t2)) %>%
-      mutate(value = measured_value, filtered = FALSE, label = 'zero') %>%
-      select(time, value, flagged, filtered, label)
-    filtered_zeros = get_filtered_cals(measure, zeros$time, 'zero')
-    zeros = rbind(zeros, filtered_zeros)
+             ifelse(is.na(lag(time)), time < t2, lag(time) < t2))
+    if (nrow(zeros) > 0) {
+      zeros = zeros %>%
+        mutate(value = measured_value, filtered = FALSE, label = 'zero') %>%
+        select(time, value, flagged, filtered, label)
+      filtered_zeros = get_filtered_cals(measure, zeros$time, 'zero')
+      zeros = rbind(zeros, filtered_zeros)
+    }
   }
   ## now the spans
   spans = obj %>%
-    nysatmoschem:::get_cal_spans(measure) %>%
-    select(time, ratio, flagged)
+    nysatmoschem:::get_cal_spans(measure)
+  print(head(spans))
   if (nrow(spans) > 0) {
     spans = spans %>%
+      select(time, ratio, flagged) %>%
       filter(ifelse(is.na(lead(time)), time > t1, lead(time) > t1),
-             ifelse(is.na(lag(time)), time < t2, lag(time) < t2)) %>%
-      mutate(value = ratio, filtered = FALSE, label = 'span') %>%
-      select(time, value, flagged, filtered, label)
-    filtered_spans = get_filtered_cals(measure, spans$time, 'span')
-    spans = rbind(spans, filtered_spans)
+             ifelse(is.na(lag(time)), time < t2, lag(time) < t2))
+    if (nrow(spans) > 0) {
+      spans = spans %>%
+        mutate(value = ratio, filtered = FALSE, label = 'span') %>%
+        select(time, value, flagged, filtered, label)
+      filtered_spans = get_filtered_cals(measure, spans$time, 'span')
+      spans = rbind(spans, filtered_spans)
+    }
   }
   rbind(zeros, spans)
 }
 
 get_ces = function(measure, t1, t2) {
   ces = obj %>%
-    nysatmoschem:::get_ces(measure) %>%
-    select(time, efficiency, flagged)
+    nysatmoschem:::get_ces(measure)
   if (nrow(ces) > 0) {
     ces = ces %>%
+      select(time, efficiency, flagged) %>%
       mutate(filtered_value =
                nysatmoschem:::estimate_ces(obj, measure, time)) %>%
       filter(ifelse(is.na(lead(time)), time > t1, lead(time) > t1),
