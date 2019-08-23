@@ -1,5 +1,10 @@
 ## organize calibration
 
+## see if a dbplyr result exists
+dbplyr_exists = function(x) {
+  as.logical(nrow(as.data.frame(head(x, 1))))
+}
+
 ## interpolate a function with discontinuities at `breaks`
 piecewise_approx = function(x, y, xout, breaks, ...) {
   x_segments = findInterval(x, breaks)
@@ -23,11 +28,13 @@ piecewise_runmed = function(x, k, segments, ...) {
 }
 
 get_cal_breaks = function(obj, m_id, cal_type) {
-  obj %>%
+  breaks = obj %>%
     tbl('manual_calibrations') %>%
     filter(measurement_type_id == m_id,
            type == cal_type,
-           corrected) %>%
+           corrected)
+  if (!dbplyr_exists(breaks)) return(NULL)
+  breaks %>%
     mutate(time = timezone('EST', upper(times))) %>%
     arrange(time) %>%
     pull(time)
@@ -87,16 +94,14 @@ get_cal_spans = function(obj, m_id) {
     filter(measurement_type_id == m_id,
            type == 'span',
            !is.na(measured_value),
-           !is.na(provided_value)) %>%
+           !is.na(provided_value))
+  if (!dbplyr_exists(spans)) return(spans)
+  spans = spans %>%
     mutate(time = timezone('EST', time)) %>%
     select(time, measured_value, provided_value, flagged) %>%
     arrange(time) %>%
-    collect()
-  if (nrow(spans) == 0) {
-    return(spans)
-  }
-  ## get the estimated zero values at the corresponding times
-  spans %>%
+    collect() %>%
+    ## get the estimated zero values at the corresponding times
     mutate(zero = estimate_zeros(obj, m_id, time),
            ratio = (measured_value - zero) / provided_value)
 }
