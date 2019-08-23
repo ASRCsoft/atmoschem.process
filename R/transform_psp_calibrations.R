@@ -52,11 +52,13 @@ read_psp_NO_cal_table = function(f, trange = 'F33:AD35',
   row.names(cals) = chem_names
   cal_df = expand.grid(chem_names, c('zero', 'span'))
   names(cal_df) = c('measurement_name', 'type')
+  provided_vals = as.numeric(c(rep(0, 2), cals$cert_span))
+  measured_vals = as.numeric(cals[as.matrix(cal_df[, 1:2])])
   res1 = data.frame(measurement_name = cal_df$measurement_name,
                     type = cal_df$type,
                     times = cal_times,
-                    provided_value = c(rep(0, 2), cals$cert_span),
-                    measured_value = cals[as.matrix(cal_df[, 1:2])],
+                    provided_value = provided_vals,
+                    measured_value = measured_vals,
                     corrected = FALSE)
   ## and now the conversion efficiencies
   ce_range = paste0('O', ce_row, ':W', ce_row)
