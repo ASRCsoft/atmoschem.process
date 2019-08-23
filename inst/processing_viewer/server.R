@@ -236,9 +236,15 @@ make_processing_plot = function(m, t1, t2, plot_types,
     filtered_df = subset(df, Filtered)
     zero_breaks = nysatmoschem:::get_cal_breaks(obj, m, 'zero')
     span_breaks = nysatmoschem:::get_cal_breaks(obj, m, 'span')
-    breaks_df = data.frame(breaks = c(zero_breaks, span_breaks),
-                           Label = c(rep('zero', length(zero_breaks)),
-                                     rep('span', length(span_breaks))))
+    combined_breaks = c(zero_breaks, span_breaks)
+    if (!is.null(combined_breaks)) {
+      breaks_df = data.frame(breaks = c(zero_breaks, span_breaks),
+                             Label = c(rep('zero', length(zero_breaks)),
+                                       rep('span', length(span_breaks))))
+    } else {
+      breaks_df = data.frame(breaks = numeric(0))
+    }
+
     ## getting ggplot2 to plot different linetypes along with
     ## different colors, and create correct legends, requires an
     ## elaborate ruse with a fake dataset
