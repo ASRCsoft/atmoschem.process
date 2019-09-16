@@ -44,7 +44,6 @@ even_smarter_upload = function(obj, f, site, measurement,
       ncols = ncol(df)
       df = df[, c((ncols - 1):ncols, 1:(ncols - 2))]
     } else {
-      df$instrument_time = as.POSIXct(df$instrument_time)
       df$observation_id =
         get_obs_id(obj$con, file_id, df$record,
                    df$instrument_time)
