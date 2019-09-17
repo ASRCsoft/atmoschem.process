@@ -166,6 +166,8 @@ psp_no2_ce_inputs = function(obj) {
            !flagged,
            !is.na(measured_value),
            !is.na(provided_value)) %>%
+    mutate(time = timezone('EST', time)) %>%
+    collect() %>%
     mutate(measured_no =
              apply_cal(obj$con, psp_no_id, time, measured_value),
            no_flagged = flagged) %>%
@@ -176,16 +178,17 @@ psp_no2_ce_inputs = function(obj) {
            type == 'CE',
            !is.na(measured_value),
            !is.na(provided_value)) %>%
+    mutate(time = timezone('EST', time)) %>%
+    collect() %>%
     mutate(measured_nox =
              apply_cal(obj$con, psp_nox_id, time, measured_value),
            nox_flagged = flagged) %>%
-    select(time, measured_nox, provided_value, flagged)
+    select(time, measured_nox, provided_value, nox_flagged)
   no_tbl %>%
     inner_join(nox_tbl) %>%
     mutate(measurement_type_id =
              get_measurement_type_id(obj$con, 'PSP', 'derived', 'NO2'),
            measured_value = measured_nox - measured_no,
-           time = timezone('EST', time),
            flagged = no_flagged | nox_flagged) %>%
     select(time, measured_value, provided_value, flagged) %>%
     arrange(time) %>%
