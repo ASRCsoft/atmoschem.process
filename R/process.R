@@ -46,6 +46,16 @@ in_interval = function(x, l, u, l_inc, u_inc) {
   res
 }
 
+## this is the outlier detection used by the Hampel filter
+is_hampel_outlier = function(x, k, threshold = 3.5) {
+  ## I'm not sure how I feel about endrule = 'constant' here. The
+  ## default endrule breaks with too many NA values, though, so it's
+  ## unusable.
+  medians = runmed(x, k, endrule = 'constant')
+  mads = caTools::runmad(x, k, center = medians)
+  abs(x - medians) / mads > threshold
+}
+
 is_flagged = function(obj, m_id, times, x) {
   if (length(times) == 0) {
     return(logical(0))
@@ -58,7 +68,7 @@ is_flagged = function(obj, m_id, times, x) {
 
   ## check for outliers
   if (!is.na(mtype$remove_outliers) && mtype$remove_outliers) {
-    is_outlier = seismicRoll::roll_hampel(x, 241) > 3.5
+    is_outlier = is_hampel_outlier(x, 241)
     is_outlier[is.na(is_outlier)] = FALSE
   } else {
     is_outlier = FALSE

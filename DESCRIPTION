@@ -8,6 +8,7 @@ Description: An R package providing the ASRC NYS Atmospheric Chemistry
     Database, along with tools to process and visualize the data and
     generate reports.
 Imports:
+    caTools,
     DBI,
     dbplyr,
     dbx,
@@ -17,7 +18,6 @@ Imports:
     RPostgreSQL,
     rvest,
     R.utils,
-    seismicRoll,
     shiny,
     ssh,
     staplr (>= 2.10),
