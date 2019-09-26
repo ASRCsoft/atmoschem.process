@@ -180,7 +180,7 @@ transform_wfms_42C = function(f) {
 }
 
 transform_wfms_42Cs = function(f) {
-  transform_wfm_no_cal(f, c('NO', 'NOy'), 4)
+  transform_wfm_no_cal(f, c('NO 42Cs', 'NOy'), 4)
 }
 
 transform_wfms_43C = function(f) {
