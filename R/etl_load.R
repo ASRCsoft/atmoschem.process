@@ -95,7 +95,7 @@ etl_load.etl_nysatmoschem = function(obj, sites = NULL, data_sources = NULL,
                         is_measurement, dss, clobber)
     ## recreate the constraints and end the transaction
     DBI::dbSendQuery(obj$con, 'alter table measurements add constraint measurements_observation_id_fkey foreign key (observation_id) references observations on delete cascade')
-    DBI::dbSendQuery(obj$con, 'alter table measurements add constraint measurements_measurement_type_id_fkey foreign key (observation_id) references observations on delete cascade')
+    DBI::dbSendQuery(obj$con, 'alter table measurements add constraint measurements_measurement_type_id_fkey foreign key (measurement_type_id) references measurement_types on delete cascade')
     DBI::dbCommit(obj$con)
   }
   
