@@ -63,6 +63,7 @@ create table measurement_types (
   max_jump numeric,
   apply_ce boolean,
   max_ce numeric,
+  ce_smooth_window int,
   unique(data_source_id, name)
 );
 

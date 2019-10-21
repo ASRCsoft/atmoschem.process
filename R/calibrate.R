@@ -239,5 +239,7 @@ estimate_ces = function(obj, m_id, times) {
     return(rep(NA, length(times)))
   }
   breaks = numeric() # currently no way to adjust CE values
-  estimate_cals(ces$time, ces$efficiency, 31, times, breaks)
+  m_params = get_mtype_params(obj, m_id)
+  estimate_cals(ces$time, ces$efficiency, m_params$ce_smooth_window,
+                times, breaks)
 }
