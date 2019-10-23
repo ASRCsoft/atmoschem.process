@@ -1,0 +1,10 @@
+site,data_source,name,times,instrument
+PSP,envidas,NO,"[2019-01-01, 2019-07-01)",Thermo_42C-TL
+PSP,envidas,NO-DEC,"[2019-01-01, 2019-07-01)",DEC_Thermo_42i_2
+PSP,envidas,NOx,"[2019-01-01, 2019-07-01)",Thermo_42C-TL
+PSP,envidas,NOy,"[2019-01-01, 2019-07-01)",Thermo_42i-TL
+PSP,envidas,NOy-DEC,"[2019-01-01, 2019-07-01)",DEC_Thermo_42i_2
+PSP,envidas,NOy-HNO3,"[2019-01-01, 2019-07-01)",Thermo_42i-TL
+PSP,envidas,Thermo_O3,"[2019-01-01, 2019-07-01)",Thermo_49i_2
+PSP,envidas,CO,"[2019-01-01, 2019-07-01)",Teledyne_300EU_2
+PSP,envidas,SO2,"[2019-01-01, 2019-07-01)",Thermo_43i
