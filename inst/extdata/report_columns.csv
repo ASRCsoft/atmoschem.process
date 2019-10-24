@@ -1,0 +1,27 @@
+site,column,data_source,measurement,hourly_measurement,units
+PSP,Ozone,envidas,Thermo_O3,,
+PSP,NO,envidas,NO,,
+PSP,DEC_NO,envidas,NO-DEC,,
+PSP,NO₂,envidas,NO2,,
+PSP,NOy,envidas,NOy,,
+PSP,DEC_NOy,envidas,NOy-DEC,,
+PSP,HNO₃,envidas,HNO3,,
+PSP,CO,envidas,CO,,
+PSP,SO₂,envidas,SO2,,
+PSP,WS_raw,,,,m/s
+PSP,WS,envidas,VWS,WS_hourly,
+PSP,WD_raw,,,,degrees
+PSP,WD,envidas,VWD,WD_hourly,
+PSP,Temp,envidas,AmbTemp,,
+PSP,RH,envidas,AmbRH,,
+PSP,Precip,envidas,Precip,,
+PSP,SR,envidas,SR2,,
+PSP,BP,envidas,BP,,
+PSP,TMC,envidas,TEOMA(2.5)MC,,
+PSP,TMD,,,,ug/m³
+PSP,Nephscat,envidas,NGN3a-BScatt,,
+PSP,Ultrafine,envidas,Concentration,,
+PSP,SLP,envidas,SLP,,
+PSP,BC1_370nm,envidas,BC1,,
+PSP,BC6_880nm,envidas,BC6,,
+PSP,Woodsmoke,envidas,Wood smoke,,
