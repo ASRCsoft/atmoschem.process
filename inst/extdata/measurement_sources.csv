@@ -1,4 +1,4 @@
-site,data_source,name,times,instrument
+site,data_source,measurement,times,instrument
 PSP,envidas,NO,"[2019-01-01, 2019-07-01)",Thermo_42C-TL
 PSP,envidas,NO-DEC,"[2019-01-01, 2019-07-01)",DEC_Thermo_42i_2
 PSP,envidas,NOx,"[2019-01-01, 2019-07-01)",Thermo_42C-TL
