@@ -29,7 +29,7 @@ wfms_no2 = function(obj, start_time, end_time) {
   combine_measures(obj, 'WFMS', 'campbell', 'NO', 'NOx',
                    start_time, end_time) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'WFMS', 'derived', 'NO2'),
+             get_measurement_type_id(obj$con, 'WFMS', 'campbell', 'NO2'),
            value = value2 - value1,
            flagged = flagged1 | flagged2) %>%
     select(measurement_type_id, time, value, flagged)
@@ -39,7 +39,7 @@ wfms_slp = function(obj, start_time, end_time) {
   combine_measures(obj, 'WFMS', 'campbell', 'BP', 'PTemp_C',
                    start_time, end_time) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'WFMS', 'derived', 'SLP'),
+             get_measurement_type_id(obj$con, 'WFMS', 'campbell', 'SLP'),
            value = sea_level_pressure(value1, value2, 1483.5),
            flagged = flagged1 | flagged2) %>%
     select(measurement_type_id, time, value, flagged)
@@ -49,7 +49,7 @@ wfms_ws = function(obj, start_time, end_time) {
   combine_measures(obj, 'WFMS', 'campbell', 'WS3Cup', 'WS3CupB',
                    start_time, end_time) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'WFMS', 'derived', 'WS'),
+             get_measurement_type_id(obj$con, 'WFMS', 'campbell', 'WS'),
            value = pmax(value1, value2, na.rm = TRUE),
            flagged = flagged1 & flagged2) %>%
     select(measurement_type_id, time, value, flagged)
@@ -67,8 +67,8 @@ wfms_ws_components = function(obj, start_time, end_time) {
     tidyr::gather(component, value, -time, -flagged) %>%
     mutate(measurement_type_id =
              ifelse(component == 'u',
-                    get_measurement_type_id(obj$con, 'WFMS', 'derived', 'WS_u'),
-                    get_measurement_type_id(obj$con, 'WFMS', 'derived', 'WS_v'))) %>%
+                    get_measurement_type_id(obj$con, 'WFMS', 'campbell', 'WS_u'),
+                    get_measurement_type_id(obj$con, 'WFMS', 'campbell', 'WS_v'))) %>%
     select(measurement_type_id, time, value, flagged)
 }
 
@@ -76,7 +76,7 @@ wfms_ws_max = function(obj, start_time, end_time) {
   combine_measures(obj, 'WFMS', 'campbell', 'WS3Cup_Max', 'WS3CupB_Max',
                    start_time, end_time) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'WFMS', 'derived', 'WS_Max'),
+             get_measurement_type_id(obj$con, 'WFMS', 'campbell', 'WS_Max'),
            value = pmax(value1, value2, na.rm = TRUE),
            flagged = flagged1 & flagged2) %>%
     select(measurement_type_id, time, value, flagged)
@@ -87,7 +87,7 @@ wfms_wood_smoke = function(obj, start_time, end_time) {
                    'concentration_370', 'concentration_880',
                    start_time, end_time) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'WFMS', 'derived',
+             get_measurement_type_id(obj$con, 'WFMS', 'aethelometer',
                                      'Wood smoke'),
            value = value1 - value2,
            flagged = flagged1 | flagged2) %>%
@@ -103,7 +103,7 @@ wfml_no2 = function(obj, start_time, end_time) {
   combine_measures(obj, 'WFML', 'campbell', 'NO', 'NOX',
                    start_time, end_time) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'WFML', 'derived', 'NO2'),
+             get_measurement_type_id(obj$con, 'WFML', 'campbell', 'NO2'),
            value = value2 - value1,
            flagged = flagged1 | flagged2) %>%
     select(measurement_type_id, time, value, flagged)
@@ -115,7 +115,7 @@ wfml_ozone = function(obj, start_time, end_time) {
                                   'API-T400-OZONE')
   get_measurements(obj, o3_id, start_time, end_time) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'WFML', 'derived', 'Ozone_ppbv'),
+             get_measurement_type_id(obj$con, 'WFML', 'envidas', 'Ozone_ppbv'),
            value = value * 1000) %>%
     select(measurement_type_id, time, value, flagged)
 }
@@ -124,7 +124,7 @@ wfml_slp = function(obj, start_time, end_time) {
   combine_measures(obj, 'WFML', 'campbell', 'BP2', 'PTemp_C',
                    start_time, end_time) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'WFML', 'derived', 'SLP'),
+             get_measurement_type_id(obj$con, 'WFML', 'campbell', 'SLP'),
            value = sea_level_pressure(value1, value2, 604),
            flagged = flagged1 | flagged2) %>%
     select(measurement_type_id, time, value, flagged)
@@ -145,8 +145,8 @@ wfml_ws_components = function(obj, start_time, end_time) {
     tidyr::gather(component, value, -time, -flagged) %>%
     mutate(measurement_type_id =
              ifelse(component == 'u',
-                    get_measurement_type_id(obj$con, 'WFML', 'derived', 'WS_u'),
-                    get_measurement_type_id(obj$con, 'WFML', 'derived', 'WS_v'))) %>%
+                    get_measurement_type_id(obj$con, 'WFML', 'mesonet', 'WS_u'),
+                    get_measurement_type_id(obj$con, 'WFML', 'mesonet', 'WS_v'))) %>%
     select(measurement_type_id, time, value, flagged)
 }
 
@@ -159,7 +159,7 @@ psp_no2 = function(obj, start_time, end_time) {
   combine_measures(obj, 'PSP', 'envidas', 'NO', 'NOx',
                    start_time, end_time) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'PSP', 'derived', 'NO2'),
+             get_measurement_type_id(obj$con, 'PSP', 'envidas', 'NO2'),
            value = value2 - value1,
            flagged = flagged1 | flagged2) %>%
     select(measurement_type_id, time, value, flagged)
@@ -169,7 +169,7 @@ psp_hno3 = function(obj, start_time, end_time) {
   combine_measures(obj, 'PSP', 'envidas', 'NOy', 'NOy-HNO3',
                    start_time, end_time) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'PSP', 'derived', 'HNO3'),
+             get_measurement_type_id(obj$con, 'PSP', 'envidas', 'HNO3'),
            value = value1 - value2,
            flagged = flagged1 | flagged2) %>%
     select(measurement_type_id, time, value, flagged)
@@ -185,7 +185,7 @@ psp_precip = function(obj, start_time, end_time) {
   get_measurements(obj, rain_id, start_time, end_time) %>%
     arrange(time) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'PSP', 'derived', 'Precip'),
+             get_measurement_type_id(obj$con, 'PSP', 'envidas', 'Precip'),
            d1 = c(NA, diff(value)),
            resetting = d1 <= -.02,
            value = case_when(
@@ -202,7 +202,7 @@ psp_teoma25_base = function(obj, start_time, end_time) {
   combine_measures(obj, 'PSP', 'envidas', 'TEOMA(2.5)MC', 'TEOMA(2.5)RefMC',
                    start_time, end_time) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'PSP', 'derived',
+             get_measurement_type_id(obj$con, 'PSP', 'envidas',
                                      'TEOMA(2.5)BaseMC'),
            value = value1 + value2,
            flagged = flagged1 | flagged2) %>%
@@ -213,7 +213,7 @@ psp_teombcrs_base = function(obj, start_time, end_time) {
   combine_measures(obj, 'PSP', 'envidas', 'TEOMB(crs)MC', 'TEOMB(crs)RefMC',
                    start_time, end_time) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'PSP', 'derived',
+             get_measurement_type_id(obj$con, 'PSP', 'envidas',
                                      'TEOMB(crs)BaseMC'),
            value = value1 + value2,
            flagged = flagged1 | flagged2) %>%
@@ -224,7 +224,7 @@ psp_dichot10_base = function(obj, start_time, end_time) {
   combine_measures(obj, 'PSP', 'envidas', 'Dichot(10)MC', 'Dichot(10)RefMC',
                    start_time, end_time) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'PSP', 'derived',
+             get_measurement_type_id(obj$con, 'PSP', 'envidas',
                                      'Dichot(10)BaseMC'),
            value = value1 + value2,
            flagged = flagged1 | flagged2) %>%
@@ -235,7 +235,7 @@ psp_wood_smoke = function(obj, start_time, end_time) {
   combine_measures(obj, 'PSP', 'envidas', 'BC1', 'BC6',
                    start_time, end_time) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'PSP', 'derived',
+             get_measurement_type_id(obj$con, 'PSP', 'envidas',
                                      'Wood smoke'),
            value = value1 - value2,
            flagged = flagged1 | flagged2) %>%
@@ -254,8 +254,8 @@ psp_ws_components = function(obj, start_time, end_time) {
     tidyr::gather(component, value, -time, -flagged) %>%
     mutate(measurement_type_id =
              ifelse(component == 'u',
-                    get_measurement_type_id(obj$con, 'PSP', 'derived', 'WS_u'),
-                    get_measurement_type_id(obj$con, 'PSP', 'derived', 'WS_v'))) %>%
+                    get_measurement_type_id(obj$con, 'PSP', 'envidas', 'WS_u'),
+                    get_measurement_type_id(obj$con, 'PSP', 'envidas', 'WS_v'))) %>%
     select(measurement_type_id, time, value, flagged)
 }
 
@@ -263,7 +263,7 @@ psp_slp = function(obj, start_time, end_time) {
   combine_measures(obj, 'PSP', 'envidas', 'BP', 'AmbTemp',
                    start_time, end_time) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'PSP', 'derived', 'SLP'),
+             get_measurement_type_id(obj$con, 'PSP', 'envidas', 'SLP'),
            value = sea_level_pressure(value1, value2, 504),
            flagged = flagged1 | flagged2) %>%
     select(measurement_type_id, time, value, flagged)
@@ -273,7 +273,7 @@ psp_sr2 = function(obj, start_time, end_time) {
   sr_id = get_measurement_type_id(obj$con, 'PSP', 'envidas', 'SR')
   get_measurements(obj, sr_id, start_time, end_time) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'PSP', 'derived', 'SR2'),
+             get_measurement_type_id(obj$con, 'PSP', 'envidas', 'SR2'),
            value = value + 17.7) %>%
     select(measurement_type_id, time, value, flagged)
 }

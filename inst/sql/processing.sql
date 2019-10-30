@@ -55,7 +55,6 @@ CREATE materialized VIEW hourly_measurements as
 		   then max(value) FILTER (WHERE extract(minute from time)=0)
 		 else avg(value) FILTER (WHERE not flagged) end as value,
 		 case when pm.measurement_type_id=any(get_data_source_ids(1, 'aethelometer'))
-			or pm.measurement_type_id=get_measurement_id(1, 'derived', 'Wood smoke')
 		 -- the aethelometer only records values every 15
 		 -- minutes, have to adjust the count to compensate
 		   then (count(value) FILTER (WHERE not flagged)) * 15

@@ -145,7 +145,7 @@ wfms_no2_ce_inputs = function(obj) {
            !is.na(measured_value),
            !is.na(provided_value)) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'WFMS', 'derived',
+             get_measurement_type_id(obj$con, 'WFMS', 'campbell',
                                      'NO2'),
            time = timezone('EST', time),
            measured_value =
@@ -187,7 +187,7 @@ psp_no2_ce_inputs = function(obj) {
   no_tbl %>%
     inner_join(nox_tbl) %>%
     mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'PSP', 'derived', 'NO2'),
+             get_measurement_type_id(obj$con, 'PSP', 'envidas', 'NO2'),
            measured_value = measured_nox - measured_no,
            flagged = no_flagged | nox_flagged) %>%
     select(time, measured_value, provided_value, flagged) %>%
@@ -207,9 +207,9 @@ get_ces = function(obj, m_id) {
     arrange(time) %>%
     collect()
   if (nrow(ces) == 0) {
-    wfms_no2_id = get_measurement_type_id(obj$con, 'WFMS', 'derived',
+    wfms_no2_id = get_measurement_type_id(obj$con, 'WFMS', 'campbell',
                                           'NO2')
-    psp_no2_id = get_measurement_type_id(obj$con, 'PSP', 'derived',
+    psp_no2_id = get_measurement_type_id(obj$con, 'PSP', 'envidas',
                                          'NO2')
     if (m_id == wfms_no2_id) {
       ces = wfms_no2_ce_inputs(obj)
