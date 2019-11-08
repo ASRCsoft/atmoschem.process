@@ -28,6 +28,7 @@ even_smarter_upload = function(obj, f, site, measurement,
         next()
       }
     }
+    DBI::dbSendQuery(obj$con, 'SAVEPOINT new_file_savepoint')
     add_new_file(obj$con, site_i, ds_i, f_i,
                  is_calibration)
     file_id = get_file_id(obj$con, site_i, ds_i,
@@ -63,11 +64,14 @@ even_smarter_upload = function(obj, f, site, measurement,
                                row.names = FALSE, append = TRUE),
              error = function(e) {
                if (grepl('conflicting key value violates exclusion constraint', e)) {
+                 DBI::dbSendQuery(obj$con, 'ROLLBACK TO SAVEPOINT new_file_savepoint')
                  warning(e)
                } else {
+                 DBI::dbRollback(obj$con)
                  stop(e)
                }
              })
+    DBI::dbSendQuery(obj$con, 'RELEASE SAVEPOINT new_file_savepoint')
   }
 }
 
