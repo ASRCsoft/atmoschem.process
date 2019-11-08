@@ -134,7 +134,9 @@ update_processing = function(obj, site, data_source, start_time,
     tbl('measurement_types') %>%
     collect()
   ds_mtypes = mtypes %>%
-    filter(data_source_id == ds_id & !is.na(apply_processing) & apply_processing)
+    filter(data_source_id == ds_id,
+           !is.na(apply_processing) & apply_processing,
+           is.na(derived) | !derived)
   
   DBI::dbWithTransaction(obj$con, {
     message('Updating processing inputs ...')
