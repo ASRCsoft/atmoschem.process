@@ -45,11 +45,16 @@ even_smarter_upload = function(obj, f, site, measurement,
       ncols = ncol(df)
       df = df[, c((ncols - 1):ncols, 1:(ncols - 2))]
     } else {
-      df$observation_id =
-        get_obs_id(obj$con, file_id, df$record,
-                   df$instrument_time)
-      if (any(is.na(df$observation_id)))
-        stop('missing observation_ids')
+      ## for now just print a warning for key conflicts
+      obs_res = tryCatch(get_obs_id(obj$con, file_id, df$record,
+                                    df$instrument_time),
+                         error = function(e) {
+                           DBI::dbSendQuery(obj$con, 'ROLLBACK TO SAVEPOINT new_file_savepoint')
+                           warning(f_i, ' load failed: ', e)
+                           e
+                         })
+      if (inherits(obs_res, 'error')) next()
+      df$observation_id = obs_res
       df$record = NULL
       df$instrument_time = NULL
     }
@@ -63,9 +68,9 @@ even_smarter_upload = function(obj, f, site, measurement,
     tryCatch(DBI::dbWriteTable(obj$con, tbl_name, df,
                                row.names = FALSE, append = TRUE),
              error = function(e) {
-               if (grepl('conflicting key value violates exclusion constraint', e)) {
+               if (grepl(' violates .* constraint', e)) {
                  DBI::dbSendQuery(obj$con, 'ROLLBACK TO SAVEPOINT new_file_savepoint')
-                 warning(e)
+                 warning(f_i, ' load failed: ', e)
                } else {
                  DBI::dbRollback(obj$con)
                  stop(e)
