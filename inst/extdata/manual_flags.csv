@@ -123,28 +123,50 @@ WFML,campbell,CO,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
 WFML,envidas,PM25C,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
 WFML,envidas,SO2,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
 WFML,envidas,API-T400-OZONE,"[2018-12-11 05:03, 2018-12-11 05:21)",AM,unknown
+PSP,envidas,Dichot(10)MC,"[2019-01-01, 2019-01-03)",AM,remove this bit of data to simplify 2019 report
+PSP,envidas,Dichot(10)RefMC,"[2019-01-01, 2019-01-03)",AM,remove this bit of data to simplify 2019 report
+PSP,envidas,TEOMA(2.5)MC,"[2019-01-01, 2019-01-03)",AM,remove this bit of data to simplify 2019 report
+PSP,envidas,TEOMA(2.5)RefMC,"[2019-01-01, 2019-01-03)",AM,remove this bit of data to simplify 2019 report
+PSP,envidas,TEOMB(crs)MC,"[2019-01-01, 2019-01-03)",AM,remove this bit of data to simplify 2019 report
+PSP,envidas,TEOMB(crs)RefMC,"[2019-01-01, 2019-01-03)",AM,remove this bit of data to simplify 2019 report
 PSP,envidas,Concentration,"[2019-01-25, 2019-02-01 12:00)",AN,zero inlet flow issue
 PSP,envidas,CO,"[2019-01-24 18:08, 2019-01-24 19:30)",AV,power fluctuation
 PSP,envidas,NOy-DEC,"[2019-01-17 10:00, 2019-01-17 13:17)",AV,power cord pulled out
 PSP,envidas,NO-DEC,"[2019-01-17 10:00, 2019-01-17 13:17)",AV,power cord pulled out
-PSP,envidas,NO,"[2019-01-17 10:00, 2019-01-17 11:30)",AV,power fluctuation
+PSP,envidas,NO,"[2019-01-17 10:00, 2019-01-17 11:30)",AV,power cord pulled out
 PSP,envidas,NOx,"[2019-01-17 10:00, 2019-01-17 11:30)",AV,power cord pulled out
 PSP,envidas,NOy,"[2019-01-17 10:00, 2019-01-17 11:30)",AV,power cord pulled out
 PSP,envidas,CO,"[2019-02-04 12:00, 2019-02-04 13:00)",AV,power failure
-PSP,envidas,BC1,"[2019-03-04 20:30, 2019-03-04 22:30)",AV,power fluctuation
-PSP,envidas,BC6,"[2019-03-04 20:30, 2019-03-04 22:30)",AV,power cord pulled out
-PSP,envidas,PM_10calc,"[2019-03-04 20:30, 2019-03-04 22:30)",AV,power cord pulled out
-PSP,envidas,PM_2_5,"[2019-03-04 20:30, 2019-03-04 22:30)",AV,power failure
+PSP,envidas,BC1,"[2019-03-04 20:30, 2019-03-04 22:30)",AM,unknown
+PSP,envidas,BC6,"[2019-03-04 20:30, 2019-03-04 22:30)",AM,unknown
+PSP,envidas,PM_10calc,"[2019-03-04 20:30, 2019-03-04 22:30)",AM,unknown
+PSP,envidas,PM_2_5,"[2019-03-04 20:30, 2019-03-04 22:30)",AM,unknown
 PSP,envidas,CO,"[2019-03-25 06:00, 2019-03-25 07:00)",BA,removed and reinstalled
 PSP,envidas,Concentration,"[2019-03-23 08:07, 2019-03-25 08:25)",AN,pump failure
 PSP,envidas,NO,"[2019-04-05 12:05, 2019-04-09 09:00)",AN,calibrator tubing left connected
 PSP,envidas,NOx,"[2019-04-05 12:05, 2019-04-09 09:00)",AN,calibrator tubing left connected
 PSP,envidas,CO,"[2019-04-06 15:00, 2019-04-06 16:00)",AV,power failure
+PSP,envidas,SO2,"[2019-04-06 15:00, 2019-04-06 16:30)",AV,power failure
+PSP,envidas,PM_2_5,"[2019-04-06 15:00, 2019-04-06 15:30)",AV,power failure
+PSP,envidas,PM_crs,"[2019-04-06 15:00, 2019-04-06 15:30)",AV,power failure
+PSP,envidas,BC1,"[2019-04-06 15:00, 2019-04-06 15:30)",AV,power failure
+PSP,envidas,BC6,"[2019-04-06 15:00, 2019-04-06 15:30)",AV,power failure
+PSP,envidas,Concentration,"[2019-04-06 15:00, 2019-04-06 15:30)",AV,power failure
+PSP,envidas,CO,"[2019-04-10 18:00, 2019-04-13 06:00)",AM,unknown
 PSP,envidas,Thermo_O3,"[2019-04-15 02:45, 2019-04-15 03:07)",AV,power failure
 PSP,envidas,CO,"[2019-04-15 02:45, 2019-04-15 04:00)",AV,power failure
+PSP,envidas,SO2,"[2019-04-15 02:45, 2019-04-15 04:00)",AV,power failure
+PSP,envidas,PM_2_5,"[2019-04-15 02:45, 2019-04-15 03:05)",AV,power failure
+PSP,envidas,PM_crs,"[2019-04-15 02:45, 2019-04-15 03:05)",AV,power failure
+PSP,envidas,BC1,"[2019-04-15 02:45, 2019-04-15 03:15)",AV,power failure
+PSP,envidas,Concentration,"[2019-04-15 02:45, 2019-04-15 03:15)",AV,power failure
 PSP,envidas,CO,"[2019-04-16 08:46, 2019-04-19 10:30)",AN,input line disconnected
 PSP,envidas,SO2,"[2019-04-24 06:00, 2019-04-24 09:00)",AN,cable loose
+PSP,envidas,CO,"[2019-05-04 19:00, 2019-05-06 10:00)",AM,unknown
 PSP,envidas,Wood smoke,"[2019-05-26 06:00, 2019-05-26 08:00)",AM,unknown
+PSP,envidas,Concentration,"[2019-05-31 12:00, 2019-05-31 14:00)",AM,unknown
 PSP,envidas,CO,"[2019-06-03 12:00, 2019-06-03 14:30)",AM,unknown
+PSP,envidas,CO,"[2019-06-08 09:00, 2019-06-11)",AM,unknown
+PSP,envidas,Concentration,"[2019-06-14 12:00, 2019-06-14 13:30)",AM,unknown
 PSP,envidas,SO2,"[2019-06-24 09:40, 2019-06-26 09:15)",AN,sample line disconnected
 PSP,envidas,HNO3,"[2019-01-01, 2019-07-01)",AM,unknown
