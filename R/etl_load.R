@@ -1,7 +1,6 @@
-
 ## only load the data if the file hasn't been loaded already
-even_smarter_upload = function(obj, f, site, measurement,
-                               ds, clobber = FALSE) {
+.even_smarter_upload = function(obj, f, site, measurement,
+                                ds, clobber = FALSE) {
   for (i in 1:length(f)) {
     f_i = f[i]
     site_i = site[i]
@@ -28,7 +27,6 @@ even_smarter_upload = function(obj, f, site, measurement,
         next()
       }
     }
-    DBI::dbSendQuery(obj$con, 'SAVEPOINT new_file_savepoint')
     add_new_file(obj$con, site_i, ds_i, f_i,
                  is_calibration)
     file_id = get_file_id(obj$con, site_i, ds_i,
@@ -46,14 +44,8 @@ even_smarter_upload = function(obj, f, site, measurement,
       df = df[, c((ncols - 1):ncols, 1:(ncols - 2))]
     } else {
       ## for now just print a warning for key conflicts
-      obs_res = tryCatch(get_obs_id(obj$con, file_id, df$record,
-                                    df$instrument_time),
-                         error = function(e) {
-                           DBI::dbSendQuery(obj$con, 'ROLLBACK TO SAVEPOINT new_file_savepoint')
-                           warning(f_i, ' load failed: ', e)
-                           e
-                         })
-      if (inherits(obs_res, 'error')) next()
+      obs_res = get_obs_id(obj$con, file_id, df$record,
+                           df$instrument_time)
       df$observation_id = obs_res
       df$record = NULL
       df$instrument_time = NULL
@@ -65,19 +57,26 @@ even_smarter_upload = function(obj, f, site, measurement,
       tbl_name = 'measurements'
     }
     ## for now just print a warning for key conflicts
-    tryCatch(DBI::dbWriteTable(obj$con, tbl_name, df,
-                               row.names = FALSE, append = TRUE),
-             error = function(e) {
-               if (grepl(' violates .* constraint', e)) {
-                 DBI::dbSendQuery(obj$con, 'ROLLBACK TO SAVEPOINT new_file_savepoint')
-                 warning(f_i, ' load failed: ', e)
-               } else {
-                 DBI::dbRollback(obj$con)
-                 stop(e)
-               }
-             })
-    DBI::dbSendQuery(obj$con, 'RELEASE SAVEPOINT new_file_savepoint')
+    DBI::dbWriteTable(obj$con, tbl_name, df, row.names = FALSE,
+                      append = TRUE)
+    
   }
+}
+
+even_smarter_upload = function(obj, f, site, measurement,
+                               ds, clobber = FALSE) {
+  ## This function is running in a database transaction. Use
+  ## savepoints to recover from errors without preventing other files
+  ## from loading.
+  DBI::dbSendQuery(obj$con, 'SAVEPOINT new_file_savepoint')
+  tryCatch(.even_smarter_upload(obj, f, site, measurement,
+                                ds, clobber = FALSE),
+           error = function(e) {
+             DBI::dbSendQuery(obj$con, 'ROLLBACK TO SAVEPOINT new_file_savepoint')
+             warning(f, ' load failed: ', e)
+             e
+           })
+  DBI::dbSendQuery(obj$con, 'RELEASE SAVEPOINT new_file_savepoint')
 }
 
 #' @import etl
@@ -102,6 +101,9 @@ etl_load.etl_nysatmoschem = function(obj, sites = NULL, data_sources = NULL,
     DBI::dbSendQuery(obj$con, 'alter table measurements drop constraint measurements_measurement_type_id_fkey')
     even_smarter_upload(obj, f_paths, sites,
                         is_measurement, dss, clobber)
+    mapply(even_smarter_upload, f = f_paths, site = sites,
+           measurement = is_measurement, ds = dss, clobber = clobber,
+           MoreArgs = list(obj = obj))
     ## recreate the constraints and end the transaction
     DBI::dbSendQuery(obj$con, 'alter table measurements add constraint measurements_observation_id_fkey foreign key (observation_id) references observations on delete cascade')
     DBI::dbSendQuery(obj$con, 'alter table measurements add constraint measurements_measurement_type_id_fkey foreign key (measurement_type_id) references measurement_types on delete cascade')
