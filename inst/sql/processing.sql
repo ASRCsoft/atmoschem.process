@@ -24,9 +24,9 @@ create table processed_measurements (
   measurement_type_id int references measurement_types,
   time timestamp,
   value numeric,
-  flagged boolean not null,
-  primary key(measurement_type_id, time)
+  flagged boolean not null
 );
+create index processed_measurements_idx on processed_measurements(measurement_type_id, time);
 
 /* This is another placeholder for derived values. */
 drop view if exists hourly_derived_measurements cascade;
