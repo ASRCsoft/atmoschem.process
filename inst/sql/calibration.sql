@@ -159,7 +159,7 @@ CREATE OR REPLACE FUNCTION guess_cal_time(mtype int, type text, cal_times tsrang
   select case when dif>maxdif then null
 	 else times end
     from (select *,
-		 abs(measured_value - val) as dif
+		 abs(100 * measured_value/ val - 100) as dif
 	    from group_cals) g1
    order by dif asc
    limit 1;
@@ -167,9 +167,99 @@ $$ LANGUAGE sql STABLE PARALLEL SAFE;
 
 /* Guess the NOx/NO2 conversion efficiency calibration time period for
    using the calibration value and a time range of possible times */
-CREATE OR REPLACE FUNCTION guess_no_ce_time(mtype int, cal_times tsrange, val numeric)
+-- CREATE OR REPLACE FUNCTION guess_no_ce_time(mtype int, cal_times tsrange, val numeric)
+--   RETURNS tsrange AS $$
+--   select guess_cal_time(mtype, 'CE', cal_times2, val + 10, 1, 15);
+-- $$ LANGUAGE sql STABLE PARALLEL SAFE;
+
+-- For testing:
+-- select guess_cal_time(mtype, 'CE', cal_times2, ceval, 1, 20)
+--   from (select cal_times - stimes as cal_times2
+-- 	  from (select guess_cal_time(mtype, 'span', cal_times, sval, 1, 5) as stimes
+-- 		  from (select measured_value as sval
+-- 			  from manual_calibrations
+-- 			 where times=cal_times
+-- 			   and type='span') s1) t1) t2;
+
+-- with mtype as (select 58 as id),
+--   cecals as (select times,
+-- 		    measured_value as ceval
+-- 	       from manual_calibrations
+-- 	      where measurement_type_id=(select id
+-- 					   from mtype)
+-- 		and type='CE'),
+--   scals as (select times,
+-- 		   measured_value as sval
+-- 	      from manual_calibrations
+-- 	     where measurement_type_id=(select id
+-- 					  from mtype)
+-- 	       and type='span')
+-- select guess_cal_time((select id
+-- 			 from mtype), 'CE', cal_times2, ceval, 1, 20)
+--   from (select tsrange(upper(stimes), upper(times)) as cal_times2,
+-- 	       ceval
+-- 	  from (select cecals.times,
+-- 		       ceval,
+-- 		       guess_cal_time((select id
+-- 					 from mtype), 'span', cecals.times, sval, 1, 5) as stimes
+-- 		  from scals
+-- 			 join cecals
+-- 			     on scals.times=cecals.times) t1) t2;
+
+-- with mtype as (select 58 as id),
+--   cecals as (select times,
+-- 		    measured_value as ceval
+-- 	       from manual_calibrations
+-- 	      where measurement_type_id=(select id
+-- 					   from mtype)
+-- 		and type='CE'),
+--   scals as (select times,
+-- 		   measured_value as sval
+-- 	      from manual_calibrations
+-- 	     where measurement_type_id=(select id
+-- 					  from mtype)
+-- 	       and type='span')
+-- select cecals.times,
+--        ceval,
+--        guess_cal_time((select id
+-- 			 from mtype), 'CE', cecals.times, sval, 1, 5) as stimes
+--   from scals
+-- 	 join cecals
+-- 	     on scals.times=cecals.times;
+
+-- with mtype as (select 58 as id),
+--   cecals as (select times,
+-- 		    measured_value as ceval
+-- 	       from manual_calibrations
+-- 	      where measurement_type_id=(select id
+-- 					   from mtype)
+-- 		and type='CE'),
+--   scals as (select times,
+-- 		   measured_value as sval
+-- 	      from manual_calibrations
+-- 	     where measurement_type_id=(select id
+-- 					  from mtype)
+-- 	       and type='span')
+-- select cecals.times
+--   from scals
+-- 	 join cecals
+-- 	     on scals.times=cecals.times;
+
+CREATE OR REPLACE FUNCTION guess_no_ce_time(mtype int, cal_times tsrange, ceval numeric)
   RETURNS tsrange AS $$
-  select guess_cal_time(mtype, 'CE', cal_times, val + 10, 1, 15);
+  -- find the span time and exclude it, then search the remaining time for the CE
+  select case when cal_times2 is null then null
+	 else guess_cal_time(mtype, 'CE', cal_times2, ceval, 1, 20) end
+    from (select tsrange(upper(stimes), upper(cal_times)) as cal_times2
+	    -- due to the way I have this coded I have to specify
+	    -- type='CE' here instead of span, even though they are
+	    -- spans
+	    from (select guess_cal_time(mtype, 'CE', cal_times, sval, 1, 5) as stimes
+		    from (select measured_value as sval
+			    from manual_calibrations
+			   where measurement_type_id=mtype
+			     and times=cal_times
+			     and type='span') s1) t1) t2;
 $$ LANGUAGE sql STABLE PARALLEL SAFE;
 
 create materialized view calibration_results as
