@@ -165,101 +165,90 @@ CREATE OR REPLACE FUNCTION guess_cal_time(mtype int, type text, cal_times tsrang
    limit 1;
 $$ LANGUAGE sql STABLE PARALLEL SAFE;
 
-/* Guess the NOx/NO2 conversion efficiency calibration time period for
-   using the calibration value and a time range of possible times */
--- CREATE OR REPLACE FUNCTION guess_no_ce_time(mtype int, cal_times tsrange, val numeric)
+-- CREATE OR REPLACE FUNCTION guess_no_ce_time(mtype int, cal_times tsrange, ceval numeric)
 --   RETURNS tsrange AS $$
---   select guess_cal_time(mtype, 'CE', cal_times2, val + 10, 1, 15);
+--   -- find the span time and exclude it, then search the remaining time for the CE
+--   select case when cal_times2 is null then null
+-- 	 else guess_cal_time(mtype, 'CE', cal_times2, ceval, 1, 20) end
+--     from (select tsrange(upper(stimes), upper(cal_times)) as cal_times2
+-- 	    -- due to the way I have this coded I have to specify
+-- 	    -- type='CE' here instead of span, even though they are
+-- 	    -- spans
+-- 	    from (select guess_cal_time(mtype, 'CE', cal_times, sval, 1, 5) as stimes
+-- 		    from (select measured_value as sval
+-- 			    from manual_calibrations
+-- 			   where measurement_type_id=mtype
+-- 			     and times=cal_times
+-- 			     and type='span') s1) t1) t2;
 -- $$ LANGUAGE sql STABLE PARALLEL SAFE;
 
--- For testing:
--- select guess_cal_time(mtype, 'CE', cal_times2, ceval, 1, 20)
---   from (select cal_times - stimes as cal_times2
--- 	  from (select guess_cal_time(mtype, 'span', cal_times, sval, 1, 5) as stimes
--- 		  from (select measured_value as sval
--- 			  from manual_calibrations
--- 			 where times=cal_times
--- 			   and type='span') s1) t1) t2;
-
--- with mtype as (select 58 as id),
---   cecals as (select times,
--- 		    measured_value as ceval
--- 	       from manual_calibrations
--- 	      where measurement_type_id=(select id
--- 					   from mtype)
--- 		and type='CE'),
---   scals as (select times,
--- 		   measured_value as sval
--- 	      from manual_calibrations
--- 	     where measurement_type_id=(select id
--- 					  from mtype)
--- 	       and type='span')
--- select guess_cal_time((select id
--- 			 from mtype), 'CE', cal_times2, ceval, 1, 20)
---   from (select tsrange(upper(stimes), upper(times)) as cal_times2,
--- 	       ceval
--- 	  from (select cecals.times,
--- 		       ceval,
--- 		       guess_cal_time((select id
--- 					 from mtype), 'span', cecals.times, sval, 1, 5) as stimes
--- 		  from scals
--- 			 join cecals
--- 			     on scals.times=cecals.times) t1) t2;
-
--- with mtype as (select 58 as id),
---   cecals as (select times,
--- 		    measured_value as ceval
--- 	       from manual_calibrations
--- 	      where measurement_type_id=(select id
--- 					   from mtype)
--- 		and type='CE'),
---   scals as (select times,
--- 		   measured_value as sval
--- 	      from manual_calibrations
--- 	     where measurement_type_id=(select id
--- 					  from mtype)
--- 	       and type='span')
--- select cecals.times,
---        ceval,
---        guess_cal_time((select id
--- 			 from mtype), 'CE', cecals.times, sval, 1, 5) as stimes
---   from scals
--- 	 join cecals
--- 	     on scals.times=cecals.times;
-
--- with mtype as (select 58 as id),
---   cecals as (select times,
--- 		    measured_value as ceval
--- 	       from manual_calibrations
--- 	      where measurement_type_id=(select id
--- 					   from mtype)
--- 		and type='CE'),
---   scals as (select times,
--- 		   measured_value as sval
--- 	      from manual_calibrations
--- 	     where measurement_type_id=(select id
--- 					  from mtype)
--- 	       and type='span')
--- select cecals.times
---   from scals
--- 	 join cecals
--- 	     on scals.times=cecals.times;
-
-CREATE OR REPLACE FUNCTION guess_no_ce_time(mtype int, cal_times tsrange, ceval numeric)
+/* Guess the conversion efficiency calibration time period using the
+recorded value from the cal sheet, the range of calibration times, and
+the NO/NOx divergence */
+CREATE OR REPLACE FUNCTION guess_42C_ce_time(noid int, noxid int, cal_times tsrange, noxval numeric)
   RETURNS tsrange AS $$
-  -- find the span time and exclude it, then search the remaining time for the CE
-  select case when cal_times2 is null then null
-	 else guess_cal_time(mtype, 'CE', cal_times2, ceval, 1, 20) end
-    from (select tsrange(upper(stimes), upper(cal_times)) as cal_times2
-	    -- due to the way I have this coded I have to specify
-	    -- type='CE' here instead of span, even though they are
-	    -- spans
-	    from (select guess_cal_time(mtype, 'CE', cal_times, sval, 1, 5) as stimes
-		    from (select measured_value as sval
-			    from manual_calibrations
-			   where measurement_type_id=mtype
-			     and times=cal_times
-			     and type='span') s1) t1) t2;
+  -- new steps:
+  -- 1) get NOx minus NO from the measurements table
+  -- 2) use derivative to label groups of measurements
+  -- 3) select the group with the largest NOx - NO values
+  -- 4) check that the NOx value is reasonably close to the NO value
+  -- Old steps:
+  -- 1) select the mtype1 measurements within the time bounds
+  with meas1 as (
+    select *
+      from measurements2
+     where measurement_type_id=mtype
+       and time <@ cal_times
+  ),
+  -- 2) use derivative to label groups of measurements
+  meas_d1 as (
+    select *,
+	   value - lag(value) over w as d1
+      from meas1
+	     window w as (order by time)
+  ),
+  meas_disc as (
+    select *,
+	   abs(d1)>threshold as discontinuous
+      from meas_d1
+  ),
+  meas_new_group as (
+    select *,
+	   discontinuous and not lag(discontinuous) over w as new_group
+      from meas_disc
+	     window w as (order by time)
+  ),
+  meas_groups as (
+    select *
+      from (select *,
+		   sum(new_group::int) over w as group_id
+	      from meas_new_group
+		     window w as (order by time)) m1
+     where not discontinuous
+  ),
+  -- 3) submit each group to `estimate_cal`
+  group_times as (
+    select measurement_type_id,
+	   group_id,
+	   tsrange(min(time), max(time), '[)') as times
+      from meas_groups
+     group by measurement_type_id, group_id
+  ),
+  group_cals as (
+    select *,
+	   estimate_cal(measurement_type_id, type, times) as measured_value
+      from (select *
+	      from group_times
+	     where (upper(times) - lower(times))>='5 min') g1
+  )
+  -- 4) get the group with the closest value to val
+  select case when dif>maxdif then null
+	 else times end
+    from (select *,
+		 abs(100 * measured_value/ val - 100) as dif
+	    from group_cals) g1
+   order by dif asc
+   limit 1;
 $$ LANGUAGE sql STABLE PARALLEL SAFE;
 
 create materialized view calibration_results as
