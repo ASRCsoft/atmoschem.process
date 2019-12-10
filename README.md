@@ -1,6 +1,6 @@
 # The ASRC NYS Atmospheric Chemistry Database
 
-[![Build Status](https://travis-ci.org/ASRCsoft/nysatmoschem.svg?branch=master)](https://travis-ci.org/ASRCsoft/nysatmoschem)
+[![Build Status](https://travis-ci.org/ASRCsoft/atmoschem.datasets.svg?branch=master)](https://travis-ci.org/ASRCsoft/atmoschem.datasets)
 
 The ASRC NYS Atmospheric Chemistry Database is a PostgreSQL database containing atmospheric chemistry data from ASRC sites in New York State.
 
