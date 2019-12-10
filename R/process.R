@@ -120,7 +120,9 @@ process = function(obj, msmts, m_id) {
   }
   msmts$flagged = is_true(msmts$flagged) |
     is_flagged(obj, m_id, msmts$time, msmts$value)
-  msmts[, c('measurement_type_id', 'time', 'value', 'flagged')]
+  msmts = msmts[, c('measurement_type_id', 'time', 'value', 'flagged')]
+  attributes(msmts$time)$tzone = 'EST'
+  msmts
 }
 
 #' @export
@@ -156,14 +158,22 @@ update_processing = function(obj, site, data_source, start_time,
 
     ## add new measurements
     for (n in 1:nrow(ds_mtypes)) {
-      message('Processing ', ds_mtypes$name[n], '...')
+      mname = ds_mtypes$name[n]
+      message('Processing ', mname, '...')
       msmts = get_measurements(obj, ds_mtypes$id[n], start_time,
                                end_time)
       if (nrow(msmts) > 0) {
-        pr_msmts = process(obj, msmts, ds_mtypes$id[n])
-        attributes(pr_msmts$time)$tzone = 'EST'
-        DBI::dbWriteTable(obj$con, 'processed_measurements',
-                          pr_msmts, row.names = FALSE, append = TRUE)
+        DBI::dbSendQuery(obj$con, 'SAVEPOINT processing_savepoint')
+        tryCatch({
+          pr_msmts = process(obj, msmts, ds_mtypes$id[n])
+          DBI::dbWriteTable(obj$con, 'processed_measurements',
+                            pr_msmts, row.names = FALSE, append = TRUE)
+        },
+        error = function(e) {
+          DBI::dbSendQuery(obj$con, 'ROLLBACK TO SAVEPOINT processing_savepoint')
+          warning(mname, ' processing failed: ', e)
+        })
+        DBI::dbSendQuery(obj$con, 'RELEASE SAVEPOINT processing_savepoint')
       } else {
         warning('No measurements found.')
       }
@@ -174,31 +184,38 @@ update_processing = function(obj, site, data_source, start_time,
         length(derived_vals[[site]]) > 0) {
       derive_list = derived_vals[[site]]
       for (n in 1:length(derive_list)) {
-        f_n = derive_list[[n]]
-        msmts = f_n(obj, start_time, end_time)
-        if (nrow(msmts) > 0) {
-          ## some functions return multiple derived measurements
-          un_id = unique(msmts$measurement_type_id)
-          for (id in un_id) {
-            name = mtypes$name[match(id, mtypes$id)]
-            message('Processing ', name, '...')
-            ## delete old measurements
-            q2 = '  delete
+        DBI::dbSendQuery(obj$con, 'SAVEPOINT processing_savepoint')
+        tryCatch({
+          f_n = derive_list[[n]]
+          msmts = f_n(obj, start_time, end_time)
+          if (nrow(msmts) > 0) {
+            ## some functions return multiple derived measurements
+            un_id = unique(msmts$measurement_type_id)
+            for (id in un_id) {
+              name = mtypes$name[match(id, mtypes$id)]
+              message('Processing ', name, '...')
+              ## delete old measurements
+              q2 = '  delete
     from processed_measurements
    where measurement_type_id=?id
      and (?start is null or time>=?start)
      and (?end is null or time<=?end)'
-            sql2 = DBI::sqlInterpolate(obj$con, q2, id = id,
-                                       start = start_time, end = end_time)
-            DBI::dbExecute(obj$con, sql2)
-            id_msmts = subset(msmts, measurement_type_id == id)
-            pr_msmts = process(obj, id_msmts, id)
-            attributes(pr_msmts$time)$tzone = 'EST'
-            DBI::dbWriteTable(obj$con, 'processed_measurements',
-                              pr_msmts, row.names = FALSE,
-                              append = TRUE)
+              sql2 = DBI::sqlInterpolate(obj$con, q2, id = id,
+                                         start = start_time, end = end_time)
+              DBI::dbExecute(obj$con, sql2)
+              id_msmts = subset(msmts, measurement_type_id == id)
+              pr_msmts = process(obj, id_msmts, id)
+              DBI::dbWriteTable(obj$con, 'processed_measurements',
+                                pr_msmts, row.names = FALSE,
+                                append = TRUE)
+            }
           }
-        }
+        },
+        error = function(e) {
+          DBI::dbSendQuery(obj$con, 'ROLLBACK TO SAVEPOINT processing_savepoint')
+          warning('derived value (', n, ') processing failed: ', e)
+        })
+        DBI::dbSendQuery(obj$con, 'RELEASE SAVEPOINT processing_savepoint')
       }
     }
 
