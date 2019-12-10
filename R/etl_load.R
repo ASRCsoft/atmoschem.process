@@ -59,7 +59,6 @@
     ## for now just print a warning for key conflicts
     DBI::dbWriteTable(obj$con, tbl_name, df, row.names = FALSE,
                       append = TRUE)
-    
   }
 }
 
@@ -69,8 +68,9 @@ even_smarter_upload = function(obj, f, site, measurement,
   ## savepoints to recover from errors without preventing other files
   ## from loading.
   DBI::dbSendQuery(obj$con, 'SAVEPOINT new_file_savepoint')
-  tryCatch(.even_smarter_upload(obj, f, site, measurement,
-                                ds, clobber),
+  tryCatch(ignore_fields(.even_smarter_upload(obj, f, site,
+                                              measurement, ds,
+                                              clobber)),
            error = function(e) {
              DBI::dbSendQuery(obj$con, 'ROLLBACK TO SAVEPOINT new_file_savepoint')
              warning(f, ' load failed: ', e)

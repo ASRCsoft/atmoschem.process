@@ -1,5 +1,15 @@
 ## useful functions
 
+## ignore "unrecognized PostgreSQL field type" warnings from
+## RPostgreSQL
+muffle_warning_pattern = function(w, pattern) {
+  if (grepl(pattern, conditionMessage(w))) invokeRestart("muffleWarning")
+}
+ignore_fields = function(expr) {
+  withCallingHandlers(expr, warning = function(w)
+    muffle_warning_pattern(w, 'unrecognized PostgreSQL field type'))
+}
+
 is_true = function(x) !is.na(x) & x
 
 is_psp_42C_cal = function(f)
