@@ -102,74 +102,67 @@ create or replace view calibration_periods as
 	   group by measurement_type_id, type, scheduled_times) sa2
    where not isempty(times);
 
-/* Guess the calibration time period using the calibration value and a
-time range of possible times */
-CREATE OR REPLACE FUNCTION guess_cal_time(mtype int, type text, cal_times tsrange, val numeric,
-					  threshold numeric, maxdif numeric)
+/* Guess the conversion efficiency calibration time period using the
+   recorded NOx value from the cal sheet (noxval), the range of
+   calibration times, and the NO/NOx divergence */
+CREATE OR REPLACE FUNCTION guess_42C_ce_time(noid int, noxid int, cal_times tsrange, noxval numeric)
   RETURNS tsrange AS $$
-  -- 1) select the mtype1 measurements within the time bounds
-  with meas1 as (
-    select *
-      from measurements2
-     where measurement_type_id=mtype
-       and time <@ cal_times
-  ),		       
-  -- 2) use derivative to label groups of measurements
-  meas_d1 as (
-    select *,
-	   value - lag(value) over w as d1
-      from meas1
-	     window w as (order by time)
+  -- 1) get NOx minus NO (approximate NO2) from the measurements table
+  with no2 as (
+    select no.time as time,
+	   nox.value as nox_val,
+	   nox.value - no.value as no2_val
+      from (select *
+	      from measurements2
+	     where measurement_type_id=noid) no
+	     join
+	     (select *
+		from measurements2
+	       where measurement_type_id=noxid) nox
+		 on no.time=nox.time
+     where no.time <@ cal_times
   ),
-  meas_disc as (
-    select *,
-	   abs(d1)>threshold as discontinuous
-      from meas_d1
-  ),
-  meas_new_group as (
-    select *,
-	   discontinuous and not lag(discontinuous) over w as new_group
-      from meas_disc
-	     window w as (order by time)
-  ),
-  meas_groups as (
-    select *
+  -- 2) use derivative NOx and NO2 values to separate measurements
+  -- into groups
+  groups as (
+    select tsrange(min(time), max(time), '[)') as times
       from (select *,
 		   sum(new_group::int) over w as group_id
-	      from meas_new_group
+	      from (select *,
+			   discontinuous and not lag(discontinuous) over w as new_group
+		      from (select *,
+				   abs(dnox)>1 or abs(dno2)>1 as discontinuous
+			      from (select *,
+					   nox_val - lag(nox_val) over w as dnox,
+					   no2_val - lag(no2_val) over w as dno2
+				      from no2
+					     window w as (order by time)) d1) d2
+			     window w as (order by time)) d3
 		     window w as (order by time)) m1
      where not discontinuous
+     group by group_id
+    having max(time) - min(time) >= '10 min'
   ),
-  -- 3) submit each group to `estimate_cal`
-  group_times as (
-    select measurement_type_id,
-	   group_id,
-	   tsrange(min(time), max(time), '[)') as times
-      from meas_groups
-     group by measurement_type_id, group_id
-  ),
-  group_cals as (
+  -- 3) select the group with the largest NO2 values that matches CE
+  -- criteria
+  ce_cal as (
     select *,
-	   estimate_cal(measurement_type_id, type, times) as measured_value
-      from (select *
-	      from group_times
-	     where (upper(times) - lower(times))>='5 min') g1
+	   nox - no as no2
+      from (select *,
+	           -- get the lowest value of NO, highest NOx
+		   estimate_cal(noid, 'zero', times) as no,
+		   estimate_cal(noxid, 'CE', times) as nox
+	      from groups) g1
+     -- filter out zero calibrations
+     where no > .3
+     -- make sure measured NOx value is within +/- 30% of the recorded
+     -- NOx value
+       and abs(100 * nox / noxval - 100) < 30
+     order by nox - no desc
+     limit 1
   )
-  -- 4) get the group with the closest value to val
-  select case when dif>maxdif then null
-	 else times end
-    from (select *,
-		 abs(measured_value - val) as dif
-	    from group_cals) g1
-   order by dif asc
-   limit 1;
-$$ LANGUAGE sql STABLE PARALLEL SAFE;
-
-/* Guess the NOx/NO2 conversion efficiency calibration time period for
-   using the calibration value and a time range of possible times */
-CREATE OR REPLACE FUNCTION guess_no_ce_time(mtype int, cal_times tsrange, val numeric)
-  RETURNS tsrange AS $$
-  select guess_cal_time(mtype, 'CE', cal_times, val + 10, 1, 15);
+  select times
+    from ce_cal;
 $$ LANGUAGE sql STABLE PARALLEL SAFE;
 
 create materialized view calibration_results as
@@ -205,9 +198,12 @@ create materialized view calibration_results as
 		 type,
 		 upper(times) as time,
 		 provided_value,
-		 estimate_cal(get_measurement_id(3, 'envidas', 'NO'), 'CE',
-			      guess_no_ce_time(measurement_type_id, times,
-					       measured_value)) as measured_value
+		 -- get minimum (not maximum!) NO values for CE calibrations
+		 estimate_cal(get_measurement_id(3, 'envidas', 'NO'), 'zero',
+			      guess_42C_ce_time(get_measurement_id(3, 'envidas', 'NO'),
+						get_measurement_id(3, 'envidas', 'NOx'),
+						times,
+						measured_value)) as measured_value
 	    from manual_calibrations
 	   where measurement_type_id=get_measurement_id(3, 'envidas', 'NOx')
 	     and type='CE') cr1
