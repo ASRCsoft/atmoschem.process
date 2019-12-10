@@ -46,14 +46,15 @@ in_interval = function(x, l, u, l_inc, u_inc) {
   res
 }
 
-## this is the outlier detection used by the Hampel filter
+## this is the outlier detection used by the Hampel filter, with the
+## exception that no values are flagged if the MAD is zero
 is_hampel_outlier = function(x, k, threshold = 3.5) {
   ## I'm not sure how I feel about endrule = 'constant' here. The
   ## default endrule breaks with too many NA values, though, so it's
   ## unusable.
   medians = runmed(x, k, endrule = 'constant')
   mads = caTools::runmad(x, k, center = medians)
-  abs(x - medians) / mads > threshold
+  abs(x - medians) / mads > threshold & (mads != 0)
 }
 
 is_flagged = function(obj, m_id, times, x) {
