@@ -70,7 +70,7 @@ even_smarter_upload = function(obj, f, site, measurement,
   ## from loading.
   DBI::dbSendQuery(obj$con, 'SAVEPOINT new_file_savepoint')
   tryCatch(.even_smarter_upload(obj, f, site, measurement,
-                                ds, clobber = FALSE),
+                                ds, clobber),
            error = function(e) {
              DBI::dbSendQuery(obj$con, 'ROLLBACK TO SAVEPOINT new_file_savepoint')
              warning(f, ' load failed: ', e)
