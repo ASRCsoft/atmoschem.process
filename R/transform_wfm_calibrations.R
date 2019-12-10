@@ -155,24 +155,29 @@ transform_wfml_48C = function(f) {
 }
 
 transform_wfms_300EU = function(f) {
-  transform_wfm_single_cal(f, 'CO',
-                           calibrated = c('zero_cal_mode_2',
-                                          'span cal mode 4',
-                                          'zero cal check 6'),
-                           start_time = c('time_log_2',
-                                          'time log 4',
-                                          'time log 6'),
-                           measured_time = c('time log 3',
-                                             'time log 5',
-                                             'time log 7'),
-                           corrected = c('set 300EU to zero 3',
-                                         'set 300EU span 5',
-                                         NA),
-                           provided = c(0, 452, 0),
-                           measured = c('measured zero 3',
-                                        'measured span 5',
-                                        'zero check 300EU ppb'),
-                           online_time = 'time log 8')
+  df300EU = transform_wfm_single_cal(f, 'CO',
+                                     calibrated = c('zero_cal_mode_2',
+                                                    'span cal mode 4',
+                                                    'zero cal check 6'),
+                                     start_time = c('time_log_2',
+                                                    'time log 4',
+                                                    'time log 6'),
+                                     measured_time = c('time log 3',
+                                                       'time log 5',
+                                                       'time log 7'),
+                                     corrected = c('set 300EU to zero 3',
+                                                   'set 300EU span 5',
+                                                   NA),
+                                     provided = c(0, 452, 0),
+                                     measured = c('measured zero 3',
+                                                  'measured span 5',
+                                                  'zero check 300EU ppb'),
+                                     online_time = 'time log 8')
+  ## for whatever reason these cal values are being recorded as an
+  ## offset from 200 rather than from zero
+  df300EU$measured_value =
+    as.numeric(as.character(df300EU$measured_value)) + 200
+  df300EU
 }
 
 transform_wfms_42C = function(f) {
