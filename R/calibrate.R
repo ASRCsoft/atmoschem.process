@@ -144,15 +144,15 @@ wfms_no2_ce_inputs = function(obj) {
            type == 'CE',
            !is.na(measured_value),
            !is.na(provided_value)) %>%
+    mutate(time = timezone('EST', time)) %>%
+    collect() %>%
     mutate(measurement_type_id =
              get_measurement_type_id(obj$con, 'WFMS', 'campbell',
                                      'NO2'),
-           time = timezone('EST', time),
            measured_value =
              apply_cal(obj$con, wfms_nox_id, time, measured_value)) %>%
     select(time, measured_value, provided_value, flagged) %>%
-    arrange(time) %>%
-    collect()
+    arrange(time)
 }
 
 psp_no2_ce_inputs = function(obj) {
