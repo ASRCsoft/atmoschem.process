@@ -171,7 +171,12 @@ create materialized view calibration_results as
     from (select measurement_type_id,
 		 type,
 		 upper(times) as time,
-		 m.span as provided_value,
+		 case
+		 when type='zero' then 0
+		 when type='span' then m.span
+		 when type='CE' then m.max_ce
+		 else null
+		 end as provided_value,
 		 estimate_cal(measurement_type_id, type, times) as measured_value
 	    from calibration_periods cp1
 		   join measurement_types m
