@@ -144,7 +144,10 @@ update_processing = function(obj, site, data_source, start_time,
     
     DBI::dbWithTransaction(obj$con, {
       message('Updating processing inputs ...')
-      DBI::dbExecute(obj$con, 'select update_processing_inputs()')
+      q0 = 'select update_processing_inputs(?site, ?ds, ?start, ?end)'
+      sql0 = DBI::sqlInterpolate(obj$con, q0, site = site_id, ds = data_source,
+                                 start = start_time, end = end_time)
+      DBI::dbExecute(obj$con, sql0)
       
       ## delete old measurements
       if (is(start_time, 'POSIXt')) attributes(start_time)$tzone = 'EST'

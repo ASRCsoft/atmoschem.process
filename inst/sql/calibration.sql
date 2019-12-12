@@ -165,24 +165,57 @@ CREATE OR REPLACE FUNCTION guess_42C_ce_time(noid int, noxid int, cal_times tsra
     from ce_cal;
 $$ LANGUAGE sql STABLE PARALLEL SAFE;
 
-create materialized view calibration_results as
+-- estimate the calibration results for the autocalibration periods
+create view _calibration_results as
+  select measurement_type_id,
+	 type,
+	 upper(times) as time,
+	 case when type='zero' then 0
+	 when type='span' then m.span
+	 when type='CE' then m.max_ce
+	 else null end as provided_value,
+	 estimate_cal(measurement_type_id, type, times) as measured_value
+    from calibration_periods cp1
+	   join measurement_types m
+	       on cp1.measurement_type_id=m.id
+   where (type='zero' and upper(times) - lower(times) > interval '5 min')
+      or upper(times) - lower(times) > interval '10 min';
+
+-- find NO conversion efficiency results, which weren't recorded in
+-- the PSP cal sheets
+create view psp_no_ces as
+  select get_measurement_id(3, 'envidas', 'NO'),
+	 type,
+	 upper(times) as time,
+	 provided_value,
+         -- get minimum (not maximum!) NO values for CE calibrations
+	 estimate_cal(get_measurement_id(3, 'envidas', 'NO'), 'zero',
+		      guess_42C_ce_time(get_measurement_id(3, 'envidas', 'NO'),
+					get_measurement_id(3, 'envidas', 'NOx'),
+					times,
+					measured_value)) as measured_value
+    from manual_calibrations
+   where measurement_type_id=get_measurement_id(3, 'envidas', 'NOx')
+     and type='CE';
+
+-- gather the combined calibration results for the given data source
+-- and time range
+CREATE OR REPLACE FUNCTION get_calibration_results(site int, data_source text,
+						   starttime timestamp,
+						   endtime timestamp)
+  RETURNS TABLE (
+    measurement_type_id int,
+    type text,
+    "time" timestamp,
+    provided_value numeric,
+    measured_value numeric,
+    flagged bool
+  ) 
+AS $$
   select cr1.*,
 	 cf.times is not null as flagged
-    from (select measurement_type_id,
-		 type,
-		 upper(times) as time,
-		 case
-		 when type='zero' then 0
-		 when type='span' then m.span
-		 when type='CE' then m.max_ce
-		 else null
-		 end as provided_value,
-		 estimate_cal(measurement_type_id, type, times) as measured_value
-	    from calibration_periods cp1
-		   join measurement_types m
-		       on cp1.measurement_type_id=m.id
-	   where ((type='zero' and upper(times) - lower(times) > interval '5 min')
-		  or upper(times) - lower(times) > interval '10 min')
+    from (select *
+	    from _calibration_results
 	   union
 	  select measurement_type_id,
 		 type,
@@ -197,24 +230,46 @@ create materialized view calibration_results as
 									 from data_sources
 									where site_id=2))
 	   union
-	         -- find NO conversion efficiency results, which
-	         -- weren't recorded in the PSP cal sheets
-	  select get_measurement_id(3, 'envidas', 'NO'),
-		 type,
-		 upper(times) as time,
-		 provided_value,
-		 -- get minimum (not maximum!) NO values for CE calibrations
-		 estimate_cal(get_measurement_id(3, 'envidas', 'NO'), 'zero',
-			      guess_42C_ce_time(get_measurement_id(3, 'envidas', 'NO'),
-						get_measurement_id(3, 'envidas', 'NOx'),
-						times,
-						measured_value)) as measured_value
-	    from manual_calibrations
-	   where measurement_type_id=get_measurement_id(3, 'envidas', 'NOx')
-	     and type='CE') cr1
+	  select *
+	    from psp_no_ces) cr1
 	   left join calibration_flags cf
 	       on cr1.measurement_type_id=cf.measurement_type_id
 	       and cr1.type = cf.type
 	       and cr1.time <@ cf.times
-   where cr1.type in ('zero', 'span', 'CE');
-CREATE INDEX calibration_results_idx ON calibration_results(measurement_type_id, type, flagged, time);
+  where cr1.measurement_type_id in (select id
+				      from measurement_types
+				     where data_source_id=(select id
+							     from data_sources
+							    where site_id=$1
+							      and name=$2))
+    and cr1.time>=$3 and cr1.time<$4
+    and cr1.type in ('zero', 'span', 'CE');
+$$ LANGUAGE sql;
+
+create table calibration_results (
+  measurement_type_id int not null,
+  type text not null,
+  time timestamp not null,
+  provided_value numeric,
+  measured_value numeric,
+  flagged bool,
+  unique(measurement_type_id, type, time)
+);
+
+CREATE OR REPLACE FUNCTION update_calibration_results(site int, data_source text,
+						      starttime timestamp,
+						      endtime timestamp)
+  RETURNS void as $$
+  delete 
+    from calibration_results
+   where measurement_type_id in (select id
+				   from measurement_types
+				  where data_source_id=(select id
+							  from data_sources
+							 where site_id=$1
+							   and name=$2))
+     and time>=$3 and time<$4;
+  insert into calibration_results
+  select *
+    from get_calibration_results($1, $2, $3, $4);
+$$ language sql;

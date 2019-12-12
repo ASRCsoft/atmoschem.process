@@ -70,11 +70,13 @@ create index hourly_measurements_idx on hourly_measurements(measurement_type_id,
 
 /* Update the processed data. */
 drop function if exists update_processing_inputs cascade;
-CREATE OR REPLACE FUNCTION update_processing_inputs()
+CREATE OR REPLACE FUNCTION update_processing_inputs(site int, data_source text,
+						    starttime timestamp,
+						    endtime timestamp)
   RETURNS void as $$
   refresh materialized view matched_clock_audits;
   refresh materialized view processed_observations;
-  refresh materialized view calibration_results;
+  select update_calibration_results($1, $2, $3, $4);
   refresh materialized view freezing_clusters;
   refresh materialized VIEW flagged_periods;
 $$ language sql;
