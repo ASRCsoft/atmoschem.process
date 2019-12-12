@@ -76,6 +76,9 @@ WFMS,aethelometer,concentration_880,"[2018-11-29 06:00, 2018-11-30 18:00)",AC,el
 WFMS,campbell,Ozone,"[2018-10-15 21:30, 2018-10-15 23:45)",AT,manual calibration
 WFMS,campbell,NOy,"[2018-09-27 13:00, 2018-10-03 10:00)",AN,unknown error
 WFMS,campbell,CO,"[2018-12-27 14:26, 2018-12-27 14:38)",AT,calibration
+WFMS,campbell,WS3Cup,"[2019-01-11 02:30, 2019-01-11 07:00)",AN,instrument frozen
+WFMS,campbell,WS3Cup,"[2019-01-24 22:00, 2019-01-25 11:00)",AN,instrument frozen
+WFMS,campbell,WS3CupB,"[2019-01-24 19:00, 2019-01-25 10:30)",AN,instrument frozen
 PSP,envidas,CO,"[2018-10-03 07:08, 2018-10-03 08:00)",AN,instrument reset
 PSP,envidas,Dichot(10)MC,"[2018-10-04 12:01, 2018-10-04 14:46)",AT,calibration
 PSP,envidas,Dichot(10)RefMC,"[2018-10-04 12:01, 2018-10-04 14:46)",AT,calibration
