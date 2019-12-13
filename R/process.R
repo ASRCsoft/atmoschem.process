@@ -46,15 +46,37 @@ in_interval = function(x, l, u, l_inc, u_inc) {
   res
 }
 
+## Rolling Median Absolute Deviation
+roll_mad = function(x, k) {
+  n = length(x)
+  k2 = floor(k / 2)
+  ## surprisingly this seems to be the most practical way to calculate
+  ## running medians with NA values in R
+  m = caTools::runquantile(x, k, .5)
+  ## for each segment of sequential equal medians, get rolling median
+  ## of |x - median|
+  seg_inds = c(1, which(m[2:n] != m[1:(n - 1)]) + 1, n + 1)
+  seg_m = m[seg_inds]
+  mads = lapply(2:length(seg_inds), function(y) {
+    ## index bounds, padding the range with k/2 values on each side
+    ## (if available)
+    lpad = max(1, seg_inds[y - 1] - k2)
+    upad = min(n, seg_inds[y] - 1 + k2)
+    ## the bounds, removing the padding
+    lbound = seg_inds[y - 1] - lpad + 1
+    ubound = seg_inds[y] - lpad
+    caTools::runquantile(abs(x[lpad:upad] - seg_m[y - 1]), k, .5)[lbound:ubound]
+  })
+  ## multiply by 1.4826 to estimate standard deviation
+  unlist(mads) * 1.4826
+}
+
 ## this is the outlier detection used by the Hampel filter, with the
 ## exception that no values are flagged if the MAD is zero
-is_hampel_outlier = function(x, k, threshold = 3.5) {
-  ## I'm not sure how I feel about endrule = 'constant' here. The
-  ## default endrule breaks with too many NA values, though, so it's
-  ## unusable.
-  medians = runmed(x, k, endrule = 'constant')
-  mads = caTools::runmad(x, k, center = medians)
-  abs(x - medians) / mads > threshold & (mads != 0)
+hampel_outlier = function(x, k, threshold = 3.5) {
+  medians = caTools::runquantile(x, k, probs = .5)
+  mads = roll_mad(x, k)
+  (mads != 0) & (abs(x - medians) / mads > threshold)
 }
 
 is_flagged = function(obj, m_id, times, x) {
@@ -69,7 +91,7 @@ is_flagged = function(obj, m_id, times, x) {
 
   ## check for outliers
   if (!is.na(mtype$remove_outliers) && mtype$remove_outliers) {
-    is_outlier = is_hampel_outlier(x, mtype$spike_window)
+    is_outlier = hampel_outlier(x, mtype$spike_window)
     is_outlier[is.na(is_outlier)] = FALSE
   } else {
     is_outlier = FALSE
