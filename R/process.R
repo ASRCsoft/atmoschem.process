@@ -69,7 +69,7 @@ is_flagged = function(obj, m_id, times, x) {
 
   ## check for outliers
   if (!is.na(mtype$remove_outliers) && mtype$remove_outliers) {
-    is_outlier = is_hampel_outlier(x, 241)
+    is_outlier = is_hampel_outlier(x, mtype$spike_window)
     is_outlier[is.na(is_outlier)] = FALSE
   } else {
     is_outlier = FALSE
