@@ -36,4 +36,4 @@ WFML,campbell,NO,span,"[2018-01-01,)","[11:30,12:00)",14
 WFML,campbell,NOX,zero,"[2018-01-01,)","[11:00,11:30)",
 WFML,campbell,NOX,span,"[2018-01-01,)","[11:30,12:05)",14
 WFML,campbell,CO,zero,"[2018-01-01,)","[10:00,10:30)",
-WFML,campbell,CO,span,"[2018-01-01,)","[10:30,11:05)",450
+WFML,campbell,CO,span,"[2018-01-01,)","[10:30,11:15)",450
