@@ -98,8 +98,6 @@ etl_load.etl_nysatmoschem = function(obj, sites = NULL, data_sources = NULL,
     DBI::dbBegin(obj$con)
     DBI::dbSendQuery(obj$con, 'alter table measurements drop constraint measurements_observation_id_fkey')
     DBI::dbSendQuery(obj$con, 'alter table measurements drop constraint measurements_measurement_type_id_fkey')
-    even_smarter_upload(obj, f_paths, sites,
-                        is_measurement, dss, clobber)
     mapply(even_smarter_upload, f = f_paths, site = sites,
            measurement = is_measurement, ds = dss, clobber = clobber,
            MoreArgs = list(obj = obj))
