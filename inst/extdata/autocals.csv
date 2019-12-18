@@ -14,7 +14,7 @@ WFMS,campbell,NOx,CE,"[2018-01-01,)","[12:15,13:05)",
 WFMS,campbell,NOx,zero,"[2018-01-01,)","[18:00,18:20)",
 WFMS,campbell,NOy,zero,"[2018-01-01,)","[0:00,0:15)",
 WFMS,campbell,NOy,span,"[2018-01-01,)","[0:15,0:45)",4
-WFMS,campbell,NOy,zero check,"[2018-01-01,)","[0:45,1:00)",
+WFMS,campbell,NOy,zero check,"[2018-01-01,)","[0:45,1:05)",
 WFMS,campbell,NOy,zero,"[2018-01-01,)","[6:00,6:20)",
 WFMS,campbell,NOy,zero,"[2018-01-01,)","[12:00,12:15)",
 WFMS,campbell,NOy,CE,"[2018-01-01,)","[12:15,13:05)",
