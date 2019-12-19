@@ -15,19 +15,56 @@ read_psp_envidas = function(f, ...) {
   df
 }
 
+read_envidas_daily = function(f) {
+  ## these files were downloaded directly from SQL Server and stored
+  ## in a simple csv format
+  na_strings = c('NA', 'NAN', 'NANN', '-9999', '---')
+  df = read.csv(f, na.strings = na_strings, fileEncoding = 'UTF-8',
+                check.names = F)
+  df
+}
+
+transform_envidas_daily = function(f) {
+  df = read_envidas_daily(f)
+  df$Date_Time = as.POSIXct(df$Date_Time, format = '%Y-%m-%d %H:%M:%S',
+                            tz = 'UTC')
+  names(df)[1] = 'instrument_time'
+  ## match the row number of the original file
+  df$record = 1:nrow(df) + 1
+  ## move the new record column to 2nd position
+  df = df[, c(1, ncol(df), 2:(ncol(df) - 1))]
+
+  ## get data frame of values
+  df_vals = df[, !grepl(' \\(status\\)$', names(df))]
+  ## remove units from name to match column names from the older files
+  names(df_vals) = sub(' \\([^(]*\\)$', '', names(df_vals))
+  long_vals = tidyr::gather(df_vals, measurement_name, value,
+                            -c(instrument_time, record))
+
+  ## get data frame of flags
+  df_flags = df[, c(1:2, grep(' \\(status\\)$', names(df)))]
+  names(df_flags) = names(df_vals)
+  long_flags = tidyr::gather(df_flags, measurement_name, flag,
+                             -c(instrument_time, record))
+  long_flags$flagged = is.na(long_flags$flag) | long_flags$flag != 1
+  long_flags$flag = NULL
+
+  ## long_df = merge(long_vals, long_flags)
+  ## safe to assume both data frames are in the same order for now
+  long_df = cbind(long_vals, flagged = long_flags$flagged)
+
+  long_df[, c('measurement_name', 'instrument_time',
+              'record', 'value', 'flagged')]
+}
+
 transform_psp_envidas = function(f) {
-  df = read_psp_envidas(f)
-  ## files from 2019 forward are in the same format as the WFML
-  ## envidas files
-  date_re = '[0-9]{1,2}-[0-9]{1,2}-[0-9]{4}'
-  new_file_re = paste0(date_re, ' - ', date_re)
-  is_new_format = grep(new_file_re, basename(f))
-  if (is_new_format) {
-    date1_str = strsplit(basename(f), ' - ')[[1]][1]
-    f_date = strptime(date1_str, '%m-%d-%Y')
-    f_year = as.integer(format(f_date, '%Y'))
-    if (f_year >= 2019) return(transform_wfml_envidas(f))
+  ## check to see if the file is in the simpler daily format
+  is_daily_format = grep('^[0-9]{8}_envidas.csv$', basename(f))
+  if (is_daily_format) {
+    return(transform_envidas_daily(f))
   }
+  
+  df = read_psp_envidas(f)
   
   ## check for newer files with the absurd date format
   file_date = gsub('.*envi_rpt-|\\.csv', '', f)
@@ -42,6 +79,7 @@ transform_psp_envidas = function(f) {
                                   tz = 'UTC')
   ## match the row number of the original file
   df$record = 1:nrow(df) + 4
+  ## move the new record column to 2nd position
   df = df[, c(1, ncol(df), 2:(ncol(df) - 1))]
 
   ## get data frame of values
