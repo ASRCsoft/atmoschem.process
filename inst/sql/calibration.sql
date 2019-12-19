@@ -52,7 +52,8 @@ create or replace function estimate_cal(measurement_type int, cal_type text, cal
       -- ignore first 15 minutes of span calibration data due to spikes I
       -- think?
      where time <@ case when cal_type!='span' then cal_times
-	   else tsrange(lower(cal_times) + interval '15 minutes', upper(cal_times)) end;
+	   else tsrange(least(lower(cal_times) + interval '15 minutes', upper(cal_times)),
+			upper(cal_times)) end;
   end;
 $$ language plpgsql STABLE PARALLEL SAFE;
 
@@ -166,7 +167,7 @@ CREATE OR REPLACE FUNCTION guess_42C_ce_time(noid int, noxid int, cal_times tsra
 $$ LANGUAGE sql STABLE PARALLEL SAFE;
 
 -- estimate the calibration results for the autocalibration periods
-create view _calibration_results as
+create or replace view _calibration_results as
   select measurement_type_id,
 	 type,
 	 upper(times) as time,
@@ -179,7 +180,8 @@ create view _calibration_results as
 	   join measurement_types m
 	       on cp1.measurement_type_id=m.id
    where (type='zero' and upper(times) - lower(times) > interval '5 min')
-      or upper(times) - lower(times) > interval '10 min';
+      or (type='span' and upper(times) - lower(times) > interval '15 min')
+      or (type!='span' and upper(times) - lower(times) > interval '10 min');
 
 -- find NO conversion efficiency results, which weren't recorded in
 -- the PSP cal sheets
