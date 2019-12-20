@@ -20,7 +20,7 @@ create or replace function get_psp_envidas_file_time(f text)
   RETURNS timestamp AS $$
   select case when substring(f from 1 for 4)='envi'
 	 then to_timestamp(substring(f from 10 for 4), 'YYMM')::timestamp
-	 else to_timestamp(substring(f from 1 for 8), 'MM-DD-YYYY')::timestamp end;
+	 else to_timestamp(substring(f from 1 for 8), 'YYYYMMDD')::timestamp end;
 $$ LANGUAGE sql STABLE PARALLEL SAFE;
 
 create or replace function get_psp_envidas_file_index(f text)
