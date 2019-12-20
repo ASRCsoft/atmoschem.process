@@ -105,8 +105,7 @@ The ETL functions are implemented in R and organized using the etl package [@bau
 
 ```{r dbschema, fig.cap='The NYS Atmospheric Chemistry database schema.'}
 library(datamodelr)
-schema_file = system.file('extdata', 'nysacdb_schema.rda',
-                          package = 'nysatmoschem')
+schema_file = 'nysacdb_schema.rda'
 load(schema_file)
 
 dm_atmoschemdm = as.data_model(nysacdb_schema)
