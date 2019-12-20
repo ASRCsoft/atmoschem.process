@@ -1,4 +1,4 @@
-## move supporting datasets (in data-raw/csv) to /data
+## move supporting datasets (in data-raw/package_data) to /data
 
 library(usethis)
 
