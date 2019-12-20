@@ -25,4 +25,4 @@ sQuery = dm_re_query('postgres')
 nysacdb_schema = dbGetQuery(dbcon$con, sQuery)
 ## don't include intermediate processing tables in this schema
 nysacdb_schema = subset(nysacdb_schema, !startsWith(table, '_'))
-save(nysacdb_schema, file = 'inst/extdata/nysacdb_schema.rda')
+save(nysacdb_schema, file = 'vignettes/nysacdb_schema.rda')
