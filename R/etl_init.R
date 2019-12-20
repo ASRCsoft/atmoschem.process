@@ -118,16 +118,11 @@ etl_init.etl_nysatmoschem = function(obj, script = NULL, schema_name = "init",
     run_sql_script(pg, sql_file)
   }
 
-  ## add metadata
-  measurement_types = read_meta_csv('measurement_types')
+  ## add supporting data
   update_measurement_types(pg, measurement_types)
-  autocals = read_meta_csv('autocals')
   update_autocals(pg, autocals)
-  manual_flags = read_meta_csv('manual_flags')
   update_manual_flags(pg, manual_flags)
-  cal_flags = read_meta_csv('cal_flags')
   update_cal_flags(pg, cal_flags)
-  clock_audits = read_meta_csv('clock_audits')
   update_clock_audits(pg, clock_audits)
   
   invisible(obj)
