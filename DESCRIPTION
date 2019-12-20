@@ -41,6 +41,8 @@ Suggests:
     rsvg,
     shinyWidgets,
     testthat,
+    tools,
+    usethis,
     zoo
 Remotes:
     bergant/datamodelr,
