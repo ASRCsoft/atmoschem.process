@@ -148,9 +148,21 @@ transform_psp_API300EU_calibrations = function(f) {
 }
 
 transform_psp_ASRC_TEI42i_Y_NOy_calibrations = function(f) {
-  transform_psp_NO_calibrations(f,
-                                chem_names = c('NOy-HNO3', 'NOy'),
-                                ce_row = 45)
+  caldf = transform_psp_NO_calibrations(f,
+                                        chem_names = c('NOy-HNO3', 'NOy'),
+                                        ce_row = 45)
+  ## Make an ad hoc correction to CE values for the 146i measurements
+  ## in 2019. This is a crude guess (but better than not correcting
+  ## it) and ideally we will find a way to deal with this more
+  ## rigorously and systematically in the future.
+  start_time = gsub('\\[|\\(|,.*', '', caldf$times)
+  end_time = gsub('.*,|\\]|\\)', '', caldf$times)
+  if (any(start_time > '2019-02-06' & end_time < '2019-08-28')) {
+    message('adjusting ', start_time[1], ' cal')
+    caldf$provided_value[caldf$type == 'CE'] =
+      caldf$provided_value[caldf$type == 'CE'] * 1.05
+  }
+  caldf
 }
 
 transform_psp_DEC_TEI42i_NOy_calibrations = function(f) {
