@@ -59,7 +59,7 @@ transform_envidas_daily = function(f) {
 
 transform_psp_envidas = function(f) {
   ## check to see if the file is in the simpler daily format
-  is_daily_format = grep('^[0-9]{8}_envidas.csv$', basename(f))
+  is_daily_format = grepl('^[0-9]{8}_envidas.csv$', basename(f))
   if (is_daily_format) {
     return(transform_envidas_daily(f))
   }
