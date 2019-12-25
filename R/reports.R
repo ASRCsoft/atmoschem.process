@@ -11,6 +11,30 @@ order_report_cols = function(df, vars, fill = NA) {
   df[, c(1, match(vars, names(df)))]
 }
 
+get_aqs_flags = function(con, mtype_id, time, narsto_flag) {
+  ## default flag value is '' (no flag)
+  aqs_flags = rep('', times = length(narsto_flag))
+  ## get the flags
+  q_ultra = paste0('select lower(times) as start_time, upper(times) as end_time, aqs_flag from manual_flags where measurement_type_id=',
+                   mtype_id, " and times&&'[", min(time),
+                   ",", max(time), "]'::tsrange order by lower(times) asc")
+  conc_flags = DBI::dbGetQuery(con, q_ultra)
+  if (nrow(conc_flags) > 0) {
+    for (n in 1:nrow(conc_flags)) {
+      affected_rows =
+        which(time >= conc_flags$start_time[n] &
+              time <= conc_flags$end_time[n] &
+              narsto_flag == 'M1')
+      if (length(affected_rows) > 0) {
+        aqs_flags[affected_rows] = conc_flags$aqs_flag[n]
+      }
+    }
+  }
+  ## if there are any unflagged M1 NARSTO values left, give them a
+  ## miscellaneous void (AM)
+  replace(aqs_flags, narsto_flag == 'M1' & aqs_flags == '', 'AM')
+}
+
 organize_report_data = function(con, site_name, dsname, vars,
                                 start_time, end_time, freq = 'raw',
                                 var_dict = NULL, unit_dict = NULL) {
@@ -128,27 +152,8 @@ organize_report_data = function(con, site_name, dsname, vars,
     narsto_col = paste(ultrafine_col, '(NARSTO)')
     ## get the flags
     ultra_id = mtypes_df$id[match('Concentration', mtypes_df$name)]
-    q_ultra = paste0('select lower(times) as start_time, upper(times) as end_time, aqs_flag from manual_flags where measurement_type_id=',
-                     ultra_id, " and times&&'[", start_time,
-                     ",", end_time, "]'::tsrange order by lower(times) asc")
-    conc_flags = DBI::dbGetQuery(con, q_ultra)
-    df2[, aqs_col] = ''
-    ## df2$`Ultrafine (AQS)` = ''
-    if (nrow(conc_flags) > 0) {
-      for (n in 1:nrow(conc_flags)) {
-        affected_rows =
-          which(df2$`Time (EST)` >= conc_flags$start_time[n] &
-                df2$`Time (EST)` <= conc_flags$end_time[n] &
-                df2[, narsto_col] == 'M1')
-        if (length(affected_rows) > 0) {
-          df2[affected_rows, aqs_col] = conc_flags$aqs_flag[n]
-        }
-      }
-    }
-    ## if there are any unflagged M1 values left, give them a
-    ## miscellaneous void (AM)
-    df2[df2[, narsto_col] == 'M1' & df2[, aqs_col] == '',
-        aqs_col] = 'AM'
+    df2[, aqs_col] =
+      get_aqs_flags(con, ultra_id, df2$`Time (EST)`, df2[, narsto_col])
     ## fix the column ordering
     ultra_n = which(vars == 'Concentration')
     df2 = df2[, c(1:(1 + ultra_n * 2), ncol(df2),
@@ -279,4 +284,106 @@ generate_wfml_report = function(con, start_time, end_time, freq = 'raw') {
     list(campbell = campbell_df, envidas = env_df,
          mesonet = meso_df)
   }
+}
+
+
+
+## format data frame
+## convert atmoschem data from long format to wide format
+format_report_data = function(con, columns, mtype_ids, times, 
+                              freq = 'hourly', unit_dict = NULL) {
+  if (freq == 'raw') {
+    tbl_name = 'processed_measurements'
+    flag_str = 'Status'
+    fill = 0
+  } else {
+    tbl_name = 'hourly_measurements'
+    flag_str = 'NARSTO'
+    fill = 'M1'
+  }
+  mtypes_df = DBI::dbReadTable(con, 'measurement_types')
+  ## get the data
+  filters = paste0('measurement_type_id=', mtype_ids, ' and time @> \'', times, '\'::tsrange')
+  filter_sql = paste(filters, collapse = ') or (')
+  sql_str = paste0('select * from ', tbl_name, ' where (', filter_sql, ')')
+  ## rearrange (spread)
+  dflong = DBI::dbGetQuery(con, sql_str) %>%
+    dplyr::rename(`Time (EST)` = time) %>%
+    dplyr::mutate(column = columns[match(measurement_type_id, mtype_ids)]) %>%
+    dplyr::select(-measurement_type_id)
+  if (freq == 'raw') {
+    dflong = dflong %>%
+      dplyr::mutate(flag = as.integer(!flagged)) %>%
+      dplyr::select(-flagged)
+  }
+  value_df = dflong[, -3] %>%
+    tidyr::spread(column, value) %>%
+    order_report_cols(columns)
+  flag_df = dflong[, -2] %>%
+    tidyr::spread(column, flag, fill = fill) %>%
+    order_report_cols(columns, fill = fill)
+  
+  ## add units to columns
+  names(flag_df)[2:ncol(flag_df)] = paste0(columns, ' (', flag_str, ')')
+  var_units = mtypes_df$units[match(mtype_ids, mtypes_df$id)]
+  if (!is.null(unit_dict)) {
+    var_units[match(names(unit_dict), columns)] = unit_dict
+  }
+  names(value_df)[2:ncol(value_df)] = paste0(columns, ' (', var_units, ')')
+
+  ## return data frame
+  dfwide = merge(value_df, flag_df)
+  ## reorder columns, alternating between values and the corresponding
+  ## flag
+  nvars = length(columns)
+  dfwide = dfwide[, c(1, rep(1:nvars, each=2) + 1 + rep(c(0, nvars), nvars))]
+  var_decimals = mtypes_df$report_decimals[match(mtype_ids, mtypes_df$id)]
+  for (n in 1:nvars) {
+    col_n = n * 2
+    ## format number decimals
+    if (!is.na(var_decimals[n])) {
+      dfwide[, col_n] = fmt_decimals(dfwide[, col_n], var_decimals[n])
+      ## replace NA strings with real NA's
+      dfwide[dfwide[, col_n] == 'NA', col_n] = NA
+    }
+    ## remove values with M1 flag
+    dfwide[dfwide[, col_n + 1] == 'M1', col_n] = NA
+  }
+  dfwide
+}
+
+
+## report generating function
+
+## returns list of: hourly values, minute values (separated by data
+## source), and instruments
+generate_report = function(obj, column, times, site, data_source,
+                           measurement, hmeasurement = NULL,
+                           units = NULL) {
+  res = list()
+  if (!is.null(units)) {
+    unit_dict = setNames(units, column[!is.na(units)])
+  } else {
+    unit_dict = NULL
+  }
+  ## hourly data
+  ## if an hourly measurement name isn't specified, use the value from
+  ## `measurement`
+  hmeasurement = replace(measurement, !is.na(hmeasurement), na.omit(hmeasurement))
+  mtype_ids = get_measurement_type_id(obj$con, site, data_source, hmeasurement)
+  res$hourly = format_report_data(obj$con, columns, mtype_ids, times,
+                                  freq = 'hourly', unit_dict)
+  ## raw data
+  res$raw = list()
+  ds_uniq = vector()
+  for (n in 1:length(ds_uniq)) {
+    mtype_ids = get_measurement_type_id(obj$con, site, data_source, measurement)
+    res$raw[[n]] = format_report_data(obj$con, columns, mtype_ids, times,
+                                      freq = 'raw', unit_dict)
+  }
+  ## instrument info
+  ## match column measurements to measurement instruments
+  ## ...
+  class(res) = 'atmoschem_report'
+  res
 }
