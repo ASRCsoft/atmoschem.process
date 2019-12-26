@@ -12,6 +12,7 @@ Imports:
     DBI,
     dbplyr,
     dbx,
+    dplyr,
     httr,
     lubridate,
     readxl,

@@ -100,7 +100,7 @@ get_site_id = function(pg, x) {
 add_new_data_sources = function(pg, site, data_source) {
   df_in = data.frame(site = site,
                      name = data_source)
-  uniq_df = unique(df_in)
+  uniq_df = na.omit(unique(df_in))
   ds_ids = get_data_source_id(pg, uniq_df$site, uniq_df$name,
                               add_new = FALSE)
   if (sum(is.na(ds_ids)) > 0) {
@@ -179,7 +179,7 @@ add_new_measurement_types = function(pg, site, data_source,
                                      names) {
   mtype_df = data.frame(site = site, data_source = data_source,
                         name = names)
-  uniq_mtypes = unique(mtype_df)
+  uniq_mtypes = na.omit(unique(mtype_df))
   m_ids = get_measurement_type_id(pg, uniq_mtypes$site,
                                   uniq_mtypes$data_source,
                                   uniq_mtypes$name,
