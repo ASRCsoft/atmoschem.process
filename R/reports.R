@@ -168,3 +168,28 @@ generate_report = function(obj, columns, times, site, data_source,
   class(res) = 'atmoschem_report'
   res
 }
+
+write_report_files = function(report, name = 'report', dir = '.',
+                              version = NULL, ...) {
+  if (is.null(version)) {
+    version_str = ''
+  } else {
+    version_str = paste0('_v', version)
+  }
+  ## write the hour file
+  message('Writing hourly data file...')
+  hour_file = paste0(name, version_str, '.csv')
+  hour_path = file.path(dir, hour_file)
+  write.csv(report$hourly, file = hour_path, ...)
+  ## write the minute files
+  message('Writing raw data files...')
+  raw_folder = file.path(dir, 'raw')
+  dir.create(raw_folder, showWarnings = FALSE, recursive = TRUE)
+  for (ds in names(report$raw)) {
+    raw_file = paste0(name, '_', ds, version_str, '.csv')
+    raw_path = file.path(raw_folder, raw_file)
+    write.csv(report$raw[[ds]], file = raw_path, ...)
+  }
+  ## write the instrument info file
+  ## ...
+}
