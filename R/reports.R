@@ -8,7 +8,7 @@ order_report_cols = function(df, vars, fill = NA) {
       df[, v] = fill
     }
   }
-  df[, c(1, match(vars, names(df)))]
+  df[, c(1:2, match(vars, names(df)))]
 }
 
 get_aqs_flags = function(con, mtype_id, time, narsto_flag) {
@@ -34,130 +34,6 @@ get_aqs_flags = function(con, mtype_id, time, narsto_flag) {
   ## miscellaneous void (AM)
   replace(aqs_flags, narsto_flag == 'M1' & aqs_flags == '', 'AM')
 }
-
-## #' @export
-## generate_wfms_report = function(con, start_time, end_time, freq = 'raw') {
-##   if (freq == 'raw') {
-##     ws = 'WS'
-##     wd = 'WindDir_D1_WVT'
-##   } else {
-##     ws = 'WS_hourly'
-##     wd = 'WD_hourly'
-##   }
-##   var_dict = c(WindDir_D1_WVT = 'WD_V',
-##                WS_hourly = 'WS', WD_hourly = 'WD_V',
-##                Concentration = 'Ultrafine PM',
-##                concentration_370 = 'BC1_370nm',
-##                concentration_880 = 'BC6_880nm',
-##                `Wood smoke` = 'Woodsmoke')
-##   unit_dict = c(WD = 'degrees')
-##   if (freq == 'hourly') {
-##     vars = c('NO', 'NO2', 'NOy', 'Ozone', 'CO', 'SO2',
-##              'T', 'RH', ws, 'WD', wd, 'WS_Max', 'BP',
-##              'SLP', 'Concentration',
-##              'concentration_370', 'concentration_880',
-##              'Wood smoke')
-##     data_sources = c('campbell', 'ultrafine', 'aethelometer')
-##     organize_report_data(con, 'WFMS', data_sources, vars, start_time, end_time,
-##                          freq = freq, var_dict, unit_dict)
-##   } else if (freq == 'raw') {
-##     ## return one data frame per data source
-##     vars = c('NO', 'NO2', 'NOy', 'Ozone', 'CO', 'SO2',
-##              'T', 'RH', ws, 'WD', wd, 'WS_Max', 'BP',
-##              'SLP')
-##     campbell_df = organize_report_data(con, 'WFMS', 'campbell',
-##                                        vars, start_time, end_time,
-##                                        freq = freq, var_dict, unit_dict)
-##     vars = 'Concentration'
-##     ultrafine_df = organize_report_data(con, 'WFMS', 'ultrafine',
-##                                         vars, start_time, end_time,
-##                                         freq = freq, var_dict, unit_dict)
-##     vars = c('concentration_370', 'concentration_880',
-##              'Wood smoke')
-##     aeth_df = organize_report_data(con, 'WFMS', 'aethelometer',
-##                                        vars, start_time, end_time,
-##                                    freq = freq, var_dict, unit_dict)
-##     list(campbell = campbell_df, ultrafine = ultrafine_df,
-##          aethelometer = aeth_df)
-##   }
-## }
-
-## #' @export
-## generate_psp_report = function(con, start_time, end_time, freq = 'raw') {
-##   if (freq == 'raw') {
-##     ws = 'VWS'
-##     wd = 'VWD'
-##   } else {
-##     ws = 'WS_hourly'
-##     wd = 'WD_hourly'
-##   }
-##   vars = c('Thermo_O3', 'NO', 'NO-DEC', 'NO2', 'NOy', 'NOy-DEC', 'HNO3',
-##            'CO', 'SO2', 'WS_raw', ws, 'WD_raw', wd, 'AmbTemp',
-##            'AmbRH', 'Precip', 'SR2', 'BP', 'TEOMA(2.5)MC', 'TMD',
-##            'NGN3a-BScatt', 'Concentration', 'SLP', 'BC1', 'BC6',
-##            'Wood smoke')
-##   var_dict = c(Thermo_O3 = 'Ozone', `NO-DEC` = 'DEC_NO',
-##                `NOy-DEC` = 'DEC_NOy', VWS = 'WS', VWD = 'WD',
-##                WS_hourly = 'WS', WD_hourly = 'WD',
-##                AmbTemp = 'Temp', AmbRH = 'RH', SR2 = 'SR',
-##                `TEOMA(2.5)MC` = 'TMC', `NGN3a-BScatt` = 'Nephscat',
-##                Concentration = 'Ultrafine', BC1 = 'BC1_370nm',
-##                BC6 = 'BC6_880nm', `Wood smoke` = 'Woodsmoke')
-##   unit_dict = c(WS_raw = 'm/s', WD_raw = 'degrees', TMD = 'ug/m3')
-##   organize_report_data(con, 'PSP', 'envidas', vars, start_time, end_time,
-##                        freq = freq, var_dict, unit_dict)
-## }
-
-## #' @export
-## generate_wfml_report = function(con, start_time, end_time, freq = 'raw') {
-##   if (freq == 'raw') {
-##     ws = 'wind_speed [m/s]'
-##     wd = 'wind_direction [degrees]'
-##   } else {
-##     ws = 'WS_hourly'
-##     wd = 'WD_hourly'
-##   }
-##   unit_dict = c(CH4 = 'ppmv', NMHC = 'ppmv', WS = 'm/s',
-##                 WD = 'degrees', WD_V = 'degrees', Bscatt = 'Mm-1')
-##   var_dict = c(Ozone_ppbv = 'Ozone', `temperature_2m [degC]` = 'T',
-##                `relative_humidity [%]` = 'RH',
-##                `wind_speed [m/s]` = 'WS_MESO', WS_hourly = 'WS_MESO',
-##                `wind_maximum [m/s]` = 'WS_MAX_MESO',
-##                `wind_direction [degrees]` = 'WD_MESO',
-##                WD_hourly = 'WD_MESO', BP2 = 'BP', PM25C = 'PM25',
-##                NGN3 = 'Bscatt',
-##                `BLK-CARBON-1` = 'Black Carbon',
-##                `precip_since_00Z [mm]` = 'Precip')
-##   if (freq == 'hourly') {
-##     vars = c('NO', 'NO2', 'Ozone_ppbv', 'CO', 'SO2', 'CH4', 'NMHC',
-##              'temperature_2m [degC]', 'relative_humidity [%]', 'WS',
-##              ws, 'wind_maximum [m/s]', 'WD', 'WD_V', wd, 'BP2', 'SLP',
-##              'PM25C', 'NGN3', 'BLK-CARBON-1', 'precip_since_00Z [mm]')
-##     organize_report_data(con, 'WFML',
-##                          c('envidas', 'campbell', 'mesonet'), vars,
-##                          start_time, end_time, freq = freq, var_dict,
-##                          unit_dict)
-##   } else if (freq == 'raw') {
-##     ## return one data frame per data source
-##     vars = c('NO', 'NO2', 'CO', 'BP2', 'SLP')
-##     campbell_df = organize_report_data(con, 'WFML', 'campbell', vars,
-##                                        start_time, end_time,
-##                                        freq = freq, var_dict,
-##                                        unit_dict)
-##     vars = c('Ozone_ppbv', 'SO2', 'PM25C', 'BLK-CARBON-1')
-##     env_df = organize_report_data(con, 'WFML', 'envidas', vars,
-##                                   start_time, end_time, freq = freq,
-##                                   var_dict, unit_dict)
-##     vars = c('temperature_2m [degC]', 'relative_humidity [%]', ws,
-##              'wind_maximum [m/s]', wd, 'precip_since_00Z [mm]')
-##     meso_df = organize_report_data(con, 'WFML', 'mesonet', vars,
-##                                    start_time, end_time, freq = freq,
-##                                    var_dict, unit_dict)
-##     list(campbell = campbell_df, envidas = env_df,
-##          mesonet = meso_df)
-##   }
-## }
-
 
 ## format data frame, convert atmoschem data from long format to wide
 ## format
@@ -186,7 +62,12 @@ format_report_data = function(con, columns, mtype_ids, times,
     dplyr::rename(`Time (EST)` = time) %>%
     dplyr::collect() %>%
     dplyr::mutate(column = columns[match(measurement_type_id, mtype_ids)]) %>%
-    dplyr::select(-measurement_type_id)
+    dplyr::select(-measurement_type_id) %>%
+    ## occasionally in the raw data a few minutes are repeated after a
+    ## clock adjustment, so an additional row identifier is needed to
+    ## pivot the data frame
+    dplyr::group_by(`Time (EST)`, column) %>% 
+    dplyr::mutate(group_id = row_number())
   if (freq == 'raw') {
     dflong = dflong %>%
       dplyr::mutate(flag = as.integer(!flagged)) %>%
@@ -202,17 +83,18 @@ format_report_data = function(con, columns, mtype_ids, times,
     order_report_cols(columns, fill = fill)
   
   ## add units to columns
-  names(flag_df)[2:ncol(flag_df)] = paste0(columns, ' (', flag_str, ')')
+  names(flag_df)[3:ncol(flag_df)] = paste0(columns, ' (', flag_str, ')')
   var_units = mtypes_df$units[match(mtype_ids, mtypes_df$id)]
   if (!is.null(unit_dict) && any(names(unit_dict) %in% columns)) {
     unit_dict2 = unit_dict[names(unit_dict) %in% columns]
     var_units[match(names(unit_dict2), columns)] = unit_dict2
   }
-  names(value_df)[2:ncol(value_df)] = paste0(columns, ' (', var_units, ')')
+  names(value_df)[3:ncol(value_df)] = paste0(columns, ' (', var_units, ')')
 
   ## reorder columns, alternating between values and the corresponding
   ## flag
   dfwide = merge(value_df, flag_df)
+  dfwide$group_id = NULL
   nvars = length(columns)
   dfwide = dfwide[, c(1, rep(1:nvars, each=2) + 1 + rep(c(0, nvars), nvars))]
   var_decimals = mtypes_df$report_decimals[match(mtype_ids, mtypes_df$id)]
@@ -230,11 +112,12 @@ format_report_data = function(con, columns, mtype_ids, times,
 
   ## if the report includes ultrafine data, need to include an AQS
   ## flag column
-  if (freq == 'hourly' && 'Ultrafine' %in% columns) {
+  if (freq == 'hourly' && any(grepl('Ultrafine', columns))) {
     ## get the relevant column names
-    aqs_col = 'Ultrafine (AQS)'
-    narsto_col = 'Ultrafine (NARSTO)'
-    ultra_n = which(columns == 'Ultrafine')
+    ultra_n = grep('Ultrafine', columns)[1]
+    ultra_col = columns[ultra_n]
+    aqs_col = paste(ultra_col, '(AQS)')
+    narsto_col = paste(ultra_col, '(NARSTO)')
     ## get the flags
     ultra_id = mtype_ids[ultra_n]
     dfwide[, aqs_col] =
@@ -247,9 +130,7 @@ format_report_data = function(con, columns, mtype_ids, times,
   dfwide
 }
 
-
 ## report generating function
-
 ## returns list of: hourly values, minute values (separated by data
 ## source), and instruments
 generate_report = function(obj, columns, times, site, data_source,

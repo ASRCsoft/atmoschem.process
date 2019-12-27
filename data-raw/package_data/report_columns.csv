@@ -1,4 +1,43 @@
 site,column,times,data_source,measurement,hourly_measurement,units
+WFMS,NO,"[2019-01-01, 2019-10-01)",campbell,NO,,
+WFMS,NO2,"[2019-01-01, 2019-10-01)",campbell,NO2,,
+WFMS,NOy,"[2019-01-01, 2019-10-01)",campbell,NOy,,
+WFMS,Ozone,"[2019-01-01, 2019-10-01)",campbell,Ozone,,
+WFMS,CO,"[2019-01-01, 2019-10-01)",campbell,CO,,
+WFMS,SO2,"[2019-01-01, 2019-10-01)",campbell,SO2,,
+WFMS,T,"[2019-01-01, 2019-10-01)",campbell,T,,
+WFMS,RH,"[2019-01-01, 2019-10-01)",campbell,RH,,
+WFMS,WS,"[2019-01-01, 2019-10-01)",campbell,WS,WS_hourly,
+WFMS,WD,"[2019-01-01, 2019-10-01)",,,,degrees
+WFMS,WD_V,"[2019-01-01, 2019-10-01)",campbell,WindDir_D1_WVT,WD_hourly,
+WFMS,WS_Max,"[2019-01-01, 2019-10-01)",campbell,WS_Max,,
+WFMS,BP,"[2019-01-01, 2019-10-01)",campbell,BP,,
+WFMS,SLP,"[2019-01-01, 2019-10-01)",campbell,SLP,,
+WFMS,Ultrafine PM,"[2019-01-01, 2019-10-01)",ultrafine,Concentration,,
+WFMS,BC1_370nm,"[2019-01-01, 2019-10-01)",aethelometer,concentration_370,,
+WFMS,BC6_880nm,"[2019-01-01, 2019-10-01)",aethelometer,concentration_880,,
+WFMS,Woodsmoke,"[2019-01-01, 2019-10-01)",aethelometer,Wood smoke,,
+WFML,NO,"[2019-01-01, 2019-10-01)",campbell,NO,,
+WFML,NO2,"[2019-01-01, 2019-10-01)",campbell,NO2,,
+WFML,Ozone,"[2019-01-01, 2019-10-01)",envidas,Ozone_ppbv,,
+WFML,CO,"[2019-01-01, 2019-10-01)",envidas,CO,,
+WFML,SO2,"[2019-01-01, 2019-10-01)",envidas,SO2,,
+WFML,CH4,"[2019-01-01, 2019-10-01)",,,,ppmv
+WFML,NMHC,"[2019-01-01, 2019-10-01)",,,,ppmv
+WFML,T,"[2019-01-01, 2019-10-01)",mesonet,temperature_2m [degC],,
+WFML,RH,"[2019-01-01, 2019-10-01)",mesonet,relative_humidity [%],,
+WFML,WS,"[2019-01-01, 2019-10-01)",,,,m/s
+WFML,WS_MESO,"[2019-01-01, 2019-10-01)",mesonet,wind_speed [m/s],WS_hourly,
+WFML,WS_MAX_MESO,"[2019-01-01, 2019-10-01)",mesonet,wind_maximum [m/s],,
+WFML,WD,"[2019-01-01, 2019-10-01)",,,,degrees
+WFML,WD_V,"[2019-01-01, 2019-10-01)",,,,degrees
+WFML,WD_MESO,"[2019-01-01, 2019-10-01)",mesonet,wind_direction [degrees],WD_hourly,
+WFML,BP,"[2019-01-01, 2019-10-01)",campbell,BP2,,
+WFML,SLP,"[2019-01-01, 2019-10-01)",campbell,SLP,,
+WFML,PM25,"[2019-01-01, 2019-10-01)",envidas,PM25C,,
+WFML,Bscatt,"[2019-01-01, 2019-10-01)",campbell,NGN3,,
+WFML,Black Carbon,"[2019-01-01, 2019-10-01)",envidas,BLK-CARBON-1,,
+WFML,Precip,"[2019-01-01, 2019-10-01)",mesonet,precip_since_00Z [mm],,
 PSP,Ozone,"[2019-01-01, 2019-10-01)",envidas,Thermo_O3,,
 PSP,NO,"[2019-01-01, 2019-10-01)",envidas,NO,,
 PSP,DEC_NO,"[2019-01-01, 2019-10-01)",envidas,NO-DEC,,
