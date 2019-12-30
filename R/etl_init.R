@@ -124,6 +124,7 @@ etl_init.etl_nysatmoschem = function(obj, script = NULL, schema_name = "init",
   update_manual_flags(pg, manual_flags)
   update_cal_flags(pg, cal_flags)
   update_clock_audits(pg, clock_audits)
+  update_metadata_tbl(pg, 'gilibrator', gilibrator)
   
   invisible(obj)
 }

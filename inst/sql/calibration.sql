@@ -30,6 +30,15 @@ create table manual_calibrations (
   )
 );
 
+create table gilibrator (
+  measurement_type_id int references measurement_types,
+  time timestamp,
+  certified_value numeric,
+  measured_value numeric,
+  changed boolean,
+  primary key(measurement_type_id, time)
+);
+
 create table calibration_flags (
   measurement_type_id int references measurement_types,
   type text,
