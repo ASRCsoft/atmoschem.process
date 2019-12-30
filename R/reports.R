@@ -35,6 +35,35 @@ get_aqs_flags = function(con, mtype_id, time, narsto_flag) {
   replace(aqs_flags, narsto_flag == 'M1' & aqs_flags == '', 'AM')
 }
 
+## convert strings from csv files to lubridate intervals
+as_interval = function(s) {
+  tlow = as.POSIXct(gsub('^[[(]|,.*$', '', s), tz='EST')
+  tupp = as.POSIXct(gsub('^.*,|[])]$', '', s), tz='EST')
+  lubridate::interval(tlow, tupp)
+}
+
+## convert lubridate intervals back to csv strings
+as_timerange_str = function(tint) {
+  ifelse(is.na(tint), NA,
+         paste0('[', lubridate::int_start(tint), ',',
+                lubridate::int_end(tint), ')'))
+}
+
+merge_timerange = function(x, y, tcol.x, tcol.y = tcol.x, ...) {
+  ## prevent the time range columns from being used for merging
+  new_tcol.x = paste(tcol.x, 'x', sep = '.')
+  new_tcol.y = paste(tcol.y, 'y', sep = '.')
+  names(x)[names(x) == tcol.x] = new_tcol.x
+  names(y)[names(y) == tcol.y] = new_tcol.y
+  df2 = merge(x, y, ...)
+  ## filter to remove non-overlapping time ranges
+  x_int = as_interval(df2[, new_tcol.x])
+  y_int = as_interval(df2[, new_tcol.y])
+  df2[, tcol.x] = as_timerange_str(lubridate::intersect(x_int, y_int))
+  df2 = df2[, !names(df2) %in% c(new_tcol.x, new_tcol.y)]
+  df2[!is.na(df2[, tcol.x]), ]
+}
+
 ## format data frame, convert atmoschem data from long format to wide
 ## format
 format_report_data = function(con, columns, mtype_ids, times, 
@@ -164,7 +193,15 @@ generate_report = function(obj, columns, times, site, data_source,
   }
   ## instrument info
   ## match column measurements to measurement instruments
-  ## ...
+  columns_df = data.frame(column = columns, times = times,
+                          site = site, data_source = data_source,
+                          measurement = measurement)
+  measurement_insts = merge(measurement_sources, instruments,
+                            by.x = c('site', 'instrument'),
+                            by.y = c('site', 'name'))
+  column_insts = merge_timerange(columns_df, measurement_insts, 'times')
+  instr_cols = c('column', 'times', 'brand', 'model', 'serial_number')
+  res$instruments = column_insts[, instr_cols]
   class(res) = 'atmoschem_report'
   res
 }
@@ -191,5 +228,8 @@ write_report_files = function(report, name = 'report', dir = '.',
     write.csv(report$raw[[ds]], file = raw_path, ...)
   }
   ## write the instrument info file
-  ## ...
+  message('Writing instrument file...')
+  instr_file = paste0(name, '_instruments', version_str, '.csv')
+  instr_path = file.path(dir, instr_file)
+  write.csv(report$instruments, file = instr_path, ...)
 }
