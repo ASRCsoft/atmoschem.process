@@ -66,6 +66,7 @@ create table measurement_types (
   apply_ce boolean,
   max_ce numeric,
   ce_smooth_window int,
+  gilibrator boolean,
   unique(data_source_id, name)
 );
 

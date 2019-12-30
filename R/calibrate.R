@@ -15,7 +15,9 @@ piecewise_approx = function(x, y, xout, breaks, ...) {
   ## match x and y lists with xout
   x_list = x_list[names(xout_list)]
   y_list = y_list[names(xout_list)]
-  res_list = mapply(approx, x_list, y_list, xout_list,
+  method_list = as.list(ifelse(lengths(x_list) > 1, 'linear',
+                               'constant'))
+  res_list = mapply(approx, x_list, y_list, xout_list, method_list,
                     MoreArgs = list(...), SIMPLIFY = FALSE)
   unlist(lapply(res_list, function(x) x$y), use.names = FALSE)
 }
@@ -88,20 +90,56 @@ estimate_zeros = function(obj, m_id, times) {
                 m_params$zero_smooth_window, times, breaks)
 }
 
+estimate_gilibrator_spans = function(obj, m_id, times) {
+  if (!is(times, 'POSIXct')) stop("'times' must be of class POSIXct.")
+  gil_tbl = obj %>%
+    tbl('gilibrator')
+  spans = gil_tbl %>%
+    filter(measurement_type_id == m_id,
+           !is.na(measured_value)) %>%
+    mutate(time = timezone('EST', time)) %>%
+    arrange(time) %>%
+    collect()
+  if (nrow(spans) == 0) {
+    warning('No gilibrator spans found')
+    return(rep(NA, length(times)))
+  }
+  breaks = gil_tbl %>%
+    filter(!is.na(changed) & changed) %>%
+    mutate(time = timezone('EST', time)) %>%
+    arrange(time) %>%
+    pull(time)
+  m_params = get_mtype_params(obj, m_id)
+  estimate_cals(spans$time, spans$measured_value,
+                NA, times, breaks)
+}
+
 get_cal_spans = function(obj, m_id) {
+  m_params = get_mtype_params(obj, m_id)
+  has_gilibrator = !is.na(m_params$gilibrator) && m_params$gilibrator
   spans = obj %>%
     tbl('calibration_results') %>%
     filter(measurement_type_id == m_id,
            type == 'span',
-           !is.na(measured_value),
-           !is.na(provided_value))
+           !is.na(measured_value))
+  if (!has_gilibrator) {
+    ## if there are no gilibrator measurements then the provided value
+    ## must come from the calibration table
+    spans = spans %>%
+      filter(!is.na(provided_value))
+  }
   if (!dbplyr_exists(spans)) return(spans)
   spans = spans %>%
     mutate(time = timezone('EST', time)) %>%
     select(time, measured_value, provided_value, flagged) %>%
     arrange(time) %>%
-    collect() %>%
-    ## get the estimated zero values at the corresponding times
+    collect()
+  if (has_gilibrator) {
+    ## get the provided value from gilibrator measurements
+    spans = spans %>%
+      mutate(provided_value = estimate_gilibrator_spans(obj, m_id, time))
+  }
+  spans %>%
     mutate(zero = estimate_zeros(obj, m_id, time),
            ratio = (measured_value - zero) / provided_value)
 }
