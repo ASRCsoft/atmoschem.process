@@ -22,3 +22,6 @@
 
 #' Report column information
 "report_columns"
+
+#' Gilibrator flow measurements
+"gilibrator"
