@@ -6,11 +6,19 @@ WFML,campbell,CO,zero,"[2018-12-14, 2018-12-18)",
 WFML,campbell,CO,span,"[2018-12-14, 2018-12-18)",
 PSP,envidas,NOx,CE,"[2019-01-02, 2019-02-02)",wrong NOx values recorded
 PSP,envidas,NOx,CE,"[2019-02-08, 2019-02-22)","new calibration instrument, values recorded before leveling off"
-WFMS,campbell,NO,zero,"[2019-02-27 12:00, 2019-02-28)",
-WFMS,campbell,NOx,zero,"[2019-02-27 12:00, 2019-02-28)",
-WFMS,campbell,NOy,zero,"[2019-02-27 12:00, 2019-02-28)",
-WFMS,campbell,CO,zero,"[2019-02-27 12:00, 2019-02-28)",
-WFMS,campbell,NO,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",
-WFMS,campbell,NOx,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",
-WFMS,campbell,NOy,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",
+WFMS,campbell,NO,zero,"[2019-02-27 12:00, 2019-02-28)",zero air disconnected
+WFMS,campbell,NOx,zero,"[2019-02-27 12:00, 2019-02-28)",zero air disconnected
+WFMS,campbell,NOy,zero,"[2019-02-27 12:00, 2019-02-28)",zero air disconnected
+WFMS,campbell,CO,zero,"[2019-02-27 12:00, 2019-02-28)",zero air disconnected
+WFMS,campbell,SO2,zero,"[2019-02-27 12:00, 2019-02-28)",zero air disconnected
+WFMS,campbell,NO,zero,"[2019-02-28 12:00, 2019-02-28 01:00)",zero air disconnected
+WFMS,campbell,NOx,zero,"[2019-02-28 12:00, 2019-02-28 01:00)",zero air disconnected
+WFMS,campbell,NOy,zero,"[2019-02-28 12:00, 2019-02-28 01:00)",zero air disconnected
+WFMS,campbell,CO,zero,"[2019-02-28 12:00, 2019-02-28 01:00)",zero air disconnected
+WFMS,campbell,SO2,zero,"[2019-02-28 12:00, 2019-02-28 01:00)",zero air disconnected
+WFMS,campbell,NO,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",zero air disconnected
+WFMS,campbell,NOx,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",zero air disconnected
+WFMS,campbell,NOy,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",zero air disconnected
+WFMS,campbell,CO,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",zero air disconnected
+WFMS,campbell,SO2,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",zero air disconnected
 WFMS,campbell,NOy,span,"[2019-03-25, 2019-03-28)",
