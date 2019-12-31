@@ -5,7 +5,7 @@
 \alias{measurement_types}
 \title{Information and processing instructions for each type of
 measurement}
-\format{An object of class \code{data.frame} with 90 rows and 19 columns.}
+\format{An object of class \code{data.frame} with 90 rows and 20 columns.}
 \usage{
 measurement_types
 }

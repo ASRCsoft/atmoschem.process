@@ -4,7 +4,7 @@
 \name{gilibrator}
 \alias{gilibrator}
 \title{Gilibrator flow measurements}
-\format{An object of class \code{data.frame} with 58 rows and 6 columns.}
+\format{An object of class \code{data.frame} with 58 rows and 7 columns.}
 \usage{
 gilibrator
 }
