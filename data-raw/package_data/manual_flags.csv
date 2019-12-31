@@ -89,6 +89,20 @@ WFMS,aethelometer,concentration_370,"[2019-04-15 11:15, 2019-04-15 11:30)",AM,un
 WFMS,aethelometer,concentration_880,"[2019-04-15 11:15, 2019-04-15 11:30)",AM,unknown
 WFMS,aethelometer,concentration_370,"[2019-04-15 15:15, 2019-04-15 15:45)",AM,unknown
 WFMS,aethelometer,concentration_880,"[2019-04-15 15:15, 2019-04-15 15:45)",AM,unknown
+WFMS,campbell,CO,"[2019-04-15 21:00, 2019-04-16 21:00)",AM,unknown
+WFMS,ultrafine,Concentration,"[2019-04-01, 2019-05-01)",AN,unexplained cycling
+WFMS,campbell,NO,"[2019-05-07 12:00, 2019-05-14 12:00)",AN,calibration gases stuck on
+WFMS,campbell,NOx,"[2019-05-07 12:00, 2019-05-14 12:00)",AN,calibration gases stuck on
+WFMS,campbell,NOy,"[2019-05-14 10:30, 2019-05-14 12:00)",AT,calibration
+WFMS,campbell,NO,"[2019-05-23 14:30, 2019-05-23 21:15)",AM,unknown
+WFMS,campbell,NOx,"[2019-05-23 14:30, 2019-05-23 21:15)",AM,unknown
+WFMS,ultrafine,Concentration,"[2019-05-07 09:30, 2019-05-07 10:30)",AM,unknown
+WFMS,ultrafine,Concentration,"[2019-05-11 11:00, 2019-05-12)",AN,unexplained cycling
+WFMS,ultrafine,Concentration,"[2019-05-15 18:00, 2019-05-17 02:00)",AN,unexplained cycling
+WFMS,campbell,CO,"[2019-06-10 09:00, 2019-06-10 10:30)",AM,unknown
+WFMS,campbell,NO,"[2019-06-26 09:30, 2019-07-03 09:00)",AM,unknown
+WFMS,campbell,NOx,"[2019-06-26 09:30, 2019-07-03 09:00)",AM,unknown
+WFMS,ultrafine,Concentration,"[2019-06-24 06:43, 2019-06-24 06:51)",AM,unknown
 PSP,envidas,CO,"[2018-10-03 07:08, 2018-10-03 08:00)",AN,instrument reset
 PSP,envidas,Dichot(10)MC,"[2018-10-04 12:01, 2018-10-04 14:46)",AT,calibration
 PSP,envidas,Dichot(10)RefMC,"[2018-10-04 12:01, 2018-10-04 14:46)",AT,calibration

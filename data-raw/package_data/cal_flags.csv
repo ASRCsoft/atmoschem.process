@@ -11,14 +11,26 @@ WFMS,campbell,NOx,zero,"[2019-02-27 12:00, 2019-02-28)",zero air disconnected
 WFMS,campbell,NOy,zero,"[2019-02-27 12:00, 2019-02-28)",zero air disconnected
 WFMS,campbell,CO,zero,"[2019-02-27 12:00, 2019-02-28)",zero air disconnected
 WFMS,campbell,SO2,zero,"[2019-02-27 12:00, 2019-02-28)",zero air disconnected
-WFMS,campbell,NO,zero,"[2019-02-28 12:00, 2019-02-28 01:00)",zero air disconnected
-WFMS,campbell,NOx,zero,"[2019-02-28 12:00, 2019-02-28 01:00)",zero air disconnected
-WFMS,campbell,NOy,zero,"[2019-02-28 12:00, 2019-02-28 01:00)",zero air disconnected
-WFMS,campbell,CO,zero,"[2019-02-28 12:00, 2019-02-28 01:00)",zero air disconnected
-WFMS,campbell,SO2,zero,"[2019-02-28 12:00, 2019-02-28 01:00)",zero air disconnected
+WFMS,campbell,NO,zero,"[2019-02-28 12:00, 2019-03-01 01:00)",zero air disconnected
+WFMS,campbell,NOx,zero,"[2019-02-28 12:00, 2019-03-01 01:00)",zero air disconnected
+WFMS,campbell,NOy,zero,"[2019-02-28 12:00, 2019-03-01 01:00)",zero air disconnected
+WFMS,campbell,CO,zero,"[2019-02-28 12:00, 2019-03-01 01:00)",zero air disconnected
+WFMS,campbell,SO2,zero,"[2019-02-28 12:00, 2019-03-01 01:00)",zero air disconnected
 WFMS,campbell,NO,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",zero air disconnected
 WFMS,campbell,NOx,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",zero air disconnected
 WFMS,campbell,NOy,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",zero air disconnected
 WFMS,campbell,CO,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",zero air disconnected
 WFMS,campbell,SO2,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",zero air disconnected
 WFMS,campbell,NOy,span,"[2019-03-25, 2019-03-28)",
+WFMS,campbell,NO,zero,"[2019-04-30 12:00, 2019-05-01 08:00)",
+WFMS,campbell,NOx,zero,"[2019-04-30 12:00, 2019-05-01 08:00)",
+WFMS,campbell,NOy,zero,"[2019-04-30 12:00, 2019-05-01 08:00)",
+WFMS,campbell,NO,zero,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
+WFMS,campbell,NOx,zero,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
+WFMS,campbell,NOy,zero,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
+WFMS,campbell,NO,span,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
+WFMS,campbell,NOx,span,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
+WFMS,campbell,NOy,span,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
+WFMS,campbell,NO,span,"[2019-06-26 09:30, 2019-07-03 09:00)",unknown
+WFMS,campbell,NOx,span,"[2019-06-26 09:30, 2019-07-03 09:00)",unknown
+WFMS,campbell,NOy,CE,"[2019-06-26 09:30, 2019-07-03 09:00)",unknown

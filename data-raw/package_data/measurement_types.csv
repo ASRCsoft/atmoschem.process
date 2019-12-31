@@ -1,8 +1,8 @@
 site,data_source,name,units,derived,report_decimals,apply_processing,valid_range,mdl,span,has_calibration,zero_smooth_window,span_smooth_window,remove_outliers,spike_window,max_jump,apply_ce,max_ce,ce_smooth_window,gilibrator
-WFMS,campbell,NO,ppbv,,3,TRUE,,0.03,3.79,TRUE,11,5,TRUE,241,,,,,TRUE
-WFMS,campbell,NOx,ppbv,,3,TRUE,,,3.79,TRUE,11,5,TRUE,241,,,12.57,,TRUE
+WFMS,campbell,NO,ppbv,,3,TRUE,,0.03,3.79,TRUE,11,5,TRUE,181,,,,,TRUE
+WFMS,campbell,NOx,ppbv,,3,TRUE,,,3.79,TRUE,11,5,TRUE,181,,,12.57,,TRUE
 WFMS,campbell,NO2,ppbv,TRUE,3,TRUE,,,,,,,,,,TRUE,12.57,31,
-WFMS,campbell,NOy,ppbv,,3,TRUE,,,3.79,TRUE,11,5,TRUE,241,,TRUE,12.57,31,
+WFMS,campbell,NOy,ppbv,,3,TRUE,,,3.79,TRUE,11,5,TRUE,181,,TRUE,12.57,31,
 WFMS,campbell,Ozone,ppbv,,1,TRUE,,,,,,,TRUE,241,,,,,
 WFMS,campbell,CO,ppbv,,0,TRUE,,,434.9,TRUE,11,5,TRUE,241,,,,,TRUE
 WFMS,campbell,SO2,ppbv,,3,TRUE,,,6.01,TRUE,11,5,TRUE,241,,,,,TRUE
