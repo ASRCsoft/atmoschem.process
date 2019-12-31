@@ -5,8 +5,15 @@ dbplyr_exists = function(x) {
   as.logical(nrow(as.data.frame(head(x, 1))))
 }
 
-## interpolate a function with discontinuities at `breaks`
-piecewise_approx = function(x, y, xout, breaks, ...) {
+## interpolate a function with discontinuities at `breaks`. `...` is
+## passed to `approx`. `int_missing` will interpolate values from the
+## previous and next segment for segments that don't contain values.
+piecewise_approx = function(x, y, xout, breaks, ..., interp_missing = TRUE) {
+  ## remove missing values
+  val_missing = is.na(x) | is.na(y)
+  x = x[!val_missing]
+  y = y[!val_missing]
+  ## split into segments
   x_segments = findInterval(x, breaks)
   x_list = split(x, x_segments)
   y_list = split(y, x_segments)
@@ -15,7 +22,36 @@ piecewise_approx = function(x, y, xout, breaks, ...) {
   ## match x and y lists with xout
   x_list = x_list[names(xout_list)]
   y_list = y_list[names(xout_list)]
-  method_list = as.list(ifelse(lengths(x_list) > 1, 'linear',
+  if (interp_missing) {
+    ## see if any sections have no values
+    empty_inds = which(lengths(x_list) == 0)
+    ## fill in missing segments
+    if (length(empty_inds)) {
+      if (length(x_list) == 1) stop('No non-missing y data')
+      ## the xout_list names are the break numbers
+      break_inds = as.integer(names(xout_list)[empty_inds])
+      for (n in empty_inds) {
+        xs = vector(mode = 'numeric')
+        ys = vector(mode = 'numeric')
+        ## first and last segments are special cases
+        if (n > 1) {
+          ## get the last value from the previous segment, place it at
+          ## the beginning of this segment
+          xs = breaks[n]
+          ys = tail(y_list[[n - 1]], 1)
+        }
+        if (n < length(x_list)) {
+          ## get the first value from the next segment, place it at
+          ## the end of this segment
+          xs = c(xs, breaks[n + 1])
+          ys = c(ys, y_list[[n + 1]][1])
+        }
+        x_list[[n]] = xs
+        y_list[[n]] = ys
+      }
+    }
+  }
+  method_list = as.list(ifelse(lengths(x_list) >= 2, 'linear',
                                'constant'))
   res_list = mapply(approx, x_list, y_list, xout_list, method_list,
                     MoreArgs = list(...), SIMPLIFY = FALSE)
