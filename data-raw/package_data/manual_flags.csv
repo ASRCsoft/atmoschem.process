@@ -138,9 +138,9 @@ WFML,envidas,SO2,"[2019-04-18 11:00, 2019-04-18 12:00)",AT,calibration
 WFML,envidas,PM25C,"[2019-04-19 12:45, 2019-04-25)",AM,unknown
 WFML,envidas,BLK-CARBON-1,"[2019-04-25 09:00, 2019-04-25 10:30)",AM,unknown
 WFML,envidas,SO2,"[2019-04-25 10:30, 2019-04-25 12:00)",AT,calibration
-WFML,campbell,NO,"[2019-04-30 12:00, 2019-04-30 02:15)",AN,calibration gases in manifold
-WFML,campbell,NOX,"[2019-04-30 12:00, 2019-04-30 02:15)",AN,calibration gases in manifold
-WFML,campbell,CO,"[2019-04-30 12:00, 2019-04-30 02:15)",AN,calibration gases in manifold
+WFML,campbell,NO,"[2019-04-30 12:00, 2019-04-30 14:15)",AN,calibration gases in manifold
+WFML,campbell,NOX,"[2019-04-30 12:00, 2019-04-30 14:15)",AN,calibration gases in manifold
+WFML,campbell,CO,"[2019-04-30 12:00, 2019-04-30 14:15)",AN,calibration gases in manifold
 WFML,campbell,NO,"[2019-05-01 09:00, 2019-05-01 15:00)",AT,calibration
 WFML,campbell,NOX,"[2019-05-01 09:00, 2019-05-01 15:00)",AT,calibration
 WFML,campbell,CO,"[2019-05-01 09:00, 2019-05-01 15:00)",AT,calibration
