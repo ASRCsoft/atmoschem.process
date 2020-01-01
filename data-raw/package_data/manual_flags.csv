@@ -132,8 +132,8 @@ WFML,envidas,SO2,"[2019-03-27 12:30, 2019-03-27 13:30)",AT,calibration
 WFML,campbell,NO,"[2019-04-03 13:00, 2019-04-03 14:00)",AM,unknown
 WFML,campbell,NOX,"[2019-04-03 13:00, 2019-04-03 14:00)",AM,unknown
 WFML,envidas,SO2,"[2019-04-12 12:30, 2019-04-12 13:30)",AT,calibration
-WFML,campbell,NO,"[2019-04-17 09:00, 2019-04-23 12:00)",AN,pump failed
-WFML,campbell,NOX,"[2019-04-17 09:00, 2019-04-23 12:00)",AN,pump failed
+WFML,campbell,NO,"[2019-04-17 09:00, 2019-04-23 13:00)",AN,pump failed
+WFML,campbell,NOX,"[2019-04-17 09:00, 2019-04-23 13:00)",AN,pump failed
 WFML,envidas,SO2,"[2019-04-18 11:00, 2019-04-18 12:00)",AT,calibration
 WFML,envidas,PM25C,"[2019-04-19 12:45, 2019-04-25)",AM,unknown
 WFML,envidas,BLK-CARBON-1,"[2019-04-25 09:00, 2019-04-25 10:30)",AM,unknown
