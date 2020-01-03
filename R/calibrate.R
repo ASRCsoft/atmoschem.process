@@ -314,6 +314,9 @@ estimate_ces = function(obj, m_id, times) {
   }
   breaks = numeric() # currently no way to adjust CE values
   m_params = get_mtype_params(obj, m_id)
-  estimate_cals(ces$time, ces$efficiency, m_params$ce_smooth_window,
-                times, breaks)
+  smoothed_ces = estimate_cals(ces$time, ces$efficiency,
+                               m_params$ce_smooth_window, times,
+                               breaks)
+  ## conversion efficiencies can't go above 1
+  pmin(smoothed_ces, 1)
 }
