@@ -34,7 +34,7 @@ get_cal_start_time = function(start_time, offline_time, measured_times) {
     offline_time
   } else if (!is.na(cur_measured_time)) {
     ## get the measured time - 40 minutes
-    measured_time - as.difftime(40, units = 'mins')
+    cur_measured_time - as.difftime(40, units = 'mins')
   }
 }
 
@@ -82,6 +82,9 @@ transform_wfm_cal_list = function(pdf, measurement_name,
   measured_times = format_pdf_time(pdf, measured_time)
   res = data.frame()
   for (n in 1:3) {
+    ## Hey! need to look at more info here to determine if the
+    ## calibration happened-- occasionally people forget to check the
+    ## box
     performed_cal = box_checked(pdf[[calibrated[n]]])
     if (performed_cal) {
       start_time = get_cal_start_time(start_times[n], offline_time,
