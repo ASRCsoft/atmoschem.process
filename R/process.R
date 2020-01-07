@@ -79,7 +79,7 @@ hampel_outlier = function(x, k, threshold = 3.5) {
   (mads != 0) & (abs(x - medians) / mads > threshold)
 }
 
-is_flagged = function(obj, m_id, times, x) {
+is_flagged = function(obj, m_id, times, x, flagged = FALSE) {
   if (length(times) == 0) {
     return(logical(0))
   }
@@ -94,7 +94,7 @@ is_flagged = function(obj, m_id, times, x) {
     is_outlier = x %>%
       ## don't use previously flagged data (often indicating
       ## calibrations) during outlier detection
-      replace(in_flagged_period, NA) %>%
+      replace(flagged | in_flagged_period, NA) %>%
       hampel_outlier(mtype$spike_window) %>%
       replace(., is.na(.), FALSE)
   } else {
@@ -117,7 +117,7 @@ is_flagged = function(obj, m_id, times, x) {
   } else {
     is_jump = FALSE
   }
-  in_flagged_period | is_outlier | !is_valid | is_jump
+  flagged | in_flagged_period | is_outlier | !is_valid | is_jump
 }
 
 get_measurements = function(obj, m_id, start_time, end_time) {
@@ -145,8 +145,8 @@ process = function(obj, msmts, m_id) {
   if (is_true(m_params$apply_ce)) {
     msmts$value = msmts$value / estimate_ces(obj, m_id, msmts$time)
   }
-  msmts$flagged = is_true(msmts$flagged) |
-    is_flagged(obj, m_id, msmts$time, msmts$value)
+  msmts$flagged = is_flagged(obj, m_id, msmts$time, msmts$value,
+                             msmts$flagged)
   msmts = msmts[, c('measurement_type_id', 'time', 'value', 'flagged')]
   attributes(msmts$time)$tzone = 'EST'
   msmts
