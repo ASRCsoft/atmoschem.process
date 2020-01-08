@@ -27,6 +27,8 @@ WFMS,campbell,NOy,span,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases 
 WFMS,campbell,NO,span,"[2019-06-26 09:30, 2019-07-03 09:00)",unknown
 WFMS,campbell,NOx,span,"[2019-06-26 09:30, 2019-07-03 09:00)",unknown
 WFMS,campbell,NOy,CE,"[2019-06-26 09:30, 2019-07-03 09:00)",unknown
+WFMS,campbell,CO,zero,"[2019-07-08 09:00, 2019-07-09 09:00)",power failure
+WFMS,campbell,CO,span,"[2019-07-09, 2019-07-09 02:00)",power failure
 WFMS,campbell,NOx,zero,"[2019-07-26 12:00, 2019-07-26 13:00)",unknown
 WFMS,campbell,NOy,zero,"[2019-07-26 12:00, 2019-07-26 13:00)",unknown
 WFMS,campbell,NO,zero,"[2019-07-27, 2019-07-27 01:00)",unknown
