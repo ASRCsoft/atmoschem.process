@@ -148,6 +148,42 @@ WFMS,campbell,NOx,"[2019-08-01 05:03, 2019-08-01 07:10)",AV,power failure
 WFMS,campbell,NOy,"[2019-08-01 05:03, 2019-08-01 07:10)",AV,power failure
 WFMS,campbell,Ozone,"[2019-08-01 05:03, 2019-08-01 07:16)",AV,power failure
 WFMS,campbell,SO2,"[2019-08-01 05:03, 2019-08-01 07:10)",AV,power failure
+WFMS,campbell,CO,"[2019-08-05 05:06, 2019-08-10)",AV,power failure
+WFMS,campbell,NO,"[2019-08-05 05:06, 2019-08-05 06:57)",AV,power failure
+WFMS,campbell,NOx,"[2019-08-05 05:06, 2019-08-05 06:57)",AV,power failure
+WFMS,campbell,NOy,"[2019-08-05 05:06, 2019-08-05 06:57)",AV,power failure
+WFMS,campbell,Ozone,"[2019-08-05 05:06, 2019-08-05 07:05)",AV,power failure
+WFMS,campbell,SO2,"[2019-08-05 05:06, 2019-08-05 06:57)",AV,power failure
+WFMS,campbell,NO,"[2019-08-06 05:05, 2019-08-06 06:49)",AV,power failure
+WFMS,campbell,NOx,"[2019-08-06 05:05, 2019-08-06 06:49)",AV,power failure
+WFMS,campbell,NOy,"[2019-08-06 05:05, 2019-08-06 06:49)",AV,power failure
+WFMS,campbell,Ozone,"[2019-08-06 05:05, 2019-08-06 06:57)",AV,power failure
+WFMS,campbell,SO2,"[2019-08-06 05:05, 2019-08-06 06:49)",AV,power failure
+WFMS,campbell,NO,"[2019-08-07 05:09, 2019-08-07 06:55)",AV,power failure
+WFMS,campbell,NOx,"[2019-08-07 05:09, 2019-08-07 06:55)",AV,power failure
+WFMS,campbell,NOy,"[2019-08-07 05:09, 2019-08-07 06:55)",AV,power failure
+WFMS,campbell,Ozone,"[2019-08-07 05:09, 2019-08-07 06:55)",AV,power failure
+WFMS,campbell,SO2,"[2019-08-07 05:09, 2019-08-07 06:55)",AV,power failure
+WFMS,ultrafine,Concentration,"[2019-08-10 10:30, 2019-08-11 12:00)",AN,unexplained cycling
+WFMS,campbell,CO,"[2019-08-12 05:10, 2019-08-13 07:30)",AV,power failure
+WFMS,campbell,NO,"[2019-08-12 05:10, 2019-08-12 07:00)",AV,power failure
+WFMS,campbell,NOx,"[2019-08-12 05:10, 2019-08-12 07:00)",AV,power failure
+WFMS,campbell,NOy,"[2019-08-12 05:10, 2019-08-12 07:00)",AV,power failure
+WFMS,campbell,Ozone,"[2019-08-12 05:10, 2019-08-12 07:06)",AV,power failure
+WFMS,campbell,SO2,"[2019-08-12 05:10, 2019-08-12 07:00)",AV,power failure
+WFMS,campbell,NO,"[2019-08-13 05:06, 2019-08-13 06:48)",AV,power failure
+WFMS,campbell,NOx,"[2019-08-13 05:06, 2019-08-13 06:48)",AV,power failure
+WFMS,campbell,NOy,"[2019-08-13 05:06, 2019-08-13 06:48)",AV,power failure
+WFMS,campbell,Ozone,"[2019-08-13 05:06, 2019-08-13 06:48)",AV,power failure
+WFMS,campbell,SO2,"[2019-08-13 05:06, 2019-08-13 06:48)",AV,power failure
+WFMS,campbell,CO,"[2019-08-15 07:33, 2019-08-15 09:00)",AV,power failure
+WFMS,campbell,CO,"[2019-08-16 07:48, 2019-08-22)",AV,power failure
+WFMS,ultrafine,Concentration,"[2019-08-22 10:00, 2019-08-23 06:00)",AN,unexplained cycling
+WFMS,ultrafine,Concentration,"[2019-08-24 05:00, 2019-08-25 12:00)",AN,unexplained cycling
+WFMS,ultrafine,Concentration,"[2019-08-26 12:00, 2019-08-27)",AN,unexplained cycling
+WFMS,campbell,CO,"[2019-08-27 08:13, 2019-08-31)",AV,power failure
+WFMS,ultrafine,Concentration,"[2019-08-28 16:00, 2019-08-30 11:00)",AN,unexplained cycling
+WFMS,ultrafine,Concentration,"[2019-09-01, 2019-10-01)",AN,unexplained cycling
 WFML,campbell,NO,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
 WFML,campbell,NOX,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
 WFML,campbell,CO,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
