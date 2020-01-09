@@ -101,6 +101,8 @@ WFMS,ultrafine,Concentration,"[2019-05-07 09:30, 2019-05-07 10:30)",AM,unknown
 WFMS,ultrafine,Concentration,"[2019-05-11 11:00, 2019-05-12)",AN,unexplained cycling
 WFMS,ultrafine,Concentration,"[2019-05-15 18:00, 2019-05-17 02:00)",AN,unexplained cycling
 WFMS,campbell,CO,"[2019-06-10 09:00, 2019-06-10 10:30)",AV,power failure
+WFMS,ultrafine,Concentration,"[2019-06-12 23:00, 2019-06-15 18:00)",AN,unexplained cycling
+WFMS,ultrafine,Concentration,"[2019-06-17 06:00, 2019-06-26 18:00)",AN,unexplained cycling
 WFMS,campbell,NO,"[2019-06-26 09:30, 2019-07-03 09:00)",AV,power failure
 WFMS,campbell,NOx,"[2019-06-26 09:30, 2019-07-03 09:00)",AV,power failure
 WFMS,ultrafine,Concentration,"[2019-06-24 06:43, 2019-06-24 06:51)",AV,power failure
