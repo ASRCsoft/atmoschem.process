@@ -93,6 +93,7 @@ WFMS,campbell,CO,"[2019-04-15 21:00, 2019-04-16 21:00)",AM,unknown
 WFMS,ultrafine,Concentration,"[2019-04-01, 2019-05-01)",AN,unexplained cycling
 WFMS,campbell,NO,"[2019-05-07 12:00, 2019-05-14 12:00)",AN,calibration gases stuck on
 WFMS,campbell,NOx,"[2019-05-07 12:00, 2019-05-14 12:00)",AN,calibration gases stuck on
+WFMS,campbell,CO,"[2019-05-10 06:53, 2019-05-10 12:00)",AV,power failure
 WFMS,campbell,NOy,"[2019-05-14 10:30, 2019-05-14 12:00)",AT,calibration
 WFMS,campbell,NO,"[2019-05-23 14:30, 2019-05-23 21:15)",AM,unknown
 WFMS,campbell,NOx,"[2019-05-23 14:30, 2019-05-23 21:15)",AM,unknown
