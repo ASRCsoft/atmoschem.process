@@ -247,6 +247,21 @@ WFML,campbell,NO,"[2019-06-30 06:30, 2019-06-30 10:30)",AM,unknown
 WFML,campbell,NOX,"[2019-06-30 06:30, 2019-06-30 10:30)",AM,unknown
 WFML,campbell,CO,"[2019-06-30 06:30, 2019-06-30 10:30)",AM,unknown
 WFML,envidas,PM25C,"[2019-06-30 06:30, 2019-06-30 11:00)",AM,unknown
+WFML,envidas,SO2,"[2019-07-03 10:30, 2019-07-03 11:30)",AT,calibration
+WFML,envidas,PM25C,"[2019-07-08 06:00, 2019-07-08 12:00)",AM,unknown
+WFML,envidas,SO2,"[2019-07-10 10:30, 2019-07-10 12:00)",AT,calibration
+WFML,envidas,SO2,"[2019-07-15 10:30, 2019-07-15 11:30)",AT,calibration
+WFML,envidas,SO2,"[2019-07-24 10:00, 2019-07-24 11:00)",AT,calibration
+WFML,envidas,SO2,"[2019-07-31 11:00, 2019-07-31 12:00)",AT,calibration
+WFML,envidas,SO2,"[2019-08-08 13:00, 2019-08-08 14:00)",AT,calibration
+WFML,envidas,SO2,"[2019-08-16 09:00, 2019-08-16 10:30)",AT,calibration
+WFML,envidas,SO2,"[2019-08-22 10:00, 2019-08-22 11:00)",AT,calibration
+WFML,envidas,SO2,"[2019-08-30 10:00, 2019-08-30 11:00)",AT,calibration
+WFML,envidas,SO2,"[2019-09-05 12:00, 2019-09-05 13:30)",AT,calibration
+WFML,campbell,CO,"[2019-09-11, 2019-09-20 12:00)",AM,unknown
+WFML,envidas,SO2,"[2019-09-12 10:30, 2019-09-12 12:00)",AT,calibration
+WFML,envidas,SO2,"[2019-09-18 10:30, 2019-09-18 12:00)",AT,calibration
+WFML,envidas,SO2,"[2019-09-26 10:30, 2019-09-26 12:00)",AT,calibration
 PSP,envidas,CO,"[2018-10-03 07:08, 2018-10-03 08:00)",AN,instrument reset
 PSP,envidas,Dichot(10)MC,"[2018-10-04 12:01, 2018-10-04 14:46)",AT,calibration
 PSP,envidas,Dichot(10)RefMC,"[2018-10-04 12:01, 2018-10-04 14:46)",AT,calibration
