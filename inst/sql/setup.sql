@@ -62,6 +62,7 @@ create table measurement_types (
   span_smooth_window int,
   remove_outliers boolean,
   spike_window int,
+  spike_log_transform boolean,
   max_jump numeric,
   apply_ce boolean,
   max_ce numeric,

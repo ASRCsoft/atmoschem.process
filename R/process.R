@@ -95,6 +95,7 @@ is_flagged = function(obj, m_id, times, x, flagged = FALSE) {
       ## don't use previously flagged data (often indicating
       ## calibrations) during outlier detection
       replace(flagged | in_flagged_period, NA) %>%
+      { if (is_true(mtype$spike_log_transform)) log(.) else . } %>%
       hampel_outlier(mtype$spike_window) %>%
       replace(., is.na(.), FALSE)
   } else {
