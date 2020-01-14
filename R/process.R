@@ -83,6 +83,8 @@ is_flagged = function(obj, m_id, times, x, flagged = FALSE) {
   if (length(times) == 0) {
     return(logical(0))
   }
+  ## treat missing flagged values as false
+  flagged = is_true(flagged)
   ## get the mtype attributes
   mtype = get_mtype_params(obj, m_id)
 
