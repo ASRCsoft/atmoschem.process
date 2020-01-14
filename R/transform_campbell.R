@@ -31,7 +31,7 @@ read_campbell = function(f) {
   ## replace 'CupA' with 'Cup' for consistency over time
   names(df) = gsub('CupA', 'Cup', names(df))
   ## remove empty columns
-  df[, -grep('Spare|Phase', names(df), ignore.case = T)]
+  df[, -grep('Spare', names(df), ignore.case = T)]
 }
 
 fix_wfms = function(df) {
