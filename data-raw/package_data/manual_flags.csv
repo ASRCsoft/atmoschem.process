@@ -80,15 +80,15 @@ WFMS,ultrafine,Concentration,"[2019-01-01, 2019-02-13)",AN,unexplained cycling
 WFMS,campbell,WS3Cup,"[2019-01-11 02:30, 2019-01-11 07:00)",AN,instrument frozen
 WFMS,campbell,WS3Cup,"[2019-01-24 22:00, 2019-01-25 11:00)",AN,instrument frozen
 WFMS,campbell,WS3CupB,"[2019-01-24 19:00, 2019-01-25 10:30)",AN,instrument frozen
+WFMS,aethelometer,concentration_370,"[2019-02-14 15:15, 2019-02-14 15:30)",AM,unknown
+WFMS,aethelometer,concentration_880,"[2019-02-14 15:15, 2019-02-14 15:30)",AM,unknown
+WFMS,aethelometer,concentration_370,"[2019-02-15 08:00, 2019-02-15 09:30)",AM,unknown
+WFMS,aethelometer,concentration_880,"[2019-02-15 08:00, 2019-02-15 09:30)",AM,unknown
+WFMS,aethelometer,concentration_370,"[2019-02-15 11:15, 2019-02-15 11:30)",AM,unknown
+WFMS,aethelometer,concentration_880,"[2019-02-15 11:15, 2019-02-15 11:30)",AM,unknown
+WFMS,aethelometer,concentration_370,"[2019-02-15 15:15, 2019-02-15 15:45)",AM,unknown
+WFMS,aethelometer,concentration_880,"[2019-02-15 15:15, 2019-02-15 15:45)",AM,unknown
 WFMS,ultrafine,Concentration,"[2019-02-20, 2019-03-21 10:00)",AN,unexplained cycling
-WFMS,aethelometer,concentration_370,"[2019-04-14 15:15, 2019-04-14 15:30)",AM,unknown
-WFMS,aethelometer,concentration_880,"[2019-04-14 15:15, 2019-04-14 15:30)",AM,unknown
-WFMS,aethelometer,concentration_370,"[2019-04-15 08:00, 2019-04-15 09:30)",AM,unknown
-WFMS,aethelometer,concentration_880,"[2019-04-15 08:00, 2019-04-15 09:30)",AM,unknown
-WFMS,aethelometer,concentration_370,"[2019-04-15 11:15, 2019-04-15 11:30)",AM,unknown
-WFMS,aethelometer,concentration_880,"[2019-04-15 11:15, 2019-04-15 11:30)",AM,unknown
-WFMS,aethelometer,concentration_370,"[2019-04-15 15:15, 2019-04-15 15:45)",AM,unknown
-WFMS,aethelometer,concentration_880,"[2019-04-15 15:15, 2019-04-15 15:45)",AM,unknown
 WFMS,campbell,CO,"[2019-04-15 21:00, 2019-04-16 21:00)",AM,unknown
 WFMS,ultrafine,Concentration,"[2019-04-01, 2019-05-01)",AN,unexplained cycling
 WFMS,campbell,NO,"[2019-05-07 12:00, 2019-05-14 12:00)",AN,calibration gases stuck on
