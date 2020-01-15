@@ -31,12 +31,13 @@ create table manual_calibrations (
 );
 
 create table gilibrator (
-  measurement_type_id int references measurement_types,
+  site_id int references sites not null,
+  measurement_name text not null,
   time timestamp,
   certified_value numeric,
   measured_value numeric,
   changed boolean,
-  primary key(measurement_type_id, time)
+  primary key(site_id, measurement_name, time)
 );
 
 create table calibration_flags (

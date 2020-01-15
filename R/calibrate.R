@@ -126,15 +126,15 @@ estimate_zeros = function(obj, m_id, times) {
                 m_params$zero_smooth_window, times, breaks)
 }
 
-estimate_gilibrator_spans = function(obj, m_id, times) {
+estimate_flows = function(obj, m_name, times) {
   if (!is(times, 'POSIXct')) stop("'times' must be of class POSIXct.")
   gil_tbl = obj %>%
-    tbl('gilibrator')
-  spans = gil_tbl %>%
-    filter(measurement_type_id == m_id,
-           !is.na(measured_value)) %>%
+    tbl('gilibrator') %>%
+    filter(measurement_name == m_name) %>%
     mutate(time = timezone('EST', time)) %>%
-    arrange(time) %>%
+    arrange(time)
+  spans = gil_tbl %>%
+    filter(!is.na(measured_value)) %>%
     collect()
   if (nrow(spans) == 0) {
     warning('No gilibrator spans found')
@@ -142,17 +142,14 @@ estimate_gilibrator_spans = function(obj, m_id, times) {
   }
   breaks = gil_tbl %>%
     filter(!is.na(changed) & changed) %>%
-    mutate(time = timezone('EST', time)) %>%
-    arrange(time) %>%
     pull(time)
-  m_params = get_mtype_params(obj, m_id)
   estimate_cals(spans$time, spans$measured_value,
                 NA, times, breaks)
 }
 
 get_cal_spans = function(obj, m_id) {
   m_params = get_mtype_params(obj, m_id)
-  has_gilibrator = !is.na(m_params$gilibrator) && m_params$gilibrator
+  has_gilibrator = !is.na(m_params$gilibrator_span)
   spans = obj %>%
     tbl('calibration_results') %>%
     filter(measurement_type_id == m_id,
@@ -173,7 +170,8 @@ get_cal_spans = function(obj, m_id) {
   if (has_gilibrator) {
     ## get the provided value from gilibrator measurements
     spans = spans %>%
-      mutate(provided_value = estimate_gilibrator_spans(obj, m_id, time))
+      mutate(provided_value =
+               estimate_flows(obj, m_params$gilibrator_span, time))
   }
   spans %>%
     mutate(zero = estimate_zeros(obj, m_id, time),
@@ -216,8 +214,7 @@ wfms_no2_ce_inputs = function(obj) {
     tbl('calibration_results') %>%
     filter(measurement_type_id == wfms_nox_id,
            type == 'CE',
-           !is.na(measured_value),
-           !is.na(provided_value)) %>%
+           !is.na(measured_value)) %>%
     mutate(time = timezone('EST', time)) %>%
     collect() %>%
     mutate(measurement_type_id =
@@ -295,6 +292,10 @@ get_ces = function(obj, m_id) {
     return(ces)
   }
   m_params = get_mtype_params(obj, m_id)
+  if (!is.na(m_params$gilibrator_ce)) {
+    ces$provided_value = estimate_flows(obj, m_params$gilibrator_ce,
+                                        ces$time)
+  }
   if (!is.na(m_params$has_calibration) && m_params$has_calibration) {
     ces$efficiency = apply_cal(obj, m_id, ces$time, ces$measured_value) /
       ces$provided_value

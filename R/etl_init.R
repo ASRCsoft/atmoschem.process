@@ -68,6 +68,14 @@ update_clock_audits = function(pg, df) {
   dbxInsert(pg, 'clock_audits', df)
 }
 
+update_gilibrator = function(pg, df) {
+  df$site_id = get_site_id(pg, df$site)
+  df$site = NULL
+  ## purge old data then add new data
+  dbxDelete(pg, 'gilibrator')
+  dbxInsert(pg, 'gilibrator', df)
+}
+
 ## Very weird issue-- this is find_schema from `etl`. But it must be
 ## defined here to work with devtools, which makes adjustments to
 ## `system.file` to run unit tests. devtools can't change the
@@ -124,7 +132,7 @@ etl_init.etl_nysatmoschem = function(obj, script = NULL, schema_name = "init",
   update_manual_flags(pg, manual_flags)
   update_cal_flags(pg, cal_flags)
   update_clock_audits(pg, clock_audits)
-  update_metadata_tbl(pg, 'gilibrator', gilibrator)
+  update_gilibrator(pg, gilibrator)
   
   invisible(obj)
 }
