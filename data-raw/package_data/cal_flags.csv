@@ -24,6 +24,26 @@ WFMS,campbell,NOy,zero,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases 
 WFMS,campbell,NO,span,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
 WFMS,campbell,NOx,span,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
 WFMS,campbell,NOy,span,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
+WFMS,campbell,NO2,CE,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
+WFMS,campbell,NOy,CE,"[2019-05-08 12:00, 2019-05-09 14:00)",spikes during measurement
+WFMS,campbell,NO2,CE,"[2019-05-15 12:00, 2019-05-16 14:00)",spikes during measurement
+WFMS,campbell,NOy,CE,"[2019-05-15 12:00, 2019-05-16 14:00)",spikes during measurement
+WFMS,campbell,NO2,CE,"[2019-05-18 12:00, 2019-05-18 14:00)",spikes during measurement
+WFMS,campbell,NOy,CE,"[2019-05-18 12:00, 2019-05-18 14:00)",spikes during measurement
+WFMS,campbell,NO2,CE,"[2019-05-24 12:00, 2019-05-25 14:00)",spikes during measurement
+WFMS,campbell,NOy,CE,"[2019-05-24 12:00, 2019-05-25 14:00)",spikes during measurement
+WFMS,campbell,NO2,CE,"[2019-05-27 12:00, 2019-05-27 14:00)",spikes during measurement
+WFMS,campbell,NOy,CE,"[2019-05-27 12:00, 2019-05-27 14:00)",spikes during measurement
+WFMS,campbell,NO2,CE,"[2019-05-30 12:00, 2019-06-02 14:00)",spikes during measurement
+WFMS,campbell,NOy,CE,"[2019-05-30 12:00, 2019-06-02 14:00)",spikes during measurement
+WFMS,campbell,NO2,CE,"[2019-06-04 12:00, 2019-06-04 14:00)",spikes during measurement
+WFMS,campbell,NOy,CE,"[2019-06-04 12:00, 2019-06-04 14:00)",spikes during measurement
+WFMS,campbell,NO2,CE,"[2019-06-06 12:00, 2019-06-06 14:00)",spikes during measurement
+WFMS,campbell,NOy,CE,"[2019-06-06 12:00, 2019-06-06 14:00)",spikes during measurement
+WFMS,campbell,NO2,CE,"[2019-06-11 12:00, 2019-06-11 14:00)",spikes during measurement
+WFMS,campbell,NOy,CE,"[2019-06-11 12:00, 2019-06-11 14:00)",spikes during measurement
+WFMS,campbell,NO2,CE,"[2019-06-22 12:00, 2019-06-23 14:00)",spikes during measurement
+WFMS,campbell,NOy,CE,"[2019-06-22 12:00, 2019-06-23 14:00)",spikes during measurement
 WFMS,campbell,NO,span,"[2019-06-26 09:30, 2019-07-03 09:00)",unknown
 WFMS,campbell,NOx,span,"[2019-06-26 09:30, 2019-07-03 09:00)",unknown
 WFMS,campbell,NOy,CE,"[2019-06-26 09:30, 2019-07-03 09:00)",unknown

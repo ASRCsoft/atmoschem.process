@@ -47,6 +47,8 @@ create table calibration_flags (
   primary key(measurement_type_id, type, times)
 );
 
+-- get the highest (or lowest) value of the 5-minute moving average in
+-- a given calibration period
 create or replace function estimate_cal(measurement_type int, cal_type text, cal_times tsrange) returns numeric as $$
   begin
     return case when cal_type='zero' then min(moving_average)
@@ -54,10 +56,10 @@ create or replace function estimate_cal(measurement_type int, cal_type text, cal
       from (select time,
 		   AVG(value) OVER(partition by measurement_type_id
 				   ORDER BY time
-				   ROWS BETWEEN 1 PRECEDING AND 1 following) as moving_average
+				   ROWS BETWEEN 2 PRECEDING AND 2 following) as moving_average
 	      from measurements2
 	     where measurement_type_id=$1
-	       and time between (lower(cal_times) - interval '2 minutes') and (upper(cal_times) + interval '2 minutes')) moving_averages
+	       and time between (lower(cal_times) - interval '3 minutes') and (upper(cal_times) + interval '3 minutes')) moving_averages
       -- ignore first 15 minutes of span calibration data due to spikes I
       -- think?
      where time <@ case when cal_type!='span' then cal_times
