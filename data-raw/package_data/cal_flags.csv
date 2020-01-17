@@ -49,27 +49,17 @@ WFMS,campbell,NOx,span,"[2019-06-26 09:30, 2019-07-03 09:00)",unknown
 WFMS,campbell,NOy,CE,"[2019-06-26 09:30, 2019-07-03 09:00)",unknown
 WFMS,campbell,CO,zero,"[2019-07-08 09:00, 2019-07-09 09:00)",power failure
 WFMS,campbell,CO,span,"[2019-07-09, 2019-07-09 02:00)",power failure
-WFMS,campbell,NOx,zero,"[2019-07-26 12:00, 2019-07-26 13:00)",unknown
-WFMS,campbell,NOy,zero,"[2019-07-26 12:00, 2019-07-26 13:00)",unknown
-WFMS,campbell,NO,zero,"[2019-07-27, 2019-07-27 01:00)",unknown
-WFMS,campbell,NOx,zero,"[2019-07-27, 2019-07-27 01:00)",unknown
-WFMS,campbell,NOy,zero,"[2019-07-27, 2019-07-27 01:00)",unknown
-WFMS,campbell,NOx,zero,"[2019-07-27 12:00, 2019-07-27 13:00)",unknown
-WFMS,campbell,NOy,zero,"[2019-07-27 12:00, 2019-07-27 13:00)",unknown
-WFMS,campbell,NO,zero,"[2019-07-28, 2019-07-28 01:00)",unknown
-WFMS,campbell,NOx,zero,"[2019-07-28, 2019-07-28 01:00)",unknown
-WFMS,campbell,NOy,zero,"[2019-07-28, 2019-07-28 01:00)",unknown
-WFMS,campbell,NOx,zero,"[2019-07-28 12:00, 2019-07-28 13:00)",unknown
-WFMS,campbell,NOy,zero,"[2019-07-28 12:00, 2019-07-28 13:00)",unknown
-WFMS,campbell,NO,zero,"[2019-07-29, 2019-07-29 01:00)",unknown
-WFMS,campbell,NOx,zero,"[2019-07-29, 2019-07-29 01:00)",unknown
-WFMS,campbell,NOy,zero,"[2019-07-29, 2019-07-29 01:00)",unknown
-WFMS,campbell,NOx,zero,"[2019-07-29 12:00, 2019-07-29 13:00)",unknown
-WFMS,campbell,NOy,zero,"[2019-07-29 12:00, 2019-07-29 13:00)",unknown
-WFMS,campbell,NO,zero,"[2019-07-30, 2019-07-30 01:00)",unknown
-WFMS,campbell,NOx,zero,"[2019-07-30, 2019-07-30 01:00)",unknown
-WFMS,campbell,NOy,zero,"[2019-07-30, 2019-07-30 01:00)",unknown
+WFMS,campbell,NO,zero,"[2019-07-26 06:00, 2019-07-30 06:00)",NO span valve stuck
+WFMS,campbell,NOx,zero,"[2019-07-26 06:00, 2019-07-30 06:00)",NO span valve stuck
+WFMS,campbell,NOx,CE,"[2019-07-26 06:00, 2019-07-30 06:00)",NO span valve stuck
+WFMS,campbell,NOy,zero,"[2019-07-26 06:00, 2019-07-30 06:00)",NO span valve stuck
+WFMS,campbell,NOy,CE,"[2019-07-26 06:00, 2019-07-30 06:00)",NO span valve stuck
 WFMS,campbell,CO,span,"[2019-07-31, 2019-08-14 09:00)",ran out of CO span gas
+WFMS,campbell,NO,zero,"[2019-08-05 06:00, 2019-08-07 18:00)",power failures and NO span valve stuck
+WFMS,campbell,NOx,zero,"[2019-08-05 06:00, 2019-08-07 18:00)",power failures and NO span valve stuck
+WFMS,campbell,NOx,CE,"[2019-08-05 06:00, 2019-08-07 18:00)",power failures and NO span valve stuck
+WFMS,campbell,NOy,zero,"[2019-08-05 06:00, 2019-08-07 18:00)",power failures and NO span valve stuck
+WFMS,campbell,NOy,CE,"[2019-08-05 06:00, 2019-08-07 18:00)",power failures and NO span valve stuck
 WFML,campbell,NO,zero,"[2018-12-14, 2018-12-18)",
 WFML,campbell,NOX,zero,"[2018-12-14, 2018-12-18)",
 WFML,campbell,CO,zero,"[2018-12-14, 2018-12-18)",
