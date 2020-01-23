@@ -2,12 +2,25 @@
 
 ## [Unreleased]
 ### Added
-- Add 2019 1st and 2nd quarter data annotations.
+- Add 2019 1st, 2nd, and 3rd quarter data annotations.
+- Generate instrument info file with datasets.
+- Interpolate calibrator instrument flow values.
+- Add PSP aethelometer method detection limits.
 
-## [0.1.2]
+### Changed
+- Improve PSP conversion efficiency calculations.
+- Improve outlier detection in the presence of missing or flagged
+  data.
+- Flag more data at the end of auto-calibrations.
+- Adjust WFMS perm tube calibration values based on GPT and IPN tests.
+- Use unicode sub- and superscripts in generated dataset column names.
+- Apply spike filter to WFMS ultrafine data.
+
+## [0.1.2] - 2019-08-16
 ### Added
 - Add WFML 2018 4th quarter data annotations.
 - Add manual flags for calibrations.
+- Break calibration smoothing at instrument adjustment times.
 
 ### Changed
 - Apply smoothing to zero and span calibration values.
