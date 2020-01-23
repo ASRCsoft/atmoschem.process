@@ -20,7 +20,7 @@ WFMS,Woodsmoke,"[2019-01-01, 2019-10-01)",aethelometer,Wood smoke,,
 WFML,NO,"[2019-01-01, 2019-10-01)",campbell,NO,,
 WFML,NO2,"[2019-01-01, 2019-10-01)",campbell,NO2,,
 WFML,Ozone,"[2019-01-01, 2019-10-01)",envidas,Ozone_ppbv,,
-WFML,CO,"[2019-01-01, 2019-10-01)",envidas,CO,,
+WFML,CO,"[2019-01-01, 2019-10-01)",campbell,CO,,
 WFML,SO2,"[2019-01-01, 2019-10-01)",envidas,SO2,,
 WFML,CH4,"[2019-01-01, 2019-10-01)",,,,ppmv
 WFML,NMHC,"[2019-01-01, 2019-10-01)",,,,ppmv
