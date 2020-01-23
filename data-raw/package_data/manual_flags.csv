@@ -239,8 +239,6 @@ WFML,campbell,NOX,"[2019-05-23 22:00, 2019-05-24 02:00)",AM,unknown
 WFML,campbell,CO,"[2019-05-23 22:00, 2019-05-24 02:00)",AM,unknown
 WFML,envidas,PM25C,"[2019-05-23 22:00, 2019-05-24 03:00)",AM,unknown
 WFML,envidas,SO2,"[2019-05-31 11:00, 2019-05-31 12:00)",AT,calibration
-WFML,campbell,NO,"[2019-06-02 12:00, 2019-06-09 12:00)",BJ,bad calibration settings
-WFML,campbell,NOX,"[2019-06-02 12:00, 2019-06-09 12:00)",BJ,bad calibration settings
 WFML,envidas,SO2,"[2019-06-05 09:30, 2019-06-05 10:30)",AT,calibration
 WFML,campbell,NO,"[2019-06-11 12:00, 2019-06-18 12:00)",AM,unknown
 WFML,campbell,NOX,"[2019-06-11 12:00, 2019-06-18 12:00)",AM,unknown
@@ -252,6 +250,8 @@ WFML,campbell,NO,"[2019-06-30 06:30, 2019-06-30 10:30)",AM,unknown
 WFML,campbell,NOX,"[2019-06-30 06:30, 2019-06-30 10:30)",AM,unknown
 WFML,campbell,CO,"[2019-06-30 06:30, 2019-06-30 10:30)",AM,unknown
 WFML,envidas,PM25C,"[2019-06-30 06:30, 2019-06-30 11:00)",AM,unknown
+WFML,campbell,NO,"[2019-07-02 12:00, 2019-07-09 12:00)",BJ,bad calibration settings
+WFML,campbell,NOX,"[2019-07-02 12:00, 2019-07-09 12:00)",BJ,bad calibration settings
 WFML,envidas,SO2,"[2019-07-03 10:30, 2019-07-03 11:30)",AT,calibration
 WFML,envidas,PM25C,"[2019-07-08 06:00, 2019-07-08 12:00)",AM,unknown
 WFML,envidas,SO2,"[2019-07-10 10:30, 2019-07-10 12:00)",AT,calibration
