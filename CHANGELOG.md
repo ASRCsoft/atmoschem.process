@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 ### Added
+- Add 2019 4th quarter WFMS, WFLS, and PSP data flags.
+
+## [0.1.3] - 2020-01-23
+### Added
 - Add 2019 1st, 2nd, and 3rd quarter data annotations.
 - Generate instrument info file with datasets.
 - Interpolate calibrator instrument flow values.
