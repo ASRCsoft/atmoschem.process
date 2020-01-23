@@ -8,6 +8,7 @@
 - Add PSP aethelometer method detection limits.
 
 ### Changed
+- Simplify and standardize high time resolution dataset files.
 - Improve PSP conversion efficiency calculations.
 - Improve outlier detection in the presence of missing or flagged
   data.
