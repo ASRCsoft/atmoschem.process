@@ -18,15 +18,19 @@
                           f_i, is_calibration)
     if (!is.na(file_id)) {
       if (clobber) {
-        ## remove the existing file data -- removing the file will
-        ## remove all its associated data thanks to cascade options in
-        ## postgres
-        rmv_file_sql = paste0('delete from files where id=', file_id)
-        DBI::dbSendQuery(obj$con, rmv_file_sql)
+        ## this file's data should have been removed earlier in
+        ## `etl_load.etl_nysatmoschem`
+        stop('error clobbering file ', f_i)
+        ## ## remove the existing file data -- removing the file will
+        ## ## remove all its associated data thanks to cascade options in
+        ## ## postgres
+        ## rmv_file_sql = paste0('delete from files where id=', file_id)
+        ## DBI::dbSendQuery(obj$con, rmv_file_sql)
       } else {
         next()
       }
     }
+    message('Loading ', f_i, '...')
     add_new_file(obj$con, site_i, ds_i, f_i,
                  is_calibration)
     file_id = get_file_id(obj$con, site_i, ds_i,
@@ -64,18 +68,13 @@
 
 even_smarter_upload = function(obj, f, site, measurement,
                                ds, clobber = FALSE) {
-  ## This function is running in a database transaction. Use
-  ## savepoints to recover from errors without preventing other files
-  ## from loading.
-  DBI::dbSendQuery(obj$con, 'SAVEPOINT new_file_savepoint')
+  ## recover from errors without preventing other files from loading
   tryCatch(ignore_fields(.even_smarter_upload(obj, f, site,
                                               measurement, ds,
                                               clobber)),
            error = function(e) {
-             DBI::dbSendQuery(obj$con, 'ROLLBACK TO SAVEPOINT new_file_savepoint')
              warning(f, ' load failed: ', e)
            })
-  DBI::dbSendQuery(obj$con, 'RELEASE SAVEPOINT new_file_savepoint')
 }
 
 #' @import etl
@@ -93,18 +92,33 @@ etl_load.etl_nysatmoschem = function(obj, sites = NULL, data_sources = NULL,
     is_measurement =
       get_type_from_path(attr(obj, 'load_dir'), f_paths) == 'measurements'
     dss = get_data_source_from_path(attr(obj, 'load_dir'), f_paths)
-    ## start a DB transaction and drop a few constraints to make
-    ## loading substantially faster
-    DBI::dbBegin(obj$con)
+    if (clobber) {
+      ## Remove the existing file data. Removing the file will remove
+      ## all its associated data thanks to cascade options in
+      ## postgres. *Has to be done before cascading foreign key
+      ## constraints are dropped.*
+      message('Removing clobbered file data...')
+      file_ids = get_file_id(obj$con, sites, dss, f_paths,
+                             !is_measurement)
+      if (any(!is.na(file_ids))) {
+        file_ids_str = paste(na.omit(file_ids), collapse = ', ')
+        rmv_file_sql = paste0('delete from files where id in (',
+                              file_ids_str, ')')
+        DBI::dbSendQuery(obj$con, rmv_file_sql)
+      }
+    }
+    ## drop a few constraints to make bulk loading substantially
+    ## faster
+    message('Dropping table constraints...')
     DBI::dbSendQuery(obj$con, 'alter table measurements drop constraint measurements_observation_id_fkey')
     DBI::dbSendQuery(obj$con, 'alter table measurements drop constraint measurements_measurement_type_id_fkey')
     mapply(even_smarter_upload, f = f_paths, site = sites,
            measurement = is_measurement, ds = dss, clobber = clobber,
            MoreArgs = list(obj = obj))
-    ## recreate the constraints and end the transaction
+    ## recreate the constraints
+    message('Recreating table constraints...')
     DBI::dbSendQuery(obj$con, 'alter table measurements add constraint measurements_observation_id_fkey foreign key (observation_id) references observations on delete cascade')
     DBI::dbSendQuery(obj$con, 'alter table measurements add constraint measurements_measurement_type_id_fkey foreign key (measurement_type_id) references measurement_types on delete cascade')
-    DBI::dbCommit(obj$con)
   }
   
   invisible(obj)
