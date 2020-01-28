@@ -13,7 +13,12 @@ create table manual_flags (
   )
 );
 
-/* Find frozen wind periods */
+create table freezing_clusters (
+  measurement_type_id int not null,
+  freeze_period tsrange
+);
+CREATE INDEX freezing_clusters_idx ON freezing_clusters using gist(measurement_type_id, freeze_period);
+
 -- get the anemometer measurement type IDs
 create or replace function anemometer_ids() RETURNS int[] AS $$
   select array_agg(id)
@@ -25,55 +30,67 @@ create or replace function anemometer_ids() RETURNS int[] AS $$
 			  'WS3CupB_Max')) m1;
 $$ LANGUAGE sql stable parallel safe;
 
--- see if the anemometers look frozen
-CREATE or replace VIEW wind_looks_frozen AS
-  select measurement_type_id,
-	 time,
-	 (bit_and(slow_wind::int) over w)::boolean as looks_frozen
-    from (select measurement_type_id,
-		 time,
-		 value < .2 as slow_wind
-	    from measurements2
-	   where measurement_type_id=any(anemometer_ids())) w1
-	   window w as (partition by measurement_type_id
-			order by time
-			rows between current row and 30 following);
-
--- get contiguous periods of frozen anemometer times
-CREATE or replace VIEW contiguous_freezes AS
-  select measurement_type_id,
-	 tsrange(min(time) - interval '1 hour',
-		 max(time) + interval '40 minutes') as freezing_times
-    from (select *,
-		 sum(freeze_starts::int) over w as freeze_group
-	    from (select *,
-			 looks_frozen and not lag(looks_frozen) over w as freeze_starts
-		    from wind_looks_frozen
-			   window w as (partition by measurement_type_id
-					order by time)) w1
-		   window w as (partition by measurement_type_id
-				order by time)) w2
-   where looks_frozen
-   group by measurement_type_id, freeze_group;
-
--- filter contiguous_freezes using the corresponding site temperature
--- at the beginning of the freeze
-CREATE or replace VIEW contiguous_cold_freezes AS
-  select f1.measurement_type_id,
-	 freezing_times
-    from contiguous_freezes f1
-  	   join measurement_types mt1
-	       on f1.measurement_type_id=mt1.id
-	   join measurement_types mt2
-	       on mt1.data_source_id=mt2.data_source_id
-	   join measurements2 m1
-	       on m1.measurement_type_id=mt2.id
-	       and m1.time=(lower(freezing_times) + interval '1 hour')
-   where mt2.name='T'
-     and m1.value<5;
-
--- get clusters of frozen anemometer times
-CREATE materialized VIEW freezing_clusters AS
+-- get clusters of frozen anemometer times, checking to make sure the
+-- temperature is below freezing at the start of the frozen period
+-- (currently only works for WFMS)
+CREATE OR REPLACE FUNCTION get_freezing_clusters(site int, data_source text,
+						 starttime timestamp,
+						 endtime timestamp)
+  RETURNS TABLE (
+    measurement_type_id int,
+    freeze_period tsrange
+  ) 
+AS $$
+  with wind_looks_frozen as (
+    select measurement_type_id,
+	   time,
+	   (bit_and(slow_wind::int) over w)::boolean as looks_frozen
+      from (select measurement_type_id,
+		   time,
+		   value < .2 as slow_wind
+	      from measurements2
+	     where measurement_type_id=any(anemometer_ids())
+	       and measurement_type_id in (select id
+					     from measurement_types
+					    where data_source_id=(select id
+								    from data_sources
+								   where site_id=$1
+								     and name=$2))
+	       and time>=$3 - interval '1 day' and time<$4 + interval '1 day') w1
+	     window w as (partition by measurement_type_id
+			  order by time
+			  rows between current row and 30 following)
+  ),
+  contiguous_freezes as (
+    select measurement_type_id,
+	   tsrange(min(time) - interval '1 hour',
+		   max(time) + interval '40 minutes') as freezing_times
+      from (select *,
+		   sum(freeze_starts::int) over w as freeze_group
+	      from (select *,
+			   looks_frozen and not lag(looks_frozen) over w as freeze_starts
+		      from wind_looks_frozen
+			     window w as (partition by measurement_type_id
+					  order by time)) w1
+		     window w as (partition by measurement_type_id
+				  order by time)) w2
+     where looks_frozen
+     group by measurement_type_id, freeze_group
+  ),
+  contiguous_cold_freezes as (
+    select f1.measurement_type_id,
+	   freezing_times
+      from contiguous_freezes f1
+  	     join measurement_types mt1
+		 on f1.measurement_type_id=mt1.id
+	     join measurement_types mt2
+		 on mt1.data_source_id=mt2.data_source_id
+	     join measurements2 m1
+		 on m1.measurement_type_id=mt2.id
+		 and m1.time=(lower(freezing_times) + interval '1 hour')
+     where mt2.name='T'
+       and m1.value<5
+  )
   select measurement_type_id,
 	 tsrange(min(lower(freezing_times)),
 		 max(upper(freezing_times))) as freeze_period
@@ -88,7 +105,25 @@ CREATE materialized VIEW freezing_clusters AS
 		   window w as (partition by measurement_type_id
 				order by lower(freezing_times))) w2
    group by measurement_type_id, freeze_cluster;
-CREATE INDEX freezing_clusters_idx ON freezing_clusters using gist(measurement_type_id, freeze_period);
+$$ LANGUAGE sql;
+
+CREATE OR REPLACE FUNCTION update_freezing_clusters(site int, data_source text,
+						    starttime timestamp,
+						    endtime timestamp)
+  RETURNS void as $$
+  delete 
+    from freezing_clusters
+   where measurement_type_id in (select id
+				   from measurement_types
+				  where data_source_id=(select id
+							  from data_sources
+							 where site_id=$1
+							   and name=$2))
+  and freeze_period && tsrange($3, $4);
+  insert into freezing_clusters
+  select *
+    from get_freezing_clusters($1, $2, $3, $4);
+$$ language sql;
 
 -- gather all flagged periods
 CREATE or replace VIEW _flagged_periods AS
