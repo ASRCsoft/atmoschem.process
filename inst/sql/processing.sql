@@ -1,5 +1,23 @@
 /* Storing/organizing/calculating processing results. */
 
+/* Store processed results */
+drop table if exists processed_measurements cascade;
+create table processed_measurements (
+  measurement_type_id int references measurement_types,
+  time timestamp,
+  value numeric,
+  flagged boolean not null
+);
+create index processed_measurements_idx on processed_measurements(measurement_type_id, time);
+
+create table hourly_measurements (
+  measurement_type_id int references measurement_types,
+  time timestamp,
+  value numeric,
+  flag text,
+  primary key(measurement_type_id, time)
+);
+
 /* Correct the instrument clock times, where needed. */
 drop materialized view if exists processed_observations cascade;
 CREATE materialized VIEW processed_observations as
@@ -18,16 +36,6 @@ CREATE materialized VIEW processed_observations as
    where not (ds.site_id=3 and ds.name='envidas');
 create index processed_observations_idx on processed_observations(id);
 
-/* Store processed results */
-drop table if exists processed_measurements cascade;
-create table processed_measurements (
-  measurement_type_id int references measurement_types,
-  time timestamp,
-  value numeric,
-  flagged boolean not null
-);
-create index processed_measurements_idx on processed_measurements(measurement_type_id, time);
-
 /* This is another placeholder for derived values. */
 drop view if exists hourly_derived_measurements cascade;
 create or replace view hourly_derived_measurements as
@@ -38,10 +46,17 @@ create or replace view hourly_derived_measurements as
 		 'M1' as flag) t1
    limit 0;
 
-/* Aggregate the processed data by hour using a function from
-   flags.sql. */
-drop materialized view if exists hourly_measurements cascade;
-CREATE materialized VIEW hourly_measurements as
+/* Aggregate the processed data by hour and apply NARSTO flags. */
+CREATE OR REPLACE FUNCTION get_hourly_measurements(site int, data_source text,
+						   starttime timestamp,
+						   endtime timestamp)
+  RETURNS TABLE (
+    measurement_type_id int,
+    "time" timestamp,
+    value numeric,
+    flag text
+  )
+AS $$
   select measurement_type_id,
 	 time,
 	 value,
@@ -64,9 +79,43 @@ CREATE materialized VIEW hourly_measurements as
 	    from processed_measurements pm
 		   join measurement_types mt
 		       on pm.measurement_type_id=mt.id
+	   where measurement_type_id in (select id
+					   from measurement_types
+					  where data_source_id=(select id
+								  from data_sources
+								 where site_id=$1
+								   and name=$2))
+	     and time>=$3 and time<$4
 	   group by measurement_type_id, name, date_trunc('hour', time)) c1
-   union select * from hourly_derived_measurements;
-create index hourly_measurements_idx on hourly_measurements(measurement_type_id, time);
+   union
+  select *
+    from hourly_derived_measurements
+   where measurement_type_id in (select id
+				   from measurement_types
+				  where data_source_id=(select id
+							  from data_sources
+							 where site_id=$1
+							   and name=$2))
+     and time>=$3 and time<$4;
+$$ LANGUAGE sql;
+
+CREATE OR REPLACE FUNCTION update_hourly_measurements(site int, data_source text,
+						      starttime timestamp,
+						      endtime timestamp)
+  RETURNS void as $$
+  delete 
+  from hourly_measurements
+   where measurement_type_id in (select id
+				   from measurement_types
+				  where data_source_id=(select id
+							  from data_sources
+							 where site_id=$1
+							   and name=$2))
+  and time>=$3 and time<$4;
+  insert into hourly_measurements
+  select *
+    from get_hourly_measurements($1, $2, $3, $4);
+$$ language sql;
 
 /* Update the processed data. */
 drop function if exists update_processing_inputs cascade;
@@ -82,7 +131,9 @@ CREATE OR REPLACE FUNCTION update_processing_inputs(site int, data_source text,
 $$ language sql;
 
 drop function if exists update_processing_outputs cascade;
-CREATE OR REPLACE FUNCTION update_processing_outputs()
+CREATE OR REPLACE FUNCTION update_processing_outputs(site int, data_source text,
+						     starttime timestamp,
+						     endtime timestamp)
   RETURNS void as $$
-  refresh materialized view hourly_measurements;
+  select update_hourly_measurements($1, $2, $3, $4);
 $$ language sql;
