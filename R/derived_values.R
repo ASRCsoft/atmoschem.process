@@ -94,8 +94,11 @@ wfms_wood_smoke = function(obj, start_time, end_time) {
     select(measurement_type_id, time, value, flagged)
 }
 
-derived_wfms = list(wfms_no2, wfms_slp, wfms_ws, wfms_ws_components,
-                    wfms_ws_max, wfms_wood_smoke)
+derived_wfms = list(
+    campbell = list(wfms_no2, wfms_slp, wfms_ws, wfms_ws_components,
+                    wfms_ws_max),
+    aethelometer = list(wfms_wood_smoke)
+)
 
 
 ## WFML functions
@@ -150,8 +153,11 @@ wfml_ws_components = function(obj, start_time, end_time) {
     select(measurement_type_id, time, value, flagged)
 }
 
-derived_wfml = list(wfml_no2, wfml_ozone, wfml_slp,
-                    wfml_ws_components)
+derived_wfml = list(
+    campbell = list(wfml_no2, wfml_slp),
+    envidas = list(wfml_ozone),
+    mesonet = list(wfml_ws_components)
+)
 
 
 ## PSP functions
@@ -278,11 +284,12 @@ psp_sr2 = function(obj, start_time, end_time) {
     select(measurement_type_id, time, value, flagged)
 }
 
-derived_psp = list(psp_no2, psp_hno3, psp_precip, psp_teoma25_base,
+derived_psp = list(
+    envidas = list(psp_no2, psp_hno3, psp_precip, psp_teoma25_base,
                    psp_teombcrs_base, psp_dichot10_base,
                    psp_wood_smoke, psp_ws_components, psp_slp,
                    psp_sr2)
-
+)
 
 derived_vals = list('WFMS' = derived_wfms,
                     'WFML' = derived_wfml,

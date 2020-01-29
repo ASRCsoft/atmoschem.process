@@ -213,8 +213,9 @@ update_processing = function(obj, site, data_source, start_time,
 
     ## add derived measurements
     if (site %in% names(derived_vals) &&
-        length(derived_vals[[site]]) > 0) {
-      derive_list = derived_vals[[site]]
+        data_source %in% names(derived_vals[[site]]) &&
+        length(derived_vals[[site]][[data_source]]) > 0) {
+      derive_list = derived_vals[[site]][[data_source]]
       for (n in 1:length(derive_list)) {
         tryCatch({
           f_n = derive_list[[n]]
