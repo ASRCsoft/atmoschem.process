@@ -61,8 +61,8 @@ wfms_ws_components = function(obj, start_time, end_time) {
     mutate(ws = value1,
            theta = pi * (270 - value2) / 180,
            flagged = flagged1 | flagged2) %>%
-    mutate(u = ws * sin(theta),
-           v = ws * cos(theta)) %>%
+    mutate(u = ws * cos(theta),
+           v = ws * sin(theta)) %>%
     select(time, u, v, flagged) %>%
     tidyr::gather(component, value, -time, -flagged) %>%
     mutate(measurement_type_id =
@@ -142,8 +142,8 @@ wfml_ws_components = function(obj, start_time, end_time) {
     mutate(ws = value1,
            theta = pi * (270 - value2) / 180,
            flagged = flagged1 | flagged2) %>%
-    mutate(u = ws * sin(theta),
-           v = ws * cos(theta)) %>%
+    mutate(u = ws * cos(theta),
+           v = ws * sin(theta)) %>%
     select(time, u, v, flagged) %>%
     tidyr::gather(component, value, -time, -flagged) %>%
     mutate(measurement_type_id =
@@ -254,8 +254,8 @@ psp_ws_components = function(obj, start_time, end_time) {
     mutate(ws = value1,
            theta = pi * (270 - value2) / 180,
            flagged = flagged1 | flagged2) %>%
-    mutate(u = ws * sin(theta),
-           v = ws * cos(theta)) %>%
+    mutate(u = ws * cos(theta),
+           v = ws * sin(theta)) %>%
     select(time, u, v, flagged) %>%
     tidyr::gather(component, value, -time, -flagged) %>%
     mutate(measurement_type_id =
