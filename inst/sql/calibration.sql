@@ -3,7 +3,7 @@
 create table autocals (
   measurement_type_id int references measurement_types,
   type text,
-  dates daterange,
+  dates tsrange,
   times timerange,
   value numeric default 0,
   primary key(measurement_type_id, dates, times),
@@ -87,16 +87,22 @@ CREATE or replace VIEW manual_calibration_sessions AS
 create or replace view scheduled_autocals as
   select measurement_type_id,
 	 type,
-	 tsrange(cal_day + lower(cal_times),
-		 cal_day + upper(cal_times),
-		 '[]') as times
+	 times * dates as times
     from (select measurement_type_id,
 		 type,
-		 generate_series(lower(dates),
-				 coalesce(upper(dates), CURRENT_DATE),
-				 interval '1 day')::date as cal_day,
-		 times as cal_times
-	    from autocals) a1;
+		 tsrange(cal_day + lower(cal_times),
+			 cal_day + upper(cal_times),
+			 '[]') as times,
+		 dates
+	    from (select measurement_type_id,
+			 type,
+			 generate_series(lower(dates),
+					 coalesce(upper(dates), CURRENT_DATE),
+					 interval '1 day')::date as cal_day,
+			 times as cal_times,
+			 dates
+		    from autocals) a1) a2
+   where times && dates;
 	 
 create or replace view calibration_periods as
   select *
