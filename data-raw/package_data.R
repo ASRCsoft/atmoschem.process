@@ -1,4 +1,4 @@
-## move supporting datasets (in data-raw/package_data) to /data
+## move supporting datasets in data-raw/package_data to /data
 
 library(usethis)
 
@@ -17,3 +17,6 @@ for (n in 1:length(csv_files)) {
 dflist = lapply(df_names, as.symbol)
 dflist$overwrite = TRUE
 do.call(use_data, dflist)
+
+## update the dataset documentation
+devtools::document()
