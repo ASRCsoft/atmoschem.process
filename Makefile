@@ -59,7 +59,7 @@ $(routine_chemistry_zip):
 routine_chemistry_unzip: $(routine_chemistry_zip)
 	unzip -n ${routine_chemistry_zip} -d ${raw_folder}
 
-clean_routine_chemistry: routine_chemistry_unzip
+clean_routine_chemistry: routine_chemistry_unzip datasets/clean_processed_routine.R
 	Rscript datasets/clean_processed_routine.R
 
 $(cleaned_routine_chemistry_csvs): clean_routine_chemistry ;
