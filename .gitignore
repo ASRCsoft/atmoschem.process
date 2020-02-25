@@ -1,6 +1,8 @@
 Meta
 doc
 *scratch*
+datasets/cleaned/
+datasets/raw/
 
 # R
 .Rproj.user
