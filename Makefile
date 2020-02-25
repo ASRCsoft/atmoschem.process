@@ -7,25 +7,23 @@ PKGVERS = `sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION`
 
 # these are the .rda and .Rd files automatically generated from the
 # package data .csv files
-pkgdata_csv_files != find data-raw/package_data/*.csv
-pkgdata_rda_files != echo ${pkgdata_csv_files} | sed 's/.*\//data\//; s/csv/rda/'
-pkgdata_man_files != echo ${pkgdata_csv_files} | sed 's/.*\//man\//; s/csv/Rd/'
-pkgdata_out_files = $(pkgdata_rda_files) $(pkgdata_man_files)
+pkgdata_csv = $(wildcard data-raw/package_data/*.csv)
+pkgdata_rda = $(patsubst data-raw/package_data/%.csv,data/%.rda,$(pkgdata_csv))
+pkgdata_man = $(patsubst data-raw/package_data/%.csv,man/%.Rd,$(pkgdata_csv))
+pkgdata_out = $(pkgdata_rda) $(pkgdata_man)
 
 all: check
 
 # following https://stackoverflow.com/a/10609434/5548959
-.INTERMEDIATE: update_pkgdata routine_chemistry_unzip clean_routine_chemistry
+.INTERMEDIATE: update_pkgdata clean_routine
 
-update_pkgdata: data-raw/package_data.R R/data.R $(pkgdata_csv_files)
-	Rscript data-raw/package_data.R
-	# package_data.R doesn't always rewrite files. `touch` updates
-	# the file modified times so make knows they're up to date.
-	touch $(pkgdata_out_files)
+update_pkgdata: data-raw/package_data.R R/data.R $(pkgdata_csv)
+	Rscript data-raw/package_data.R && \
+	touch $(pkgdata_out)
 
-$(pkgdata_out_files): update_pkgdata ;
+$(pkgdata_out): update_pkgdata ;
 
-pkgdata: $(pkgdata_out_files)
+pkgdata: $(pkgdata_out)
 
 build:
 	R CMD build .
@@ -48,20 +46,18 @@ clean:
 sites = WFMS WFML PSP QC
 raw_folder = datasets/raw
 download_url = http://atmoschem.asrc.cestm.albany.edu/~aqm/AQM_Products/bulk_downloads
-routine_chemistry_url = $(download_url)/routine_chemistry/routine_chemistry_v0.1.zip
-routine_chemistry_zip = $(raw_folder)/routine_chemistry_v0.1.zip
-cleaned_routine_chemistry_csvs != echo ${sites} | tr ' ' '\n' | sed 's/^/datasets\/cleaned\/routine_chemistry\//; s/$$/\.csv/'
+routine_url = $(download_url)/routine_chemistry/routine_chemistry_v0.1.zip
+routine_zip = $(raw_folder)/routine_chemistry_v0.1.zip
+cleaned_routine_csvs = $(patsubst %,datasets/cleaned/routine_chemistry/%.csv,$(sites))
 
-$(routine_chemistry_zip):
-	mkdir -p ${raw_folder}
-	wget --user=aqm --ask-password -O ${routine_chemistry_zip} ${routine_chemistry_url}
+$(routine_zip):
+	mkdir -p ${raw_folder} && \
+	wget --user=aqm --ask-password -O ${routine_zip} ${routine_url}
 
-routine_chemistry_unzip: $(routine_chemistry_zip)
-	unzip -n ${routine_chemistry_zip} -d ${raw_folder}
-
-clean_routine_chemistry: routine_chemistry_unzip datasets/clean_processed_routine.R
+clean_routine: $(routine_zip) datasets/clean_processed_routine.R
+	unzip -n ${routine_zip} -d ${raw_folder} && \
 	Rscript datasets/clean_processed_routine.R
 
-$(cleaned_routine_chemistry_csvs): clean_routine_chemistry ;
+$(cleaned_routine_csvs): clean_routine ;
 
-cleaned_routine_chemistry: $(cleaned_routine_chemistry_csvs)
+cleaned_routine_chemistry: $(cleaned_routine_csvs)
