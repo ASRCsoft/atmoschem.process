@@ -8,8 +8,8 @@ PKGVERS = `sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION`
 # these are the .rda and .Rd files automatically generated from the
 # package data .csv files
 pkgdata_csv_files != find data-raw/package_data/*.csv
-pkgdata_rda_files != echo ${pkgdata_csv_files} | sed 's/.*\//data\//' | sed 's/csv/rda/'
-pkgdata_man_files != echo ${pkgdata_csv_files} | sed 's/.*\//man\//' | sed 's/csv/Rd/'
+pkgdata_rda_files != echo ${pkgdata_csv_files} | sed 's/.*\//data\//; s/csv/rda/'
+pkgdata_man_files != echo ${pkgdata_csv_files} | sed 's/.*\//man\//; s/csv/Rd/'
 pkgdata_out_files = $(pkgdata_rda_files) $(pkgdata_man_files)
 
 all: check
