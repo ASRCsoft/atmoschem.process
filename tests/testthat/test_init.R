@@ -1,34 +1,18 @@
-context('DB')
 library(nysatmoschem)
 
-## create temp database
-dbname = basename(tempfile(pattern=''))
-db_res = system2('createdb', dbname)
-if (db_res == 0) {
-  has_temp_db = TRUE
-  dbcon = src_postgres(dbname = dbname)
-} else {
-  warning('Unable to create database for testing.')
-  has_temp_db = FALSE
-}
-
-## make sure the temporary database is dropped even if there's an
-## error
-if (has_temp_db) {
-  on.exit({
-    try(DBI::dbDisconnect(dbcon$con))
-    system2('dropdb', dbname)
-  })
-}
-
-check_db = function() {
-  if (!has_temp_db) {
-    skip('Temporary database not available')
-  }
-}
+dbname = 'nysatmoschem_unit_test_tmp'
+setup({
+  db_res = system2('createdb', dbname)
+  tmp_db_available <<- db_res == 0
+})
+teardown({
+  if (tmp_db_available) system2('dropdb', dbname)
+})
 
 test_that('etl_init works', {
-  check_db()
+  skip_if_not(tmp_db_available)
+  dbcon = src_postgres(dbname = dbname)
+  on.exit(DBI::dbDisconnect(dbcon$con))
   nysac = etl('nysatmoschem', db = dbcon)
   ## expect no error
   expect_error(etl_init(nysac), NA)
