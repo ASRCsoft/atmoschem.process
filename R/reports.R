@@ -96,7 +96,8 @@ format_report_data = function(con, columns, mtype_ids, times,
     ## clock adjustment, so an additional row identifier is needed to
     ## pivot the data frame
     dplyr::group_by(`Time (EST)`, column) %>% 
-    dplyr::mutate(group_id = row_number())
+    dplyr::mutate(group_id = row_number()) %>%
+    dplyr::ungroup()
   if (freq == 'raw') {
     dflong = dflong %>%
       dplyr::mutate(flag = as.integer(!flagged)) %>%
