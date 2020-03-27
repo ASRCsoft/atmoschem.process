@@ -7,6 +7,7 @@ u = '<atmoschem username>'
 p = '<atmoschem password>'
 dbname = '<database name>'
 v = '<version string>'
+outdir = 'cleaned/processed_data'
 
 library(nysatmoschem)
 
@@ -34,7 +35,7 @@ for (site in names(sources_list)) {
              years = years)
   ## process
   for (s in site_sources) {
-    update_processing(nysac, site, s, '2019-01-01', '2019-10-01')
+    update_processing(nysac, site, s, '2018-10-01', '2019-10-01')
   }
   ## generate the processed dataset files
   rcols = report_columns[report_columns$site == site, ]
@@ -44,7 +45,8 @@ for (site in names(sources_list)) {
                                        rcols$measurement,
                                        rcols$hourly_measurement,
                                        rcols$units)
-  rep_name = paste0(site, 2019)
-  write_report_files(rep, name = rep_name, dir = 'out', version = v,
-                     row.names = F, na = '-999')
+  dir.create(outdir, showWarnings = FALSE, recursive = TRUE)
+  nysatmoschem:::write_report_files(rep, name = site,
+                                    dir = outdir, version = v,
+                                    row.names = F, na = '-999')
 }
