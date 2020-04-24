@@ -98,6 +98,8 @@ format_report_data = function(con, columns, mtype_ids, times,
     dplyr::group_by(`Time (EST)`, column) %>% 
     dplyr::mutate(group_id = row_number()) %>%
     dplyr::ungroup()
+  # make sure the report time zone is EST
+  attributes(dflong$`Time (EST)`)$tzone = 'EST'
   if (freq == 'raw') {
     dflong = dflong %>%
       dplyr::mutate(flag = as.integer(!flagged)) %>%
