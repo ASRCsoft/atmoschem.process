@@ -5,6 +5,8 @@ library(magrittr)
 # print warnings immediately, helpful for tracking file loading errors
 options(warn = 1)
 
+out_dir = 'datasets/cleaned/old_routine'
+
 ## convert a list to a named vector
 map_to_dict = function(l) {
   sdf = stack(l)
@@ -298,14 +300,12 @@ write_site_file = function(site, ...) {
   dflist = lapply(files, read_processed, ...)
   finaldf = merge_dfs(dflist)
   finaldf = finaldf[, order_columns(names(finaldf))]
-  out_path = file.path('datasets/cleaned/routine_chemistry',
-                       paste0(site, '.csv'))
+  out_path = file.path(out_dir, paste0(site, '.csv'))
   write.csv(finaldf, file = out_path, row.names = F)
 }
 
 
-dir.create('datasets/cleaned/routine_chemistry', showWarnings = FALSE,
-           recursive = TRUE)
+dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 ## missing WFMS 1990 4th quarter?
 write_site_file('WFMS')
 write_site_file('WFML')

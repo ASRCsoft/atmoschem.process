@@ -3,7 +3,7 @@
 
 options(warn = 1) # print warnings immediately
 
-old_processed_dir = 'datasets/cleaned/routine_chemistry'
+old_processed_dir = 'datasets/cleaned/old_routine'
 new_processed_dir = 'datasets/cleaned/processed_data'
 out_dir = 'datasets/out/routine_chemistry'
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)

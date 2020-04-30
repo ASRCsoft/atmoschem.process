@@ -15,7 +15,7 @@ pkgdata_out = $(pkgdata_rda) $(pkgdata_man)
 all: check
 
 # following https://stackoverflow.com/a/10609434/5548959
-.INTERMEDIATE: update_pkgdata clean_routine
+.INTERMEDIATE: update_pkgdata clean_old_routine0
 
 update_pkgdata: data-raw/package_data.R R/data.R $(pkgdata_csv)
 	Rscript data-raw/package_data.R && \
@@ -48,16 +48,16 @@ raw_folder = datasets/raw
 download_url = http://atmoschem.asrc.cestm.albany.edu/~aqm/AQM_Products/bulk_downloads
 routine_url = $(download_url)/routine_chemistry/routine_chemistry_v0.1.zip
 routine_zip = $(raw_folder)/routine_chemistry_v0.1.zip
-cleaned_routine_csvs = $(patsubst %,datasets/cleaned/routine_chemistry/%.csv,$(sites))
+clean_old_routine_out = $(patsubst %,datasets/cleaned/old_routine/%.csv,$(sites))
 
 $(routine_zip):
 	mkdir -p ${raw_folder} && \
 	wget --user=aqm --ask-password -O ${routine_zip} ${routine_url}
 
-clean_routine: $(routine_zip) datasets/clean_processed_routine.R
+clean_old_routine0: $(routine_zip) datasets/clean_old_routine.R
 	unzip -n ${routine_zip} -d ${raw_folder} && \
-	Rscript datasets/clean_processed_routine.R
+	Rscript datasets/clean_old_routine.R
 
-$(cleaned_routine_csvs): clean_routine ;
+$(clean_old_routine_out): clean_old_routine0 ;
 
-cleaned_routine_chemistry: $(cleaned_routine_csvs)
+clean_old_routine: $(clean_old_routine_out)
