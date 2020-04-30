@@ -138,6 +138,16 @@ patch_psp = function(f, df) {
     sub('RWS ', 'WS ', .) %>%
     sub('RWD ', 'WD ', .) %>%
     sub('MWS ', 'WS_raw ', .)
+  # wind speeds/directions from 2009-04-14 09:00 until 2016-07-26 11:00:00 are
+  # raw averages instead of vector averages
+  raw = df$`Time (EST)` >= as.POSIXct('2009-04-14 09:00', tz = 'EST') &
+    df$`Time (EST)` < as.POSIXct('2016-07-26 11:00:00', tz = 'EST')
+  if (any(raw)) {
+    df$`WD (degrees)`[raw] = NA
+    df$`WD (flag)`[raw] = 'M1'
+    df$`WS (m/s)`[raw] = NA
+    df$`WS (flag)`[raw] = 'M1'
+  }
   df
 }
 
