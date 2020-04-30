@@ -24,7 +24,7 @@ params_map = list(
     WS_Max = 'WS_MAX'
 )
 units_map = list(
-    AQS_flag = 'AQS',
+    `AQS flag` = c('AQS', 'AQS_flag'),
     degrees = c('Az.', 'Azimuth', 'deg', 'Deg'),
     flag = c('NARSTO', 'NARSTO_flag'),
     `g/m3` = c('gm-3', 'g/m^3', 'gm^-3'),
