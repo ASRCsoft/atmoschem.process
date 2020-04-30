@@ -73,77 +73,95 @@ standardize_col_names = function(params, units) {
   paste0(params, ifelse(is.na(units), '', paste0(' (', units, ')')))
 }
 
-make_site_specific_fixes = function(site, f, df) {
-  ## site-specific fixes
-  if (site == 'WFMS') {
-    ## rename wind columns for consistency
-    if (any(grepl('WD_V ', names(df)))) {
-      ## WD_V is preferred over older plain WD (though both are pretty
-      ## sucky before 2011)
-      if (basename(f) == 'WFMS2009.csv') {
-        ## combine earlier WD with WD_V
-        df$`WD_V (degrees)`[df$time < '2009-09-01'] =
-          df$`WD (degrees)`[df$time < '2009-09-01']
-        df$`WD_V (flag)`[df$time < '2009-09-01'] =
-          df$`WD (flag)`[df$time < '2009-09-01']
-      }
-      df[, grepl('WD ', names(df))] = NULL
-      names(df) = names(df) %>%
-        sub('WD_V ', 'WD ', .)
+patch_wfms = function(f, df) {
+  ## rename wind columns for consistency
+  if (any(grepl('WD_V ', names(df)))) {
+    ## WD_V is preferred over older plain WD (though both are pretty
+    ## sucky before 2011)
+    if (basename(f) == 'WFMS2009.csv') {
+      ## combine earlier WD with WD_V
+      df$`WD_V (degrees)`[df$time < '2009-09-01'] =
+        df$`WD (degrees)`[df$time < '2009-09-01']
+      df$`WD_V (flag)`[df$time < '2009-09-01'] =
+        df$`WD (flag)`[df$time < '2009-09-01']
     }
-    if (basename(f) < 'WFMS2011_v4.csv') {
-      ## all wind speeds/directions are raw means before 2011
-      names(df) = names(df) %>%
-        sub('WS ', 'WS_raw ', .) %>%
-        sub('WD ', 'WD_raw ', .)
-    }
-  } else if (site == 'WFML') {
-    ## fix incorrect NMHC units
-    names(df) = sub('NMHC (ppmv)', 'NMHC (ppmC)', names(df))
-    ## rename wind columns for consistency
-    if (any(grepl('WD_V ', names(df)))) {
-      ## WD_V is preferred over older plain WD (though both are pretty
-      ## sucky before 2011)
-      if (basename(f) == 'WFML2009.csv') {
-        ## combine earlier WD with WD_V
-        df$`WD_V (degrees)`[df$time < '2009-09-01'] =
-          df$`WD (degrees)`[df$time < '2009-09-01']
-        df$`WD_V (flag)`[df$time < '2009-09-01'] =
-          df$`WD (flag)`[df$time < '2009-09-01']
-      }
-      df[, grepl('WD ', names(df))] = NULL
-      names(df) = names(df) %>%
-        sub('WD_V ', 'WD ', .)
-    }
-    if (basename(f) < 'WFML2012_v03.csv') {
-      ## all wind speeds are raw means before 2012
-      names(df) = names(df) %>%
-        sub('WS ', 'WS_raw ', .) %>%
-        sub('WD ', 'WD_raw ', .)
-    }
-  } else if (site == 'PSP') {
-    ## fix some wind info
-    if (basename(f) == 'PSP1995_v02.csv') {
-      ## original (1995) WD/WS is raw
-      names(df) = names(df) %>%
-        sub('WS ', 'WS_raw ', .) %>%
-        sub('WD ', 'WD_raw ', .)
-    }
-    ## RW[SD] is vector averaged and MWS is raw mean
+    df[, grepl('WD ', names(df))] = NULL
     names(df) = names(df) %>%
-      sub('RWS ', 'WS ', .) %>%
-      sub('RWD ', 'WD ', .) %>%
-      sub('MWS ', 'WS_raw ', .)
-  } else if (site == 'QC') {
-    ## fix methane with incorrect units
-    if (df$`Time (EST)`[1] == '2008-01-01 00:00') {
-      df$`CH₄ (ppbC)` = 1000 * df$`CH4 (μg/m3)`
-    }
-    if ('CH4 (μg/m3)' %in% names(df)) {
-      df[, 'CH4 (μg/m3)'] = NULL
-    }
+      sub('WD_V ', 'WD ', .)
+  }
+  if (basename(f) < 'WFMS2011_v4.csv') {
+    ## all wind speeds/directions are raw means before 2011
+    names(df) = names(df) %>%
+      sub('WS ', 'WS_raw ', .) %>%
+      sub('WD ', 'WD_raw ', .)
   }
   df
+}
+
+patch_wfml = function(f, df) {
+  ## fix incorrect NMHC units
+  names(df) = sub('NMHC (ppmv)', 'NMHC (ppmC)', names(df))
+  ## rename wind columns for consistency
+  if (any(grepl('WD_V ', names(df)))) {
+    ## WD_V is preferred over older plain WD (though both are pretty
+    ## sucky before 2011)
+    if (basename(f) == 'WFML2009.csv') {
+      ## combine earlier WD with WD_V
+      df$`WD_V (degrees)`[df$time < '2009-09-01'] =
+        df$`WD (degrees)`[df$time < '2009-09-01']
+      df$`WD_V (flag)`[df$time < '2009-09-01'] =
+        df$`WD (flag)`[df$time < '2009-09-01']
+    }
+    df[, grepl('WD ', names(df))] = NULL
+    names(df) = names(df) %>%
+      sub('WD_V ', 'WD ', .)
+  }
+  if (basename(f) < 'WFML2012_v03.csv') {
+    ## all wind speeds are raw means before 2012
+    names(df) = names(df) %>%
+      sub('WS ', 'WS_raw ', .) %>%
+      sub('WD ', 'WD_raw ', .)
+  }
+  df
+}
+
+patch_psp = function(f, df) {
+  ## fix some wind info
+  if (basename(f) == 'PSP1995_v02.csv') {
+    ## original (1995) WD/WS is raw
+    names(df) = names(df) %>%
+      sub('WS ', 'WS_raw ', .) %>%
+      sub('WD ', 'WD_raw ', .)
+  }
+  ## RW[SD] is vector averaged and MWS is raw mean
+  names(df) = names(df) %>%
+    sub('RWS ', 'WS ', .) %>%
+    sub('RWD ', 'WD ', .) %>%
+    sub('MWS ', 'WS_raw ', .)
+  df
+}
+
+patch_qc = function(f, df) {
+  ## fix methane with incorrect units
+  if (df$`Time (EST)`[1] == '2008-01-01 00:00') {
+    df$`CH₄ (ppbC)` = 1000 * df$`CH4 (μg/m3)`
+  }
+  if ('CH4 (μg/m3)' %in% names(df)) {
+    df[, 'CH4 (μg/m3)'] = NULL
+  }
+  df
+}
+
+make_site_specific_fixes = function(site, f, df) {
+  if (site == 'WFMS') {
+    patch_wfms(f, df)
+  } else if (site == 'WFML') {
+    patch_wfml(f, df)
+  } else if (site == 'PSP') {
+    patch_psp(f, df)
+  } else if (site == 'QC') {
+    patch_qc(f, df)
+  }
 }
 
 ## read processed files in the old awkward format
