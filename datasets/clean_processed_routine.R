@@ -234,29 +234,6 @@ read_processed = function(f, index_cols = 5) {
   df
 }
 
-## read processed files in the new simple format
-read_new_processed = function(f) {
-  message('parsing ', f)
-  site = basename(dirname(f))
-  ## get the data
-  df = read.csv(f, na.strings = '-999', fileEncoding = 'UTF-8',
-                check.names = F)
-  ## col_labels = sub(' \\([^(]\\)$', '', names(df))
-  params = sub(' \\([^(].*\\)$', '', names(df))
-  units = gsub('^.* \\(|\\)$', '', names(df))
-  colnames(df) = standardize_col_names(params, units)
-  ## get a nice datetime
-  df$`Time (EST)` = as.POSIXct(df$`Time (EST)`, tz = 'EST')
-  if (any(is.na(df$time))) warning('unrecognized time values')
-  ## remove some columns
-  if (any(names(df) %in% drop_list)) {
-    drop_params = params[names(df) %in% drop_list]
-    df = df[, !params %in% drop_params]
-  }
-  df = make_site_specific_fixes(site, f, df)
-  df
-}
-
 add_missing_cols = function(dfin, cols) {
   missing = cols[!cols %in% names(dfin)]
   dfin[, missing] = NA
@@ -290,13 +267,7 @@ write_site_file = function(site, ...) {
     subset(., !grepl('instruments', .)) %>%
     sort
   n_files = length(files)
-  if (site == 'QC') {
-    dflist = lapply(files, read_processed, ...)
-  } else {
-    dflist = lapply(files[1:(n_files - 2)], read_processed, ...)
-    dflist2 = lapply(files[(n_files - 1):n_files], read_new_processed)
-    dflist = c(dflist, dflist2)
-  }
+  dflist = lapply(files, read_processed, ...)
   finaldf = merge_dfs(dflist)
   finaldf = finaldf[, order_columns(names(finaldf))]
   out_path = file.path('datasets/cleaned/routine_chemistry',
