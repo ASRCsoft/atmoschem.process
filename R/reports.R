@@ -74,7 +74,7 @@ format_report_data = function(con, columns, mtype_ids, times,
     fill = 0
   } else {
     tbl_name = 'hourly_measurements'
-    flag_str = 'NARSTO'
+    flag_str = 'flag'
     fill = 'M1'
   }
   if (length(times) == 1) times = rep(times, length(columns))
@@ -148,8 +148,8 @@ format_report_data = function(con, columns, mtype_ids, times,
     ## get the relevant column names
     ultra_n = grep('Ultrafine', columns)[1]
     ultra_col = columns[ultra_n]
-    aqs_col = paste(ultra_col, '(AQS)')
-    narsto_col = paste(ultra_col, '(NARSTO)')
+    aqs_col = paste(ultra_col, '(AQS flag)')
+    narsto_col = paste(ultra_col, '(', flag_str, ')')
     ## get the flags
     ultra_id = mtype_ids[ultra_n]
     dfwide[, aqs_col] =
