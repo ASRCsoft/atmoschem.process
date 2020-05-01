@@ -97,6 +97,46 @@ patch_wfms = function(f, df) {
       sub('WS ', 'WS_raw ', .) %>%
       sub('WD ', 'WD_raw ', .)
   }
+  # In July 2014, something knocked the wind direction sensor off by 140
+  # degrees. Brian, not yet knowing the true offset or timing of the error,
+  # corrected the winds by 75 degrees, gradually phasing in the full 75 degree
+  # correction over the month of July. I dug around in the data and found that
+  # the error occurred abruptly at 9pm July 18th. Rich corrected the issue in
+  # January 2015 and found that the true offset was 140 degrees. After the
+  # sensor was corrected, Brian forgot to remove the original 75 degree
+  # correction, so it mistakenly continued through to 2018 when he left and the
+  # old dataset ends. Here I'm undoing Brian's adjustments and applying a more
+  # accurate adjustment.
+  phasein = df$`Time (EST)` >= as.POSIXct('2014-07-01', tz = 'EST') &
+    df$`Time (EST)` < as.POSIXct('2014-08-01', tz = 'EST')
+  if (any(phasein)) {
+    phasein_hours = which(phasein)
+    h_since_jul1 = difftime(df$`Time (EST)`[phasein_hours],
+                            as.POSIXct('2014-07-01', tz = 'EST'),
+                            units = 'hours')
+    # He phased the correction in by minute. This is the best I can do to
+    # correct it without looking at the minute data. If some minutes are flagged
+    # or missing in an hour then this will be very slightly inaccurate.
+    correction = 75 * (29.5 + as.numeric(h_since_jul1) * 60) / (60 * 24 * 31)
+    df$`WD (degrees)`[phasein_hours] =
+      round((df$`WD (degrees)`[phasein_hours] - correction) %% 360, 1)
+    # Flag the exact hour that the event occurred
+    jul18 = which(df$`Time (EST)` == as.POSIXct('2014-07-18 21:00', tz = 'EST'))
+    df$`WD (degrees)`[jul18] = NA
+    df$`WD (flag)`[jul18] = 'M1'
+    df$`WS (m/s)`[jul18] = NA
+    df$`WS (flag)`[jul18] = 'M1'
+  }
+  corrected75 = df$`Time (EST)` >= as.POSIXct('2014-08-01', tz = 'EST')
+  if (any(corrected75)) {
+    df$`WD (degrees)`[corrected75] =
+      round((df$`WD (degrees)`[corrected75] - 75) %% 360, 1)
+  }
+  off140 = df$`Time (EST)` >= as.POSIXct('2014-07-18 22:00', tz = 'EST') &
+    df$`Time (EST)` < as.POSIXct('2015-01-14 12:00', tz = 'EST')
+  if (any(off140)) {
+    df$`WD (degrees)`[off140] = round((df$`WD (degrees)`[off140] + 140) %% 360, 1)
+  }
   df
 }
 
