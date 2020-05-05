@@ -4,7 +4,9 @@
 \name{measurement_sources}
 \alias{measurement_sources}
 \title{Measurement instruments}
-\format{An object of class \code{data.frame} with 25 rows and 5 columns.}
+\format{
+An object of class \code{data.frame} with 25 rows and 5 columns.
+}
 \usage{
 measurement_sources
 }

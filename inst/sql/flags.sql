@@ -13,6 +13,87 @@ create table manual_flags (
   )
 );
 
+-- WFMS power outages
+create table power_outage_flags (
+  measurement_type_id int not null,
+  flag_period tsrange
+);
+CREATE INDEX power_outage_flags_idx ON power_outage_flags using gist(measurement_type_id, flag_period);
+
+CREATE OR REPLACE FUNCTION get_phases(starttime timestamp, endtime timestamp)
+  RETURNS TABLE (
+    "time" timestamp,
+    phase1 numeric,
+    phase2 numeric,
+    phase3 numeric
+  ) 
+AS $$
+  select ph1.time as time,
+	 ph1.value as phase1,
+	 ph2.value as phase2,
+	 ph3.value as phase3
+    from (select *
+	    from measurements2
+	   where measurement_type_id=get_measurement_id(1, 'campbell', 'Phase1')
+	     and time>=starttime and time<endtime) ph1
+	   join (select *
+		   from measurements2
+		  where measurement_type_id=get_measurement_id(1, 'campbell', 'Phase2')
+		    and time>=starttime and time<endtime) ph2
+	       on ph1.time=ph2.time
+	   join (select *
+		   from measurements2
+		  where measurement_type_id=get_measurement_id(1, 'campbell', 'Phase3')
+		    and time>=starttime and time<endtime) ph3
+	       on ph2.time=ph3.time;
+$$ LANGUAGE sql;
+
+CREATE OR REPLACE FUNCTION get_power_outages(starttime timestamp,
+					     endtime timestamp)
+  RETURNS TABLE (
+    measurement_type_id int,
+    flag_period tsrange
+  ) 
+AS $$
+  with power_outage_check as (
+    select time,
+	   phase1 < 115 or phase2 < 115 or phase3 < 110 as outage
+      from get_phases(starttime, endtime)
+  ),
+  outage_periods as (
+    select min(time) - interval '2 min' as period_start,
+	   max(time) as period_end
+      from (select *,
+		   sum(outage_starts::int) over w as outage_group
+	      from (select *,
+			   outage and not lag(outage) over w as outage_starts
+		      from power_outage_check
+	            window w as (order by time)) w1
+            window w as (order by time)) w2
+     where outage
+     group by outage_group
+  )
+  select measurement_type_id,
+         tsrange(period_start, period_end + recovery_time) as outage_period
+    from outage_periods,
+	 (select get_measurement_id(1, 'campbell', name) as measurement_type_id,
+		 minutes * interval '1 min' as recovery_time
+	    from unnest('{CO, NO, NOx, NOy, Ozone, SO2}'::text[],
+			'{50, 4, 4, 4, 10, 4}'::numeric[]) as chem(name, minutes)
+	 ) chem1;
+$$ LANGUAGE sql;
+
+CREATE OR REPLACE FUNCTION update_power_outages(starttime timestamp,
+						endtime timestamp)
+  RETURNS void as $$
+  delete 
+    from power_outage_flags
+   where flag_period && tsrange(starttime, endtime);
+  insert into power_outage_flags
+  select *
+    from get_power_outages(starttime, endtime);
+$$ language sql;
+
 create table freezing_clusters (
   measurement_type_id int not null,
   freeze_period tsrange
@@ -141,7 +222,11 @@ CREATE or replace VIEW _flagged_periods AS
    union
   select measurement_type_id,
 	 freeze_period as times
-    from freezing_clusters;
+    from freezing_clusters
+   union
+  select measurement_type_id,
+	 flag_period as times
+    from power_outage_flags;
 
 -- combine overlapping periods
 CREATE materialized VIEW flagged_periods AS

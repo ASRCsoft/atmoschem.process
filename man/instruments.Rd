@@ -4,7 +4,9 @@
 \name{instruments}
 \alias{instruments}
 \title{Instruments}
-\format{An object of class \code{data.frame} with 32 rows and 6 columns.}
+\format{
+An object of class \code{data.frame} with 32 rows and 6 columns.
+}
 \usage{
 instruments
 }

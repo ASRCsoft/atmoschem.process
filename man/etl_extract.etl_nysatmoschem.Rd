@@ -4,11 +4,18 @@
 \alias{etl_extract.etl_nysatmoschem}
 \title{My ETL functions}
 \usage{
-\method{etl_extract}{etl_nysatmoschem}(obj, user, password, sites = NULL,
-  data_sources = NULL, years = NULL, ...)
+\method{etl_extract}{etl_nysatmoschem}(
+  obj,
+  user,
+  password,
+  sites = NULL,
+  data_sources = NULL,
+  years = NULL,
+  ...
+)
 }
 \arguments{
-\item{obj}{an \code{\link{etl}} object}
+\item{obj}{an \code{\link[etl]{etl}} object}
 
 \item{...}{arguments passed to methods}
 }

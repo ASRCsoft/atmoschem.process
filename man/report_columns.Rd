@@ -4,7 +4,9 @@
 \name{report_columns}
 \alias{report_columns}
 \title{Report column information}
-\format{An object of class \code{data.frame} with 64 rows and 7 columns.}
+\format{
+An object of class \code{data.frame} with 64 rows and 7 columns.
+}
 \usage{
 report_columns
 }

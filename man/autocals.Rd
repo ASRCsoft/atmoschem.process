@@ -4,7 +4,9 @@
 \name{autocals}
 \alias{autocals}
 \title{The instrument auto-calibration schedule}
-\format{An object of class \code{data.frame} with 59 rows and 7 columns.}
+\format{
+An object of class \code{data.frame} with 59 rows and 7 columns.
+}
 \usage{
 autocals
 }

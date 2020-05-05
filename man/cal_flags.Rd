@@ -4,7 +4,9 @@
 \name{cal_flags}
 \alias{cal_flags}
 \title{Calibration flags}
-\format{An object of class \code{data.frame} with 76 rows and 6 columns.}
+\format{
+An object of class \code{data.frame} with 76 rows and 6 columns.
+}
 \usage{
 cal_flags
 }
