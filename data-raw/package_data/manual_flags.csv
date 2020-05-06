@@ -126,7 +126,22 @@ WFMS,ultrafine,Concentration,"[2019-08-24 05:00, 2019-08-25 12:00)",AN,unexplain
 WFMS,ultrafine,Concentration,"[2019-08-26 12:00, 2019-08-27)",AN,unexplained cycling
 WFMS,campbell,CO,"[2019-08-27 08:13, 2019-08-31)",AV,power failure
 WFMS,ultrafine,Concentration,"[2019-08-28 16:00, 2019-08-30 11:00)",AN,unexplained cycling
-WFMS,ultrafine,Concentration,"[2019-09-01, 2019-10-01)",AN,unexplained cycling
+WFMS,ultrafine,Concentration,"[2019-09-01, 2019-11-01)",AN,unexplained cycling
+WFMS,campbell,CO,"[2019-11-04 09:00, 2019-11-06 12:00)",AV,power failure
+WFMS,campbell,WS3Cup,"[2019-11-28 06:00, 2019-11-29 16:00)",AN,instrument frozen
+WFMS,campbell,WS3Cup_Max,"[2019-11-28 06:00, 2019-11-29 16:00)",AN,instrument frozen
+WFMS,campbell,WS3CupB,"[2019-11-28 06:00, 2019-11-30)",AN,instrument frozen
+WFMS,campbell,WS3CupB_Max,"[2019-11-28 06:00, 2019-11-30)",AN,instrument frozen
+WFMS,campbell,WS3Cup,"[2019-12-05 19:30, 2019-12-06 09:00)",AN,instrument frozen
+WFMS,campbell,WS3Cup_Max,"[2019-12-05 19:30, 2019-12-06 09:00)",AN,instrument frozen
+WFMS,campbell,WS3CupB,"[2019-12-05 20:30, 2019-12-06 09:00)",AN,instrument frozen
+WFMS,campbell,WS3CupB_Max,"[2019-12-05 20:30, 2019-12-06 09:00)",AN,instrument frozen
+WFMS,campbell,WS3Cup,"[2019-12-11 18:45, 2020-01-01)",AN,instrument frozen
+WFMS,campbell,WS3Cup_Max,"[2019-12-11 18:45, 2020-01-01)",AN,instrument frozen
+WFMS,campbell,CO,"[2019-12-13 18:00, 2019-12-19 06:00)",AN,pump seized
+WFMS,ultrafine,Concentration,"[2019-12-16 19:30, 2019-12-18 09:00)",AN,unexplained cycling
+WFMS,campbell,CO,"[2019-12-21 04:00, 2020-01-01)",AN,pump seized
+WFMS,ultrafine,Concentration,"[2019-12-31 17:30, 2020-01-01)",AN,unexplained cycling
 WFML,campbell,NO,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
 WFML,campbell,NOX,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
 WFML,campbell,CO,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration

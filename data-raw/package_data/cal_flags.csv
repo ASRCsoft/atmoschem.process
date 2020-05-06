@@ -60,6 +60,14 @@ WFMS,campbell,NOx,zero,"[2019-08-05 06:00, 2019-08-07 18:00)",power failures and
 WFMS,campbell,NOx,CE,"[2019-08-05 06:00, 2019-08-07 18:00)",power failures and NO span valve stuck
 WFMS,campbell,NOy,zero,"[2019-08-05 06:00, 2019-08-07 18:00)",power failures and NO span valve stuck
 WFMS,campbell,NOy,CE,"[2019-08-05 06:00, 2019-08-07 18:00)",power failures and NO span valve stuck
+WFMS,campbell,CO,zero,"[2019-11-04 12:00, 2019-11-06 12:00)",power failure
+WFMS,campbell,CO,span,"[2019-11-04 12:00, 2019-11-06 12:00)",power failure
+WFMS,campbell,NOx,CE,"[2019-11-06, 2019-11-14)",unknown
+WFMS,campbell,NOy,CE,"[2019-11-06, 2019-11-14)",unknown
+WFMS,campbell,CO,zero,"[2019-12-13 18:00, 2019-12-19 06:00)",pump seized
+WFMS,campbell,CO,span,"[2019-12-13 18:00, 2019-12-19 06:00)",pump seized
+WFMS,campbell,CO,zero,"[2019-12-21 04:00, 2020-01-01)",pump seized
+WFMS,campbell,CO,span,"[2019-12-21 04:00, 2020-01-01)",pump seized
 WFML,campbell,NO,zero,"[2018-12-14, 2018-12-18)",
 WFML,campbell,NOX,zero,"[2018-12-14, 2018-12-18)",
 WFML,campbell,CO,zero,"[2018-12-14, 2018-12-18)",

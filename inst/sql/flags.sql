@@ -24,28 +24,28 @@ CREATE OR REPLACE FUNCTION get_phases(starttime timestamp, endtime timestamp)
   RETURNS TABLE (
     "time" timestamp,
     phase1 numeric,
-    phase2 numeric,
+    -- phase2 numeric,
     phase3 numeric
   ) 
 AS $$
   select ph1.time as time,
 	 ph1.value as phase1,
-	 ph2.value as phase2,
+	 -- ph2.value as phase2,
 	 ph3.value as phase3
     from (select *
 	    from measurements2
 	   where measurement_type_id=get_measurement_id(1, 'campbell', 'Phase1')
 	     and time>=starttime and time<endtime) ph1
-	   join (select *
-		   from measurements2
-		  where measurement_type_id=get_measurement_id(1, 'campbell', 'Phase2')
-		    and time>=starttime and time<endtime) ph2
-	       on ph1.time=ph2.time
+	   -- join (select *
+	   -- 	   from measurements2
+	   -- 	  where measurement_type_id=get_measurement_id(1, 'campbell', 'Phase2')
+	   -- 	    and time>=starttime and time<endtime) ph2
+	   --     on ph1.time=ph2.time
 	   join (select *
 		   from measurements2
 		  where measurement_type_id=get_measurement_id(1, 'campbell', 'Phase3')
 		    and time>=starttime and time<endtime) ph3
-	       on ph2.time=ph3.time;
+	       on ph1.time=ph3.time;
 $$ LANGUAGE sql;
 
 CREATE OR REPLACE FUNCTION get_power_outages(starttime timestamp,
@@ -57,7 +57,7 @@ CREATE OR REPLACE FUNCTION get_power_outages(starttime timestamp,
 AS $$
   with power_outage_check as (
     select time,
-	   phase1 < 115 or phase2 < 115 or phase3 < 110 as outage
+	   phase1 < 105 or phase3 < 100 as outage
       from get_phases(starttime, endtime)
   ),
   outage_periods as (
