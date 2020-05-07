@@ -48,6 +48,14 @@ transform_file = function(f, out_file, site, measurement, ds) {
   }
 }
 
+transform_file2 = function(f, out_file, site, measurement, ds) {
+  # keep going in case of errors
+  tryCatch(transform_file(f, out_file, site, measurement, ds),
+           error = function(e) {
+             warning(f, ' transform failed: ', e)
+           })
+}
+
 ## Only transform new files, similar to `smart_download` from etl
 smart_transform = function(raw, cleaned, site, measurement,
                            ds, clobber = FALSE) {
@@ -62,7 +70,7 @@ smart_transform = function(raw, cleaned, site, measurement,
   message(paste("Transforming", sum(missing), "new files. ",
                 sum(!missing), "untouched."))
   if (sum(missing) == 0) return(NULL)
-  mapply(transform_file, raw[missing], cleaned[missing],
+  mapply(transform_file2, raw[missing], cleaned[missing],
          site[missing], measurement[missing], ds[missing])
 }
 
