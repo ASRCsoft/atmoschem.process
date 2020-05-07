@@ -228,6 +228,12 @@ WFML,campbell,CO,"[2019-09-11, 2019-09-20 12:00)",AM,unknown
 WFML,envidas,SO2,"[2019-09-12 10:30, 2019-09-12 12:00)",AT,calibration
 WFML,envidas,SO2,"[2019-09-18 10:30, 2019-09-18 12:00)",AT,calibration
 WFML,envidas,SO2,"[2019-09-26 10:30, 2019-09-26 12:00)",AT,calibration
+WFML,campbell,CO,"[2019-10-04 06:30, 2019-10-16)",AM,unknown
+WFML,campbell,NO,"[2019-10-31 15:45, 2019-11-05 14:15)",AM,manifold failure
+WFML,campbell,NOX,"[2019-10-31 15:45, 2019-11-05 14:15)",AM,manifold failure
+WFML,envidas,API-T400-OZONE,"[2019-10-31 15:45, 2019-11-05 14:15)",AM,manifold failure
+WFML,campbell,CO,"[2019-11-01 23:00, 2019-11-02 06:00)",AV,power failure
+WFML,campbell,NOX,"[2019-11-27 10:00, 2019-11-27 11:00)",AM,unknown
 PSP,envidas,CO,"[2018-10-03 07:08, 2018-10-03 08:00)",AN,instrument reset
 PSP,envidas,Dichot(10)MC,"[2018-10-04 12:01, 2018-10-04 14:46)",AT,calibration
 PSP,envidas,Dichot(10)RefMC,"[2018-10-04 12:01, 2018-10-04 14:46)",AT,calibration
