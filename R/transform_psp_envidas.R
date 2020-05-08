@@ -34,6 +34,13 @@ transform_envidas_daily = function(f) {
   ## move the new record column to 2nd position
   df = df[, c(1, ncol(df), 2:(ncol(df) - 1))]
 
+  # fix some black carbon data, which is incorrectly recorded as zero when it's
+  # missing
+  if (all(c('BC1 (ng/m3)', 'BC6 (ng/m3)') %in% names(df))) {
+    na_bc = which(df$`BC1 (ng/m3)` == 0 & df$`BC6 (ng/m3)` == 0)
+    if (length(na_bc) > 0) df[na_bc, c('BC1 (ng/m3)', 'BC6 (ng/m3)')] = NA
+  }
+
   ## get data frame of values
   df_vals = df[, !grepl(' \\(status\\)$', names(df))]
   ## remove units from name to match column names from the older files
