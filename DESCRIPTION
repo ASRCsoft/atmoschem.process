@@ -46,6 +46,7 @@ Suggests:
     usethis,
     zoo
 Remotes:
+    beanumber/etl,
     bergant/datamodelr,
     pridiltal/staplr
 VignetteBuilder: knitr
