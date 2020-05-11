@@ -149,7 +149,7 @@ format_report_data = function(con, columns, mtype_ids, times,
     ultra_n = grep('Ultrafine', columns)[1]
     ultra_col = columns[ultra_n]
     aqs_col = paste(ultra_col, '(AQS flag)')
-    narsto_col = paste(ultra_col, '(', flag_str, ')')
+    narsto_col = paste0(ultra_col, ' (', flag_str, ')')
     ## get the flags
     ultra_id = mtype_ids[ultra_n]
     dfwide[, aqs_col] =
