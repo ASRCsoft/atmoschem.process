@@ -231,8 +231,10 @@ write_report_files = function(report, name = 'report', dir = '.',
     write.csv(report$raw[[ds]], file = raw_path, ...)
   }
   ## write the instrument info file
-  message('Writing instrument file...')
-  instr_file = paste0(name, '_instruments', version_str, '.csv')
-  instr_path = file.path(dir, instr_file)
-  write.csv(report$instruments, file = instr_path, ...)
+  if (nrow(report$instruments) > 0) {
+    message('Writing instrument file...')
+    instr_file = paste0(name, '_instruments', version_str, '.csv')
+    instr_path = file.path(dir, instr_file)
+    write.csv(report$instruments, file = instr_path, ...)
+  }
 }
