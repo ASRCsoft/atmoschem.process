@@ -37,9 +37,9 @@ units_map = list(
     `particles/cm3` = 'particles/cm4',
     ppbv = c('ppb', 'ppbv '),
     `W/m2` = c('watts/(meter squared)', 'w/m2', 'w/m^2', 'wm-2'),
-    `μg/m3` = c('ug/m3', 'ugm-3', 'ug/m³'),
+    `ug/m3` = c('ug/m3', 'ugm-3', 'ug/m³', 'μg/m3'),
     `%` = c('pct', 'pc', 'percent'),
-    `°C` = c('deg C', 'oC', 'oc')
+    `degrees C` = c('deg C', 'oC', 'oc', '°C')
 )
 drop_list = c(
     'CH4 (ppbv)',
@@ -48,7 +48,7 @@ drop_list = c(
     'LWC (volts)',
     'LWC (g/m3)',
     'MWS (m/s)',
-    'NMHC (μg/m3)',
+    'NMHC (ug/m3)',
     'NMHC (ppbv)',
     'PSA (cm2/m3)',
     'SO2(MDL2) (ppbv)',
@@ -196,10 +196,10 @@ patch_psp = function(f, df) {
 patch_qc = function(f, df) {
   ## fix methane with incorrect units
   if (df$`Time (EST)`[1] == '2008-01-01 00:00') {
-    df$`CH₄ (ppbC)` = 1000 * df$`CH4 (μg/m3)`
+    df$`CH₄ (ppbC)` = 1000 * df$`CH4 (ug/m3)`
   }
-  if ('CH4 (μg/m3)' %in% names(df)) {
-    df[, 'CH4 (μg/m3)'] = NULL
+  if ('CH4 (ug/m3)' %in% names(df)) {
+    df[, 'CH4 (ug/m3)'] = NULL
   }
   df
 }
