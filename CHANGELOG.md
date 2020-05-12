@@ -2,7 +2,28 @@
 
 ## [Unreleased]
 ### Added
+- Add 2020 1st quarter WFMS, WFLS, and PSP data flags.
+
+## [0.3.0] - 2020-05-11
+### Added
 - Add 2019 4th quarter WFMS, WFLS, and PSP data flags.
+- Add code for cleaning original processed routine data.
+- Add Makefile and scripts for reproducing the routine chemistry dataset
+  package.
+
+### Changed
+- Prioritize V4 over V1 flags when both apply.
+- Replace NA flag values with M1.
+- Create unified dataset package instead of yearly data files.
+- Reprocess all data starting from 2018-10-01.
+- Set R package version number to match dataset version.
+
+### Fixed
+- Flag data and ignore calibrations during WFMS 300EU auto-reference (AREF)
+  periods.
+- Correct a variety of WFMS and PSP wind direction issues in both the current
+  and previously processed data.
+- Replace zeros with NA during PSP black carbon tape changes.
 
 ## [0.1.3] - 2020-01-23
 ### Added
