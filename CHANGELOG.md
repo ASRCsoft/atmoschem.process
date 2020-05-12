@@ -14,6 +14,7 @@
 ### Changed
 - Prioritize V4 over V1 flags when both apply.
 - Replace NA flag values with M1.
+- Flag suspicious 1999-2001 WFMS CO drop as V4.
 - Create unified dataset package instead of yearly data files.
 - Reprocess all data starting from 2018-10-01.
 - Set R package version number to match dataset version.

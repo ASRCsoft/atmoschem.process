@@ -97,6 +97,13 @@ patch_wfms = function(f, df) {
       sub('WS ', 'WS_raw ', .) %>%
       sub('WD ', 'WD_raw ', .)
   }
+  # Flag very suspicious (probably wrong) CO dip with V4
+  suspicious_co = df$`Time (EST)` >= as.POSIXct('1999-03-01', tz = 'EST') &
+    df$`Time (EST)` < as.POSIXct('2001-05-02 05:00', tz = 'EST')
+  if (any(suspicious_co)) {
+    make_v4 = suspicious_co & df$`CO (flag)` != 'M1'
+    df$`CO (flag)`[make_v4] = 'V4'
+  }
   # In July 2014, something knocked the wind direction sensor off by 140
   # degrees. Brian, not yet knowing the true offset or timing of the error,
   # corrected the winds by 75 degrees, gradually phasing in the full 75 degree
@@ -277,7 +284,7 @@ read_processed = function(f, index_cols = 5) {
   ## make sure non-flag columns are numeric
   for (n in (index_cols + 1):(ncols - 1)) {
     if (!grepl('.*flag', units[n], ignore.case = T)) {
-      if (is(df[, n], 'factor')) {
+      if (is(df[, n], 'factor') || is(df[, n], 'character')) {
         warning('non-numeric values in ', names(df)[n])
         tmp_char = as.character(df[, n])
         old_nas = is.na(df[, n])
