@@ -2,11 +2,11 @@
 
 ## [Unreleased]
 ### Added
-- Add 2020 1st quarter WFMS, WFLS, and PSP data flags.
+- Add 2020 1st quarter WFMS, WFML, and PSP data flags.
 
 ## [0.3.0] - 2020-05-11
 ### Added
-- Add 2019 4th quarter WFMS, WFLS, and PSP data flags.
+- Add 2019 4th quarter WFMS, WFML, and PSP data flags.
 - Add code for cleaning original processed routine data.
 - Add Makefile and scripts for reproducing the routine chemistry dataset
   package.
