@@ -15,7 +15,7 @@ pkgdata_out = $(pkgdata_rda) $(pkgdata_man)
 all: check
 
 # following https://stackoverflow.com/a/10609434/5548959
-.INTERMEDIATE: update_pkgdata clean_old_routine0 new_processed_data0
+.INTERMEDIATE: update_pkgdata new_processed_data0
 
 update_pkgdata: data-raw/package_data.R R/data.R $(pkgdata_csv)
 	Rscript data-raw/package_data.R && \
@@ -63,11 +63,9 @@ $(raw_dir)/%.zip:
 	mkdir -p $(raw_dir) && \
 	wget --user=aqm --ask-password -O $@ $(download_url)/$(shell echo $* | sed -E s/_v[0-9.]+$$//)/$*.zip
 
-clean_old_routine0: $(routine_zip) datasets/clean_old_routine.R
+$(cleaned_dir)/old_routine/%.csv: $(routine_zip) datasets/clean_old_routine.R
 	unzip -nq $(routine_zip) -d $(raw_dir) && \
-	Rscript datasets/clean_old_routine.R
-
-$(clean_old_routine_out): clean_old_routine0 ;
+	Rscript datasets/clean_old_routine.R $*
 
 clean_old_routine: $(clean_old_routine_out)
 

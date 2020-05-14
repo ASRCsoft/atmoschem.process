@@ -3,6 +3,7 @@
 library(magrittr)
 
 out_dir = 'datasets/cleaned/old_routine'
+site = commandArgs(trailingOnly = TRUE)[1]
 
 ## convert a list to a named vector
 map_to_dict = function(l) {
@@ -351,7 +352,9 @@ write_site_file = function(site, ...) {
 
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 ## missing WFMS 1990 4th quarter?
-write_site_file('WFMS')
-write_site_file('WFML')
-write_site_file('PSP', index_cols = 4)
-write_site_file('QC')
+
+if (site == 'PSP') {
+  write_site_file('PSP', index_cols = 4)
+} else {
+  write_site_file(site)
+}
