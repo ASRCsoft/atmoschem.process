@@ -48,10 +48,8 @@ raw_dir = datasets/raw
 cleaned_dir = datasets/cleaned
 out_dir = datasets/out
 download_url = http://atmoschem.asrc.cestm.albany.edu/~aqm/AQM_Products/bulk_downloads
-routine_url = $(download_url)/routine_chemistry/routine_chemistry_v0.1.zip
 routine_zip = $(raw_dir)/routine_chemistry_v0.1.zip
 clean_old_routine_out = $(patsubst %,$(cleaned_dir)/old_routine/%.csv,$(sites))
-raw_url = $(download_url)/raw_data/raw_data_v0.1.zip
 raw_zip = $(raw_dir)/raw_data_v0.1.zip
 # the new processed data doesn't yet contain all the sites
 sites2 = WFMS WFML PSP
@@ -61,9 +59,9 @@ new_instrument_csvs = $(patsubst %,$(cleaned_dir)/processed_data/%_instruments.c
 new_processed_files = $(new_hourly_csvs) $(new_instrument_csvs)
 routine_out = routine_chemistry_v$(PKGVERS)
 
-$(routine_zip):
-	mkdir -p ${raw_dir} && \
-	wget --user=aqm --ask-password -O ${routine_zip} ${routine_url}
+$(raw_dir)/%.zip:
+	mkdir -p $(raw_dir) && \
+	wget --user=aqm --ask-password -O $@ $(download_url)/$(shell echo $* | sed -E s/_v[0-9.]+$$//)/$*.zip
 
 clean_old_routine0: $(routine_zip) datasets/clean_old_routine.R
 	unzip -n ${routine_zip} -d ${raw_dir} && \
@@ -72,10 +70,6 @@ clean_old_routine0: $(routine_zip) datasets/clean_old_routine.R
 $(clean_old_routine_out): clean_old_routine0 ;
 
 clean_old_routine: $(clean_old_routine_out)
-
-$(raw_zip):
-	mkdir -p ${raw_dir} && \
-	wget --user=aqm --ask-password -O ${raw_zip} ${raw_url}
 
 new_processed_data0: $(raw_zip) datasets/process_new_data.R
 	unzip -n ${raw_zip} -d ${raw_dir} && \
