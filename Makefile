@@ -4,6 +4,7 @@
 PKGNAME := $(shell sed -n "s/Package: *\([^ ]*\)/\1/p" DESCRIPTION)
 PKGVERS := $(shell sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION)
 r_files := $(wildcard R/*.R)
+sql_files := $(wildcard inst/sql/*.sql)
 pkgdata_csv := $(wildcard data-raw/package_data/*.csv)
 pkgdata_rda := $(patsubst data-raw/package_data/%.csv,data/%.rda,$(pkgdata_csv))
 build_file := $(PKGNAME)_$(PKGVERS).tar.gz
@@ -18,8 +19,9 @@ clean_old_routine_out := $(patsubst %,$(cleaned_dir)/old_routine/%.csv,$(sites))
 raw_zip := $(raw_dir)/raw_data_v0.1.zip
 sites2 := WFMS WFML PSP
 sites3 := WFMS PSP
-new_hourly_csvs := $(patsubst %,$(cleaned_dir)/processed_data/%.csv,$(sites2))
-new_instrument_csvs := $(patsubst %,$(cleaned_dir)/processed_data/%_instruments.csv,$(sites3))
+processed_dir := $(cleaned_dir)/processed_data
+new_hourly_csvs := $(patsubst %,$(processed_dir)/%.csv,$(sites2))
+new_instrument_csvs := $(patsubst %,$(processed_dir)/%_instruments.csv,$(sites3))
 new_processed_files := $(new_hourly_csvs) $(new_instrument_csvs)
 routine_out := routine_chemistry_v$(PKGVERS)
 
@@ -32,19 +34,20 @@ all: routine_dataset
 routine_dataset: $(clean_old_routine_out) $(new_processed_files)
 	mkdir -p $(out_dir)/$(routine_out) && \
 	Rscript datasets/routine_package.R $(out_dir)/$(routine_out)
-	cp datasets/README.txt $(cleaned_dir)/processed_data/*_instruments.csv $(out_dir)/$(routine_out)
+	cp datasets/README.txt $(processed_dir)/*_instruments.csv $(out_dir)/$(routine_out)
 	cd $(out_dir); zip -r $(routine_out).zip $(routine_out)
 
 .PHONY: new_processed_data
 new_processed_data: $(new_processed_files)
 
-$(new_processed_files): new_processed_data0 ;
-
-# following https://stackoverflow.com/a/10609434/5548959
-.INTERMEDIATE: new_processed_data0
-new_processed_data0: $(raw_zip) datasets/process_new_data.R
+$(processed_dir)/%.csv $(processed_dir)/%_instruments.csv: $(raw_zip) \
+  processingdb datasets/process_new_data.R
 	unzip -nq $(raw_zip) -d $(raw_dir) && \
-	Rscript datasets/process_new_data.R
+	Rscript datasets/process_new_data.R $*
+
+.INTERMEDIATE: processingdb
+processingdb: $(sql_files)
+	Rscript datasets/initdb.R
 
 .PHONY: clean_old_routine
 clean_old_routine: $(clean_old_routine_out)
