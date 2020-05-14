@@ -64,7 +64,7 @@ $(raw_dir)/%.zip:
 	wget --user=aqm --ask-password -O $@ $(download_url)/$(shell echo $* | sed -E s/_v[0-9.]+$$//)/$*.zip
 
 clean_old_routine0: $(routine_zip) datasets/clean_old_routine.R
-	unzip -n ${routine_zip} -d ${raw_dir} && \
+	unzip -nq $(routine_zip) -d $(raw_dir) && \
 	Rscript datasets/clean_old_routine.R
 
 $(clean_old_routine_out): clean_old_routine0 ;
@@ -72,7 +72,7 @@ $(clean_old_routine_out): clean_old_routine0 ;
 clean_old_routine: $(clean_old_routine_out)
 
 new_processed_data0: $(raw_zip) datasets/process_new_data.R
-	unzip -n ${raw_zip} -d ${raw_dir} && \
+	unzip -nq $(raw_zip) -d $(raw_dir) && \
 	Rscript datasets/process_new_data.R
 
 $(new_processed_files): new_processed_data0 ;
