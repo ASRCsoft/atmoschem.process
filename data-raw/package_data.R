@@ -1,22 +1,12 @@
-## move supporting datasets in data-raw/package_data to /data
+# move dataset in data-raw/package_data to /data
 
 library(usethis)
 
-csv_files = list.files('data-raw/package_data', pattern = '\\.csv$',
-                       full.names = TRUE)
+csv_file = commandArgs(trailingOnly = TRUE)[1]
 
-## usethis::use_data requires passing the data as a list of symbols,
-## so we have to assign the data frames and pass a list of the data
-## frame names as symbols
-df_names = tools::file_path_sans_ext(basename(csv_files))
-for (n in 1:length(csv_files)) {
-  df_n = read.csv(csv_files[n], na.strings = c('NA', ''),
-                  stringsAsFactors = FALSE)
-  assign(df_names[n], df_n)
-}
-dflist = lapply(df_names, as.symbol)
-dflist$overwrite = TRUE
-do.call(use_data, dflist)
-
-## update the dataset documentation
-devtools::document()
+# use_data requires the data name as a symbol, so we have to assign the data
+# frame and pass the data frame name as symbol
+data_name = tools::file_path_sans_ext(basename(csv_file))
+csv_data = read.csv(csv_file, na.strings = c('NA', ''), stringsAsFactors = FALSE)
+assign(data_name, csv_data)
+do.call(use_data, list(as.symbol(data_name), overwrite = TRUE))

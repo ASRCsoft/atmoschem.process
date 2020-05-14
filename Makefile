@@ -5,27 +5,26 @@
 PKGNAME = `sed -n "s/Package: *\([^ ]*\)/\1/p" DESCRIPTION`
 PKGVERS := $(shell sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION)
 
-# these are the .rda and .Rd files automatically generated from the
-# package data .csv files
+r_files = $(wildcard R/*.R)
+# these are the .rda files automatically generated from the package data .csv
+# files
 pkgdata_csv = $(wildcard data-raw/package_data/*.csv)
 pkgdata_rda = $(patsubst data-raw/package_data/%.csv,data/%.rda,$(pkgdata_csv))
-pkgdata_man = $(patsubst data-raw/package_data/%.csv,man/%.Rd,$(pkgdata_csv))
-pkgdata_out = $(pkgdata_rda) $(pkgdata_man)
 
 all: check
 
 # following https://stackoverflow.com/a/10609434/5548959
-.INTERMEDIATE: update_pkgdata new_processed_data0
+.INTERMEDIATE: new_processed_data0
 
-update_pkgdata: data-raw/package_data.R R/data.R $(pkgdata_csv)
-	Rscript data-raw/package_data.R && \
-	touch $(pkgdata_out)
+data/%.rda: data-raw/package_data/%.csv data-raw/package_data.R
+	Rscript data-raw/package_data.R $<
 
-$(pkgdata_out): update_pkgdata ;
+docs: $(pkgdata_rda) $(r_files)
+	Rscript \
+	-e 'if (!requireNamespace("roxygen2")) install.packages("roxygen2")' \
+	-e 'roxygen2::roxygenise()'
 
-pkgdata: $(pkgdata_out)
-
-build:
+build: docs
 	R CMD build .
 
 check: build
