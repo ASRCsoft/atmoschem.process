@@ -10,6 +10,7 @@ r_files = $(wildcard R/*.R)
 # files
 pkgdata_csv = $(wildcard data-raw/package_data/*.csv)
 pkgdata_rda = $(patsubst data-raw/package_data/%.csv,data/%.rda,$(pkgdata_csv))
+build_file = $(PKGNAME)_$(PKGVERS).tar.gz
 
 all: check
 
@@ -24,22 +25,24 @@ docs: $(pkgdata_rda) $(r_files)
 	-e 'if (!requireNamespace("roxygen2")) install.packages("roxygen2")' \
 	-e 'roxygen2::roxygenise()'
 
-build: docs
+$(build_file): docs
 	R CMD build .
 
-check: build
-	R CMD check --no-manual $(PKGNAME)_$(PKGVERS).tar.gz
+build: $(build_file) ;
+
+check: $(build_file)
+	R CMD check --no-manual $(build_file)
 
 install_deps:
 	Rscript \
 	-e 'if (!requireNamespace("remotes")) install.packages("remotes")' \
 	-e 'remotes::install_deps(dependencies = TRUE)'
 
-install: install_deps build
-	R CMD INSTALL $(PKGNAME)_$(PKGVERS).tar.gz
+install: install_deps $(build_file)
+	R CMD INSTALL $(build_file)
 
 clean:
-	@rm -rf $(PKGNAME)_$(PKGVERS).tar.gz $(PKGNAME).Rcheck
+	@rm -rf $(build_file) $(PKGNAME).Rcheck
 
 # Data processing targets
 sites = WFMS WFML PSP QC
