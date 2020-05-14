@@ -2,9 +2,6 @@
 
 library(magrittr)
 
-# print warnings immediately, helpful for tracking file loading errors
-options(warn = 1)
-
 out_dir = 'datasets/cleaned/old_routine'
 
 ## convert a list to a named vector
