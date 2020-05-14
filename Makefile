@@ -1,86 +1,90 @@
+## R package variables
 # h/t to @jimhester and @yihui for this parse block:
 # https://github.com/yihui/knitr/blob/dc5ead7bcfc0ebd2789fe99c527c7d91afb3de4a/Makefile#L1-L4
-# Note the portability change as suggested in the manual:
-# https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Writing-portable-packages
-PKGNAME = `sed -n "s/Package: *\([^ ]*\)/\1/p" DESCRIPTION`
+PKGNAME := $(shell sed -n "s/Package: *\([^ ]*\)/\1/p" DESCRIPTION)
 PKGVERS := $(shell sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION)
+r_files := $(wildcard R/*.R)
+pkgdata_csv := $(wildcard data-raw/package_data/*.csv)
+pkgdata_rda := $(patsubst data-raw/package_data/%.csv,data/%.rda,$(pkgdata_csv))
+build_file := $(PKGNAME)_$(PKGVERS).tar.gz
+## Data processing variables
+sites := WFMS WFML PSP QC
+raw_dir := datasets/raw
+cleaned_dir := datasets/cleaned
+out_dir := datasets/out
+download_url := http://atmoschem.asrc.cestm.albany.edu/~aqm/AQM_Products/bulk_downloads
+routine_zip := $(raw_dir)/routine_chemistry_v0.1.zip
+clean_old_routine_out := $(patsubst %,$(cleaned_dir)/old_routine/%.csv,$(sites))
+raw_zip := $(raw_dir)/raw_data_v0.1.zip
+sites2 := WFMS WFML PSP
+sites3 := WFMS PSP
+new_hourly_csvs := $(patsubst %,$(cleaned_dir)/processed_data/%.csv,$(sites2))
+new_instrument_csvs := $(patsubst %,$(cleaned_dir)/processed_data/%_instruments.csv,$(sites3))
+new_processed_files := $(new_hourly_csvs) $(new_instrument_csvs)
+routine_out := routine_chemistry_v$(PKGVERS)
 
-r_files = $(wildcard R/*.R)
-# these are the .rda files automatically generated from the package data .csv
-# files
-pkgdata_csv = $(wildcard data-raw/package_data/*.csv)
-pkgdata_rda = $(patsubst data-raw/package_data/%.csv,data/%.rda,$(pkgdata_csv))
-build_file = $(PKGNAME)_$(PKGVERS).tar.gz
+.PHONY: all
+all: routine_dataset
 
-all: check
+## Atmoschem Dataset
+
+.PHONY: routine_dataset
+routine_dataset: $(clean_old_routine_out) $(new_processed_files)
+	mkdir -p $(out_dir)/$(routine_out) && \
+	Rscript datasets/routine_package.R $(out_dir)/$(routine_out)
+	cp datasets/README.txt $(cleaned_dir)/processed_data/*_instruments.csv $(out_dir)/$(routine_out)
+	cd $(out_dir); zip -r $(routine_out).zip $(routine_out)
+
+.PHONY: new_processed_data
+new_processed_data: $(new_processed_files)
+
+$(new_processed_files): new_processed_data0 ;
 
 # following https://stackoverflow.com/a/10609434/5548959
 .INTERMEDIATE: new_processed_data0
+new_processed_data0: $(raw_zip) datasets/process_new_data.R
+	unzip -nq $(raw_zip) -d $(raw_dir) && \
+	Rscript datasets/process_new_data.R
 
-data/%.rda: data-raw/package_data/%.csv data-raw/package_data.R
-	Rscript data-raw/package_data.R $<
-
-docs: $(pkgdata_rda) $(r_files)
-	Rscript \
-	-e 'if (!requireNamespace("roxygen2")) install.packages("roxygen2")' \
-	-e 'roxygen2::roxygenise()'
-
-$(build_file): docs
-	R CMD build .
-
-build: $(build_file) ;
-
-check: $(build_file)
-	R CMD check --no-manual $(build_file)
-
-install_deps:
-	Rscript \
-	-e 'if (!requireNamespace("remotes")) install.packages("remotes")' \
-	-e 'remotes::install_deps(dependencies = TRUE)'
-
-install: install_deps $(build_file)
-	R CMD INSTALL $(build_file)
-
-clean:
-	@rm -rf $(build_file) $(PKGNAME).Rcheck
-
-# Data processing targets
-sites = WFMS WFML PSP QC
-raw_dir = datasets/raw
-cleaned_dir = datasets/cleaned
-out_dir = datasets/out
-download_url = http://atmoschem.asrc.cestm.albany.edu/~aqm/AQM_Products/bulk_downloads
-routine_zip = $(raw_dir)/routine_chemistry_v0.1.zip
-clean_old_routine_out = $(patsubst %,$(cleaned_dir)/old_routine/%.csv,$(sites))
-raw_zip = $(raw_dir)/raw_data_v0.1.zip
-# the new processed data doesn't yet contain all the sites
-sites2 = WFMS WFML PSP
-sites3 = WFMS PSP
-new_hourly_csvs = $(patsubst %,$(cleaned_dir)/processed_data/%.csv,$(sites2))
-new_instrument_csvs = $(patsubst %,$(cleaned_dir)/processed_data/%_instruments.csv,$(sites3))
-new_processed_files = $(new_hourly_csvs) $(new_instrument_csvs)
-routine_out = routine_chemistry_v$(PKGVERS)
-
-$(raw_dir)/%.zip:
-	mkdir -p $(raw_dir) && \
-	wget --user=aqm --ask-password -O $@ $(download_url)/$(shell echo $* | sed -E s/_v[0-9.]+$$//)/$*.zip
+.PHONY: clean_old_routine
+clean_old_routine: $(clean_old_routine_out)
 
 $(cleaned_dir)/old_routine/%.csv: $(routine_zip) datasets/clean_old_routine.R
 	unzip -nq $(routine_zip) -d $(raw_dir) && \
 	Rscript datasets/clean_old_routine.R $*
 
-clean_old_routine: $(clean_old_routine_out)
+$(raw_dir)/%.zip:
+	mkdir -p $(raw_dir) && \
+	wget --user=aqm --ask-password -O $@ $(download_url)/$(shell echo $* | sed -E s/_v[0-9.]+$$//)/$*.zip
 
-new_processed_data0: $(raw_zip) datasets/process_new_data.R
-	unzip -nq $(raw_zip) -d $(raw_dir) && \
-	Rscript datasets/process_new_data.R
+## R package
 
-$(new_processed_files): new_processed_data0 ;
+.PHONY: check
+check: $(build_file)
+	R CMD check --no-manual $(build_file)
 
-new_processed_data: $(new_processed_files)
+.PHONY: install
+install: install_deps $(build_file)
+	R CMD INSTALL $(build_file)
 
-routine_dataset: clean_old_routine new_processed_data
-	mkdir -p $(out_dir)/$(routine_out) && \
-	Rscript datasets/routine_package.R $(out_dir)/$(routine_out)
-	cp datasets/README.txt $(cleaned_dir)/processed_data/*_instruments.csv $(out_dir)/$(routine_out)
-	cd $(out_dir); zip -r $(routine_out).zip $(routine_out)
+.INTERMEDIATE: install_deps
+install_deps: DESCRIPTION
+	Rscript \
+	-e 'if (!requireNamespace("remotes")) install.packages("remotes")' \
+	-e 'remotes::install_deps(dependencies = TRUE)'
+
+$(build_file): docs
+	R CMD build .
+
+.INTERMEDIATE: docs
+docs: $(pkgdata_rda) $(r_files)
+	Rscript \
+	-e 'if (!requireNamespace("roxygen2")) install.packages("roxygen2")' \
+	-e 'roxygen2::roxygenise()'
+
+data/%.rda: data-raw/package_data/%.csv data-raw/package_data.R
+	Rscript data-raw/package_data.R $<
+
+.PHONY: clean
+clean:
+	@rm -rf $(build_file) $(PKGNAME).Rcheck
