@@ -19,7 +19,7 @@ years = 2018:2020
 site_sources = sources_list[[site]]
 # process
 for (s in site_sources) {
-  update_processing(nysac, site, s, '2018-10-01', '2020-01-01')
+  update_processing(nysac, site, s, '2018-10-01', '2020-04-01')
 }
 # generate the processed dataset files
 rcols = report_columns[report_columns$site == site, ]
