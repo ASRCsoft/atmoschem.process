@@ -13,16 +13,13 @@ Imports:
     dbplyr,
     dbx,
     dplyr,
-    httr,
     lubridate,
     readxl,
     RPostgreSQL,
-    rvest,
     R.utils,
     shiny,
     staplr (>= 2.10),
-    tidyr,
-    xml2
+    tidyr
 Depends:
     R (>= 3.4.4),
     etl
