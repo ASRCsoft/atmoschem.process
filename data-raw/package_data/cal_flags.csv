@@ -68,6 +68,8 @@ WFMS,campbell,CO,zero,"[2019-12-13 18:00, 2019-12-19 06:00)",pump seized
 WFMS,campbell,CO,span,"[2019-12-13 18:00, 2019-12-19 06:00)",pump seized
 WFMS,campbell,CO,zero,"[2019-12-21 04:00, 2020-01-08 12:00)",pump seized
 WFMS,campbell,CO,span,"[2019-12-21 04:00, 2020-01-08 12:00)",pump seized
+WFMS,campbell,CO,zero,"[2020-02-25 18:00, 2020-03-05 09:00)",zero air valve off
+WFMS,campbell,CO,span,"[2020-02-25 18:00, 2020-03-05 09:00)",zero air valve off
 WFML,campbell,NO,zero,"[2018-12-14, 2018-12-18)",
 WFML,campbell,NOX,zero,"[2018-12-14, 2018-12-18)",
 WFML,campbell,CO,zero,"[2018-12-14, 2018-12-18)",
