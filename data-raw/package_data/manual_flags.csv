@@ -151,7 +151,7 @@ WFMS,campbell,WS3Cup,"[2020-01-25 18:00, 2020-01-29 10:21]",AN,instrument frozen
 WFMS,campbell,WS3Cup_Max,"[2020-01-25 18:00, 2020-01-29 10:21]",AN,instrument frozen
 WFMS,campbell,WS3CupB,"[2020-01-27 03:00, 2020-01-29 10:21]",AN,instrument frozen
 WFMS,campbell,WS3CupB_Max,"[2020-01-27 03:00, 2020-01-29 10:21]",AN,instrument frozen
-WFMS,aethelometer,concentration_880,"[2020-04-20 04:30, 2020-04-20 07:30)",AM,unknown
+WFMS,aethelometer,concentration_370,"[2020-04-20 04:30, 2020-04-20 07:30)",AM,unknown
 WFMS,aethelometer,concentration_880,"[2020-04-20 04:30, 2020-04-20 07:30)",AM,unknown
 WFMS,campbell,CO,"[2020-04-23 03:00, 2020-04-23 15:00)",AN,filter issues
 WFML,campbell,NO,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
