@@ -24,6 +24,19 @@ read_envidas_daily = function(f) {
   df
 }
 
+patch_psp_envidas_daily = function(df) {
+  # fix some black carbon data, which is incorrectly recorded as zero when it's
+  # missing
+  if (all(c('BC1 (ng/m3)', 'BC6 (ng/m3)') %in% names(df))) {
+    na_bc = which(df$`BC1 (ng/m3)` == 0 & df$`BC6 (ng/m3)` == 0)
+    if (length(na_bc) > 0) df[na_bc, c('BC1 (ng/m3)', 'BC6 (ng/m3)')] = NA
+  }
+  # fix some incorrectly set flags
+  df$`NOy (status)`[df$instrument_time >= '2020-01-24 12:00' &
+                    df$instrument_time < '2020-01-27 11:00'] = 1
+  df
+}
+
 transform_envidas_daily = function(f) {
   df = read_envidas_daily(f)
   df$Date_Time = as.POSIXct(df$Date_Time, format = '%Y-%m-%d %H:%M:%S',
@@ -33,14 +46,8 @@ transform_envidas_daily = function(f) {
   df$record = 1:nrow(df) + 1
   ## move the new record column to 2nd position
   df = df[, c(1, ncol(df), 2:(ncol(df) - 1))]
-
-  # fix some black carbon data, which is incorrectly recorded as zero when it's
-  # missing
-  if (all(c('BC1 (ng/m3)', 'BC6 (ng/m3)') %in% names(df))) {
-    na_bc = which(df$`BC1 (ng/m3)` == 0 & df$`BC6 (ng/m3)` == 0)
-    if (length(na_bc) > 0) df[na_bc, c('BC1 (ng/m3)', 'BC6 (ng/m3)')] = NA
-  }
-
+  # make some corrections
+  df = patch_psp_envidas_daily(df)
   ## get data frame of values
   df_vals = df[, !grepl(' \\(status\\)$', names(df))]
   ## remove units from name to match column names from the older files
