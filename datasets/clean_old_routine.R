@@ -102,6 +102,9 @@ patch_wfms = function(f, df) {
     make_v4 = suspicious_co & df$`CO (flag)` != 'M1'
     df$`CO (flag)`[make_v4] = 'V4'
   }
+  # Wind speed max values are not calculated correctly
+  df$`WS_Max (m/s)` = NA
+  df$`WS_Max (flag)` = 'M1'
   # In July 2014, something knocked the wind direction sensor off by 140
   # degrees. Brian, not yet knowing the true offset or timing of the error,
   # corrected the winds by 75 degrees, gradually phasing in the full 75 degree
