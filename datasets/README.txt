@@ -21,6 +21,9 @@ measurements, respectively. These values are sometimes misleading and should be
 used with caution. All other WS and WD values are vector averages that combine
 wind speeds and directions.
 
+Whiteface Mountain lodge CO measurements seem to be affected by room temperature
+and should also be used with caution.
+
 The instruments.csv file contains instrument information for some recent data.
 
 Any questions should be directed to Mr. William May at wcmay@albany.edu or
