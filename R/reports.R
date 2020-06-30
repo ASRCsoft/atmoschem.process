@@ -67,16 +67,10 @@ merge_timerange = function(x, y, tcol.x, tcol.y = tcol.x, ...) {
 ## format data frame, convert atmoschem data from long format to wide
 ## format
 format_report_data = function(con, columns, mtype_ids, times, 
-                              freq = 'hourly', unit_dict = NULL) {
-  if (freq == 'raw') {
-    tbl_name = 'processed_measurements'
-    flag_str = 'Status'
-    fill = 0
-  } else {
-    tbl_name = 'hourly_measurements'
-    flag_str = 'flag'
-    fill = 'M1'
-  }
+                              unit_dict = NULL) {
+  tbl_name = 'hourly_measurements'
+  flag_str = 'flag'
+  fill = 'M1'
   if (length(times) == 1) times = rep(times, length(columns))
   mtypes_df = DBI::dbReadTable(con, 'measurement_types')
   ## get the data
@@ -100,11 +94,6 @@ format_report_data = function(con, columns, mtype_ids, times,
     dplyr::ungroup()
   # make sure the report time zone is EST
   attributes(dflong$`Time (EST)`)$tzone = 'EST'
-  if (freq == 'raw') {
-    dflong = dflong %>%
-      dplyr::mutate(flag = as.integer(!flagged)) %>%
-      dplyr::select(-flagged)
-  }
   value_df = dflong %>%
     dplyr::select(-flag) %>%
     tidyr::spread(column, value) %>%
@@ -144,7 +133,7 @@ format_report_data = function(con, columns, mtype_ids, times,
 
   ## if the report includes ultrafine data, need to include an AQS
   ## flag column
-  if (freq == 'hourly' && any(grepl('Ultrafine', columns))) {
+  if (any(grepl('Ultrafine', columns))) {
     ## get the relevant column names
     ultra_n = grep('Ultrafine', columns)[1]
     ultra_col = columns[ultra_n]
@@ -183,17 +172,7 @@ generate_report = function(obj, columns, times, site, data_source,
   mtype_ids = get_measurement_type_id(obj$con, site, data_source,
                                       hmeasurement)
   res$hourly = format_report_data(obj$con, columns, mtype_ids, times,
-                                  freq = 'hourly', unit_dict)
-  ## raw data
-  res$raw = list()
-  for (ds in unique(na.omit(data_source))) {
-    ind = which(data_source == ds)
-    mtype_ids = get_measurement_type_id(obj$con, site[ind], ds,
-                                        measurement[ind])
-    res$raw[[ds]] = format_report_data(obj$con, columns[ind],
-                                       mtype_ids, times[ind],
-                                       freq = 'raw', unit_dict)
-  }
+                                  unit_dict)
   ## instrument info
   ## match column measurements to measurement instruments
   columns_df = data.frame(column = columns, times = times,
@@ -221,15 +200,6 @@ write_report_files = function(report, name = 'report', dir = '.',
   hour_file = paste0(name, version_str, '.csv')
   hour_path = file.path(dir, hour_file)
   write.csv(report$hourly, file = hour_path, ...)
-  ## write the minute files
-  message('Writing raw data files...')
-  raw_folder = file.path(dir, 'raw')
-  dir.create(raw_folder, showWarnings = FALSE, recursive = TRUE)
-  for (ds in names(report$raw)) {
-    raw_file = paste0(name, '_', ds, version_str, '.csv')
-    raw_path = file.path(raw_folder, raw_file)
-    write.csv(report$raw[[ds]], file = raw_path, ...)
-  }
   ## write the instrument info file
   if (nrow(report$instruments) > 0) {
     message('Writing instrument file...')
