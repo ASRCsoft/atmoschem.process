@@ -6,7 +6,7 @@
 \title{Information and processing instructions for each type of
 measurement}
 \format{
-An object of class \code{data.frame} with 90 rows and 22 columns.
+An object of class \code{data.frame} with 97 rows and 22 columns.
 }
 \usage{
 measurement_types

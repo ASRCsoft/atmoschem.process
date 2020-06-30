@@ -18,7 +18,7 @@ etl_init(nysac)
 sources_list = list(
     WFMS = c('campbell', 'ultrafine', 'aethelometer'),
     WFML = c('envidas', 'campbell', 'mesonet'),
-    PSP = 'envidas'
+    PSP = c('envidas', 'mesonet')
 )
 years = 2018:2020
 for (site in names(sources_list)) {

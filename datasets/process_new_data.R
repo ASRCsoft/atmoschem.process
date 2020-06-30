@@ -13,7 +13,7 @@ nysac = etl('nysatmoschem', db = dbcon)
 sources_list = list(
     WFMS = c('campbell', 'ultrafine', 'aethelometer'),
     WFML = c('envidas', 'campbell', 'mesonet'),
-    PSP = 'envidas'
+    PSP = c('envidas', 'mesonet')
 )
 years = 2018:2020
 site_sources = sources_list[[site]]

@@ -106,8 +106,36 @@ create or replace view psp_hourly_winds as
 			 0, n_values::int) as flag
     from windspeeds;
 
+drop view if exists psp_meso_hourly_winds cascade;
+create or replace view psp_meso_hourly_winds as
+  with windspeeds as (select date_trunc('hour', time) as time,
+			     avg(value1) as u,
+			     avg(value2) as v,
+			     -- multiply the count by 5 since mesonet
+			     -- measurements are only recorded every 5
+			     -- minutes:
+			     count(*) * 5 as n_values
+			from combine_measures(3, 'mesonet', 'WS_u', 'WS_v')
+		       where not flagged1
+			 and not flagged2
+		       group by date_trunc('hour', time))
+  select get_measurement_id(3, 'mesonet', 'WS_hourly') as measurement_type_id,
+	 time,
+	 sqrt(u^2 + v^2)::numeric as value,
+	 get_hourly_flag(get_measurement_id(3, 'mesonet', 'WS_hourly'),
+			 0, n_values::int) as flag
+    from windspeeds
+   union
+  select get_measurement_id(3, 'mesonet', 'WD_hourly') as measurement_type_id,
+	 time,
+	 (270 - (180 / pi()) * atan2(v, u))::numeric % 360 as value,
+	 get_hourly_flag(get_measurement_id(3, 'mesonet', 'WD_hourly'),
+			 0, n_values::int) as flag
+    from windspeeds;
+
 /* Combine all derived measurements. */
 create or replace view hourly_derived_measurements as
   select * from wfms_hourly_winds
    union select * from wfml_hourly_winds
-   union select * from psp_hourly_winds;
+   union select * from psp_hourly_winds
+   union select * from psp_meso_hourly_winds;

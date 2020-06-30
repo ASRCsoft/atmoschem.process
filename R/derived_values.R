@@ -265,6 +265,26 @@ psp_ws_components = function(obj, start_time, end_time) {
     select(measurement_type_id, time, value, flagged)
 }
 
+psp_meso_ws_components = function(obj, start_time, end_time) {
+  ws = combine_measures(obj, 'PSP', 'mesonet', 'wind_speed [m/s]',
+                        'wind_direction [degrees]', start_time,
+                        end_time)
+  if (nrow(ws) == 0) return(ws)
+  ws %>%
+    mutate(ws = value1,
+           theta = pi * (270 - value2) / 180,
+           flagged = flagged1 | flagged2) %>%
+    mutate(u = ws * cos(theta),
+           v = ws * sin(theta)) %>%
+    select(time, u, v, flagged) %>%
+    tidyr::gather(component, value, -time, -flagged) %>%
+    mutate(measurement_type_id =
+             ifelse(component == 'u',
+                    get_measurement_type_id(obj$con, 'PSP', 'mesonet', 'WS_u'),
+                    get_measurement_type_id(obj$con, 'PSP', 'mesonet', 'WS_v'))) %>%
+    select(measurement_type_id, time, value, flagged)
+}
+
 psp_slp = function(obj, start_time, end_time) {
   combine_measures(obj, 'PSP', 'envidas', 'BP', 'AmbTemp',
                    start_time, end_time) %>%
@@ -286,9 +306,9 @@ psp_sr2 = function(obj, start_time, end_time) {
 
 derived_psp = list(
     envidas = list(psp_no2, psp_hno3, psp_precip, psp_teoma25_base,
-                   psp_teombcrs_base, psp_dichot10_base,
-                   psp_wood_smoke, psp_ws_components, psp_slp,
-                   psp_sr2)
+                   psp_teombcrs_base, psp_dichot10_base, psp_wood_smoke,
+                   psp_ws_components, psp_slp, psp_sr2),
+    mesonet = list(psp_meso_ws_components)
 )
 
 derived_vals = list('WFMS' = derived_wfms,
