@@ -25,3 +25,6 @@
 
 #' Gilibrator flow measurements
 "gilibrator"
+
+#' Monitoring sites
+"sites"

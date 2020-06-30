@@ -9,8 +9,7 @@ new_processed_dir = 'datasets/cleaned/processed_data'
 out_dir = commandArgs(trailingOnly = TRUE)[1]
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
-sites = c('WFMS', 'WFML', 'PSP', 'QC')
-for (site in sites) {
+for (site in sites$abbreviation) {
   message('Organizing ', site, ' data')
   csv_file = paste0(site, '.csv')
   old_processed_file = file.path(old_processed_dir, csv_file)
@@ -70,6 +69,10 @@ for (site in sites) {
 
 # Supplementary data
 
+## site info
+write.csv(format(sites, nsmall = 5), file = file.path(out_dir, 'sites.csv'),
+          row.names = FALSE)
+
 ## instrument info
 # match column measurements to measurement instruments
 measurement_insts = merge(measurement_sources, instruments,
@@ -79,4 +82,4 @@ column_insts = nysatmoschem:::merge_timerange(report_columns, measurement_insts,
 instr_cols = c('site', 'column', 'times', 'brand', 'model', 'serial_number')
 instruments = column_insts[, instr_cols]
 instr_path = file.path(out_dir, 'instruments.csv')
-write.csv(instruments, file = instr_path, row.names = F)
+write.csv(instruments, file = instr_path, row.names = FALSE)
