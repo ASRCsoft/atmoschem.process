@@ -18,11 +18,9 @@ routine_zip := $(raw_dir)/routine_chemistry_v0.1.zip
 clean_old_routine_out := $(patsubst %,$(cleaned_dir)/old_routine/%.csv,$(sites))
 raw_zip := $(raw_dir)/raw_data_v0.1.zip
 sites2 := WFMS WFML PSP
-sites3 := WFMS PSP
 processed_dir := $(cleaned_dir)/processed_data
 new_hourly_csvs := $(patsubst %,$(processed_dir)/%.csv,$(sites2))
-new_instrument_csvs := $(patsubst %,$(processed_dir)/%_instruments.csv,$(sites3))
-new_processed_files := $(new_hourly_csvs) $(new_instrument_csvs)
+new_processed_files := $(new_hourly_csvs)
 routine_out := routine_chemistry_v$(PKGVERS)
 
 .PHONY: all
@@ -34,13 +32,13 @@ all: routine_dataset
 routine_dataset: $(clean_old_routine_out) $(new_processed_files)
 	mkdir -p $(out_dir)/$(routine_out) && \
 	Rscript datasets/routine_package.R $(out_dir)/$(routine_out)
-	cp datasets/README.txt $(processed_dir)/*_instruments.csv $(out_dir)/$(routine_out)
+	cp datasets/README.txt $(out_dir)/$(routine_out)
 	cd $(out_dir); zip -r $(routine_out).zip $(routine_out)
 
 .PHONY: new_processed_data
 new_processed_data: $(new_processed_files)
 
-$(processed_dir)/%.csv $(processed_dir)/%_instruments.csv: $(raw_zip) \
+$(processed_dir)/%.csv: $(raw_zip) \
   processingdb datasets/process_new_data.R
 	unzip -nq $(raw_zip) -d $(raw_dir) && \
 	Rscript datasets/process_new_data.R $*

@@ -1,6 +1,7 @@
 # This file creates the routine chemistry bulk data files. It takes the old
 # processed data and combines it with the new processed data.
 
+library(nysatmoschem)
 options(warn = 1) # print warnings immediately
 
 old_processed_dir = 'datasets/cleaned/old_routine'
@@ -67,5 +68,15 @@ for (site in sites) {
   write.csv(pout, file = out_file, row.names = FALSE)
 }
 
-# should add the readme and supplementary data
-# ...
+# Supplementary data
+
+## instrument info
+# match column measurements to measurement instruments
+measurement_insts = merge(measurement_sources, instruments,
+                          by.x = c('site', 'instrument'),
+                          by.y = c('site', 'name'))
+column_insts = nysatmoschem:::merge_timerange(report_columns, measurement_insts, 'times')
+instr_cols = c('site', 'column', 'times', 'brand', 'model', 'serial_number')
+instruments = column_insts[, instr_cols]
+instr_path = file.path(out_dir, 'instruments.csv')
+write.csv(instruments, file = instr_path, row.names = F)

@@ -173,17 +173,6 @@ generate_report = function(obj, columns, times, site, data_source,
                                       hmeasurement)
   res$hourly = format_report_data(obj$con, columns, mtype_ids, times,
                                   unit_dict)
-  ## instrument info
-  ## match column measurements to measurement instruments
-  columns_df = data.frame(column = columns, times = times,
-                          site = site, data_source = data_source,
-                          measurement = measurement)
-  measurement_insts = merge(measurement_sources, instruments,
-                            by.x = c('site', 'instrument'),
-                            by.y = c('site', 'name'))
-  column_insts = merge_timerange(columns_df, measurement_insts, 'times')
-  instr_cols = c('column', 'times', 'brand', 'model', 'serial_number')
-  res$instruments = column_insts[, instr_cols]
   class(res) = 'atmoschem_report'
   res
 }
@@ -200,11 +189,4 @@ write_report_files = function(report, name = 'report', dir = '.',
   hour_file = paste0(name, version_str, '.csv')
   hour_path = file.path(dir, hour_file)
   write.csv(report$hourly, file = hour_path, ...)
-  ## write the instrument info file
-  if (nrow(report$instruments) > 0) {
-    message('Writing instrument file...')
-    instr_file = paste0(name, '_instruments', version_str, '.csv')
-    instr_path = file.path(dir, instr_file)
-    write.csv(report$instruments, file = instr_path, ...)
-  }
 }
