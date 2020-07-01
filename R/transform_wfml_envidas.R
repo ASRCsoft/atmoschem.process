@@ -12,6 +12,16 @@ read_wfml_envidas = function(f, ...) {
   df1
 }
 
+patch_wfml_envidas = function(df) {
+  # flag left on after instrument installed, 2020-01-03 14:02 to 2020-01-07
+  # 09:04
+  if ('PM25C : Status' %in% names(df)) {
+    df$`PM25C : Status`[df$instrument_time >= as.POSIXct('2020-01-03 14:02', tz = 'UTC') &
+                        df$instrument_time < as.POSIXct('2020-01-07 09:04', tz = 'UTC')] = 1
+  }
+  df
+}
+
 transform_wfml_envidas = function(f) {
   df = read_wfml_envidas(f)
   ## get timestamps from date and time columns
@@ -21,6 +31,8 @@ transform_wfml_envidas = function(f) {
   ## ^ it's not really UTC but this keeps R from mucking with time
   ## zones
   df$record = 1:nrow(df) + 2
+
+  df = patch_wfml_envidas(df)
 
   ## get data frame of values
   df_vals = df[, grep(' : Value|instrument_time|record', names(df))]
