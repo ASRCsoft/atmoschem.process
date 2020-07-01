@@ -38,13 +38,12 @@ routine_dataset: $(clean_old_routine_out) $(new_processed_files)
 .PHONY: new_processed_data
 new_processed_data: $(new_processed_files)
 
-$(processed_dir)/%.csv: $(raw_zip) \
-  processingdb datasets/process_new_data.R
-	unzip -nq $(raw_zip) -d $(raw_dir) && \
+$(processed_dir)/%.csv: processingdb datasets/process_new_data.R
 	Rscript datasets/process_new_data.R $*
 
 .INTERMEDIATE: processingdb
-processingdb: $(sql_files)
+processingdb: $(sql_files) $(raw_zip)
+	unzip -nq $(raw_zip) -d $(raw_dir) && \
 	Rscript datasets/initdb.R
 
 .PHONY: clean_old_routine
