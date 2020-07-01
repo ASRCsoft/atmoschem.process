@@ -27,6 +27,12 @@ for (site in sites$abbreviation) {
     names(newp) = gsub('\\(AQS\\)', '\\(AQS flag\\)', names(newp))
     names(oldp) = gsub('\\(AQS_flag\\)', '\\(AQS flag\\)', names(oldp))
 
+    # fix a silly inconsistency in the lodge data
+    if (site == 'WFML') {
+      names(newp) = gsub('Precip \\(mm since 00Z\\)', 'Precip since 00Z \\(mm\\)', names(newp))
+      names(newp) = gsub('Precip \\(flag\\)', 'Precip since 00Z \\(flag\\)', names(newp))
+    }
+
     # make sure datasets have the same columns
     all_cols = union(names(newp), names(oldp))
     oldp[setdiff(names(newp), names(oldp))] = NA
