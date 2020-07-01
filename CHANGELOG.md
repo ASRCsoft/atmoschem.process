@@ -2,7 +2,16 @@
 
 ## [Unreleased]
 ### Added
+- Add 2020 2nd quarter WFMS, WFML, and PSP data flags.
+
+## [0.4.0] - 2020-07-01
+### Added
 - Add 2020 1st quarter WFMS, WFML, and PSP data flags.
+- Add site information file.
+- Add Addison Mesonet winds to PSP data.
+
+### Fixed
+- Remove incorrect WFMS wind speed maximums.
 
 ## [0.3.0] - 2020-05-11
 ### Added
