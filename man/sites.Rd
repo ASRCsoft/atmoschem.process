@@ -5,7 +5,7 @@
 \alias{sites}
 \title{Monitoring sites}
 \format{
-An object of class \code{data.frame} with 4 rows and 5 columns.
+An object of class \code{data.frame} with 4 rows and 6 columns.
 }
 \usage{
 sites
