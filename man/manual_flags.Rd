@@ -5,7 +5,7 @@
 \alias{manual_flags}
 \title{Measurement flags}
 \format{
-An object of class \code{data.frame} with 360 rows and 6 columns.
+An object of class \code{data.frame} with 369 rows and 6 columns.
 }
 \usage{
 manual_flags

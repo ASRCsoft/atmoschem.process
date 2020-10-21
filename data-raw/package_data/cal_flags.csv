@@ -70,6 +70,10 @@ WFMS,campbell,CO,zero,"[2019-12-21 04:00, 2020-01-08 12:00)",pump seized
 WFMS,campbell,CO,span,"[2019-12-21 04:00, 2020-01-08 12:00)",pump seized
 WFMS,campbell,CO,zero,"[2020-02-25 18:00, 2020-03-05 09:00)",zero air valve off
 WFMS,campbell,CO,span,"[2020-02-25 18:00, 2020-03-05 09:00)",zero air valve off
+WFMS,campbell,CO,zero,"[2020-05-28 12:00, 2020-06-11 09:00)",pump issues
+WFMS,campbell,CO,span,"[2020-05-28 12:00, 2020-06-11 09:00)",pump issues
+WFMS,campbell,CO,zero,"[2020-06-21 14:00, 2020-06-24 09:00)",fuse
+WFMS,campbell,CO,span,"[2020-06-21 14:00, 2020-06-24 09:00)",fuse
 WFML,campbell,NO,zero,"[2018-12-14, 2018-12-18)",
 WFML,campbell,NOX,zero,"[2018-12-14, 2018-12-18)",
 WFML,campbell,CO,zero,"[2018-12-14, 2018-12-18)",
@@ -92,6 +96,14 @@ WFML,campbell,CO,span,"[2019-12-19, 2019-12-31)",power outages
 WFML,campbell,NO,zero,"[2019-12-19, 2019-12-31)",power outages
 WFML,campbell,NOX,zero,"[2019-12-19, 2019-12-31)",power outages
 WFML,campbell,NOX,span,"[2019-12-19, 2019-12-31)",power outages
+WFML,campbell,NO,zero,"[2020-05-20 23:00, 2020-05-26 11:00)",pump failed
+WFML,campbell,NO,span,"[2020-05-20 23:00, 2020-05-26 11:00)",pump failed
+WFML,campbell,NOX,zero,"[2020-05-20 23:00, 2020-05-26 11:00)",pump failed
+WFML,campbell,NOX,span,"[2020-05-20 23:00, 2020-05-26 11:00)",pump failed
+WFML,campbell,NO,zero,"[2020-06-02, 2020-06-05)",low ozone flow
+WFML,campbell,NO,span,"[2020-06-02, 2020-06-05)",low ozone flow
+WFML,campbell,NOX,zero,"[2020-06-02, 2020-06-05)",low ozone flow
+WFML,campbell,NOX,span,"[2020-06-02, 2020-06-05)",low ozone flow
 PSP,envidas,NO-DEC,zero,"[2018-10-23, 2018-11-09)",calibration
 PSP,envidas,NOx,CE,"[2019-01-02, 2019-02-02)",wrong NOx values recorded
 PSP,envidas,NOx,CE,"[2019-02-08, 2019-02-22)","new calibration instrument, values recorded before leveling off"
