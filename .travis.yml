@@ -8,7 +8,7 @@ sudo: required
 dist: xenial
 cache: packages
 before_install:
-  - sudo R CMD javareconf
+  - sudo $(which R) CMD javareconf
 apt_packages:
   - libv8-dev
   - ghostscript
