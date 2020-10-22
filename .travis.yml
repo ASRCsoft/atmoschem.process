@@ -8,6 +8,7 @@ sudo: required
 dist: xenial
 cache: packages
 apt_packages:
+  - default-jdk
   - libv8-dev
   - ghostscript
 r_binary_packages:
