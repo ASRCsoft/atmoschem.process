@@ -15,6 +15,7 @@ params_map = list(
     NO = 'NO_TEI',
     NO2 = 'NO2_TEI',
     NOy = 'NOy_TEI',
+    `PM2.5` = 'TMC',
     Precip = 'PRECIP',
     SO2 = 'SO2(MDL0.2)',
     T = 'Temp',
