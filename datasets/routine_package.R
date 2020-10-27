@@ -77,14 +77,14 @@ for (site in sites$abbreviation) {
   for (f in flag_cols) pout[is.na(pout[, f]), f] = 'M1'
 
   pout$`Time (EST)` = format(pout$`Time (EST)`, format = '%Y-%m-%d %H:%M')
-  write.csv(pout, file = out_file, row.names = FALSE)
+  write.csv(pout, file = out_file, na = '', row.names = FALSE)
 }
 
 # Supplementary data
 
 ## site info
 write.csv(format(sites, nsmall = 5), file = file.path(out_dir, 'sites.csv'),
-          row.names = FALSE)
+          na = '', row.names = FALSE)
 
 ## instrument info
 # match column measurements to measurement instruments
@@ -95,4 +95,4 @@ column_insts = nysatmoschem:::merge_timerange(report_columns, measurement_insts,
 instr_cols = c('site', 'column', 'times', 'brand', 'model', 'serial_number')
 instruments = column_insts[, instr_cols]
 instr_path = file.path(out_dir, 'instruments.csv')
-write.csv(instruments, file = instr_path, row.names = FALSE)
+write.csv(instruments, file = instr_path, na = '', row.names = FALSE)
