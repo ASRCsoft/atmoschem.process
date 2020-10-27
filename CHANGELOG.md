@@ -14,7 +14,7 @@
 - Add rows for hours with no data.
 
 ### Fixed
-- Include WFMS PM2.5 before 2018-10-01.
+- Include Pinnacle PM2.5 before 2018-10-01.
 
 ## [0.4.0] - 2020-07-01
 ### Added
