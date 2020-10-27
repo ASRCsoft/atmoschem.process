@@ -206,7 +206,7 @@ patch_psp = function(f, df) {
 patch_qc = function(f, df) {
   ## fix methane with incorrect units
   if (df$`Time (EST)`[1] == '2008-01-01 00:00') {
-    df$`CH₄ (ppbC)` = 1000 * df$`CH4 (ug/m3)`
+    df$`CH4 (ppbC)` = 1000 * df$`CH4 (ug/m3)`
   }
   if ('CH4 (ug/m3)' %in% names(df)) {
     df[, 'CH4 (ug/m3)'] = NULL
