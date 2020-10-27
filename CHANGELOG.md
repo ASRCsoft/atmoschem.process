@@ -2,7 +2,19 @@
 
 ## [Unreleased]
 ### Added
+- Add 2020 3rd quarter WFMS, WFML, and PSP data flags.
+
+## [0.5.0] - 2020-10-26
+### Added
 - Add 2020 2nd quarter WFMS, WFML, and PSP data flags.
+- Add site elevation to sites file.
+
+### Changed
+- Use empty string instead of "NA" for missing values.
+- Add rows for hours with no data.
+
+### Fixed
+- Include WFMS PM2.5 before 2018-10-01.
 
 ## [0.4.0] - 2020-07-01
 ### Added

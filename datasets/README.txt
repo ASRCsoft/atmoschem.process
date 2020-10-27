@@ -2,7 +2,7 @@
 
 These files contain the ASRC's routine meteorological and chemistry data from
 the Whiteface Mountain summit (WFMS), the Whiteface Mountain lodge (WFML),
-Pinnacle State Park (PSP), and Queens College (QC) up to 2020-05-01. Along with
+Pinnacle State Park (PSP), and Queens College (QC) up to 2020-07-01. Along with
 data from ASRC instruments, the dataset also includes data from the NYS
 Department of Environmental Conservation, the NYS Mesonet, and the EPA's Air
 Quality System.

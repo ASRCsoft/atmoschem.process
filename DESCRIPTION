@@ -1,6 +1,6 @@
 Package: nysatmoschem
 Title: The ASRC NYS Atmospheric Chemistry Database
-Version: 0.4.0
+Version: 0.5.0
 Authors@R: c(
     person("William", "May", email = "wcmay@albany.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-3201-1885")),
     person("SUNY RF", role = "cph"))
@@ -47,4 +47,4 @@ Remotes:
     bergant/datamodelr,
     pridiltal/staplr
 VignetteBuilder: knitr
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
