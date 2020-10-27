@@ -83,8 +83,8 @@ for (site in sites$abbreviation) {
 # Supplementary data
 
 ## site info
-write.csv(format(sites, nsmall = 5), file = file.path(out_dir, 'sites.csv'),
-          na = '', row.names = FALSE)
+write.csv(sites, file = file.path(out_dir, 'sites.csv'), na = '',
+          row.names = FALSE)
 
 ## instrument info
 # match column measurements to measurement instruments
