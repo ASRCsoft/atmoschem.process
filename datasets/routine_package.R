@@ -66,10 +66,17 @@ for (site in sites$abbreviation) {
     pout = oldp
   }
 
+  # add missing hours
+  pout$`Time (EST)` = as.POSIXct(pout$`Time (EST)`, tz = 'EST')
+  hours = seq.POSIXt(min(pout$`Time (EST)`), max(pout$`Time (EST)`), by = 'hour')
+  pout = merge(data.frame('Time (EST)' = hours, check.names = F), pout,
+               all.x = T)
+
   # replace NA flags with M1
   flag_cols = subset(cols, flag & !aqs_flag)$name
   for (f in flag_cols) pout[is.na(pout[, f]), f] = 'M1'
 
+  pout$`Time (EST)` = format(pout$`Time (EST)`, format = '%Y-%m-%d %H:%M')
   write.csv(pout, file = out_file, row.names = FALSE)
 }
 
