@@ -13,7 +13,8 @@ measurements to hourly values. All measurements are accompanied by flags
 following NARSTO guidelines (see
 cdiac.ess-dive.lbl.gov/programs/NARSTO/metadatastandards/consensus_flag_standard_20011105.pdf).
 Whiteface Mountain data before 2001 was not originally flagged, and M1 and V0
-flags have been added retroactively.
+flags have been added retroactively. Queens College data is collected from the
+EPA's Air Quality System and updated on a different schedule than other sites.
 
 WS_raw and WD_raw columns are raw averages of wind speed and wind direction
 measurements, respectively. These values are sometimes misleading and should be
