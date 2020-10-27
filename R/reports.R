@@ -130,23 +130,6 @@ format_report_data = function(con, columns, mtype_ids, times,
     ## remove values with M1 flag
     dfwide[dfwide[, col_n + 1] == 'M1', col_n] = NA
   }
-
-  ## if the report includes ultrafine data, need to include an AQS
-  ## flag column
-  if (any(grepl('Ultrafine', columns))) {
-    ## get the relevant column names
-    ultra_n = grep('Ultrafine', columns)[1]
-    ultra_col = columns[ultra_n]
-    aqs_col = paste(ultra_col, '(AQS flag)')
-    narsto_col = paste0(ultra_col, ' (', flag_str, ')')
-    ## get the flags
-    ultra_id = mtype_ids[ultra_n]
-    dfwide[, aqs_col] =
-      get_aqs_flags(con, ultra_id, dfwide$`Time (EST)`, dfwide[, narsto_col])
-    ## fix the column ordering
-    dfwide = dfwide[, c(1:(1 + ultra_n * 2), ncol(dfwide),
-                        (2 + ultra_n * 2):(ncol(dfwide) - 1))]
-  }
   
   dfwide
 }
