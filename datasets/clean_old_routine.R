@@ -52,6 +52,7 @@ drop_list = c(
     'PSA (cm2/m3)',
     'SO2(MDL2) (ppbv)',
     'SR_2 (W/m2)',
+    'Ultrafine PM (AQS flag)',
     'WD_ELM (dir_qualifier)',
     'WS_ELM (m/s)',
     'WD_raw (degrees)',
