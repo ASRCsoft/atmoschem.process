@@ -28,3 +28,7 @@
 
 #' Monitoring sites
 "sites"
+
+#' NARSTO flag definitions taken from
+#' "Developing Data Management Policy and Guidance Documents for your NARSTO Program or Project"
+"narsto_flags"
