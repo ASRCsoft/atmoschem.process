@@ -5,3 +5,6 @@
 ^nysatmoschem\.Rproj$
 ^\.Rproj\.user$
 ^Makefile$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
