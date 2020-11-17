@@ -14,6 +14,7 @@ Imports:
     dbx,
     dplyr,
     lubridate,
+    Rdpack,
     readxl,
     RPostgreSQL,
     R.utils,
@@ -48,3 +49,4 @@ Remotes:
     pridiltal/staplr
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1
+RdMacros: Rdpack
