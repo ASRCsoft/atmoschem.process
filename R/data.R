@@ -1,5 +1,3 @@
-#' @importFrom Rdpack reprompt
-
 #' The instrument auto-calibration schedule
 "autocals"
 

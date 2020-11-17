@@ -1,6 +1,7 @@
 ## process data
 
 #' @importFrom lubridate %within%
+#' @importFrom Rdpack reprompt
 
 get_mtype_params = function(obj, m_id) {
   obj %>% tbl('measurement_types') %>%
