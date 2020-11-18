@@ -2,7 +2,7 @@
 
 library(magrittr)
 
-out_dir = 'datasets/cleaned/old_routine'
+out_dir = 'analysis/cleaned/old_routine'
 site = commandArgs(trailingOnly = TRUE)[1]
 
 ## convert a list to a named vector
@@ -341,7 +341,7 @@ order_columns = function(x) {
 }
 
 write_site_file = function(site, ...) {
-  site_path = file.path('datasets/raw/routine_chemistry_v0.1', site)
+  site_path = file.path('analysis/raw/routine_chemistry_v0.1', site)
   files = site_path %>%
     list.files(full.names = T) %>%
     subset(., !grepl('instruments', .)) %>%

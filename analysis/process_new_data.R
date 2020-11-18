@@ -4,7 +4,7 @@ library(nysatmoschem)
 
 site = commandArgs(trailingOnly = TRUE)[1]
 dbname = 'nysatmoschemdb'
-outdir = 'datasets/cleaned/processed_data'
+outdir = 'analysis/cleaned/processed_data'
 
 # organize the ETL object
 dbcon = src_postgres(dbname = dbname)

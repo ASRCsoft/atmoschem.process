@@ -10,9 +10,9 @@ pkgdata_rda := $(patsubst data-raw/package_data/%.csv,data/%.rda,$(pkgdata_csv))
 build_file := $(PKGNAME)_$(PKGVERS).tar.gz
 ## Data processing variables
 sites := WFMS WFML PSP QC
-raw_dir := datasets/raw
-cleaned_dir := datasets/cleaned
-out_dir := datasets/out
+raw_dir := analysis/raw
+cleaned_dir := analysis/cleaned
+out_dir := analysis/out
 download_url := http://atmoschem.asrc.cestm.albany.edu/~aqm/AQM_Products/downloads
 routine_zip := $(raw_dir)/routine_chemistry_v0.1.zip
 clean_old_routine_out := $(patsubst %,$(cleaned_dir)/old_routine/%.csv,$(sites))
@@ -31,27 +31,27 @@ all: routine_dataset
 .PHONY: routine_dataset
 routine_dataset: $(clean_old_routine_out) $(new_processed_files)
 	mkdir -p $(out_dir)/$(routine_out) && \
-	Rscript datasets/routine_package.R $(out_dir)/$(routine_out)
-	cp datasets/README.txt $(out_dir)/$(routine_out)
+	Rscript analysis/routine_package.R $(out_dir)/$(routine_out)
+	cp analysis/README.txt $(out_dir)/$(routine_out)
 	cd $(out_dir); zip -r $(routine_out).zip $(routine_out)
 
 .PHONY: new_processed_data
 new_processed_data: $(new_processed_files)
 
-$(processed_dir)/%.csv: processingdb datasets/process_new_data.R
-	Rscript datasets/process_new_data.R $*
+$(processed_dir)/%.csv: processingdb analysis/process_new_data.R
+	Rscript analysis/process_new_data.R $*
 
 .INTERMEDIATE: processingdb
 processingdb: $(sql_files) $(raw_zip)
 	unzip -nq $(raw_zip) -d $(raw_dir) && \
-	Rscript datasets/initdb.R
+	Rscript analysis/initdb.R
 
 .PHONY: clean_old_routine
 clean_old_routine: $(clean_old_routine_out)
 
-$(cleaned_dir)/old_routine/%.csv: $(routine_zip) datasets/clean_old_routine.R
+$(cleaned_dir)/old_routine/%.csv: $(routine_zip) analysis/clean_old_routine.R
 	unzip -nq $(routine_zip) -d $(raw_dir) && \
-	Rscript datasets/clean_old_routine.R $*
+	Rscript analysis/clean_old_routine.R $*
 
 $(raw_dir)/%.zip:
 	mkdir -p $(raw_dir) && \
