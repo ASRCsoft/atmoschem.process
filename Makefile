@@ -64,8 +64,14 @@ check: $(build_file)
 	R CMD check --no-manual $(build_file)
 
 .PHONY: install
-install: install_deps $(build_file)
-	R CMD INSTALL $(build_file)
+install: docs
+	Rscript \
+	-e 'if (!requireNamespace("devtools")) install.packages("devtools")' \
+	-e 'devtools::install(build = FALSE)'
+# this alternative installation method is inconvenient due to the very slow
+# build step
+# install: install_deps $(build_file)
+# 	R CMD INSTALL $(build_file)
 
 .INTERMEDIATE: install_deps
 install_deps: DESCRIPTION
