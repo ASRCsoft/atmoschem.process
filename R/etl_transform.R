@@ -84,8 +84,8 @@ get_load_path = function(obj, raw_path) {
 #' @import etl
 #' @inheritParams etl::etl_transform
 #' @export
-etl_transform.etl_nysatmoschem = function(obj, sites = NULL, data_sources = NULL,
-                                          years = NULL, clobber = FALSE, ...) {
+etl_transform.etl_atmoschem.process = function(obj, sites = NULL, data_sources = NULL,
+                                               years = NULL, clobber = FALSE, ...) {
   glob_strs = make_file_globs(attr(obj, 'raw_dir'),
                               sites, data_sources, years)
   f_paths = Sys.glob(glob_strs)

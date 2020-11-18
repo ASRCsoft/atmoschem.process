@@ -1,4 +1,4 @@
-library(nysatmoschem)
+library(atmoschem.process)
 
 dbname = 'nysatmoschem_unit_test_tmp'
 setup({
@@ -13,7 +13,7 @@ test_that('etl_init works', {
   skip_if_not(tmp_db_available)
   dbcon = src_postgres(dbname = dbname)
   on.exit(DBI::dbDisconnect(dbcon$con))
-  nysac = etl('nysatmoschem', db = dbcon)
+  nysac = etl('atmoschem.process', db = dbcon)
   ## expect no error
   expect_error(etl_init(nysac), NA)
 })

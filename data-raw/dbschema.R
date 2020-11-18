@@ -2,7 +2,7 @@
 
 library(DBI)
 library(datamodelr)
-library(nysatmoschem)
+library(atmoschem.process)
 
 ## create an empty temporary postgres database
 dbname = basename(tempfile(pattern=''))
@@ -15,9 +15,9 @@ on.exit({
   system2('dropdb', dbname)
 })
 
-## set up the nysatmoschem schema
+## set up the atmoschem.process schema
 dbcon = src_postgres(dbname = dbname)
-nysac = etl('nysatmoschem', db = dbcon, dir = 'data')
+nysac = etl('atmoschem.process', db = dbcon, dir = 'data')
 nysac %>% etl_init()
 
 ## get the schema info

@@ -9,7 +9,7 @@ run_sql_script = function(pg, f) {
 }
 
 read_meta_csv = function(name) {
-  metadata_path = system.file('extdata', package = 'nysatmoschem')
+  metadata_path = system.file('extdata', package = 'atmoschem.process')
   meta_csv = file.path(metadata_path,
                        paste(name, 'csv', sep = '.'))
   read.csv(meta_csv, na.strings=c('', 'NA'))
@@ -102,13 +102,14 @@ find_schema <- function(obj, schema_name = "init",
 #' @examples
 #' \dontrun{
 #' if (require(dplyr)) {
-#'   obj <- etl("nysatmoschem") %>%
+#'   obj <- etl("atmoschem.process") %>%
 #'     etl_create()
 #' }
 #' }
-etl_init.etl_nysatmoschem = function(obj, script = NULL, schema_name = "init",
-                                     pkg = attr(obj, "pkg"),
-                                     ext = NULL, ...) {
+etl_init.etl_atmoschem.process = function(obj, script = NULL,
+                                          schema_name = "init",
+                                          pkg = attr(obj, "pkg"), ext = NULL,
+                                          ...) {
   ## make sure the database connection is good
   obj = etl:::verify_con(obj)
   if (!methods::is(obj$con, "DBIConnection")) {

@@ -1,4 +1,4 @@
-Package: nysatmoschem
+Package: atmoschem.process
 Title: The ASRC NYS Atmospheric Chemistry Database
 Version: 0.5.0
 Authors@R: c(

@@ -1,6 +1,6 @@
 # Set up the processing database
 
-library(nysatmoschem)
+library(atmoschem.process)
 
 dbname = 'nysatmoschemdb'
 # delete database if it already exists, then create it
@@ -9,7 +9,7 @@ system2('createdb', args = dbname)
 
 # organize the ETL object
 dbcon = src_postgres(dbname = dbname)
-nysac = etl('nysatmoschem', db = dbcon)
+nysac = etl('atmoschem.process', db = dbcon)
 attr(nysac, 'raw_dir') = 'analysis/raw/raw_data_v0.3'
 attr(nysac, 'load_dir') = 'analysis/cleaned/raw_data'
 etl_init(nysac)

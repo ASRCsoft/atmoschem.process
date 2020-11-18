@@ -1,4 +1,4 @@
 library(testthat)
-library(nysatmoschem)
+library(atmoschem.process)
 
-test_check("nysatmoschem")
+test_check("atmoschem.process")

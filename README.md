@@ -39,14 +39,14 @@ You will be asked for the atmoschem server's data password (twice), which can be
 The R package comes with a Shiny app for viewing the processing steps. After data has been processed, it can be opened from within R:
 
 ```R
-library(nysatmoschem)
-# Create a postgres database connection and nysatmoschem dataset object
+library(atmoschem.process)
+# Create a postgres database connection and atmoschem.process dataset object
 dbcon = src_postgres(dbname = 'nysatmoschemdb', user = 'user')
-nysac = etl('nysatmoschem', db = dbcon, dir = 'data')
+nysac = etl('atmoschem.process', db = dbcon, dir = 'data')
 # Open the Shiny app
 view_processing(nysac)
 ```
 
 ## License
 
-`nysatmoschem` is released under the open source MIT license.
+`atmoschem.process` is released under the open source MIT license.

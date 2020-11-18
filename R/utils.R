@@ -215,5 +215,5 @@ get_measurement_type_id = function(pg, site,
 view_processing = function(obj) {
   shiny::shinyOptions(obj = obj)
   shiny::shinyOptions(pg = obj$con)
-  shiny::runApp(system.file('processing_viewer', package = 'nysatmoschem'))
+  shiny::runApp(system.file('processing_viewer', package = 'atmoschem.process'))
 }

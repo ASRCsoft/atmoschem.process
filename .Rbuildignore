@@ -2,7 +2,7 @@
 ^Meta$
 ^doc$
 ^data-raw$
-^nysatmoschem\.Rproj$
+^atmoschem\.process\.Rproj$
 ^\.Rproj\.user$
 ^Makefile$
 ^_pkgdown\.yml$

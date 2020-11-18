@@ -19,7 +19,7 @@
     if (!is.na(file_id)) {
       if (clobber) {
         ## this file's data should have been removed earlier in
-        ## `etl_load.etl_nysatmoschem`
+        ## `etl_load.etl_atmoschem.process`
         stop('error clobbering file ', f_i)
         ## ## remove the existing file data -- removing the file will
         ## ## remove all its associated data thanks to cascade options in
@@ -80,8 +80,9 @@ even_smarter_upload = function(obj, f, site, measurement,
 #' @import etl
 #' @inheritParams etl::etl_load
 #' @export
-etl_load.etl_nysatmoschem = function(obj, sites = NULL, data_sources = NULL,
-                                     years = NULL, clobber = FALSE, ...) {
+etl_load.etl_atmoschem.process = function(obj, sites = NULL,
+                                          data_sources = NULL, years = NULL,
+                                          clobber = FALSE, ...) {
   glob_strs = make_file_globs(attr(obj, 'load_dir'),
                               sites, data_sources, years)
   f_paths = Sys.glob(glob_strs)

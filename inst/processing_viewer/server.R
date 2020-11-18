@@ -3,7 +3,7 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(DBI)
-library(nysatmoschem)
+library(atmoschem.process)
 
 obj = getShinyOption('obj')
 pg = getShinyOption('pg')
@@ -53,13 +53,13 @@ get_processed = function(measure, t1, t2) {
 
 get_filtered_cals = function(m, times, type) {
   if (type == 'zero') {
-    cals = nysatmoschem:::estimate_zeros(obj, m, times)
+    cals = atmoschem.process:::estimate_zeros(obj, m, times)
   } else if (type == 'span') {
-    cals = nysatmoschem:::estimate_spans(obj, m, times)
+    cals = atmoschem.process:::estimate_spans(obj, m, times)
   } else {
     stop('calibration type not recognized')
   }
-  breaks = nysatmoschem:::get_cal_breaks(obj, m, type)
+  breaks = atmoschem.process:::get_cal_breaks(obj, m, type)
   if (length(breaks) > 0) {
     segments = findInterval(times, breaks)
     time_list = split(times, segments)
@@ -91,7 +91,7 @@ get_filtered_cals = function(m, times, type) {
 
 get_cals = function(measure, t1, t2) {
   zeros = obj %>%
-    nysatmoschem:::get_cal_zeros(measure)
+    atmoschem.process:::get_cal_zeros(measure)
   if (nrow(zeros) > 0) {
     zeros = zeros %>%
       ## If we keep the values before and after the time range
@@ -111,7 +111,7 @@ get_cals = function(measure, t1, t2) {
   }
   ## now the spans
   spans = obj %>%
-    nysatmoschem:::get_cal_spans(measure)
+    atmoschem.process:::get_cal_spans(measure)
   if (nrow(spans) > 0) {
     spans = spans %>%
       select(time, ratio, flagged) %>%
@@ -130,12 +130,12 @@ get_cals = function(measure, t1, t2) {
 
 get_ces = function(measure, t1, t2) {
   ces = obj %>%
-    nysatmoschem:::get_ces(measure)
+    atmoschem.process:::get_ces(measure)
   if (nrow(ces) > 0) {
     ces = ces %>%
       select(time, efficiency, flagged) %>%
       mutate(filtered_value =
-               nysatmoschem:::estimate_ces(obj, measure, time)) %>%
+               atmoschem.process:::estimate_ces(obj, measure, time)) %>%
       filter(ifelse(is.na(lead(time)), time > t1, lead(time) > t1),
              ifelse(is.na(lag(time)), time < t2, lag(time) < t2)) %>%
       gather(filtered, value, -time, -flagged) %>%
@@ -234,8 +234,8 @@ make_processing_plot = function(m, t1, t2, plot_types,
   if (any(df$Filtered)) {
     raw_df = subset(df, !Filtered)
     filtered_df = subset(df, Filtered)
-    zero_breaks = nysatmoschem:::get_cal_breaks(obj, m, 'zero')
-    span_breaks = nysatmoschem:::get_cal_breaks(obj, m, 'span')
+    zero_breaks = atmoschem.process:::get_cal_breaks(obj, m, 'zero')
+    span_breaks = atmoschem.process:::get_cal_breaks(obj, m, 'span')
     combined_breaks = c(zero_breaks, span_breaks)
     if (!is.null(combined_breaks)) {
       breaks_df = data.frame(breaks = c(zero_breaks, span_breaks),
