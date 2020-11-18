@@ -33,8 +33,13 @@
 #' "Developing Data Management Policy and Guidance Documents for your NARSTO Program or Project"
 "narsto_flags"
 
-#' EPA AQS qualifier flag definitions
+#' AQS data qualifier flag definitions
 #'
-#' This dataset was downloaded from the AQS website. An additional column with
-#' the corresponding NARSTO flag was added by the ASRC.
+#' Flag definitions used by the EPA's Air Quality System
+#' \insertCite{us_environmental_protection_agency_air_nodate}{nysatmoschem}, as
+#' provided by the EPA. An additional column with the corresponding NARSTO flags
+#' was added by the ASRC.
+#'
+#' @references \insertAllCited{}
+#' @seealso \url{https://aqs.epa.gov/aqsweb/documents/codetables/qualifiers.html}
 "aqs_flags"

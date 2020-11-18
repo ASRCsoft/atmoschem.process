@@ -3,7 +3,7 @@
 \docType{data}
 \name{aqs_flags}
 \alias{aqs_flags}
-\title{EPA AQS qualifier flag definitions}
+\title{AQS data qualifier flag definitions}
 \format{
 An object of class \code{data.frame} with 163 rows and 7 columns.
 }
@@ -11,7 +11,15 @@ An object of class \code{data.frame} with 163 rows and 7 columns.
 aqs_flags
 }
 \description{
-This dataset was downloaded from the AQS website. An additional column with
-the corresponding NARSTO flag was added by the ASRC.
+Flag definitions used by the EPA's Air Quality System
+\insertCite{us_environmental_protection_agency_air_nodate}{nysatmoschem}, as
+provided by the EPA. An additional column with the corresponding NARSTO flags
+was added by the ASRC.
+}
+\references{
+\insertAllCited{}
+}
+\seealso{
+\url{https://aqs.epa.gov/aqsweb/documents/codetables/qualifiers.html}
 }
 \keyword{datasets}
