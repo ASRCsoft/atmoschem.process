@@ -1,13 +1,15 @@
 ---
-title: "ASRC NYS Atmospheric Chemistry Database"
+title: "Data Manager Standard Operating Procedures"
 author: "William May"
 date: "`r gsub(' 0', ' ', format(Sys.Date(), '%B %d, %Y'))`"
 output:
-  bookdown::pdf_document2:
+  bookdown::html_document2:
     toc: true
     number_sections: false
+pkgdown:
+  as_is: true
 vignette: >
-  %\VignetteIndexEntry{The ASRC NYS Atmospheric Chemistry Database (official documentation)}
+  %\VignetteIndexEntry{Data Manager Standard Operating Procedures}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 urlcolor: blue
@@ -22,7 +24,6 @@ header-includes:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, cache = FALSE)
-img_path = tempdir()
 ```
 
 # Overview
@@ -39,9 +40,7 @@ nodes = create_node_df(n_nodes, label = node_labels)
 edges = create_edge_df(c(1:4, rep(5, 2)),
                        c(rep(5, 4), 6:7))
 graph = create_graph(nodes, edges, attr_theme = NULL)
-overview_file = file.path(img_path, 'overview.pdf')
-graph %>% export_graph(file_name = overview_file)
-knitr::include_graphics(overview_file)
+render_graph(graph)
 ```
 
 The data goes through a complicated series of processing steps before being provided to researchers and bureaucrats for analysis. Figure \@ref(fig:processing) attempts to summarize these steps.
@@ -110,11 +109,7 @@ load(schema_file)
 
 dm_atmoschemdm = as.data_model(nysacdb_schema)
 graph = dm_create_graph(dm_atmoschemdm, rankdir = "RL", columnArrows = T)
-# do a silly dance to get the output in pdf
-schema_file = file.path(img_path, 'schema.pdf')
-rsvg::rsvg_pdf(charToRaw(DiagrammeRsvg::export_svg(dm_render_graph(graph))),
-               file = schema_file)
-knitr::include_graphics(schema_file)
+dm_render_graph(graph)
 ```
 
 # Getting Data
