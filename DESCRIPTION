@@ -3,6 +3,8 @@ Title: ASRC Atmospheric Chemistry Data Processing
 Version: 0.5.0
 Authors@R: c(
     person("William", "May", email = "wcmay@albany.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-3201-1885")),
+    person("James", "Schwab", role = "rev", comment = c(ORCID = "0000-0003-1343-4695")),
+    person("NYSERDA", role = "fnd"),
     person("SUNY RF", role = "cph"))
 Description: Functions, configuration files, and scripts for creating the ASRC's
     cleaned and processed atmospheric chemistry datasets. Tools to visualize the
