@@ -32,6 +32,9 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
           restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
 
+      - name: Install XQuartz on macOS
+        run: brew cask install xquartz
+
       - name: Configure Java
         run: R CMD javareconf
 
