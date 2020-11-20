@@ -25,7 +25,7 @@ Depends:
     R (>= 3.4.4),
     etl
 License: MIT + file LICENSE
-URL: https://github.com/ASRCsoft/nysatmoschem
+URL: https://github.com/ASRCsoft/atmoschem.process
 Encoding: UTF-8
 LazyData: true
 Suggests: 

@@ -1,38 +1,36 @@
-# Changelog
-
-## [Unreleased]
-### Added
+# version (development version) <small>Unreleased</small>
+## Added
 - Add 2020 3rd quarter WFMS, WFML, and PSP data flags.
 
-## [0.5.0] - 2020-10-26
-### Added
+# version 0.5.0 <small>2020-10-26</small>
+## Added
 - Add 2020 2nd quarter WFMS, WFML, and PSP data flags.
 - Add site elevation to sites file.
 
-### Changed
+## Changed
 - Use empty string instead of "NA" for missing values.
 - Add rows for hours with no data.
 
-### Fixed
+## Fixed
 - Include Pinnacle PM2.5 before 2018-10-01.
 
-## [0.4.0] - 2020-07-01
-### Added
+# version 0.4.0 <small>2020-07-01</small>
+## Added
 - Add 2020 1st quarter WFMS, WFML, and PSP data flags.
 - Add site information file.
 - Add Addison Mesonet winds to PSP data.
 
-### Fixed
+## Fixed
 - Remove incorrect WFMS wind speed maximums.
 
-## [0.3.0] - 2020-05-11
-### Added
+# version 0.3.0 <small>2020-05-11</small>
+## Added
 - Add 2019 4th quarter WFMS, WFML, and PSP data flags.
 - Add code for cleaning original processed routine data.
 - Add Makefile and scripts for reproducing the routine chemistry dataset
   package.
 
-### Changed
+## Changed
 - Prioritize V4 over V1 flags when both apply.
 - Replace NA flag values with M1.
 - Flag suspicious 1999-2001 WFMS CO drop as V4.
@@ -40,21 +38,21 @@
 - Reprocess all data starting from 2018-10-01.
 - Set R package version number to match dataset version.
 
-### Fixed
+## Fixed
 - Flag data and ignore calibrations during WFMS 300EU auto-reference (AREF)
   periods.
 - Correct a variety of WFMS and PSP wind direction issues in both the current
   and previously processed data.
 - Replace zeros with NA during PSP black carbon tape changes.
 
-## [0.1.3] - 2020-01-23
-### Added
+# version 0.1.3 <small>2020-01-23</small>
+## Added
 - Add 2019 1st, 2nd, and 3rd quarter data annotations.
 - Generate instrument info file with datasets.
 - Interpolate calibrator instrument flow values.
 - Add PSP aethelometer method detection limits.
 
-### Changed
+## Changed
 - Simplify and standardize high time resolution dataset files.
 - Improve PSP conversion efficiency calculations.
 - Improve outlier detection in the presence of missing or flagged
@@ -64,35 +62,35 @@
 - Use unicode sub- and superscripts in generated dataset column names.
 - Apply spike filter to WFMS ultrafine data.
 
-## [0.1.2] - 2019-08-16
-### Added
+# version 0.1.2 <small>2019-08-16</small>
+## Added
 - Add WFML 2018 4th quarter data annotations.
 - Add manual flags for calibrations.
 - Break calibration smoothing at instrument adjustment times.
 
-### Changed
+## Changed
 - Apply smoothing to zero and span calibration values.
 
-### Fixed
+## Fixed
 - Convert NYS Mesonet data times to EST.
 
-## [0.1.1] - 2019-06-10
-### Added
+# version 0.1.1 <small>2019-06-10</small>
+## Added
 - Add WFMS 2018 4th quarter data annotations.
 
-### Changed
+## Changed
 - Create separate minute files for each data source.
 - Flag negative WFMS 370nm black carbon and wood smoke values as below
   the method detection limit.
 - Treat zero WFMS 370nm and 880nm black carbon as missing data.
 
-## [0.1.0] - 2019-05-31
-### Added
+# version 0.1.0 <small>2019-05-31</small>
+## Added
 - Move raw data into PostgreSQL.
 - Automate data processing.
 - Add PSP 2018 4th quarter data annotations.
 
-### Changed
+## Changed
 - Correct for clock errors using linear interpolation rather than by
   discarding measurements with overlapping times.
 - Ignore ultrafine low pulse height flag.
@@ -104,7 +102,7 @@
 - Apply M1 flag to hours with >50% missing data.
 - Simplify data report format.
 
-### Fixed
+## Fixed
 - Fix bug ignoring ultrafine 'Nozzle Pressure' flag (400) instead of
   'Service Reminder' flag (4000).
 - Account for zero offsets when estimating calibration spans.
