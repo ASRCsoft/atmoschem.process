@@ -1,12 +1,12 @@
 Package: atmoschem.process
-Title: The ASRC NYS Atmospheric Chemistry Database
+Title: ASRC Atmospheric Chemistry Data Processing
 Version: 0.5.0
 Authors@R: c(
     person("William", "May", email = "wcmay@albany.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-3201-1885")),
     person("SUNY RF", role = "cph"))
-Description: An R package providing the ASRC NYS Atmospheric Chemistry
-    Database, along with tools to process and visualize the data and
-    generate reports.
+Description: Functions, configuration files, and scripts for creating the ASRC's
+    cleaned and processed atmospheric chemistry datasets. Tools to visualize the
+    data and generate reports are also included.
 Imports:
     caTools,
     DBI,
