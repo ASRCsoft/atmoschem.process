@@ -12,7 +12,7 @@ aqs_flags
 }
 \description{
 Flag definitions used by the EPA's Air Quality System
-\insertCite{us_environmental_protection_agency_air_nodate}{nysatmoschem}, as
+\insertCite{us_environmental_protection_agency_air_nodate}{atmoschem.process}, as
 provided by the EPA. An additional column with the corresponding NARSTO flags
 was added by the ASRC.
 }
