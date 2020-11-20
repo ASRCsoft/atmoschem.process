@@ -42,5 +42,5 @@ vignettes/*.pdf
 docs/
 
 # dataset build files
-datasets/*/
+analysis/*/
 docs
