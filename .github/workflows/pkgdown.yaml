@@ -32,11 +32,14 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
           restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
 
+      - name: Configure Java
+        run: R CMD javareconf
+
       - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE)
           install.packages("pkgdown", type = "binary")
-        shell: R CMD javareconf && Rscript {0}
+        shell: Rscript {0}
 
       - name: Install package
         run: R CMD INSTALL .
