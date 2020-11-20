@@ -35,9 +35,6 @@ jobs:
       - name: Install XQuartz on macOS
         run: brew cask install xquartz
 
-      - name: Configure Java
-        run: R CMD javareconf
-
       - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE)
