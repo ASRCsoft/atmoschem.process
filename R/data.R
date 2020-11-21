@@ -29,8 +29,13 @@
 #' Monitoring sites
 "sites"
 
-#' NARSTO flag definitions taken from
-#' "Developing Data Management Policy and Guidance Documents for your NARSTO Program or Project"
+#' NARSTO flag definitions
+#'
+#' Flag definitions used by NARSTO, as described in
+#' \insertCite{christensen_narsto_1999;textual}{atmoschem.process} and
+#' \insertCite{hook_developing_2005;textual}{atmoschem.process}.
+#'
+#' @references \insertAllCited{}
 "narsto_flags"
 
 #' AQS data qualifier flag definitions

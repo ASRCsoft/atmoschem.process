@@ -3,8 +3,7 @@
 \docType{data}
 \name{narsto_flags}
 \alias{narsto_flags}
-\title{NARSTO flag definitions taken from
-"Developing Data Management Policy and Guidance Documents for your NARSTO Program or Project"}
+\title{NARSTO flag definitions}
 \format{
 An object of class \code{data.frame} with 11 rows and 4 columns.
 }
@@ -12,7 +11,11 @@ An object of class \code{data.frame} with 11 rows and 4 columns.
 narsto_flags
 }
 \description{
-NARSTO flag definitions taken from
-"Developing Data Management Policy and Guidance Documents for your NARSTO Program or Project"
+Flag definitions used by NARSTO, as described in
+\insertCite{christensen_narsto_1999;textual}{atmoschem.process} and
+\insertCite{hook_developing_2005;textual}{atmoschem.process}.
+}
+\references{
+\insertAllCited{}
 }
 \keyword{datasets}
