@@ -47,8 +47,29 @@ in_interval = function(x, l, u, l_inc, u_inc) {
   res
 }
 
-## Rolling Median Absolute Deviation
-roll_mad = function(x, k) {
+#' Rolling median absolute deviation (MAD)
+#'
+#' Calculate the median absolute deviation (MAD) of a rolling window of values.
+#'
+#' The median absolute deviation (MAD) is a median-based alternative to the
+#' standard deviation often preferred for its robustness to outliers
+#' \insertCite{leys_detecting_2013}{atmoschem.process}. The MAD for a collection
+#' of values \eqn{X} is defined as
+#'
+#' \deqn{1.4826 \times \textrm{med}(\lvert X - \textrm{med}(X) \rvert)}{1.4826 * med(|X - med(X)|)}
+#'
+#' where the constant 1.4826 scales the result to estimate the standard
+#' deviation.
+#'
+#' @param x A vector of numbers.
+#' @param k Width of the rolling window (an odd integer).
+#' @return A vector of MADs.
+#' @examples
+#' rolling_mad(rnorm(20), 5)
+#'
+#' @references \insertAllCited{}
+#' @export
+rolling_mad = function(x, k) {
   n = length(x)
   k2 = floor(k / 2)
   ## surprisingly this seems to be the most practical way to calculate
@@ -76,7 +97,7 @@ roll_mad = function(x, k) {
 ## exception that no values are flagged if the MAD is zero
 hampel_outlier = function(x, k, threshold = 3.5) {
   medians = caTools::runquantile(x, k, probs = .5)
-  mads = roll_mad(x, k)
+  mads = rolling_mad(x, k)
   (mads != 0) & (abs(x - medians) / mads > threshold)
 }
 
