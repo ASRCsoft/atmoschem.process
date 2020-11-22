@@ -93,8 +93,38 @@ rolling_mad = function(x, k) {
   unlist(mads) * 1.4826
 }
 
-## this is the outlier detection used by the Hampel filter, with the
-## exception that no values are flagged if the MAD is zero
+#' Rolling outlier detection using the Hampel identifier
+#'
+#' Detect outliers in a rolling window using the Hampel identifier.
+#'
+#' The Hampel identifier uses the median absolute deviation (MAD) and a
+#' threshold to identify outliers based on their distance from the median
+#' \insertCite{davies_identification_1993}{atmoschem.process}. This is a robust
+#' alternative to the commonly used thresholds \eqn{mean \pm 3 \sigma}{mean
+#' +/-3sd} to identify outliers
+#' \insertCite{leys_detecting_2013}{atmoschem.process}.
+#'
+#' Values are classified as outliers when
+#' 
+#' \deqn{\frac{\lvert X_i - \textrm{med}(X) \rvert}{\textrm{MAD}(X)} >
+#' threshold}{|X_i - med(X)| / MAD(X) > threshold}
+#'
+#' When the MAD is zero this equation is undefined. In this case the function
+#' returns FALSE.
+#'
+#' @param x A vector of numbers.
+#' @param k Width of the rolling window (an odd integer).
+#' @param threshold Threshold for labeling outliers. For normally distributed
+#'   data this is equivalent to standard deviations.
+#' @return A vector of boolean values, TRUE if the value is an outlier.
+#' @examples
+#' # test a dataset with an outlier
+#' x <- rnorm(20)
+#' x[3] <- 10
+#' hampel_outlier(x, 5)
+#'
+#' @references \insertAllCited{}
+#' @export
 hampel_outlier = function(x, k, threshold = 3.5) {
   medians = caTools::runquantile(x, k, probs = .5)
   mads = rolling_mad(x, k)
