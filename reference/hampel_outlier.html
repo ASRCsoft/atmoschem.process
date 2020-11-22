@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>NARSTO flag definitions — narsto_flags • atmoschem.process</title>
+<title>Rolling outlier detection using the Hampel identifier — hampel_outlier • atmoschem.process</title>
 
 
 <!-- jquery -->
@@ -39,12 +39,8 @@
 
 
 
-<meta property="og:title" content="NARSTO flag definitions — narsto_flags" />
-<meta property="og:description" content="Flag definitions used by NARSTO, as described in
-Christensen et al. (1999)
- and
-Hook and Christensen (2005)
-." />
+<meta property="og:title" content="Rolling outlier detection using the Hampel identifier — hampel_outlier" />
+<meta property="og:description" content="Detect outliers in a rolling window using the Hampel identifier." />
 
 
 
@@ -127,33 +123,72 @@ Hook and Christensen (2005)
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>NARSTO flag definitions</h1>
-    <small class="dont-index">Source: <a href='https://github.com/ASRCsoft/atmoschem.process/blob/master/R/data.R'><code>R/data.R</code></a></small>
-    <div class="hidden name"><code>narsto_flags.Rd</code></div>
+    <h1>Rolling outlier detection using the Hampel identifier</h1>
+    <small class="dont-index">Source: <a href='https://github.com/ASRCsoft/atmoschem.process/blob/master/R/process.R'><code>R/process.R</code></a></small>
+    <div class="hidden name"><code>hampel_outlier.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Flag definitions used by NARSTO, as described in
-Christensen et al. (1999)
- and
-Hook and Christensen (2005)
-.</p>
+    <p>Detect outliers in a rolling window using the Hampel identifier.</p>
     </div>
 
-    <pre class="usage"><span class='va'>narsto_flags</span></pre>
+    <pre class="usage"><span class='fu'>hampel_outlier</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>k</span>, threshold <span class='op'>=</span> <span class='fl'>3.5</span><span class='op'>)</span></pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>x</th>
+      <td><p>A vector of numbers.</p></td>
+    </tr>
+    <tr>
+      <th>k</th>
+      <td><p>Width of the rolling window (an odd integer).</p></td>
+    </tr>
+    <tr>
+      <th>threshold</th>
+      <td><p>Threshold for labeling outliers. For normally distributed
+data this is equivalent to standard deviations.</p></td>
+    </tr>
+    </table>
 
-    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of class <code>data.frame</code> with 11 rows and 4 columns.</p>
+    <p>A vector of boolean values, TRUE if the value is an outlier.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>The Hampel identifier uses the median absolute deviation (MAD) and a
+threshold to identify outliers based on their distance from the median
+(Davies and Gather 1993)
+. This is a robust
+alternative to the commonly used thresholds \(mean \pm 3 \sigma\) to identify outliers
+(Leys et al. 2013)
+.</p>
+<p>Values are classified as outliers when</p>
+<p>$$\frac{\lvert X_i - \textrm{med}(X) \rvert}{\textrm{MAD}(X)} &gt;
+threshold$$</p>
+<p>When the MAD is zero this equation is undefined. In this case the function
+returns FALSE.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Christensen SW, Boden TA, Hook LA, Cheng M (1999).
-&#8220;NARSTO Data Management Handbook.&#8221;
-<a href='https://www.tceq.texas.gov/assets/public/implementation/air/da/data/NARSTO_dmhb_r2.pdf'>https://www.tceq.texas.gov/assets/public/implementation/air/da/data/NARSTO_dmhb_r2.pdf</a>.<br /><br /> Hook LA, Christensen SW (2005).
-&#8220;Developing Data Management Policy and Guidance Documents for your NARSTO Program or Project.&#8221;
-<a href='https://cdiac.ess-dive.lbl.gov/programs/NARSTO/DM_develop_guide.pdf'>https://cdiac.ess-dive.lbl.gov/programs/NARSTO/DM_develop_guide.pdf</a>.</p>
+    <p>Davies L, Gather U (1993).
+&#8220;The Identification of Multiple Outliers.&#8221;
+<em>Journal of the American Statistical Association</em>, <b>88</b>(423), 782--792.
+ISSN 0162-1459, doi: <a href='https://doi.org/10.1080/01621459.1993.10476339'>10.1080/01621459.1993.10476339</a>
+, Publisher: Taylor \&amp; Francis \_ eprint: https://www.tandfonline.com/doi/pdf/10.1080/01621459.1993.10476339, <a href='https://www.tandfonline.com/doi/abs/10.1080/01621459.1993.10476339'>https://www.tandfonline.com/doi/abs/10.1080/01621459.1993.10476339</a>.<br /><br /> Leys C, Ley C, Klein O, Bernard P, Licata L (2013).
+&#8220;Detecting outliers: Do not use standard deviation around the mean, use absolute deviation around the median.&#8221;
+<em>Journal of Experimental Social Psychology</em>, <b>49</b>(4), 764--766.
+ISSN 0022-1031, doi: <a href='https://doi.org/10.1016/j.jesp.2013.03.013'>10.1016/j.jesp.2013.03.013</a>
+, <a href='http://www.sciencedirect.com/science/article/pii/S0022103113000668'>http://www.sciencedirect.com/science/article/pii/S0022103113000668</a>.</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># test a dataset with an outlier</span>
+<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>20</span><span class='op'>)</span>
+<span class='va'>x</span><span class='op'>[</span><span class='fl'>3</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fl'>10</span>
+<span class='fu'>hampel_outlier</span><span class='op'>(</span><span class='va'>x</span>, <span class='fl'>5</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  [1] FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+#&gt; [13] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

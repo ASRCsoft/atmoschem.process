@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>NARSTO flag definitions — narsto_flags • atmoschem.process</title>
+<title>Rolling median absolute deviation (MAD) — rolling_mad • atmoschem.process</title>
 
 
 <!-- jquery -->
@@ -39,12 +39,8 @@
 
 
 
-<meta property="og:title" content="NARSTO flag definitions — narsto_flags" />
-<meta property="og:description" content="Flag definitions used by NARSTO, as described in
-Christensen et al. (1999)
- and
-Hook and Christensen (2005)
-." />
+<meta property="og:title" content="Rolling median absolute deviation (MAD) — rolling_mad" />
+<meta property="og:description" content="Calculate the median absolute deviation (MAD) of a rolling window of values." />
 
 
 
@@ -127,33 +123,58 @@ Hook and Christensen (2005)
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>NARSTO flag definitions</h1>
-    <small class="dont-index">Source: <a href='https://github.com/ASRCsoft/atmoschem.process/blob/master/R/data.R'><code>R/data.R</code></a></small>
-    <div class="hidden name"><code>narsto_flags.Rd</code></div>
+    <h1>Rolling median absolute deviation (MAD)</h1>
+    <small class="dont-index">Source: <a href='https://github.com/ASRCsoft/atmoschem.process/blob/master/R/process.R'><code>R/process.R</code></a></small>
+    <div class="hidden name"><code>rolling_mad.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Flag definitions used by NARSTO, as described in
-Christensen et al. (1999)
- and
-Hook and Christensen (2005)
-.</p>
+    <p>Calculate the median absolute deviation (MAD) of a rolling window of values.</p>
     </div>
 
-    <pre class="usage"><span class='va'>narsto_flags</span></pre>
+    <pre class="usage"><span class='fu'>rolling_mad</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>k</span><span class='op'>)</span></pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>x</th>
+      <td><p>A vector of numbers.</p></td>
+    </tr>
+    <tr>
+      <th>k</th>
+      <td><p>Width of the rolling window (an odd integer).</p></td>
+    </tr>
+    </table>
 
-    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of class <code>data.frame</code> with 11 rows and 4 columns.</p>
+    <p>A vector of MADs.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>The median absolute deviation (MAD) is a median-based alternative to the
+standard deviation often preferred for its robustness to outliers
+(Leys et al. 2013)
+. The MAD for a collection
+of values \(X\) is defined as</p>
+<p>$$1.4826 \times \textrm{med}(\lvert X - \textrm{med}(X) \rvert)$$</p>
+<p>where the constant 1.4826 scales the result to estimate the standard
+deviation.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Christensen SW, Boden TA, Hook LA, Cheng M (1999).
-&#8220;NARSTO Data Management Handbook.&#8221;
-<a href='https://www.tceq.texas.gov/assets/public/implementation/air/da/data/NARSTO_dmhb_r2.pdf'>https://www.tceq.texas.gov/assets/public/implementation/air/da/data/NARSTO_dmhb_r2.pdf</a>.<br /><br /> Hook LA, Christensen SW (2005).
-&#8220;Developing Data Management Policy and Guidance Documents for your NARSTO Program or Project.&#8221;
-<a href='https://cdiac.ess-dive.lbl.gov/programs/NARSTO/DM_develop_guide.pdf'>https://cdiac.ess-dive.lbl.gov/programs/NARSTO/DM_develop_guide.pdf</a>.</p>
+    <p>Leys C, Ley C, Klein O, Bernard P, Licata L (2013).
+&#8220;Detecting outliers: Do not use standard deviation around the mean, use absolute deviation around the median.&#8221;
+<em>Journal of Experimental Social Psychology</em>, <b>49</b>(4), 764--766.
+ISSN 0022-1031, doi: <a href='https://doi.org/10.1016/j.jesp.2013.03.013'>10.1016/j.jesp.2013.03.013</a>
+, <a href='http://www.sciencedirect.com/science/article/pii/S0022103113000668'>http://www.sciencedirect.com/science/article/pii/S0022103113000668</a>.</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>rolling_mad</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>20</span><span class='op'>)</span>, <span class='fl'>5</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  [1] 0.07798711 0.27785782 0.39974143 0.68258364 1.24301517 1.11747511
+#&gt;  [7] 1.08132519 1.01648642 1.01648642 1.20214937 1.12510745 1.02548140
+#&gt; [13] 0.19518041 0.09962606 0.36477163 0.36477163 0.21533316 0.21533316
+#&gt; [19] 0.02535894 1.02355283</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
