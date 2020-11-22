@@ -23,7 +23,7 @@ standard deviation often preferred for its robustness to outliers
 \insertCite{leys_detecting_2013}{atmoschem.process}. The MAD for a collection
 of values \eqn{X} is defined as
 
-\deqn{1.4826 \times \textrm{med}(\lvert X - \textrm{med}(X) \rvert)}{1.4826 * med(|X - med(X)|)}
+\deqn{1.4826 \times \textrm{med}(\left| X - \textrm{med}(X) \right|)}{1.4826 * med(|X - med(X)|)}
 
 where the constant 1.4826 scales the result to estimate the standard
 deviation.

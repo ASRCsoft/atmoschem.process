@@ -56,7 +56,7 @@ in_interval = function(x, l, u, l_inc, u_inc) {
 #' \insertCite{leys_detecting_2013}{atmoschem.process}. The MAD for a collection
 #' of values \eqn{X} is defined as
 #'
-#' \deqn{1.4826 \times \textrm{med}(\lvert X - \textrm{med}(X) \rvert)}{1.4826 * med(|X - med(X)|)}
+#' \deqn{1.4826 \times \textrm{med}(\left| X - \textrm{med}(X) \right|)}{1.4826 * med(|X - med(X)|)}
 #'
 #' where the constant 1.4826 scales the result to estimate the standard
 #' deviation.
@@ -106,7 +106,7 @@ rolling_mad = function(x, k) {
 #'
 #' Values are classified as outliers when
 #' 
-#' \deqn{\frac{\lvert X_i - \textrm{med}(X) \rvert}{\textrm{MAD}(X)} >
+#' \deqn{\frac{\left| X_i - \textrm{med}(X) \right|}{\textrm{MAD}(X)} >
 #' threshold}{|X_i - med(X)| / MAD(X) > threshold}
 #'
 #' When the MAD is zero this equation is undefined. In this case the function

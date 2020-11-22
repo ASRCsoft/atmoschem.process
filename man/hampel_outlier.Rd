@@ -30,7 +30,7 @@ alternative to the commonly used thresholds \eqn{mean \pm 3 \sigma}{mean
 
 Values are classified as outliers when
 
-\deqn{\frac{\lvert X_i - \textrm{med}(X) \rvert}{\textrm{MAD}(X)} >
+\deqn{\frac{\left| X_i - \textrm{med}(X) \right|}{\textrm{MAD}(X)} >
 threshold}{|X_i - med(X)| / MAD(X) > threshold}
 
 When the MAD is zero this equation is undefined. In this case the function
