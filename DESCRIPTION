@@ -16,7 +16,7 @@ Imports:
     dbx,
     dplyr,
     lubridate,
-    Rdpack,
+    Rdpack (>= 0.7),
     readxl,
     RPostgreSQL,
     R.utils,
