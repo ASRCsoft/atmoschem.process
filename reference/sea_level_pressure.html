@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • atmoschem.process</title>
+<title>Sea level pressure — sea_level_pressure • atmoschem.process</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,9 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Sea level pressure — sea_level_pressure" />
+<meta property="og:description" content="Estimate sea level pressure from local pressure, temperature, and height
+using the barometric formula." />
 
 
 
@@ -58,7 +60,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -120,139 +122,72 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Sea level pressure</h1>
+    <small class="dont-index">Source: <a href='https://github.com/ASRCsoft/atmoschem.process/blob/master/R/derived_values.R'><code>R/derived_values.R</code></a></small>
+    <div class="hidden name"><code>sea_level_pressure.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p>Estimate sea level pressure from local pressure, temperature, and height
+using the barometric formula.</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'>sea_level_pressure</span><span class='op'>(</span><span class='va'>press</span>, <span class='va'>temp</span>, <span class='va'>height</span><span class='op'>)</span></pre>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="aqs_flags.html">aqs_flags</a></code> </p>
-        </td>
-        <td><p>AQS data qualifier flag definitions</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="autocals.html">autocals</a></code> </p>
-        </td>
-        <td><p>The instrument auto-calibration schedule</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="cal_flags.html">cal_flags</a></code> </p>
-        </td>
-        <td><p>Calibration flags</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="clock_audits.html">clock_audits</a></code> </p>
-        </td>
-        <td><p>Clock audit results</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="epa_schedule.html">epa_schedule()</a></code> </p>
-        </td>
-        <td><p>Get the EPA monitoring day from a date</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="etl_init.etl_atmoschem.process.html">etl_init(<i>&lt;etl_atmoschem.process&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>My ETL functions</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="gilibrator.html">gilibrator</a></code> </p>
-        </td>
-        <td><p>Gilibrator flow measurements</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="hampel_outlier.html">hampel_outlier()</a></code> </p>
-        </td>
-        <td><p>Rolling outlier detection using the Hampel identifier</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="instruments.html">instruments</a></code> </p>
-        </td>
-        <td><p>Instruments</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="manual_flags.html">manual_flags</a></code> </p>
-        </td>
-        <td><p>Measurement flags</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="measurement_sources.html">measurement_sources</a></code> </p>
-        </td>
-        <td><p>Measurement instruments</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="measurement_types.html">measurement_types</a></code> </p>
-        </td>
-        <td><p>Information and processing instructions for each type of
-measurement</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="narsto_flags.html">narsto_flags</a></code> </p>
-        </td>
-        <td><p>NARSTO flag definitions</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="report_columns.html">report_columns</a></code> </p>
-        </td>
-        <td><p>Report column information</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="rolling_mad.html">rolling_mad()</a></code> </p>
-        </td>
-        <td><p>Rolling median absolute deviation (MAD)</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="sea_level_pressure.html">sea_level_pressure()</a></code> </p>
-        </td>
-        <td><p>Sea level pressure</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="sites.html">sites</a></code> </p>
-        </td>
-        <td><p>Monitoring sites</p></td>
-      </tr>
-    </tbody>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>press</th>
+      <td><p>Pressure in millibars.</p></td>
+    </tr>
+    <tr>
+      <th>temp</th>
+      <td><p>Temperature in Celsius.</p></td>
+    </tr>
+    <tr>
+      <th>height</th>
+      <td><p>Height above sea level in meters.</p></td>
+    </tr>
     </table>
-  </div>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Estimated sea level pressure.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>We estimate the sea level pressure using the barometric formula,</p>
+<p>$$P = P_0 (\frac{T_0}{T})^\frac{Mg}{R^*L}$$</p>
+<p>where \(P\) is pressure, \(T\) is temperature (in Kelvin), \(H\) is
+height, and \(L\) is the temperature lapse rate. Variables with subscript 0
+are the same at sea level. Substituting \(T_0 = T - LH\), we
+can solve for \(P_0\) in terms of pressure, temperature, and height:</p>
+<p>$$P_0 = P (\frac{T}{T - LH})^\frac{Mg}{R^*L}$$</p>
+<p>The values of physical constants are taken from
+COESA (1976)
+:</p>
+<dl>
+  <dt>\(L\) (lapse rate)</dt><dd><p>-.0065 K/m</p></dd>
+  <dt>\(M\) (molar mass of air)</dt><dd><p>0.0289644 kg/mol</p></dd>
+  <dt>\(g\) (gravitational acceleration)</dt><dd><p>9.80665 m/s^2</p></dd>
+  <dt>\(R^*\) (universal gas constant)</dt><dd><p>8.31432 J/(mol K)</p></dd>
+
+</dl>
+
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+
+    <p>COESA (1976).
+&#8220;U.S. Standard Atmosphere, 1976.&#8221;
+<a href='https://ntrs.nasa.gov/citations/19770009539'>https://ntrs.nasa.gov/citations/19770009539</a>.</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># estimate sea level pressure at the Whiteface Mountain summit</span>
+<span class='fu'>sea_level_pressure</span><span class='op'>(</span><span class='fl'>800</span>, <span class='fl'>30</span>, <span class='fl'>1483.5</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 943.1199</div><div class='input'>
+</div></pre>
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
