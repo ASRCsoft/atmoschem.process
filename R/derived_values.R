@@ -14,10 +14,45 @@ combine_measures = function(obj, site, data_source, m1, m2,
     collect()
 }
 
-sea_level_pressure = function(bp, ptemp, height, lapse_rate = .0065,
-                              gM_over_RstarL = -5.257) {
-  ptempK = ptemp + 273.15
-  bp * (ptempK / (ptempK + lapse_rate * height))^gM_over_RstarL
+#' Sea level pressure
+#'
+#' Estimate sea level pressure from local pressure, temperature, and height
+#' using the barometric formula.
+#'
+#' We estimate the sea level pressure using the barometric formula,
+#'
+#' \deqn{P = P_0 (\frac{T_0}{T})^\frac{Mg}{R^*L}}{P = P0 (T0/T)^(Mg / (Rstar L))}
+#'
+#' where \eqn{P} is pressure, \eqn{T} is temperature (in Kelvin), \eqn{H} is
+#' height, and \eqn{L} is the temperature lapse rate. Variables with subscript 0
+#' are the same at sea level. Substituting \eqn{T_0 = T - LH}{T0 = T - LH}, we
+#' can solve for \eqn{P_0}{P0} in terms of pressure, temperature, and height:
+#'
+#' \deqn{P_0 = P (\frac{T}{T - LH})^\frac{Mg}{R^*L}}{P0 = P (T/(T - LH))^(Mg/(Rstar L))}
+#'
+#' The values of physical constants are taken from
+#' \insertCite{coesa_us_1976;textual}{atmoschem.process}:
+#'
+#' \describe{
+#'   \item{\eqn{L} (lapse rate)}{-.0065 K/m}
+#'   \item{\eqn{M} (molar mass of air)}{0.0289644 kg/mol}
+#'   \item{\eqn{g} (gravitational acceleration)}{9.80665 m/s^2}
+#'   \item{\eqn{R^*}{Rstar} (universal gas constant)}{8.31432 J/(mol K)}
+#' }
+#'
+#' @param press Pressure in millibars.
+#' @param temp Temperature in Celsius.
+#' @param height Height above sea level in meters.
+#' @return Estimated sea level pressure.
+#' @examples
+#' # estimate sea level pressure at the Whiteface Mountain summit
+#' sea_level_pressure(800, 30, 1483.5)
+#'
+#' @references \insertAllCited{}
+#' @export
+sea_level_pressure = function(press, temp, height) {
+  tempK = temp + 273.15
+  press * (tempK / (tempK + .0065 * height))^(-5.256)
 }
 
 
