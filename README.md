@@ -1,6 +1,6 @@
 # ASRC Atmospheric Chemistry Data Processing Package
 
-[![Build Status](https://travis-ci.org/ASRCsoft/atmoschem.datasets.svg?branch=master)](https://travis-ci.org/ASRCsoft/atmoschem.datasets) [![R build status](https://github.com/ASRCsoft/atmoschem.process/workflows/R-CMD-check/badge.svg)](https://github.com/ASRCsoft/atmoschem.process/actions)
+[![Build Status](https://travis-ci.org/ASRCsoft/atmoschem.datasets.svg?branch=master)](https://travis-ci.org/ASRCsoft/atmoschem.datasets) [![R build status](https://github.com/ASRCsoft/atmoschem.process/workflows/R-CMD-check/badge.svg)](https://github.com/ASRCsoft/atmoschem.process/actions) [![Codecov test coverage](https://codecov.io/gh/ASRCsoft/atmoschem.process/branch/master/graph/badge.svg)](https://codecov.io/gh/ASRCsoft/atmoschem.process?branch=master)
 
 The ASRC Atmospheric Chemistry Data Processing Package processes atmospheric chemistry data from ASRC sites in New York State. It provides tools to generate reports and processed datasets from the ASRC's atmospheric chemistry data, and tools to visualize the data.
 

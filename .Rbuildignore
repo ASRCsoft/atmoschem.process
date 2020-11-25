@@ -10,3 +10,4 @@
 ^pkgdown$
 analysis
 ^\.github$
+^codecov\.yml$
