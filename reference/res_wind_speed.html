@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • atmoschem.process</title>
+<title>Resultant wind speed and direction — res_wind_speed • atmoschem.process</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,9 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Resultant wind speed and direction — res_wind_speed" />
+<meta property="og:description" content="Calculate the resultant wind speed and direction from a collection of wind
+speeds and directions." />
 
 
 
@@ -58,7 +60,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -120,145 +122,70 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Resultant wind speed and direction</h1>
+    <small class="dont-index">Source: <a href='https://github.com/ASRCsoft/atmoschem.process/blob/master/R/derived_values.R'><code>R/derived_values.R</code></a></small>
+    <div class="hidden name"><code>res_wind_speed.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p>Calculate the resultant wind speed and direction from a collection of wind
+speeds and directions.</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'>res_wind_speed</span><span class='op'>(</span><span class='va'>speed</span>, <span class='va'>dir</span>, na.rm <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="aqs_flags.html">aqs_flags</a></code> </p>
-        </td>
-        <td><p>AQS data qualifier flag definitions</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="autocals.html">autocals</a></code> </p>
-        </td>
-        <td><p>The instrument auto-calibration schedule</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="cal_flags.html">cal_flags</a></code> </p>
-        </td>
-        <td><p>Calibration flags</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="clock_audits.html">clock_audits</a></code> </p>
-        </td>
-        <td><p>Clock audit results</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="epa_schedule.html">epa_schedule()</a></code> </p>
-        </td>
-        <td><p>Get the EPA monitoring day from a date</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="etl_init.etl_atmoschem.process.html">etl_init(<i>&lt;etl_atmoschem.process&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>My ETL functions</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="gilibrator.html">gilibrator</a></code> </p>
-        </td>
-        <td><p>Gilibrator flow measurements</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="hampel_outlier.html">hampel_outlier()</a></code> </p>
-        </td>
-        <td><p>Rolling outlier detection using the Hampel identifier</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="instruments.html">instruments</a></code> </p>
-        </td>
-        <td><p>Instruments</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="manual_flags.html">manual_flags</a></code> </p>
-        </td>
-        <td><p>Measurement flags</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="measurement_sources.html">measurement_sources</a></code> </p>
-        </td>
-        <td><p>Measurement instruments</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="measurement_types.html">measurement_types</a></code> </p>
-        </td>
-        <td><p>Information and processing instructions for each type of
-measurement</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="narsto_flags.html">narsto_flags</a></code> </p>
-        </td>
-        <td><p>NARSTO flag definitions</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="report_columns.html">report_columns</a></code> </p>
-        </td>
-        <td><p>Report column information</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="res_wind_speed.html">res_wind_speed()</a></code> <code><a href="res_wind_speed.html">res_wind_dir()</a></code> </p>
-        </td>
-        <td><p>Resultant wind speed and direction</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="rolling_mad.html">rolling_mad()</a></code> </p>
-        </td>
-        <td><p>Rolling median absolute deviation (MAD)</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="sea_level_pressure.html">sea_level_pressure()</a></code> </p>
-        </td>
-        <td><p>Sea level pressure</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="sites.html">sites</a></code> </p>
-        </td>
-        <td><p>Monitoring sites</p></td>
-      </tr>
-    </tbody>
+<span class='fu'>res_wind_dir</span><span class='op'>(</span><span class='va'>speed</span>, <span class='va'>dir</span>, na.rm <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>speed</th>
+      <td><p>Wind speeds.</p></td>
+    </tr>
+    <tr>
+      <th>dir</th>
+      <td><p>Wind directions in degrees clockwise from north.</p></td>
+    </tr>
+    <tr>
+      <th>na.rm</th>
+      <td><p>A logical value indicating whether <code>NA</code> values should be
+stripped before the computation proceeds.</p></td>
+    </tr>
     </table>
-  </div>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p><code>res_wind_speed</code> returns the resultant wind
+  speed. <code>res_wind_dir</code> returns the resultant wind direction.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Resultant wind speeds are vector-averaged. We first find the average values
+of the east-west and north-south components,</p>
+<p>$$V_e = -\frac{1}{N} \sum u_i \sin(\theta_i)$$
+$$V_n = -\frac{1}{N} \sum u_i \cos(\theta_i)$$</p>
+<p>where \(u\) is the speed and \(\theta\) is the direction. The
+resultant speed and direction can then be calculated with</p>
+<p>$$U_R = \sqrt{V_e^2 + V_n^2}$$
+$$\theta_R = \textrm{arctan}(\frac{V_e}{V_n}) + 180$$</p>
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+
+    <p>U.S. Environmental Protection Agency (2000).
+&#8220;Meteorological Monitoring Guidance for Regulatory Modeling Applications.&#8221;
+<a href='https://www.epa.gov/sites/production/files/2020-10/documents/mmgrma_0.pdf'>https://www.epa.gov/sites/production/files/2020-10/documents/mmgrma_0.pdf</a>.</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># opposite winds cancel out</span>
+<span class='fu'>res_wind_speed</span><span class='op'>(</span><span class='fl'>1</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>180</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 6.123234e-17</div><div class='input'>
+<span class='co'># A scalar average would return 180 in this case. Resultant wind direction</span>
+<span class='co'># produces the correct value.</span>
+<span class='fu'>res_wind_dir</span><span class='op'>(</span><span class='fl'>1</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>355</span>, <span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 0</div><div class='input'>
+</div></pre>
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
