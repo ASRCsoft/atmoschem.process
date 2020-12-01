@@ -2,6 +2,31 @@
 
 #' @importFrom lubridate %within%
 #' @importFrom Rdpack reprompt
+NA
+
+#' Flag aggregated data
+#'
+#' Return the NARSTO flag for an aggregated measurement (for example, hourly
+#' average or maximum). See
+#' \insertCite{@ @narsto_consensus_2001, p. 10;textual}{atmoschem.process}.
+#'
+#' @param p Proportion of valid measurements.
+#' @param below_mdl Whether the aggregated value is below the method detection
+#'   limit. MDLs for aggregates are generally lower than the limits for
+#'   individual measurements.
+#' @return A NARSTO flag.
+#' @examples
+#' narsto_agg_flag(.7, below_mdl = FALSE)
+#'
+#' @references \insertAllCited{}
+#' @export
+narsto_agg_flag = function(p, below_mdl = FALSE) {
+  flag = rep('V0', length(p))
+  flag[below_mdl] = 'V1'
+  flag[p < .75] = 'V4'
+  flag[p < .5] = 'M1'
+  flag
+}
 
 get_mtype_params = function(obj, m_id) {
   obj %>% tbl('measurement_types') %>%
