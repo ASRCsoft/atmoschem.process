@@ -12,7 +12,7 @@ narsto_flags
 }
 \description{
 Flag definitions used by NARSTO, as described in
-\insertCite{christensen_narsto_1999;textual}{atmoschem.process} and
+\insertCite{christensen_narsto_2000;textual}{atmoschem.process} and
 \insertCite{hook_developing_2005;textual}{atmoschem.process}.
 }
 \references{
