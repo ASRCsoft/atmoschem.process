@@ -97,6 +97,20 @@ ggplot(df, aes(`Processing Steps`, Dataset, fill = Required)) +
         legend.position = 'bottom')
 ```
 
+In terms of processing, we tend to follow guidelines from NARSTO
+[@christensen_narsto_2000], and to a lesser extent the EPA and the WMO
+[@wmo_guide_2017]. NARSTO disbanded in 2010, but many of its guidance documents
+are still available at <https://cdiac.ess-dive.lbl.gov/programs/NARSTO/>, and
+older versions of the NARSTO website can be found on the [Internet
+Archive](https://web.archive.org/web/2017*/http://cdiac.esd.ornl.gov/programs/NARSTO/).
+
+In terms of software and project management, we tend to follow
+@marwick_packaging_2018 and @bryan_excuse_2018.
+
+In terms of data management, we tend to follow @briney_data_2015 and
+@white_nine_2013. For publication purposes we're required to follow FAIR data
+guidelines [@wilkinson_fair_2016; @db_deutz_how_2020].
+
 # Database Organization
 
 The nysatmoschem database is designed as a small data warehouse. That is, an Extract, Transform, Load (ETL) process standardizes and imports data from a variety of sources to prepare the data for analysis. Figure \@ref(fig:dbschema) shows the resulting data schema. A set of automated reports serve as a data mart providing simplified access to the data.
