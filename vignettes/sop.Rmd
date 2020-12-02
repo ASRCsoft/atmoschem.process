@@ -13,7 +13,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 urlcolor: blue
-bibliography: nysatmoschem.bib
+bibliography: sop.bib
 header-includes:
    - \usepackage[section]{placeins}
    - \usepackage{caption}
