@@ -25,7 +25,11 @@ narsto_agg_flag = function(p, below_mdl = FALSE) {
   flag[below_mdl] = 'V1'
   flag[p < .75] = 'V4'
   flag[p < .5] = 'M1'
-  flag
+  if (inherits(p, 'matrix')) {
+    matrix(flag, nrow = nrow(p), ncol = ncol(p), dimnames = dimnames(p))
+  } else {
+    flag
+  }
 }
 
 get_mtype_params = function(obj, m_id) {
