@@ -1,5 +1,3 @@
-library(atmoschem.process)
-
 dbname = 'nysatmoschem_unit_test_tmp'
 setup({
   db_res = system2('createdb', dbname)

@@ -1,5 +1,3 @@
-library(atmoschem.process)
-
 test_that('resultant average of a single value is the value', {
   expect_equal(res_wind_speed(5, 180), 5)
   expect_equal(res_wind_dir(1, 320), 320)
