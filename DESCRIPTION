@@ -41,6 +41,7 @@ Suggests:
     knitr,
     reshape2,
     rmarkdown,
+    RSQLite,
     shinyWidgets,
     testthat,
     tools,
