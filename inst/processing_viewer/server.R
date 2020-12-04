@@ -7,6 +7,7 @@ library(atmoschem.process)
 
 obj = getShinyOption('obj')
 pg = getShinyOption('pg')
+curdir = getShinyOption('dir')
 
 ## get measurement info
 measurements = tbl(pg, 'measurement_types') %>%
@@ -146,14 +147,23 @@ get_ces = function(measure, t1, t2) {
 }
 
 get_hourly = function(measure, t1, t2) {
-  tbl(pg, 'hourly_measurements') %>%
-    mutate(time = timezone('EST', time)) %>%
-    filter(measurement_type_id == measure &
-           time >= t1 &
-           time <= t2) %>%
-    select(time, value) %>%
-    arrange(time) %>%
-    collect()
+  # get site, data source, and parameter name from measurement id
+  param = measurements$name[match(measure, measurements$id)]
+  data_source_id = measurements$data_source_id[match(measure, measurements$id)]
+  data_source = data_sources$name[match(data_source_id, data_sources$id)]
+  site_id = data_sources$site_id[match(data_source_id, data_sources$id)]
+  site = c('WFMS', 'WFML', 'PSP', 'QC')[site_id]
+  # get requested data
+  # for now, assume we're at the project root
+  dbpath = file.path(curdir, 'analysis', 'intermediate',
+                     paste0('hourly_', site, '_', data_source, '.sqlite'))
+  db = dbConnect(RSQLite::SQLite(), dbpath)
+  q = paste0('select time, ? from measurements where time >= ? and time <= ? order by time asc')
+  sql = sqlInterpolate(db, q, dbQuoteIdentifier(db, param),
+                       format(t1, tz = 'EST'), format(t2, tz = 'EST'))
+  res = dbGetQuery(db, sql)
+  dbDisconnect(db)
+  res
 }
 
 make_processing_plot = function(m, t1, t2, plot_types,
