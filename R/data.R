@@ -7,6 +7,9 @@
 #' Clock audit results
 "clock_audits"
 
+#' Data sources
+"data_sources"
+
 #' Instruments
 "instruments"
 

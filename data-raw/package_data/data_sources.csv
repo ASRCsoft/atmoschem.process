@@ -1,0 +1,9 @@
+site,name,hourly_freq
+WFMS,campbell,60
+WFMS,ultrafine,60
+WFMS,aethelometer,4
+WFML,campbell,60
+WFML,envidas,60
+WFML,mesonet,12
+PSP,envidas,60
+PSP,mesonet,12
