@@ -23,6 +23,17 @@ sites in New York State. It provides tools to generate reports and processed
 datasets from the ASRC's atmospheric chemistry data, and tools to visualize the
 data.
 
+## Table of contents
+
+```{r toc, echo = FALSE, results = "asis", comment = ""}
+readme = readLines('README.Rmd')
+headers = readme[grepl('^## ', readme)][-1] # remove first header (toc)
+titles = sub('^## ', '', headers)
+links = paste0('#', gsub(' ', '-', tolower(titles)))
+md_lines = paste0('- [', titles, '](', links, ')')
+cat(paste(md_lines, collapse = '\n'))
+```
+
 ## Installation
 
 To install the package, run (from within R)

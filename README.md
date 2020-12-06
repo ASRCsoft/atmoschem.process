@@ -13,6 +13,14 @@ from ASRC sites in New York State. It provides tools to generate reports
 and processed datasets from the ASRC’s atmospheric chemistry data, and
 tools to visualize the data.
 
+## Table of contents
+
+  - [Installation](#installation)
+  - [Reproducing the routine chemistry
+    dataset](#reproducing-the-routine-chemistry-dataset)
+  - [Citation](#citation)
+  - [License](#license)
+
 ## Installation
 
 To install the package, run (from within R)
