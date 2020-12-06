@@ -10,3 +10,5 @@
 analysis
 ^\.github$
 ^codecov\.yml$
+^README\.Rmd$
+^README\.html$

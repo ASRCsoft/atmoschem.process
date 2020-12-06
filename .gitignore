@@ -44,3 +44,6 @@ docs/
 # dataset build files
 analysis/*/
 docs
+
+# readme preview
+README.html
