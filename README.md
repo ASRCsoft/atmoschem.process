@@ -68,6 +68,29 @@ nysac = etl('atmoschem.process', db = dbcon, dir = 'data')
 view_processing(nysac)
 ```
 
+## Citation
+
+The package citation can be obtained by running
+`citation('atmoschem.process')`:
+
+``` 
+
+To cite package 'atmoschem.process' in publications use:
+
+  William May (2020). atmoschem.process: ASRC Atmospheric Chemistry Data Processing. R
+  package version 0.5.0. https://github.com/ASRCsoft/atmoschem.process
+
+A BibTeX entry for LaTeX users is
+
+  @Manual{,
+    title = {atmoschem.process: ASRC Atmospheric Chemistry Data Processing},
+    author = {William May},
+    year = {2020},
+    note = {R package version 0.5.0},
+    url = {https://github.com/ASRCsoft/atmoschem.process},
+  }
+```
+
 ## License
 
 `atmoschem.process` is released under the open source MIT license.

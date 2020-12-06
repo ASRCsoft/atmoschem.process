@@ -91,7 +91,7 @@ docs: $(pkgdata_rda) $(r_files) README.md
 data/%.rda: data-raw/package_data/%.csv data-raw/package_data.R
 	Rscript data-raw/package_data.R $<
 
-README.md: README.Rmd
+README.md: README.Rmd DESCRIPTION
 	Rscript \
 	-e 'if (!requireNamespace("rmarkdown")) install.packages("rmarkdown")' \
 	-e 'rmarkdown::render("README.Rmd")'

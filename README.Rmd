@@ -76,6 +76,14 @@ nysac = etl('atmoschem.process', db = dbcon, dir = 'data')
 view_processing(nysac)
 ```
 
+## Citation
+
+The package citation can be obtained by running `citation('atmoschem.process')`:
+
+```{r citation, echo = FALSE, comment=""}
+citation('atmoschem.process')
+```
+
 ## License
 
 `atmoschem.process` is released under the open source MIT license.
