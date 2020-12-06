@@ -10,8 +10,7 @@ link-citations: yes
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
+  fig.path = "man/figures/README-"
 )
 ```
 
@@ -19,6 +18,10 @@ knitr::opts_chunk$set(
 
 [![R build status](https://github.com/ASRCsoft/atmoschem.process/workflows/R-CMD-check/badge.svg)](https://github.com/ASRCsoft/atmoschem.process/actions)
 [![Codecov test coverage](https://codecov.io/gh/ASRCsoft/atmoschem.process/branch/master/graph/badge.svg)](https://codecov.io/gh/ASRCsoft/atmoschem.process?branch=master)
+
+```{r wfms, echo = FALSE, fig.height = 3.3, fig.width = 3.8, out.width = "400px", out.extra='style="float:right; padding:0px 10px 10px 10px;"'}
+knitr::include_graphics('man/figures/whiteface-station.jpg')
+```
 
 The `atmoschem.process` R package processes atmospheric chemistry data from ASRC
 sites in New York State. It provides tools to generate reports and processed

@@ -8,6 +8,8 @@ status](https://github.com/ASRCsoft/atmoschem.process/workflows/R-CMD-check/badg
 [![Codecov test
 coverage](https://codecov.io/gh/ASRCsoft/atmoschem.process/branch/master/graph/badge.svg)](https://codecov.io/gh/ASRCsoft/atmoschem.process?branch=master)
 
+<img src="man/figures/whiteface-station.jpg" width="400px" style="float:right; padding:0px 10px 10px 10px;" />
+
 The `atmoschem.process` R package processes atmospheric chemistry data
 from ASRC sites in New York State. It provides tools to generate reports
 and processed datasets from the ASRC’s atmospheric chemistry data, and
