@@ -83,11 +83,43 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="asrc-atmospheric-chemistry-data-processing-package" class="section level1">
+<div id="asrc-atmospheric-chemistry-data-processing" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#asrc-atmospheric-chemistry-data-processing-package" class="anchor"></a>ASRC Atmospheric Chemistry Data Processing Package</h1></div>
+<a href="#asrc-atmospheric-chemistry-data-processing" class="anchor"></a>ASRC Atmospheric Chemistry Data Processing</h1></div>
 
-<p>The ASRC Atmospheric Chemistry Data Processing Package processes atmospheric chemistry data from ASRC sites in New York State. It provides tools to generate reports and processed datasets from the ASRC’s atmospheric chemistry data, and tools to visualize the data.</p>
+<p><img src="reference/figures/whiteface-station.jpg" width="400px" style="float:right; padding:0px 10px 10px 10px;"></p>
+<p>The <code>atmoschem.process</code> R package processes atmospheric chemistry data from ASRC sites in New York State. It provides tools to generate reports and processed datasets from the ASRC’s atmospheric chemistry data, and tools to visualize the data.</p>
+<div id="table-of-contents" class="section level2">
+<h2 class="hasAnchor">
+<a href="#table-of-contents" class="anchor"></a>Table of contents</h2>
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#reproducing-the-routine-chemistry-dataset">Reproducing the routine chemistry dataset</a></li>
+<li><a href="#citation">Citation</a></li>
+<li><a href="#license">License</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+</div>
+<div id="overview" class="section level2">
+<h2 class="hasAnchor">
+<a href="#overview" class="anchor"></a>Overview</h2>
+<p>The atmospheric chemistry group at the ASRC, run by Dr. Jim Schwab, collects data from instruments at 4 sites across the state of New York: Whiteface Mountain (summit and base), Pinnacle State Park, and Queens College. We maintain a variety of instruments measuring ozone and ozone precursors, airborne particulate matter, sulfur dioxide, and meteorology.</p>
+<p>The data undergoes a variety of adjustments and quality assurance checks before being released to the public, where it is used by government agencies and atmospheric science researchers, among others. Users can access the datasets online via our website at <a href="http://atmoschem.asrc.cestm.albany.edu/" class="uri">http://atmoschem.asrc.cestm.albany.edu/</a>.</p>
+<p>This software, which generates the processed datasets, synthesizes advice from atmospheric monitoring, statistical programming, and data management. In terms of data processing, we tend to follow guidelines from NARSTO (Christensen et al. <a href="#ref-christensen_narsto_2000">2000</a>), and we also work regularly with EPA standards. The code is organized as an R package (Marwick, Boettiger, and Mullen <a href="#ref-marwick_packaging_2018">2018</a>), and we use GitHub for project management (Bryan <a href="#ref-bryan_excuse_2018">2018</a>). For data management, we tend to follow Briney (<a href="#ref-briney_data_2015">2015</a>), and we try to make the data convenient to use (White et al. <a href="#ref-white_nine_2013">2013</a>).</p>
+<p>The data collection at Whiteface Mountain is described in detail in a series of publications (Schwab, Wolfe, et al. <a href="#ref-schwab_atmospheric_2016">2016</a>; Brandt et al. <a href="#ref-brandt_atmospheric_2016">2016</a>; Schwab, Casson, et al. <a href="#ref-schwab_atmospheric_2016-1">2016</a>), and another paper describes the measurements at Pinnacle State Park (Schwab, Spicer, and Demerjian <a href="#ref-schwab_ozone_2009">2009</a>).</p>
+</div>
+<div id="installation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#installation" class="anchor"></a>Installation</h2>
+<p>To install the package, run (from within R)</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">'remotes'</span><span class="op">)</span>
+<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">'ASRCsoft/atmoschem.process'</span><span class="op">)</span></code></pre></div>
+<p>To generate the processed dataset, additional dependencies are requried:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">'ASRCsoft/atmoschem.process'</span>, dependencies <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+</div>
 <div id="reproducing-the-routine-chemistry-dataset" class="section level2">
 <h2 class="hasAnchor">
 <a href="#reproducing-the-routine-chemistry-dataset" class="anchor"></a>Reproducing the routine chemistry dataset</h2>
@@ -100,26 +132,20 @@
 <li>PostgreSQL, and a user with permission to create and delete databases</li>
 </ul>
 <p>The processing is currently very computationally intensive and requires about 8GB of RAM and 30GB of disk space.</p>
-<p>To install the R package dependencies, run (from within R)</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">'remotes'</span><span class="op">)</span>
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_deps.html">install_deps</a></span><span class="op">(</span><span class="st">'path/to/atmoschem.process'</span><span class="op">)</span></code></pre></div>
-<p>replacing the path with the path on your computer. You may be need to install additional Linux packages required by the R packages.</p>
 </div>
 <div id="creating-the-dataset" class="section level3">
 <h3 class="hasAnchor">
 <a href="#creating-the-dataset" class="anchor"></a>Creating the dataset</h3>
-<p>The dataset package can be generated by running (from a terminal)</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="bu">cd</span> path/to/atmoschem.process</span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="fu">make</span> routine_dataset</span></code></pre></div>
+<p>Download or clone the repository. The dataset package can be generated by running (from a terminal)</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="bu">cd</span> path/to/atmoschem.process</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="fu">make</span> routine_dataset</span></code></pre></div>
 <p>You will be asked for the atmoschem server’s data password (twice), which can be obtained from <a href="http://atmoschem.asrc.cestm.albany.edu/">the atmoschem website</a>.</p>
 </div>
-</div>
-<div id="viewing-the-data" class="section level2">
-<h2 class="hasAnchor">
-<a href="#viewing-the-data" class="anchor"></a>Viewing the data</h2>
+<div id="viewing-the-data" class="section level3">
+<h3 class="hasAnchor">
+<a href="#viewing-the-data" class="anchor"></a>Viewing the data</h3>
 <p>The R package comes with a Shiny app for viewing the processing steps. After data has been processed, it can be opened from within R:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ASRCsoft/atmoschem.process">atmoschem.process</a></span><span class="op">)</span>
 <span class="co"># Create a postgres database connection and atmoschem.process dataset object</span>
 <span class="va">dbcon</span> <span class="op">=</span> <span class="fu">src_postgres</span><span class="op">(</span>dbname <span class="op">=</span> <span class="st">'nysatmoschemdb'</span>, user <span class="op">=</span> <span class="st">'user'</span><span class="op">)</span>
@@ -127,10 +153,64 @@
 <span class="co"># Open the Shiny app</span>
 <span class="fu">view_processing</span><span class="op">(</span><span class="va">nysac</span><span class="op">)</span></code></pre></div>
 </div>
+</div>
+<div id="citation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#citation" class="anchor"></a>Citation</h2>
+<p>The package citation can be obtained by running <code><a href="https://rdrr.io/r/utils/citation.html">citation('atmoschem.process')</a></code>:</p>
+<pre><code>
+To cite package 'atmoschem.process' in publications use:
+
+  William May (2020). atmoschem.process: ASRC Atmospheric Chemistry Data Processing. R
+  package version 0.5.0. https://github.com/ASRCsoft/atmoschem.process
+
+A BibTeX entry for LaTeX users is
+
+  @Manual{,
+    title = {atmoschem.process: ASRC Atmospheric Chemistry Data Processing},
+    author = {William May},
+    year = {2020},
+    note = {R package version 0.5.0},
+    url = {https://github.com/ASRCsoft/atmoschem.process},
+  }</code></pre>
+</div>
 <div id="license" class="section level2">
 <h2 class="hasAnchor">
 <a href="#license" class="anchor"></a>License</h2>
 <p><code>atmoschem.process</code> is released under the open source MIT license.</p>
+</div>
+<div id="references" class="section level2">
+<h2 class="hasAnchor">
+<a href="#references" class="anchor"></a>References</h2>
+<div id="refs" class="references hanging-indent">
+<div id="ref-brandt_atmospheric_2016">
+<p>Brandt, Richard E., James J. Schwab, Paul W. Casson, Utpal K. Roychowdhury, Douglas Wolfe, Kenneth L. Demerjian, Kevin L. Civerolo, Oliver V. Rattigan, and H. Dirk Felton. 2016. “Atmospheric Chemistry Measurements at Whiteface Mountain, NY: Ozone and Reactive Trace Gases.” <em>Aerosol and Air Quality Research</em> 16 (3): 873–84. <a href="https://doi.org/10.4209/aaqr.2015.05.0376" class="uri">https://doi.org/10.4209/aaqr.2015.05.0376</a>.</p>
+</div>
+<div id="ref-briney_data_2015">
+<p>Briney, Kristin. 2015. <em>Data Management for Researchers: Organize, Maintain and Share Your Data for Research Success</em>. Pelagic Publishing Ltd.</p>
+</div>
+<div id="ref-bryan_excuse_2018">
+<p>Bryan, Jennifer. 2018. “Excuse Me, Do You Have a Moment to Talk About Version Control?” <em>The American Statistician</em> 72 (1): 20–27. <a href="https://doi.org/10.1080/00031305.2017.1399928" class="uri">https://doi.org/10.1080/00031305.2017.1399928</a>.</p>
+</div>
+<div id="ref-christensen_narsto_2000">
+<p>Christensen, Sigurd W., Thomas A. Boden, Les A. Hook, and Meng-Dawn Cheng. 2000. “NARSTO Data Management Handbook.” NARSTO Quality Systems Science Center. <a href="https://web.archive.org/web/20030401082229/http://cdiac.esd.ornl.gov:80/programs/NARSTO/pdf/dmhb_current_version.PDF" class="uri">https://web.archive.org/web/20030401082229/http://cdiac.esd.ornl.gov:80/programs/NARSTO/pdf/dmhb_current_version.PDF</a>.</p>
+</div>
+<div id="ref-marwick_packaging_2018">
+<p>Marwick, Ben, Carl Boettiger, and Lincoln Mullen. 2018. “Packaging Data Analytical Work Reproducibly Using R (and Friends).” <em>The American Statistician</em> 72 (1): 80–88. <a href="https://doi.org/10.1080/00031305.2017.1375986" class="uri">https://doi.org/10.1080/00031305.2017.1375986</a>.</p>
+</div>
+<div id="ref-schwab_atmospheric_2016-1">
+<p>Schwab, James J., Paul Casson, Richard Brandt, Liquat Husain, Vincent Dutkewicz, Douglas Wolfe, Kenneth L. Demerjian, et al. 2016. “Atmospheric Chemistry Measurements at Whiteface Mountain, NY: Cloud Water Chemistry, Precipitation Chemistry, and Particulate Matter.” <em>Aerosol and Air Quality Research</em> 16 (3): 841–54. <a href="https://doi.org/10.4209/aaqr.2015.05.0344" class="uri">https://doi.org/10.4209/aaqr.2015.05.0344</a>.</p>
+</div>
+<div id="ref-schwab_ozone_2009">
+<p>Schwab, James J., John B. Spicer, and Kenneth L. Demerjian. 2009. “Ozone, Trace Gas, and Particulate Matter Measurements at a Rural Site in Southwestern New York State: 1995–2005.” <em>Journal of the Air &amp; Waste Management Association</em> 59 (3): 293–309. <a href="https://doi.org/10.3155/1047-3289.59.3.293" class="uri">https://doi.org/10.3155/1047-3289.59.3.293</a>.</p>
+</div>
+<div id="ref-schwab_atmospheric_2016">
+<p>Schwab, James J., Douglas Wolfe, Paul Casson, Richard Brandt, Kenneth L. Demerjian, Liquat Husain, Vincent A. Dutkiewicz, Kevin L. Civerolo, and Oliver V. Rattigan. 2016. “Atmospheric Science Research at Whiteface Mountain, NY: Site Description and History.” <em>Aerosol and Air Quality Research</em> 16 (3): 827–40. <a href="https://doi.org/10.4209/aaqr.2015.05.0343" class="uri">https://doi.org/10.4209/aaqr.2015.05.0343</a>.</p>
+</div>
+<div id="ref-white_nine_2013">
+<p>White, Ethan P., Elita Baldridge, Zachary T. Brym, Kenneth J. Locey, Daniel J. McGlinn, and Sarah R. Supp. 2013. “Nine Simple Ways to Make It Easier to (Re)use Your Data.” <em>Ideas in Ecology and Evolution</em> 6 (2). <a href="https://doi.org/10.4033/iee.2013.6b.6.f" class="uri">https://doi.org/10.4033/iee.2013.6b.6.f</a>.</p>
+</div>
+</div>
 </div>
 </div>
   </div>
