@@ -83,13 +83,18 @@ $(build_file): docs
 	R CMD build .
 
 .INTERMEDIATE: docs
-docs: $(pkgdata_rda) $(r_files)
+docs: $(pkgdata_rda) $(r_files) README.md
 	Rscript \
 	-e 'if (!requireNamespace("roxygen2")) install.packages("roxygen2")' \
 	-e 'roxygen2::roxygenise()'
 
 data/%.rda: data-raw/package_data/%.csv data-raw/package_data.R
 	Rscript data-raw/package_data.R $<
+
+README.md: README.Rmd
+	Rscript \
+	-e 'if (!requireNamespace("rmarkdown")) install.packages("rmarkdown")' \
+	-e 'rmarkdown::render("README.Rmd")'
 
 .PHONY: clean
 clean:
