@@ -12,3 +12,4 @@ analysis
 ^codecov\.yml$
 ^README\.Rmd$
 ^README\.html$
+^README\.bib$

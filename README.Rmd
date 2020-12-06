@@ -1,5 +1,7 @@
 ---
 output: github_document
+bibliography: README.bib
+link-citations: yes
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -33,6 +35,33 @@ links = paste0('#', gsub(' ', '-', tolower(titles)))
 md_lines = paste0('- [', titles, '](', links, ')')
 cat(paste(md_lines, collapse = '\n'))
 ```
+
+## Overview
+
+The atmospheric chemistry group at the ASRC, run by Dr. Jim Schwab, collects
+data from instruments at 4 sites across the state of New York: Whiteface
+Mountain (summit and base), Pinnacle State Park, and Queens College. We maintain
+a variety of instruments measuring ozone and ozone precursors, airborne
+particulate matter, sulfur dioxide, and meteorology.
+
+The data undergoes a variety of adjustments and quality assurance checks before
+being released to the public, where it is used by government agencies and
+atmospheric science researchers, among others. Users can access the datasets
+online via our website at <http://atmoschem.asrc.cestm.albany.edu/>.
+
+This software, which generates the processed datasets, synthesizes advice from
+atmospheric monitoring, statistical programming, and data management. In terms
+of data processing, we tend to follow guidelines from NARSTO
+[@christensen_narsto_2000], and we also work regularly with EPA standards. The
+code is organized as an R package [@marwick_packaging_2018], and we use GitHub
+for project management [@bryan_excuse_2018]. For data management, we tend to
+follow @briney_data_2015, and we try to make the data convenient to use
+[@white_nine_2013].
+
+The data collection at Whiteface Mountain is described in detail in a series of
+publications [@schwab_atmospheric_2016; @brandt_atmospheric_2016;
+@schwab_atmospheric_2016-1], and another paper describes the measurements at
+Pinnacle State Park [@schwab_ozone_2009].
 
 ## Installation
 
@@ -98,3 +127,5 @@ citation('atmoschem.process')
 ## License
 
 `atmoschem.process` is released under the open source MIT license.
+
+## References
