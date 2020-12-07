@@ -355,16 +355,6 @@ Woodsmoke = BC_{370nm} - BC_{880nm}
 $$
 following @allen_evaluation_2004 and @zhang_joint_2017.
 
-# Regular Reports
-
-## Weekly Meetings
-
-## Monthly Ultrafine Data Reports
-
-## Quarterly DEC Data Reports
-
-## Quarterly NYSERDA Reports
-
 # Making Changes
 
 Any changes to the processing procedures should be clearly documented. This means the new code (if applicable) should be available on Github, and the change should be noted in the Github repository changelog as well as the data manager SOP.
