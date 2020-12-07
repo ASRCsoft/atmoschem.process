@@ -12,9 +12,6 @@ library(RSQLite)
 site = commandArgs(trailingOnly = T)[1]
 data_source = commandArgs(trailingOnly = T)[2]
 
-dbcon = src_postgres(dbname = 'nysatmoschemdb')
-nysac = etl('atmoschem.process', db = dbcon)
-
 # the wind speed and direction variables-- this should be made into a config
 # option somehow
 winds = switch(site, WFMS = c('WS', 'WindDir_D1_WVT'), 
@@ -51,33 +48,18 @@ aggregate_wind = function(x, f, ws, wd) {
   res
 }
 
-# get all the measurement IDs for a data source
-site_id = switch(site, WFMS = 1, WFML = 2, PSP = 3, QC = 4)
-data_sources = nysac %>%
-  tbl('data_sources') %>%
-  filter(site_id == local(site_id),
-         name == data_source) %>%
-  collect()
-mtypes = nysac %>%
-  tbl('measurement_types') %>%
-  filter(data_source_id %in% local(data_sources$id),
-         !is.na(apply_processing) & apply_processing) %>%
-  collect()
+# get measurement info
+mtypes = measurement_types[measurement_types$site == site &
+                           measurement_types$data_source == data_source, ] %>%
+  subset(!is.na(apply_processing) & apply_processing)
 
-# collect and organize all data from the data source
-site_data = nysac %>%
-  tbl('processed_measurements') %>%
-  filter(measurement_type_id %in% local(mtypes$id),
-         !is.na(value),
-         !flagged) %>%
-  # add time zone so R interprets the time correctly
-  mutate(time = timezone('EST', time)) %>%
-  collect() %>%
-  as.data.frame %>%
-  transform(param = mtypes$name[match(measurement_type_id, mtypes$id)]) %>%
-  reshape(timevar = 'param', idvar = 'time', direction = 'wide',
-          drop = 'measurement_type_id')
-attr(site_data$time, 'tzone') = 'EST'
+# get the processed data
+dbpath = file.path('analysis', 'intermediate',
+                   paste0('processed_', site, '_', data_source, '.sqlite'))
+db = dbConnect(SQLite(), dbpath)
+site_data = dbReadTable(db, 'measurements', check.names = F)
+dbDisconnect(db)
+site_data$time = as.POSIXct(site_data$time, tz = 'EST')
 
 # aggregate
 time_hours = as.POSIXct(trunc(site_data$time, 'hour'))
