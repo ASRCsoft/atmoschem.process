@@ -38,13 +38,13 @@ routine_dataset: $(clean_old_routine_out) $(hourly_files)
 	cp analysis/README.txt $(out_dir)/$(routine_out)
 	cd $(out_dir); zip -r $(routine_out).zip $(routine_out)
 
-analysis/intermediate/hourly_%.csv: new_processed_data
+analysis/intermediate/hourly_%.sqlite: new_processed_data
 	Rscript analysis/aggregate_hourly.R $(shell echo $* | sed "s/_/ /")
 
 .PHONY: new_processed_data
 new_processed_data: $(new_processed_files)
 
-$(processed_dir)/%.csv: processingdb analysis/process_new_data.R
+$(processed_dir)/%.csv: #processingdb analysis/process_new_data.R
 	Rscript analysis/process_new_data.R $*
 
 .INTERMEDIATE: processingdb
