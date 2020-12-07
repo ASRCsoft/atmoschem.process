@@ -2,26 +2,52 @@
 # processed data and combines it with the new processed data.
 
 library(atmoschem.process)
+library(DBI)
+library(RSQLite)
 options(warn = 1) # print warnings immediately
 
 old_processed_dir = 'analysis/cleaned/old_routine'
-new_processed_dir = 'analysis/cleaned/processed_data'
 out_dir = commandArgs(trailingOnly = TRUE)[1]
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+
+# combine site/data source hourly files into a single site hourly file, using
+# column names from report_columns
+get_site_df = function(site) {
+  site_sources = data_sources$name[data_sources$site == site]
+  meas_list = list()
+  for (s in site_sources) {
+    dbpath = file.path('analysis', 'intermediate',
+                       paste0('hourly_', site, '_', s, '.sqlite'))
+    db = dbConnect(SQLite(), dbpath)
+    meas = dbReadTable(db, 'measurements', check.names = F)
+    dbDisconnect(db)
+    meas$time = as.POSIXct(meas$time, tz = 'EST')
+    s_cols = report_columns[report_columns$site == site, ] %>%
+      subset(data_source == s)
+    params = c('time', s_cols$measurement)
+    meas = meas[, sub(' \\(flag\\)$', '', names(meas)) %in% params]
+    old_params = sub(' \\(flag\\)$', '', names(meas)[-1])
+    new_params = s_cols$column[match(old_params, s_cols$measurement)]
+    names(meas)[-1] =
+      paste(new_params, sub('.*( \\(flag\\))$', '\\1', names(meas)[-1]))
+    names(meas)[1] = 'Time (EST)'
+    meas_list[[s]] = meas
+  }
+  Reduce(function(x, y) merge(x, y, all = T), meas_list)
+}
 
 for (site in sites$abbreviation) {
   message('Organizing ', site, ' data')
   csv_file = paste0(site, '.csv')
   old_processed_file = file.path(old_processed_dir, csv_file)
-  new_processed_file = file.path(new_processed_dir, csv_file)
   out_file = file.path(out_dir, csv_file)
 
   oldp = read.csv(old_processed_file, na.strings = c('NA', '-999'),
                   check.names = FALSE)
+  oldp$`Time (EST)` = as.POSIXct(oldp$`Time (EST)`, tz = 'EST')
 
-  if (file.exists(new_processed_file)) {
-    newp = read.csv(new_processed_file, na.strings = c('NA', '-999'),
-                    check.names = FALSE)
+  if (site != 'QC') {
+    newp = get_site_df(site)
     # make sure flag column names are all formatted consistently
     names(newp) = gsub('\\(NARSTO\\)', '\\(flag\\)', names(newp))
     names(newp) = gsub('\\(AQS\\)', '\\(AQS flag\\)', names(newp))
@@ -67,7 +93,6 @@ for (site in sites$abbreviation) {
   }
 
   # add missing hours
-  pout$`Time (EST)` = as.POSIXct(pout$`Time (EST)`, tz = 'EST')
   hours = seq.POSIXt(min(pout$`Time (EST)`), max(pout$`Time (EST)`), by = 'hour')
   pout = merge(data.frame('Time (EST)' = hours, check.names = F), pout,
                all.x = T)
