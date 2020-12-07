@@ -35,6 +35,7 @@ LazyData: true
 Suggests: 
     bookdown,
     datamodelr,
+    DiagrammeR,
     ggplot2 (>= 3.0),
     knitr,
     rmarkdown,
