@@ -34,7 +34,6 @@ Encoding: UTF-8
 LazyData: true
 Suggests: 
     bookdown,
-    covr,
     datamodelr,
     DiagrammeR,
     ggplot2 (>= 3.0),
