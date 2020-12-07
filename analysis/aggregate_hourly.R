@@ -141,7 +141,7 @@ hourly_ds = cbind(hourly_vals, flags) %>%
   subset(select = c(1, rep(1:ntypes + 1, each = 2) + c(0, ntypes))) %>%
   # convert time to character for compatibility with sqlite
   # transform(time = format(time)) # this one removes spaces from names :(
-  within(time <- format(time))
+  within(time <- format(time, '%Y-%m-%d %H:%M:%S', tz = 'EST'))
 names(hourly_ds) = names(hourly_ds) %>%
   sub('^value\\.', '', .) %>%
   sub('^flagged\\.(.*)', '\\1 (flag)', .)

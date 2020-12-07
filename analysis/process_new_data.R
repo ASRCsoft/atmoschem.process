@@ -46,8 +46,9 @@ site_data = nysac %>%
   as.data.frame %>%
   transform(param = mtypes$name[match(measurement_type_id, mtypes$id)]) %>%
   reshape(timevar = 'param', idvar = 'time', direction = 'wide',
-          drop = 'measurement_type_id')
-attr(site_data$time, 'tzone') = 'EST'
+          drop = 'measurement_type_id') %>%
+  # convert time to character for compatibility with sqlite
+  within(time <- format(time, '%Y-%m-%d %H:%M:%S', tz = 'EST'))
 
 # write to sqlite file
 interm_dir = file.path('analysis', 'intermediate')
