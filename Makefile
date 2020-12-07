@@ -17,6 +17,9 @@ download_url := http://atmoschem.asrc.cestm.albany.edu/~aqm/AQM_Products/downloa
 routine_zip := $(raw_dir)/routine_chemistry_v0.1.zip
 clean_old_routine_out := $(patsubst %,$(cleaned_dir)/old_routine/%.csv,$(sites))
 raw_zip := $(raw_dir)/raw_data_v0.3.zip
+# get <site>_<data_source> for each entry in data_sources.csv
+data_sources := $(shell sed "1d;s/^\([^,]*\),\([^,]*\).*/\1_\2/" data-raw/package_data/data_sources.csv)
+hourly_files := $(patsubst %,analysis/intermediate/hourly_%.csv,$(data_sources))
 sites2 := WFMS WFML PSP
 processed_dir := $(cleaned_dir)/processed_data
 new_hourly_csvs := $(patsubst %,$(processed_dir)/%.csv,$(sites2))
@@ -29,11 +32,14 @@ all: routine_dataset
 ## Atmoschem Dataset
 
 .PHONY: routine_dataset
-routine_dataset: $(clean_old_routine_out) $(new_processed_files)
+routine_dataset: $(clean_old_routine_out) $(hourly_files)
 	mkdir -p $(out_dir)/$(routine_out) && \
 	Rscript analysis/routine_package.R $(out_dir)/$(routine_out)
 	cp analysis/README.txt $(out_dir)/$(routine_out)
 	cd $(out_dir); zip -r $(routine_out).zip $(routine_out)
+
+analysis/intermediate/hourly_%.csv: new_processed_data
+	Rscript analysis/aggregate_hourly.R $(shell echo $* | sed "s/_/ /")
 
 .PHONY: new_processed_data
 new_processed_data: $(new_processed_files)
