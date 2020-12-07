@@ -17,7 +17,7 @@ dbcon = src_postgres(dbname = 'nysatmoschemdb')
 nysac = etl('atmoschem.process', db = dbcon)
 
 # process
-update_processing(nysac, site, s, '2018-10-01', '2020-07-01')
+update_processing(nysac, site, data_source, '2018-10-01', '2020-07-01')
 
 # organize data from processed_measurements
 
