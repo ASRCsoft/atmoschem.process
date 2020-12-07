@@ -35,10 +35,8 @@ LazyData: true
 Suggests: 
     bookdown,
     datamodelr,
-    DiagrammeR,
     ggplot2 (>= 3.0),
     knitr,
-    reshape2,
     rmarkdown,
     RSQLite,
     shinyWidgets,
