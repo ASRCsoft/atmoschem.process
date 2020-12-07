@@ -42,8 +42,7 @@ Suggests:
     shinyWidgets,
     testthat,
     tools,
-    usethis,
-    zoo
+    usethis
 Remotes:
     beanumber/etl,
     bergant/datamodelr,
