@@ -12,6 +12,7 @@ build_file := $(PKGNAME)_$(PKGVERS).tar.gz
 sites := WFMS WFML PSP QC
 raw_dir := analysis/raw
 cleaned_dir := analysis/cleaned
+interm_dir := analysis/intermediate
 out_dir := analysis/out
 download_url := http://atmoschem.asrc.cestm.albany.edu/~aqm/AQM_Products/downloads
 routine_zip := $(raw_dir)/routine_chemistry_v0.1.zip
@@ -19,11 +20,7 @@ clean_old_routine_out := $(patsubst %,$(cleaned_dir)/old_routine/%.csv,$(sites))
 raw_zip := $(raw_dir)/raw_data_v0.3.zip
 # get <site>_<data_source> for each entry in data_sources.csv
 data_sources := $(shell sed "1d;s/^\([^,]*\),\([^,]*\).*/\1_\2/" data-raw/package_data/data_sources.csv)
-hourly_files := $(patsubst %,analysis/intermediate/hourly_%.csv,$(data_sources))
-sites2 := WFMS WFML PSP
-processed_dir := $(cleaned_dir)/processed_data
-new_hourly_csvs := $(patsubst %,$(processed_dir)/%.csv,$(sites2))
-new_processed_files := $(new_hourly_csvs)
+hourly_files := $(patsubst %,$(interm_dir)/hourly_%.sqlite,$(data_sources))
 routine_out := routine_chemistry_v$(PKGVERS)
 
 .PHONY: all
@@ -38,14 +35,11 @@ routine_dataset: $(clean_old_routine_out) $(hourly_files)
 	cp analysis/README.txt $(out_dir)/$(routine_out)
 	cd $(out_dir); zip -r $(routine_out).zip $(routine_out)
 
-analysis/intermediate/hourly_%.sqlite: new_processed_data
+$(interm_dir)/hourly_%.sqlite: $(interm_dir)/processed_%.sqlite analysis/aggregate_hourly.R
 	Rscript analysis/aggregate_hourly.R $(shell echo $* | sed "s/_/ /")
 
-.PHONY: new_processed_data
-new_processed_data: $(new_processed_files)
-
-$(processed_dir)/%.csv: #processingdb analysis/process_new_data.R
-	Rscript analysis/process_new_data.R $*
+$(interm_dir)/processed_%.sqlite: processingdb analysis/process_new_data.R
+	Rscript analysis/process_new_data.R $(shell echo $* | sed "s/_/ /")
 
 .INTERMEDIATE: processingdb
 processingdb: $(sql_files) $(raw_zip)
