@@ -329,13 +329,6 @@ update_processing = function(obj, site, data_source, start_time,
         })
       }
     }
-
-    message('Updating processing outputs ...')
-    q_out = 'select update_processing_outputs(?site, ?ds, ?start, ?end)'
-    sql_out = DBI::sqlInterpolate(obj$con, q_out, site = site_id,
-                                  ds = data_source, start = start_time,
-                                  end = end_time)
-    DBI::dbExecute(obj$con, sql_out)
     
     TRUE
   })
