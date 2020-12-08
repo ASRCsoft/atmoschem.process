@@ -61,6 +61,8 @@ get_processed = function(measure, t1, t2) {
                        format(t1, tz = 'EST'), format(t2, tz = 'EST'))
   res = dbGetQuery(db, sql)
   dbDisconnect(db)
+  # booleans are stored as numbers in SQLite so they need to be converted
+  res[, 3] = as.logical(res[, 3])
   res
 }
 
@@ -169,9 +171,10 @@ get_hourly = function(measure, t1, t2) {
   # for now, assume we're at the project root
   dbpath = file.path(curdir, 'analysis', 'intermediate',
                      paste0('hourly_', site, '_', data_source, '.sqlite'))
+  param_col = paste0('value.', param)
   db = dbConnect(RSQLite::SQLite(), dbpath)
   q = paste0('select time, ? from measurements where time >= ? and time <= ? order by time asc')
-  sql = sqlInterpolate(db, q, dbQuoteIdentifier(db, param),
+  sql = sqlInterpolate(db, q, dbQuoteIdentifier(db, param_col),
                        format(t1, tz = 'EST'), format(t2, tz = 'EST'))
   res = dbGetQuery(db, sql)
   dbDisconnect(db)
