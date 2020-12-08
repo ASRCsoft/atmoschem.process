@@ -22,14 +22,28 @@ get_site_df = function(site) {
     meas = dbReadTable(db, 'measurements', check.names = F)
     dbDisconnect(db)
     meas$time = as.POSIXct(meas$time, tz = 'EST')
+    # get only the parameters included in the dataset
     s_cols = report_columns[report_columns$site == site, ] %>%
       subset(data_source == s)
     params = c('time', s_cols$measurement)
-    meas = meas[, sub(' \\(flag\\)$', '', names(meas)) %in% params]
+    meas = meas[, sub('^value\\.|^flag\\.', '', names(meas)) %in% params]
+    # add units to vals column names
+    mtypes = measurement_types[measurement_types$site == site &
+                               measurement_types$data_source == s, ]
+    val_cols = grep('^value\\.', names(meas))
+    units = names(meas)[val_cols] %>%
+      sub('^value\\.', '', .) %>%
+      match(mtypes$name) %>%
+      mtypes$units[.]
+    names(meas)[val_cols] = paste0(names(meas)[val_cols], ' (', units, ')')
+    # fix column name formatting
+    names(meas) = names(meas) %>%
+      sub('^value\\.', '', .) %>%
+      sub('^flag\\.(.*)', '\\1 (flag)', .)
     old_params = sub(' \\(flag\\)$', '', names(meas)[-1])
     new_params = s_cols$column[match(old_params, s_cols$measurement)]
     names(meas)[-1] =
-      paste(new_params, sub('.*( \\(flag\\))$', '\\1', names(meas)[-1]))
+      paste0(new_params, sub('.*( \\(flag\\))$', '\\1', names(meas)[-1]))
     names(meas)[1] = 'Time (EST)'
     meas_list[[s]] = meas
   }

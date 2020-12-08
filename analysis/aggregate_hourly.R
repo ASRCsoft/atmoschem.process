@@ -112,21 +112,17 @@ flags = narsto_agg_flag(count_mat / hourly_freq, below_mdl)
 
 # combine vals and flags
 ntypes = ncol(flags)
-# add units to vals column names
-units = names(hourly_vals)[-1] %>%
-  sub('^value\\.', '', .) %>%
-  match(mtypes$name) %>%
-  mtypes$units[.]
-names(hourly_vals)[-1] = paste0(names(hourly_vals)[-1], ' (', units, ')')
 hourly_ds = cbind(hourly_vals, flags) %>%
   # intersperse the flags with the values
   subset(select = c(1, rep(1:ntypes + 1, each = 2) + c(0, ntypes))) %>%
   # convert time to character for compatibility with sqlite
   # transform(time = format(time)) # this one removes spaces from names :(
   within(time <- format(time, '%Y-%m-%d %H:%M:%S', tz = 'EST'))
+# hourly flag columns are different than the "flagged" binary value in the
+# high-resolution data, so I think it deserves a different column name to
+# distinguish it
 names(hourly_ds) = names(hourly_ds) %>%
-  sub('^value\\.', '', .) %>%
-  sub('^flagged\\.(.*)', '\\1 (flag)', .)
+  sub('^flagged', 'flag', .)
 
 # write to sqlite file
 interm_dir = file.path('analysis', 'intermediate')
