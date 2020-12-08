@@ -107,6 +107,39 @@ sea_level_pressure = function(press, temp, height) {
   press * (tempK / (tempK + .0065 * height))^(-5.256)
 }
 
+#' Wood smoke indicator based on light absorption
+#'
+#' Derive a semi-quantitative wood smoke indicator from aethalometer
+#' measurements using the Delta-C method.
+#'
+#' Wood smoke is estimated using the Delta-C method introduced by
+#' \insertCite{allen_evaluation_2004;textual}{atmoschem.process}. Delta-C
+#' (sometimes called UVPM) is the difference between aethalometer estimates at
+#' 370nm (sometimes called UVBC) and 880nm:
+#'
+#' \deqn{Delta\textrm{-}C = BC_{370nm} - BC_{880nm}}{Delta-C = BC_370nm - BC_880nm}
+#'
+#' While absorption in the range of 880nm is known to identify black carbon,
+#' additional material absorbs light in the ultraviolet range measured at
+#' 370nm. Specifically, organic compounds associated with wood smoke become more
+#' absorbent and are included in the 370nm measurement.
+#'
+#' The resulting estimate is "semi-quantitative" in the sense that it doesn't
+#' represent the true quantity of wood smoke particles-- rather it is roughly
+#' proportional to the true value.
+#'
+#' \insertNoCite{wang_characterization_2011}{atmoschem.process}
+#' \insertNoCite{zhang_joint_2017}{atmoschem.process}
+#'
+#' @param bc370 370nm estimate of black carbon (UVBC).
+#' @param bc880 880nm estimate of black carbon.
+#' @return Delta-C wood smoke indicator values.
+#' @examples
+#' wood_smoke(1000, 800)
+#'
+#' @references \insertAllCited{}
+#' @export
+wood_smoke = function(bc370, bc880) bc370 - bc880
 
 ## each function takes an etl object, start time and end time, and returns the
 ## unprocessed data
@@ -176,7 +209,7 @@ wfms_wood_smoke = function(obj, start_time, end_time) {
     mutate(measurement_type_id =
              get_measurement_type_id(obj$con, 'WFMS', 'aethelometer',
                                      'Wood smoke'),
-           value = value1 - value2,
+           value = wood_smoke(value1, value2),
            flagged = flagged1 | flagged2) %>%
     select(measurement_type_id, time, value, flagged)
 }
@@ -330,7 +363,7 @@ psp_wood_smoke = function(obj, start_time, end_time) {
     mutate(measurement_type_id =
              get_measurement_type_id(obj$con, 'PSP', 'envidas',
                                      'Wood smoke'),
-           value = value1 - value2,
+           value = wood_smoke(value1, value2),
            flagged = flagged1 | flagged2) %>%
     select(measurement_type_id, time, value, flagged)
 }
