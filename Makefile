@@ -28,6 +28,9 @@ all: routine_dataset
 
 ## Atmoschem Dataset
 
+# save intermediate sqlite files for the processing viewer
+.SECONDARY:
+
 .PHONY: routine_dataset
 routine_dataset: $(clean_old_routine_out) $(hourly_files)
 	mkdir -p $(out_dir)/$(routine_out) && \
