@@ -17,6 +17,8 @@ data_source = commandArgs(trailingOnly = T)[2]
 winds = switch(site, WFMS = c('WS', 'WindDir_D1_WVT'), 
                WFML = c('wind_speed [m/s]', 'wind_direction [degrees]'),
                PSP = c('VWS', 'VWD'))
+if (data_source == 'mesonet')
+  winds = c('wind_speed [m/s]', 'wind_direction [degrees]')
 
 # aggregate function for each measurement type. It's a bit awkward to organize
 # things this way. This should be specified in a config file instead
