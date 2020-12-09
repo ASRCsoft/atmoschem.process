@@ -113,11 +113,34 @@ if (site %in% c('WFMS', 'WFML') & data_source == 'campbell') {
   outage_periods = interval_list(meas$time, is_outage)
   for (i in 1:length(padding_list)) {
     varname = paste0('value.', names(padding_list)[i])
+    flagname = paste0('flagged.', names(padding_list)[i])
     # pad the flagging period by 2 minutes on the front end for all values
     padded_periods = lapply(outage_periods, pad_interval,
                             start = as.difftime(2, units='mins'),
                             end = as.difftime(padding_list[[i]], units='mins'))
-    meas[meas$time %within% padded_periods, varname] = T
+    meas[meas$time %within% padded_periods, flagname] = T
+  }
+}
+# freezing anemometers
+if (site == 'WFMS' & data_source == 'campbell') {
+  windcols = c('WS3Cup', 'WS3Cup_Max', 'WS3CupB', 'WS3CupB_Max')
+  # has the wind been slow for at least 30 minutes?
+  looks_frozen = function(x) {
+    int_end(x) - int_start(x) > as.difftime(30, units = 'mins')
+  }
+  # is it (at least close to) freezing?
+  is_freezing = function(x) meas[meas$time == int_start(x), 'value.T'] < 5
+  for (w in windcols) {
+    varname = paste0('value.', w)
+    flagname = paste0('flagged.', w)
+    slow_wind = meas[, varname] < .2
+    slow_periods = interval_list(meas$time, slow_wind)
+    frozen_periods = slow_periods %>%
+      subset(., sapply(., looks_frozen)) %>%
+      subset(., sapply(., is_freezing)) %>%
+      lapply(pad_interval, start = as.difftime(1, units = 'hours'),
+             end = as.difftime(40, units = 'mins'))
+    meas[meas$time %within% frozen_periods, flagname] = T
   }
 }
 
