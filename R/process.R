@@ -204,19 +204,6 @@ is_flagged = function(obj, m_id, times, x, flagged = FALSE) {
   flagged | in_flagged_period | is_outlier | !is_valid | is_jump
 }
 
-get_measurements = function(obj, m_id, start_time, end_time) {
-  if (is(start_time, 'POSIXt')) attributes(start_time)$tzone = 'EST'
-  if (is(end_time, 'POSIXt')) attributes(end_time)$tzone = 'EST'
-  obs = tbl(obj, 'processed_observations')
-  tbl(obj, 'measurements') %>%
-    filter(measurement_type_id == m_id) %>%
-    left_join(obs, c('observation_id' = 'id')) %>%
-    filter(time >= start_time, time <= end_time) %>%
-    arrange(time) %>%
-    mutate(time = timezone('EST', time)) %>%
-    collect()
-}
-
 process = function(obj, msmts, m_id) {
   m_params = get_mtype_params(obj, m_id)
   ## if (nrow(msmts) == 0) {

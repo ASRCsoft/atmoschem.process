@@ -19,6 +19,27 @@ end_time = as.POSIXct('2020-07-01', tz = 'EST')
 dbcon = src_postgres(dbname = 'nysatmoschemdb')
 nysac = etl('atmoschem.process', db = dbcon)
 
+# R's lead and lag functions aren't so useful. These are better.
+lag2 = function(x, k = 1) c(rep(NA, k), head(x, -k))
+lead2 = function(x, k = 1) c(tail(x, -k), rep(NA, k))
+
+# get delta precip from bucket instrument's cycling cumulative values
+# Open question-- how should this function deal with data gaps?
+bucket_precip = function(val, val.max = .5, err.min = -.02) {
+  # Carefully deal with value resets from 0.5 back to 0, which usually happens
+  # in only one minute, but sometimes takes two minutes with an average
+  # measurement (of the previous high value and next low value) in between
+  out = c(NA, diff(val))
+  resetting = out <= err.min
+  # if resetting in one step
+  out[resetting & !lag2(resetting) & !lead2(resetting)] = out + val.max
+  # if 1st step, resetting in 2 steps-- split the difference over the two steps
+  out[resetting & lead2(resetting)] = (lead2(out) - lag2(out) + val.max) / 2
+  # if 2nd step, resetting in 2 steps-- this should be the same as above
+  out[resetting & lag2(resetting)] = (out - lag2(out, 2) + val.max) / 2
+  out
+}
+
 # organize data from processed_measurements
 
 # get all the measurement IDs for a data source
@@ -60,6 +81,8 @@ meas = tbl(nysac, 'measurements') %>%
   reshape(timevar = 'param', idvar = 'time', direction = 'wide',
           drop = c('observation_id', 'measurement_type_id'))
 attr(meas$time, 'tzone') = 'EST'
+# keep track of the non-derived measurements, for later
+nonderived = sub('^value\\.', '', names(meas)[grep('^value', names(meas))])
 
 # 3) process measurements
 pr_meas = data.frame(time = meas$time)
@@ -86,52 +109,111 @@ for (n in 1:nrow(mtypes)) {
 }
 
 # 4) add derived measurements
-derived_vals = atmoschem.process:::derived_vals
-# monkey patch `combine_measures` until I can rewrite the deriving functions
-combine_measures2 = function(obj, site, data_source, m1, m2, start_time,
-                             end_time) {
-  col_names0 = expand.grid(c('value','flagged'), c(m1, m2))
-  col_names = paste(col_names0[[1]], col_names0[[2]], sep = '.')
-  outdf = pr_meas[, c('time', col_names)]
-  names(outdf)[-1] = c('value1', 'flagged1', 'value2', 'flagged2')
-  outdf
-}
-acp = getNamespace('atmoschem.process')
-unlockBinding('combine_measures', acp)
-acp$combine_measures = combine_measures2
-lockBinding('combine_measures', acp)
-if (site %in% names(derived_vals) &&
-    data_source %in% names(derived_vals[[site]]) &&
-    length(derived_vals[[site]][[data_source]]) > 0) {
-  derive_list = derived_vals[[site]][[data_source]]
-  # update mtypes
-  mtypes = nysac %>%
-    tbl('measurement_types') %>%
-    filter(data_source_id == local(data_sources$id),
-           !is.na(apply_processing) & apply_processing) %>%
-    collect()
-  for (n in 1:length(derive_list)) {
-    tryCatch({
-      f_n = derive_list[[n]]
-      msmts = f_n(nysac, start_time, end_time)
-      if (nrow(msmts) > 0) {
-        ## some functions return multiple derived measurements
-        un_id = unique(msmts$measurement_type_id)
-        for (id in un_id) {
-          name = mtypes$name[match(id, mtypes$id)]
-          message('Processing ', name, '...')
-          id_msmts = subset(msmts, measurement_type_id == id)
-          pr_msmts = atmoschem.process:::process(nysac, id_msmts, id)
-          # write to pr_meas
-          pr_meas[, paste0('value.', name)] = pr_msmts$value
-          pr_meas[, paste0('flagged.', name)] = pr_msmts$flagged
-        }
-      }
-    },
-    error = function(e) {
-      warning('derived value (', n, ') processing failed: ', e)
-    })
+message('Calculating derived values...')
+if (site == 'WFMS') {
+  if (data_source == 'campbell') {
+    # NO2
+    meas$value.NO2 = with(pr_meas, value.NOx - value.NO)
+    meas$flagged.NO2 = with(pr_meas, flagged.NOx | flagged.NO)
+    # SLP
+    meas$value.SLP =
+      with(pr_meas, sea_level_pressure(value.BP, value.PTemp_C, 1483.5))
+    meas$flagged.SLP = with(pr_meas, flagged.BP | flagged.PTemp_C)
+    # WS (wind shadow corrected)
+    meas$value.WS = with(pr_meas, pmax(value.WS3Cup, value.WS3CupB, na.rm = T))
+    meas$flagged.WS = with(pr_meas, flagged.WS3Cup & flagged.WS3CupB)
+    # WS_max (wind shadow corrected)
+    meas$value.WS_Max =
+      with(pr_meas, pmax(value.WS3Cup_Max, value.WS3CupB_Max, na.rm = T))
+    meas$flagged.WS_Max =
+      with(pr_meas, flagged.WS3Cup_Max & flagged.WS3CupB_Max)
+  } else if (data_source == 'aethelometer') {
+    # Wood smoke
+    meas$`value.Wood smoke` =
+      with(pr_meas,
+           wood_smoke(value.concentration_370, value.concentration_880))
+    meas$`flagged.Wood smoke` =
+      with(pr_meas, flagged.concentration_370 | flagged.concentration_880)
   }
+} else if (site == 'WFML') {
+  if (data_source == 'campbell') {
+    # NO2
+    meas$value.NO2 = with(pr_meas, value.NOX - value.NO)
+    meas$flagged.NO2 = with(pr_meas, flagged.NOX | flagged.NO)
+    # SLP
+    meas$value.SLP =
+      with(pr_meas, sea_level_pressure(value.BP2, value.PTemp_C, 604))
+    meas$flagged.SLP = with(pr_meas, flagged.BP2 | flagged.PTemp_C)
+  } else if (data_source == 'envidas') {
+    # Ozone_ppbv
+    meas$value.Ozone_ppbv = pr_meas$`value.API-T400-OZONE` * 1000
+    meas$flagged.Ozone_ppbv = pr_meas$`flagged.API-T400-OZONE`
+  }
+} else if (site == 'PSP') {
+  if (data_source == 'envidas') {
+    # NO2
+    meas$value.NO2 = with(pr_meas, value.NOx - value.NO)
+    meas$flagged.NO2 = with(pr_meas, flagged.NOx | flagged.NO)
+    # HNO3
+    meas$value.HNO3 = with(pr_meas, value.NOy - `value.NOy-HNO3`)
+    meas$flagged.HNO3 = with(pr_meas, flagged.NOy | `flagged.NOy-HNO3`)
+    # Precip (get changes from cumulative value and convert to mm)
+    meas$value.Precip = bucket_precip(pr_meas$value.Rain, .5, -.02) * 25.4
+    meas$flagged.Precip = with(pr_meas, flagged.Rain | is.na(value.Precip))
+    # TEOMA(2.5)BaseMC
+    meas$`value.TEOMA(2.5)BaseMC` =
+      with(pr_meas, `value.TEOMA(2.5)MC` + `value.TEOMA(2.5)RefMC`)
+    meas$`flagged.TEOMA(2.5)BaseMC` =
+      with(pr_meas, `flagged.TEOMA(2.5)MC` | `flagged.TEOMA(2.5)RefMC`)
+    # TEOMB(crs)BaseMC
+    meas$`value.TEOMB(crs)BaseMC` =
+      with(pr_meas, `value.TEOMB(crs)MC` + `value.TEOMB(crs)RefMC`)
+    meas$`flagged.TEOMB(crs)BaseMC` =
+      with(pr_meas, `flagged.TEOMB(crs)MC` | `flagged.TEOMB(crs)RefMC`)
+    # Dichot(10)BaseMC
+    meas$`value.Dichot(10)BaseMC` =
+      with(pr_meas, `value.Dichot(10)MC` + `value.Dichot(10)RefMC`)
+    meas$`flagged.Dichot(10)BaseMC` =
+      with(pr_meas, `flagged.Dichot(10)MC` | `flagged.Dichot(10)RefMC`)
+    # Wood smoke
+    meas$`value.Wood smoke` = with(pr_meas, wood_smoke(value.BC1, value.BC6))
+    meas$`flagged.Wood smoke` = with(pr_meas, flagged.BC1 | flagged.BC6)
+    # SLP
+    meas$value.SLP =
+      with(pr_meas, sea_level_pressure(value.BP, value.AmbTemp, 504))
+    meas$flagged.SLP = with(pr_meas, flagged.BP | flagged.AmbTemp)
+    # SR2 (simple zero-correction)
+    meas$value.SR2 = pr_meas$value.SR + 17.7
+    meas$flagged.SR2 = pr_meas$flagged.SR
+  }
+}
+
+# process the derived values
+# what was derived?
+all_meas = sub('^value\\.', '', names(meas)[grep('^value', names(meas))])
+derived = setdiff(all_meas, nonderived)
+# update mtypes, including derived values
+mtypes = nysac %>%
+  tbl('measurement_types') %>%
+  filter(data_source_id == local(data_sources$id),
+         !is.na(apply_processing) & apply_processing) %>%
+  collect()
+for (mname in derived) {
+  n = match(mname, mtypes$name)
+  message('Processing ', mname, '...')
+  msmt_cols = c('time', paste0('value.', mname), paste0('flagged.', mname))
+  msmts = meas[, msmt_cols]
+  names(msmts) = c('time', 'value', 'flagged')
+  msmts$measurement_type_id = mtypes$id[n]
+  tryCatch({
+    pr_msmts = atmoschem.process:::process(nysac, msmts, mtypes$id[n])
+    # write to pr_meas
+    pr_meas[, paste0('value.', mname)] = pr_msmts$value
+    pr_meas[, paste0('flagged.', mname)] = pr_msmts$flagged
+  },
+  error = function(e) {
+    warning('derived value (', mname, ') processing failed: ', e)
+  })
 }
 
 # write to sqlite file
