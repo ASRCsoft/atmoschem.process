@@ -28,6 +28,5 @@ CREATE OR REPLACE FUNCTION update_processing_inputs(site int, data_source text,
   refresh materialized view processed_observations;
   select update_calibration_results($1, $2, $3, $4);
   select update_freezing_clusters($1, $2, $3, $4);
-  select update_power_outages($1, $3, $4);
   refresh materialized VIEW flagged_periods;
 $$ language sql;

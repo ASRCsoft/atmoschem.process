@@ -6,6 +6,7 @@
 # produces file analysis/intermediate/processed_<site>_<data_source>.sqlite
 
 library(atmoschem.process)
+library(lubridate)
 library(DBI)
 library(RSQLite)
 
@@ -40,6 +41,21 @@ bucket_precip = function(val, val.max = .5, err.min = -.02) {
   out
 }
 
+# for a vector of binary values, find contiguous clusters of `TRUE` values and
+# return a list of lubridate time intervals containing each cluster
+interval_list = function(t, val) {
+  data.frame(time = t, true = val) %>%
+    transform(group = cumsum(true & c(F, !lag(true)[-1]))) %>%
+    subset(true) %>%
+    split(., .$group) %>%
+    lapply(function(x) interval(min(x$time), max(x$time)))
+}
+
+# add time around a lubridate interval
+pad_interval = function(interval, start, end) {
+  interval(int_start(interval) - start, int_end(interval) - end)
+}
+
 # organize data from processed_measurements
 
 # get all the measurement IDs for a data source
@@ -52,7 +68,6 @@ data_sources = nysac %>%
 mtypes = nysac %>%
   tbl('measurement_types') %>%
   filter(data_source_id == local(data_sources$id),
-         !is.na(apply_processing) & apply_processing,
          is.na(derived) | !derived) %>%
   collect()
 
@@ -84,8 +99,37 @@ attr(meas$time, 'tzone') = 'EST'
 # keep track of the non-derived measurements, for later
 nonderived = sub('^value\\.', '', names(meas)[grep('^value', names(meas))])
 
+# 2.5) add miscellaneous flags that aren't included in
+# `atmoschem.process:::is_flagged`
+# power outage flags
+if (site %in% c('WFMS', 'WFML') & data_source == 'campbell') {
+  if (site == 'WFMS') {
+    is_outage = with(meas, value.Phase1 < 105 | value.Phase3 < 100)
+    padding_list = list(CO = 50, NO = 4, NOx = 4, NOy = 4, Ozone = 10, SO2 = 4)
+  } else if (site == 'WFML') {
+    is_outage = meas$value.Phase1 < 105
+    padding_list = list(CO = 10, NO = 45, NOX = 45)
+  }
+  outage_periods = interval_list(meas$time, is_outage)
+  for (i in 1:length(padding_list)) {
+    varname = paste0('value.', names(padding_list)[i])
+    # pad the flagging period by 2 minutes on the front end for all values
+    padded_periods = lapply(outage_periods, pad_interval,
+                            start = as.difftime(2, units='mins'),
+                            end = as.difftime(padding_list[[i]], units='mins'))
+    meas[meas$time %within% padded_periods, varname] = T
+  }
+}
+
 # 3) process measurements
 pr_meas = data.frame(time = meas$time)
+# update mtypes with only processed measurement types
+mtypes = nysac %>%
+  tbl('measurement_types') %>%
+  filter(data_source_id == local(data_sources$id),
+         !is.na(apply_processing) & apply_processing,
+         is.na(derived) | !derived) %>%
+  collect()
 for (n in 1:nrow(mtypes)) {
   mname = mtypes$name[n]
   message('Processing ', mname, '...')
