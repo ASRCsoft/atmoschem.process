@@ -303,18 +303,3 @@ CREATE materialized VIEW flagged_periods AS
 				order by lower(times))) w2
    group by measurement_type_id, period_number;
 CREATE INDEX flagged_periods_idx ON flagged_periods using gist(measurement_type_id, times);
-
-create or replace function is_below_mdl(measurement_type_id int, value numeric) RETURNS bool AS $$
-  select coalesce(value < (select mdl
-			     from measurement_types
-			    where id=$1), false);
-$$ LANGUAGE sql stable parallel safe;
-
-/* Get the NARSTO averaged data flag based on the number of
-measurements and average value. */
-CREATE OR REPLACE FUNCTION get_hourly_flag(measurement_type_id int, value numeric, n int) RETURNS text AS $$
-  SELECT case when n<30 then 'M1'
-	 when n<45 then 'V4'
-	 when is_below_mdl(measurement_type_id, value) then 'V1'
-	 else 'V0' end;
-$$ LANGUAGE sql immutable parallel safe;
