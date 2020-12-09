@@ -175,23 +175,6 @@ wfms_ws = function(obj, start_time, end_time) {
     select(measurement_type_id, time, value, flagged)
 }
 
-wfms_ws_components = function(obj, start_time, end_time) {
-  ws = combine_measures(obj, 'WFMS', 'campbell', 'WS', 'WindDir_D1_WVT',
-                        start_time, end_time) %>%
-    mutate(ws = value1,
-           theta = pi * (270 - value2) / 180,
-           flagged = flagged1 | flagged2) %>%
-    mutate(u = ws * cos(theta),
-           v = ws * sin(theta)) %>%
-    select(time, u, v, flagged) %>%
-    tidyr::gather(component, value, -time, -flagged) %>%
-    mutate(measurement_type_id =
-             ifelse(component == 'u',
-                    get_measurement_type_id(obj$con, 'WFMS', 'campbell', 'WS_u'),
-                    get_measurement_type_id(obj$con, 'WFMS', 'campbell', 'WS_v'))) %>%
-    select(measurement_type_id, time, value, flagged)
-}
-
 wfms_ws_max = function(obj, start_time, end_time) {
   combine_measures(obj, 'WFMS', 'campbell', 'WS3Cup_Max', 'WS3CupB_Max',
                    start_time, end_time) %>%
@@ -215,8 +198,7 @@ wfms_wood_smoke = function(obj, start_time, end_time) {
 }
 
 derived_wfms = list(
-    campbell = list(wfms_no2, wfms_slp, wfms_ws, wfms_ws_components,
-                    wfms_ws_max),
+    campbell = list(wfms_no2, wfms_slp, wfms_ws, wfms_ws_max),
     aethelometer = list(wfms_wood_smoke)
 )
 
@@ -253,30 +235,9 @@ wfml_slp = function(obj, start_time, end_time) {
     select(measurement_type_id, time, value, flagged)
 }
 
-wfml_ws_components = function(obj, start_time, end_time) {
-  ws = combine_measures(obj, 'WFML', 'mesonet', 'wind_speed [m/s]',
-                        'wind_direction [degrees]', start_time,
-                        end_time)
-  if (nrow(ws) == 0) return(ws)
-  ws %>%
-    mutate(ws = value1,
-           theta = pi * (270 - value2) / 180,
-           flagged = flagged1 | flagged2) %>%
-    mutate(u = ws * cos(theta),
-           v = ws * sin(theta)) %>%
-    select(time, u, v, flagged) %>%
-    tidyr::gather(component, value, -time, -flagged) %>%
-    mutate(measurement_type_id =
-             ifelse(component == 'u',
-                    get_measurement_type_id(obj$con, 'WFML', 'mesonet', 'WS_u'),
-                    get_measurement_type_id(obj$con, 'WFML', 'mesonet', 'WS_v'))) %>%
-    select(measurement_type_id, time, value, flagged)
-}
-
 derived_wfml = list(
     campbell = list(wfml_no2, wfml_slp),
-    envidas = list(wfml_ozone),
-    mesonet = list(wfml_ws_components)
+    envidas = list(wfml_ozone)
 )
 
 
@@ -368,43 +329,6 @@ psp_wood_smoke = function(obj, start_time, end_time) {
     select(measurement_type_id, time, value, flagged)
 }
 
-psp_ws_components = function(obj, start_time, end_time) {
-  ws = combine_measures(obj, 'PSP', 'envidas', 'VWS', 'VWD',
-                        start_time, end_time) %>%
-    mutate(ws = value1,
-           theta = pi * (270 - value2) / 180,
-           flagged = flagged1 | flagged2) %>%
-    mutate(u = ws * cos(theta),
-           v = ws * sin(theta)) %>%
-    select(time, u, v, flagged) %>%
-    tidyr::gather(component, value, -time, -flagged) %>%
-    mutate(measurement_type_id =
-             ifelse(component == 'u',
-                    get_measurement_type_id(obj$con, 'PSP', 'envidas', 'WS_u'),
-                    get_measurement_type_id(obj$con, 'PSP', 'envidas', 'WS_v'))) %>%
-    select(measurement_type_id, time, value, flagged)
-}
-
-psp_meso_ws_components = function(obj, start_time, end_time) {
-  ws = combine_measures(obj, 'PSP', 'mesonet', 'wind_speed [m/s]',
-                        'wind_direction [degrees]', start_time,
-                        end_time)
-  if (nrow(ws) == 0) return(ws)
-  ws %>%
-    mutate(ws = value1,
-           theta = pi * (270 - value2) / 180,
-           flagged = flagged1 | flagged2) %>%
-    mutate(u = ws * cos(theta),
-           v = ws * sin(theta)) %>%
-    select(time, u, v, flagged) %>%
-    tidyr::gather(component, value, -time, -flagged) %>%
-    mutate(measurement_type_id =
-             ifelse(component == 'u',
-                    get_measurement_type_id(obj$con, 'PSP', 'mesonet', 'WS_u'),
-                    get_measurement_type_id(obj$con, 'PSP', 'mesonet', 'WS_v'))) %>%
-    select(measurement_type_id, time, value, flagged)
-}
-
 psp_slp = function(obj, start_time, end_time) {
   combine_measures(obj, 'PSP', 'envidas', 'BP', 'AmbTemp',
                    start_time, end_time) %>%
@@ -427,8 +351,7 @@ psp_sr2 = function(obj, start_time, end_time) {
 derived_psp = list(
     envidas = list(psp_no2, psp_hno3, psp_precip, psp_teoma25_base,
                    psp_teombcrs_base, psp_dichot10_base, psp_wood_smoke,
-                   psp_ws_components, psp_slp, psp_sr2),
-    mesonet = list(psp_meso_ws_components)
+                   psp_slp, psp_sr2)
 )
 
 derived_vals = list('WFMS' = derived_wfms,
