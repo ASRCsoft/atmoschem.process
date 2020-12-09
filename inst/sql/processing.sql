@@ -1,23 +1,5 @@
 /* Storing/organizing/calculating processing results. */
 
-/* Store processed results */
-drop table if exists processed_measurements cascade;
-create table processed_measurements (
-  measurement_type_id int references measurement_types,
-  time timestamp,
-  value numeric,
-  flagged boolean not null
-);
-create index processed_measurements_idx on processed_measurements(measurement_type_id, time);
-
-create table hourly_measurements (
-  measurement_type_id int references measurement_types,
-  time timestamp,
-  value numeric,
-  flag text,
-  primary key(measurement_type_id, time)
-);
-
 /* Correct the instrument clock times, where needed. */
 drop materialized view if exists processed_observations cascade;
 CREATE materialized VIEW processed_observations as
