@@ -1,0 +1,49 @@
+# load raw data into SQLite
+
+# run like so:
+# Rscript analysis/load_raw.R <site> <data_source>
+
+# produces file analysis/intermediate/raw_<site>_<data_source>.sqlite
+
+library(magrittr)
+library(DBI)
+library(RSQLite)
+
+site = commandArgs(trailingOnly = T)[1]
+data_source = commandArgs(trailingOnly = T)[2]
+
+# organize raw data from an `etl_transform`ed file
+read_raw = function(f) {
+  read.csv(f) %>%
+    transform(time = as.POSIXct(instrument_time, tz = 'EST')) %>%
+    reshape(timevar = 'measurement_name', idvar = 'time', direction = 'wide',
+            drop = c('record', 'instrument_time'))
+}
+
+# get the manual raw
+raw_list = file.path('analysis', 'cleaned', 'raw_data', site, 'measurements',
+                     data_source, '*', '*') %>%
+  Sys.glob %>%
+  lapply(read_raw)
+# make sure columns match
+all_names = unique(unlist(lapply(raw_list, names)))
+fill_df = function(x) {
+  setdiff(all_names, names(x)) %>%
+    sapply(function(y) NA) %>%
+    c(x, .) %>%
+    data.frame
+}
+rawdf = raw_list %>%
+  lapply(fill_df) %>%
+  do.call(rbind, .)
+
+# write to sqlite file
+# convert time to character for compatibility with sqlite
+rawdf$time = format(rawdf$time, '%Y-%m-%d %H:%M:%S', tz = 'EST')
+interm_dir = file.path('analysis', 'intermediate')
+dir.create(interm_dir, F, T)
+dbpath = paste0('raw_', site, '_', data_source, '.sqlite') %>%
+  file.path(interm_dir, .)
+db = dbConnect(SQLite(), dbpath)
+dbWriteTable(db, 'measurements', rawdf, overwrite = T)
+dbDisconnect(db)
