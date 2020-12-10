@@ -41,8 +41,12 @@ routine_dataset: $(clean_old_routine_out) $(hourly_files)
 $(interm_dir)/hourly_%.sqlite: $(interm_dir)/processed_%.sqlite analysis/aggregate_hourly.R
 	Rscript analysis/aggregate_hourly.R $(shell echo $* | sed "s/_/ /")
 
-$(interm_dir)/processed_%.sqlite: processingdb analysis/process_new_data.R
+$(interm_dir)/processed_%.sqlite: $(interm_dir)/raw_%.sqlite processingdb \
+                                  analysis/process_new_data.R
 	Rscript analysis/process_new_data.R $(shell echo $* | sed "s/_/ /")
+
+$(interm_dir)/raw_%.sqlite: processingdb analysis/load_raw.R
+	Rscript analysis/load_raw.R $(shell echo $* | sed "s/_/ /")
 
 .INTERMEDIATE: processingdb
 processingdb: $(sql_files) $(raw_zip)

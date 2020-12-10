@@ -82,20 +82,12 @@ sql_in = sqlInterpolate(nysac$con, q_in, site = site_id, ds = data_source,
 dbExecute(nysac$con, sql_in)
 
 # 2) get measurements
-obs = tbl(nysac, 'processed_observations')
-meas = tbl(nysac, 'measurements') %>%
-  filter(measurement_type_id %in% local(mtypes$id)) %>%
-  left_join(obs, c('observation_id' = 'id')) %>%
-  filter(timezone('EST', time) >= local(start_time),
-         timezone('EST', time) < local(end_time)) %>%
-  arrange(time) %>%
-  mutate(time = timezone('EST', time)) %>%
-  collect() %>%
-  as.data.frame %>%
-  transform(param = mtypes$name[match(measurement_type_id, mtypes$id)]) %>%
-  reshape(timevar = 'param', idvar = 'time', direction = 'wide',
-          drop = c('observation_id', 'measurement_type_id'))
-attr(meas$time, 'tzone') = 'EST'
+dbpath = file.path('analysis', 'intermediate',
+                   paste0('raw_', site, '_', data_source, '.sqlite'))
+db = dbConnect(SQLite(), dbpath)
+meas = dbReadTable(db, 'measurements', check.names = F)
+dbDisconnect(db)
+meas$time = as.POSIXct(meas$time, tz = 'EST')
 # keep track of the non-derived measurements, for later
 nonderived = sub('^value\\.', '', names(meas)[grep('^value', names(meas))])
 
