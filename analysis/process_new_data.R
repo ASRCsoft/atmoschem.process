@@ -31,13 +31,16 @@ bucket_precip = function(val, val.max = .5, err.min = -.02) {
   # in only one minute, but sometimes takes two minutes with an average
   # measurement (of the previous high value and next low value) in between
   out = c(NA, diff(val))
-  resetting = out <= err.min
+  resetting = out < err.min
   # if resetting in one step
-  out[resetting & !lag2(resetting) & !lead2(resetting)] = out + val.max
+  reset1 = resetting & !lag2(resetting) & !lead2(resetting)
+  out[reset1] = out[reset1] + val.max
   # if 1st step, resetting in 2 steps-- split the difference over the two steps
-  out[resetting & lead2(resetting)] = (lead2(out) - lag2(out) + val.max) / 2
+  reset2_1 = resetting & lead2(resetting)
+  out[reset2_1] = (lead2(out)[reset2_1] - lag2(out)[reset2_1] + val.max) / 2
   # if 2nd step, resetting in 2 steps-- this should be the same as above
-  out[resetting & lag2(resetting)] = (out - lag2(out, 2) + val.max) / 2
+  reset2_2 = resetting & lag2(resetting)
+  out[reset2_2] = (out[reset2_2] - lag2(out, 2)[reset2_2] + val.max) / 2
   out
 }
 
