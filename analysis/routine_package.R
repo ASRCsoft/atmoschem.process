@@ -6,7 +6,7 @@ library(DBI)
 library(RSQLite)
 options(warn = 1) # print warnings immediately
 
-old_processed_dir = 'analysis/cleaned/old_routine'
+old_processed_dir = 'analysis/intermediate'
 out_dir = commandArgs(trailingOnly = TRUE)[1]
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
@@ -52,7 +52,7 @@ get_site_df = function(site) {
 
 for (site in sites$abbreviation) {
   message('Organizing ', site, ' data')
-  csv_file = paste0(site, '.csv')
+  csv_file = paste0('old_', site, '.csv')
   old_processed_file = file.path(old_processed_dir, csv_file)
   out_file = file.path(out_dir, csv_file)
 
