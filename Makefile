@@ -53,9 +53,6 @@ processingdb: $(sql_files) $(raw_zip)
 	unzip -nq $(raw_zip) -d $(raw_dir) && \
 	Rscript analysis/initdb.R
 
-.PHONY: clean_old_routine
-clean_old_routine: $(old_routine_out)
-
 $(interm_dir)/old_%.csv: $(routine_zip) analysis/clean_old_routine.R
 	unzip -nq $(routine_zip) -d $(raw_dir) && \
 	Rscript analysis/clean_old_routine.R $*
