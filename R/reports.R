@@ -37,8 +37,11 @@ get_aqs_flags = function(con, mtype_id, time, narsto_flag) {
 
 ## convert strings from csv files to lubridate intervals
 as_interval = function(s) {
-  tlow = as.POSIXct(gsub('^[[(]|,.*$', '', s), tz='EST')
-  tupp = as.POSIXct(gsub('^.*,|[])]$', '', s), tz='EST')
+  formats = c('%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M:%S', '%Y-%m-%d')
+  tlow = gsub('^[[(]|,.*$', '', s)
+  tlow = lubridate::parse_date_time(tlow, formats, tz = 'EST', exact = T)
+  tupp = gsub('^.*, ?|[])]$', '', s)
+  tupp = lubridate::parse_date_time(tupp, formats, tz = 'EST', exact = T)
   lubridate::interval(tlow, tupp)
 }
 
