@@ -16,7 +16,7 @@ interm_dir := analysis/intermediate
 out_dir := analysis/out
 download_url := http://atmoschem.asrc.cestm.albany.edu/~aqm/AQM_Products/downloads
 routine_zip := $(raw_dir)/routine_chemistry_v0.1.zip
-clean_old_routine_out := $(patsubst %,$(cleaned_dir)/old_routine/%.csv,$(sites))
+old_routine_out := $(patsubst %,$(interm_dir)/old_%.csv,$(sites))
 raw_zip := $(raw_dir)/raw_data_v0.3.zip
 # get <site>_<data_source> for each entry in data_sources.csv
 data_sources := $(shell sed "1d;s/^\([^,]*\),\([^,]*\).*/\1_\2/" data-raw/package_data/data_sources.csv)
@@ -32,7 +32,7 @@ all: routine_dataset
 .SECONDARY:
 
 .PHONY: routine_dataset
-routine_dataset: $(clean_old_routine_out) $(hourly_files)
+routine_dataset: $(old_routine_out) $(hourly_files)
 	mkdir -p $(out_dir)/$(routine_out) && \
 	Rscript analysis/routine_package.R $(out_dir)/$(routine_out)
 	cp analysis/README.txt $(out_dir)/$(routine_out)
@@ -54,9 +54,9 @@ processingdb: $(sql_files) $(raw_zip)
 	Rscript analysis/initdb.R
 
 .PHONY: clean_old_routine
-clean_old_routine: $(clean_old_routine_out)
+clean_old_routine: $(old_routine_out)
 
-$(cleaned_dir)/old_routine/%.csv: $(routine_zip) analysis/clean_old_routine.R
+$(interm_dir)/old_%.csv: $(routine_zip) analysis/clean_old_routine.R
 	unzip -nq $(routine_zip) -d $(raw_dir) && \
 	Rscript analysis/clean_old_routine.R $*
 

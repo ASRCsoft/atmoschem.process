@@ -2,7 +2,7 @@
 
 library(magrittr)
 
-out_dir = 'analysis/cleaned/old_routine'
+out_dir = 'analysis/intermediate'
 site = commandArgs(trailingOnly = TRUE)[1]
 
 ## convert a list to a named vector
@@ -350,7 +350,7 @@ write_site_file = function(site, ...) {
   dflist = lapply(files, read_processed, ...)
   finaldf = merge_dfs(dflist)
   finaldf = finaldf[, order_columns(names(finaldf))]
-  out_path = file.path(out_dir, paste0(site, '.csv'))
+  out_path = file.path(out_dir, paste0('old_', site, '.csv'))
   write.csv(finaldf, file = out_path, row.names = F)
 }
 
