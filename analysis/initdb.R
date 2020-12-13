@@ -27,6 +27,6 @@ for (site in names(sources_list)) {
   nysac %>%
     etl_transform(sites = site, data_sources = site_sources,
                   years = years) %>%
-    etl_load(sites = site, data_sources = site_sources,
+    etl_load(sites = site, data_sources = 'nothing',
              years = years)
 }

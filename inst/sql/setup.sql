@@ -29,23 +29,6 @@ create table files (
   unique(data_source_id, name, calibration)
 );
 
-create table observations (
-  id serial primary key,
-  file_id int references files on delete cascade,
-  line int not null,
-  time timestamp not null,
-  unique(file_id, line)
-);
-CREATE INDEX observations_time_idx ON observations(time);
-
-create table clock_audits (
-  data_source_id int references data_sources,
-  data_source_time timestamp,
-  audit_time timestamp,
-  corrected boolean,
-  primary key(data_source_id, audit_time)
-);
-
 create table measurement_types (
   id serial primary key,
   data_source_id int references data_sources,
@@ -71,23 +54,6 @@ create table measurement_types (
   gilibrator_ce text,
   unique(data_source_id, name)
 );
-
-create table measurements (
-  observation_id int references observations on delete cascade,
-  measurement_type_id int references measurement_types,
-  value numeric,
-  flagged boolean,
-  primary key(observation_id, measurement_type_id)
-);
-
--- other code will often want to see the measurements along with the
--- time
-create or replace view measurements2 as
-  select time,
-	 m1.*
-    from measurements m1
-	   join observations o1
-	       on m1.observation_id=o1.id;
 
 /* A few helpful ID-finding functions */
 drop function if exists get_data_source_ids cascade;

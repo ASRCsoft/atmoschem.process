@@ -57,17 +57,6 @@ update_cal_flags = function(pg, df) {
   update_metadata_tbl(pg, 'calibration_flags', df)
 }
 
-update_clock_audits = function(pg, df) {
-  df$data_source_id =
-    get_data_source_id(pg, df$site,
-                       df$data_source)
-  df$site = NULL
-  df$data_source = NULL
-  ## purge old data then add new data
-  dbxDelete(pg, 'clock_audits')
-  dbxInsert(pg, 'clock_audits', df)
-}
-
 update_gilibrator = function(pg, df) {
   df$site_id = get_site_id(pg, df$site)
   df$site = NULL
@@ -118,8 +107,7 @@ etl_init.etl_atmoschem.process = function(obj, script = NULL,
   pg = obj$con
 
   ## set up tables and functions
-  sql_files = c('utilities', 'setup', 'clock_errors',
-                'calibration', 'flags', 'processing')
+  sql_files = c('utilities', 'setup', 'calibration', 'flags', 'processing')
   for (sql_file in sql_files) {
     ## sql_file = etl::find_schema(obj, sql_file, ext = 'sql')
     sql_file = find_schema(obj, sql_file, ext = 'sql')
@@ -131,7 +119,6 @@ etl_init.etl_atmoschem.process = function(obj, script = NULL,
   update_autocals(pg, autocals)
   update_manual_flags(pg, manual_flags)
   update_cal_flags(pg, cal_flags)
-  update_clock_audits(pg, clock_audits)
   update_gilibrator(pg, gilibrator)
   
   invisible(obj)
