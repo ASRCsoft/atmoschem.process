@@ -200,6 +200,19 @@ if (nrow(acals0)) {
   all_cals = mcals
 }
 
+# apply calibration flags
+all_cals$flagged = F
+cal_flags2 = cal_flags[cal_flags$site == site, ] %>%
+  transform(times = as_interval(times))
+for (n in unique(all_cals$measurement_name)) {
+  cal_flags_n = subset(cal_flags2, measurement_name == n)
+  if (nrow(cal_flags_n)) {
+    n_cal = all_cals$measurement_name == n
+    all_cals[n_cal, 'flagged'] =
+      all_cals[n_cal, 'end_time'] %within% as.list(cal_flags_n$times)
+  }
+}
+
 # write to sqlite file
 # fix time formatting for sqlite compatibility
 all_cals$start_time = format(all_cals$start_time, '%Y-%m-%d %H:%M:%S', tz = 'EST')
