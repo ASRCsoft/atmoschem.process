@@ -266,15 +266,15 @@ AS $$
     and cr1.type in ('zero', 'span', 'CE');
 $$ LANGUAGE sql;
 
-create table calibration_results (
-  measurement_type_id int not null,
-  type text not null,
-  time timestamp not null,
-  provided_value numeric,
-  measured_value numeric,
-  flagged bool,
-  unique(measurement_type_id, type, time)
-);
+-- create table calibration_results (
+--   measurement_type_id int not null,
+--   type text not null,
+--   time timestamp not null,
+--   provided_value numeric,
+--   measured_value numeric,
+--   flagged bool,
+--   unique(measurement_type_id, type, time)
+-- );
 
 CREATE OR REPLACE FUNCTION update_calibration_results(site int, data_source text,
 						      starttime timestamp,
@@ -293,3 +293,38 @@ CREATE OR REPLACE FUNCTION update_calibration_results(site int, data_source text
   select *
     from get_calibration_results($1, $2, $3, $4);
 $$ language sql;
+
+-- calibration results calculated in load_calibration.R
+create table calibrations_wfms (
+  measurement_type_id int not null,
+  type text not null,
+  time timestamp not null,
+  provided_value numeric,
+  measured_value numeric,
+  flagged bool,
+  unique(measurement_type_id, type, time)
+);
+create table calibrations_wfml (
+  measurement_type_id int not null,
+  type text not null,
+  time timestamp not null,
+  provided_value numeric,
+  measured_value numeric,
+  flagged bool,
+  unique(measurement_type_id, type, time)
+);
+create table calibrations_psp (
+  measurement_type_id int not null,
+  type text not null,
+  time timestamp not null,
+  provided_value numeric,
+  measured_value numeric,
+  flagged bool,
+  unique(measurement_type_id, type, time)
+);
+create view calibration_results as
+  select * from calibrations_wfms
+   union
+  select * from calibrations_wfml
+   union
+  select * from calibrations_psp;

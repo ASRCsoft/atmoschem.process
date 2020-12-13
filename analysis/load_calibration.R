@@ -229,4 +229,17 @@ dbDisconnect(db)
 
 # also write to postgres. This keeps the code running until I get a chance to
 # rewrite the R code so it doesn't look for calibrations in postgres.
-# ...
+pg = src_postgres(dbname = 'nysatmoschemdb')
+data_source = switch(site, WFMS = 'campbell', WFML = 'campbell',
+                     PSP = 'envidas')
+all_cals$measurement_type_id =
+  atmoschem.process:::get_measurement_type_id(pg$con, site, data_source,
+                                              all_cals$measurement_name,
+                                              add_new = F)
+all_cals$time = as.POSIXct(all_cals$end_time, tz = 'EST')
+all_cals = all_cals[, c('measurement_type_id', 'type', 'time', 'provided_value',
+                        'measured_value', 'flagged')]
+tbl_name = paste0('calibrations_', tolower(site))
+dbSendQuery(pg$con, paste('delete from', tbl_name))
+dbWriteTable(pg$con, tbl_name, all_cals, row.names = F, append = T)
+dbDisconnect(pg$con)

@@ -26,6 +26,5 @@ CREATE OR REPLACE FUNCTION update_processing_inputs(site int, data_source text,
   RETURNS void as $$
   refresh materialized view matched_clock_audits;
   refresh materialized view processed_observations;
-  select update_calibration_results($1, $2, $3, $4);
   refresh materialized VIEW flagged_periods;
 $$ language sql;
