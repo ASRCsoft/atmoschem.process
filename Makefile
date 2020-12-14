@@ -45,17 +45,20 @@ $(interm_dir)/processed_%.sqlite: $(interm_dir)/raw_%.sqlite processingdb \
                                   analysis/process_new_data.R
 	Rscript analysis/process_new_data.R $(shell echo $* | sed "s/_/ /")
 
-$(interm_dir)/raw_%.sqlite: processingdb analysis/load_raw.R
+$(interm_dir)/raw_%.sqlite: raw_data analysis/load_raw.R
 	Rscript analysis/load_raw.R $(shell echo $* | sed "s/_/ /")
 
 .INTERMEDIATE: processingdb
-processingdb: $(sql_files) $(raw_zip)
-	unzip -nq $(raw_zip) -d $(raw_dir) && \
+processingdb: $(sql_files) raw_data
 	Rscript analysis/initdb.R
 
 $(interm_dir)/old_%.csv: $(routine_zip) analysis/clean_old_routine.R
 	unzip -nq $(routine_zip) -d $(raw_dir) && \
 	Rscript analysis/clean_old_routine.R $*
+
+.INTERMEDIATE: raw_data
+raw_data: $(raw_zip)
+	unzip -nq $(raw_zip) -d $(raw_dir)
 
 $(raw_dir)/%.zip:
 	mkdir -p $(raw_dir) && \
