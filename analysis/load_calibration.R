@@ -87,10 +87,13 @@ guess_42C_ce = function(meas, noxval) {
 }
 
 # get the manual cals
-mcals = file.path('analysis', 'cleaned', 'raw_data', site, 'calibrations', '*',
+mcals = file.path('analysis', 'raw', 'raw_data_v0.3', site, 'calibrations', '*',
                   '*', '*') %>%
   Sys.glob %>%
-  lapply(read.csv) %>%
+  data.frame(f = .) %>%
+  transform(ds = gsub('^.*calibrations/|/[0-9]{4}/[^/].*$', '', f)) %>%
+  with(mapply(atmoschem.process:::transform_calibration, f = f, site = site,
+              ds = ds, SIMPLIFY = F)) %>%
   do.call(rbind, .) %>%
   transform(times = as_interval(times))
 
@@ -237,6 +240,7 @@ all_cals$measurement_type_id =
                                               all_cals$measurement_name,
                                               add_new = F)
 all_cals$time = as.POSIXct(all_cals$end_time, tz = 'EST')
+all_cals = all_cals[!is.na(all_cals$time), ]
 all_cals = all_cals[, c('measurement_type_id', 'type', 'time', 'provided_value',
                         'measured_value', 'flagged')]
 tbl_name = paste0('calibrations_', tolower(site))
