@@ -15,17 +15,12 @@ attr(nysac, 'load_dir') = 'analysis/cleaned/raw_data'
 etl_init(nysac)
 
 # load the data
-sources_list = list(
-    WFMS = c('campbell', 'ultrafine', 'aethelometer'),
-    WFML = c('envidas', 'campbell', 'mesonet'),
-    PSP = c('envidas', 'mesonet')
-)
 years = 2018:2020
-for (site in names(sources_list)) {
+for (site in c('WFMS', 'WFML', 'PSP')) {
   message('Starting ', site, '...')
-  site_sources = sources_list[[site]]
   nysac %>%
-    etl_transform(sites = site, data_sources = site_sources,
+    # ignore the measurement files and only transform/load the calibration files
+    etl_transform(sites = site, data_sources = 'nothing',
                   years = years) %>%
     etl_load(sites = site, data_sources = 'nothing',
              years = years)

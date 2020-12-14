@@ -5,6 +5,7 @@
 
 # produces file analysis/intermediate/raw_<site>_<data_source>.sqlite
 
+library(atmoschem.process)
 library(magrittr)
 library(DBI)
 library(RSQLite)
@@ -14,14 +15,14 @@ data_source = commandArgs(trailingOnly = T)[2]
 
 # organize raw data from an `etl_transform`ed file
 read_raw = function(f) {
-  read.csv(f) %>%
+  atmoschem.process:::transform_measurement(f, site, data_source) %>%
     transform(time = as.POSIXct(instrument_time, tz = 'EST')) %>%
     reshape(timevar = 'measurement_name', idvar = 'time', direction = 'wide',
             drop = c('record', 'instrument_time'))
 }
 
 # get the manual raw
-raw_list = file.path('analysis', 'cleaned', 'raw_data', site, 'measurements',
+raw_list = file.path('analysis', 'raw', 'raw_data_v0.3', site, 'measurements',
                      data_source, '*', '*') %>%
   Sys.glob %>%
   lapply(read_raw)
