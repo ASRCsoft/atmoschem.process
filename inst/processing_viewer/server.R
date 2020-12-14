@@ -30,15 +30,29 @@ is_true = function(x) !is.na(x) & x
 
 ## retrieve data from table based on timerange and measure
 get_raw = function(measure, t1, t2) {
-  tbl(pg, 'measurements2') %>%
-    mutate(time = timezone('EST', time)) %>%
-    filter(measurement_type_id == measure &
-           time >= t1 &
-           time <= t2) %>%
-    select(time, value, flagged) %>%
-    mutate(flagged = !is.na(flagged) & flagged) %>%
-    arrange(time) %>%
-    collect()
+  # get site, data source, and parameter name from measurement id
+  param = measurements$name[match(measure, measurements$id)]
+  data_source_id = measurements$data_source_id[match(measure, measurements$id)]
+  data_source = data_sources$name[match(data_source_id, data_sources$id)]
+  site_id = data_sources$site_id[match(data_source_id, data_sources$id)]
+  site = c('WFMS', 'WFML', 'PSP', 'QC')[site_id]
+  # get requested data
+  # for now, assume we're at the project root
+  dbpath = file.path(curdir, 'analysis', 'intermediate',
+                     paste0('raw_', site, '_', data_source, '.sqlite'))
+  param_col = paste0('value.', param)
+  param_fcol = paste0('flagged.', param)
+  db = dbConnect(RSQLite::SQLite(), dbpath)
+  q = paste0('select time, ?, ? from measurements where time >= ? and time <= ? order by time asc')
+  sql = sqlInterpolate(db, q, dbQuoteIdentifier(db, param_col),
+                       dbQuoteIdentifier(db, param_fcol),
+                       format(t1, tz = 'EST'), format(t2, tz = 'EST'))
+  res = dbGetQuery(db, sql)
+  dbDisconnect(db)
+  res[, 1] = as.POSIXct(res[, 1], tz = 'EST')
+  # booleans are stored as numbers in SQLite so they need to be converted
+  res[, 3] = !is.na(res[, 3]) & as.logical(res[, 3])
+  res
 }
 
 get_processed = function(measure, t1, t2) {
@@ -61,6 +75,7 @@ get_processed = function(measure, t1, t2) {
                        format(t1, tz = 'EST'), format(t2, tz = 'EST'))
   res = dbGetQuery(db, sql)
   dbDisconnect(db)
+  res[, 1] = as.POSIXct(res[, 1], tz = 'EST')
   # booleans are stored as numbers in SQLite so they need to be converted
   res[, 3] = as.logical(res[, 3])
   res
