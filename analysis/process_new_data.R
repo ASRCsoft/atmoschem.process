@@ -48,7 +48,7 @@ bucket_precip = function(val, val.max = .5, err.min = -.02) {
 # return a list of lubridate time intervals containing each cluster
 interval_list = function(t, val) {
   data.frame(time = t, true = val) %>%
-    transform(group = cumsum(true & c(F, !lag(true)[-1]))) %>%
+    transform(group = cumsum(true & c(F, !lag2(true)[-1]))) %>%
     subset(true) %>%
     split(., .$group) %>%
     lapply(function(x) interval(min(x$time), max(x$time)))
@@ -124,11 +124,11 @@ if (site == 'WFMS' & data_source == 'campbell') {
     int_end(x) - int_start(x) > as.difftime(30, units = 'mins')
   }
   # is it (at least close to) freezing?
-  is_freezing = function(x) meas[meas$time == int_start(x), 'value.T'] < 5
+  is_freezing = function(x) meas[match(int_start(x), meas$time), 'value.T'] < 5
   for (w in windcols) {
     varname = paste0('value.', w)
     flagname = paste0('flagged.', w)
-    slow_wind = meas[, varname] < .2
+    slow_wind = !is.na(meas[, varname]) & meas[, varname] < .2
     slow_periods = interval_list(meas$time, slow_wind)
     frozen_periods = slow_periods %>%
       subset(., sapply(., looks_frozen)) %>%
