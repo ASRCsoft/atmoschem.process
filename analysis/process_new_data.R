@@ -20,6 +20,8 @@ end_time = as.POSIXct('2020-07-01', tz = 'EST')
 dbcon = src_postgres(dbname = 'nysatmoschemdb')
 nysac = etl('atmoschem.process', db = dbcon)
 
+is_true = function(x) !is.na(x) & x
+
 # R's lead and lag functions aren't so useful. These are better.
 lag2 = function(x, k = 1) c(rep(NA, k), head(x, -k))
 lead2 = function(x, k = 1) c(tail(x, -k), rep(NA, k))
@@ -155,12 +157,22 @@ for (n in 1:nrow(mtypes)) {
     msmt_cols = c('time', paste0('value.', mname), paste0('flagged.', mname))
     msmts = meas[, msmt_cols]
     names(msmts) = c('time', 'value', 'flagged')
-    msmts$measurement_type_id = mtypes$id[n]
+    m_id = mtypes$id[n]
     tryCatch({
-      pr_msmts = atmoschem.process:::process(nysac, msmts, mtypes$id[n])
+      params = atmoschem.process:::get_mtype_params(nysac, m_id)
+      if (is_true(params$has_calibration)) {
+        msmts$value =
+          atmoschem.process:::apply_cal(nysac, m_id, msmts$time, msmts$value)
+      }
+      if (is_true(params$apply_ce)) {
+        msmts$value = msmts$value /
+          atmoschem.process:::estimate_ces(nysac, m_id, msmts$time)
+      }
+      msmts$flagged = atmoschem.process:::is_flagged(nysac, m_id, msmts$time,
+                                                     msmts$value, msmts$flagged)
       # write to pr_meas
-      pr_meas[, paste0('value.', mname)] = pr_msmts$value
-      pr_meas[, paste0('flagged.', mname)] = pr_msmts$flagged
+      pr_meas[, paste0('value.', mname)] = msmts$value
+      pr_meas[, paste0('flagged.', mname)] = msmts$flagged
     },
     error = function(e) {
       warning(mname, ' processing failed: ', e)

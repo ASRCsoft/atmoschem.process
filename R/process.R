@@ -203,22 +203,3 @@ is_flagged = function(obj, m_id, times, x, flagged = FALSE) {
   }
   flagged | in_flagged_period | is_outlier | !is_valid | is_jump
 }
-
-process = function(obj, msmts, m_id) {
-  m_params = get_mtype_params(obj, m_id)
-  ## if (nrow(msmts) == 0) {
-  ##   warning('No measurements found.')
-  ##   return(data.frame())
-  ## }
-  if (is_true(m_params$has_calibration)) {
-    msmts$value = apply_cal(obj, m_id, msmts$time, msmts$value)
-  }
-  if (is_true(m_params$apply_ce)) {
-    msmts$value = msmts$value / estimate_ces(obj, m_id, msmts$time)
-  }
-  msmts$flagged = is_flagged(obj, m_id, msmts$time, msmts$value,
-                             msmts$flagged)
-  msmts = msmts[, c('measurement_type_id', 'time', 'value', 'flagged')]
-  attributes(msmts$time)$tzone = 'EST'
-  msmts
-}
