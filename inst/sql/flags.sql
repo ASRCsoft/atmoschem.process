@@ -4,11 +4,7 @@
 CREATE or replace VIEW _flagged_periods AS
   select measurement_type_id,
 	 times
-    from manual_calibrations
-   union
-  select measurement_type_id,
-	 times
-    from scheduled_autocals;
+    from manual_calibrations;
 
 -- combine overlapping periods
 CREATE materialized VIEW flagged_periods AS

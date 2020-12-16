@@ -101,7 +101,20 @@ nonderived = sub('^value\\.', '', names(meas)[grep('^value', names(meas))])
 # manual calibrations
 # ...
 # autocals
-# ...
+acals_ds = autocals[autocals$site == site &
+                    autocals$data_source == data_source, ]
+if (nrow(acals_ds)) {
+  time_hms = hms(strftime(meas$time, format = '%H:%M:%S', tz = 'EST'))
+  for (i in 1:nrow(acals_ds)) {
+    flagname = paste0('flagged.', acals_ds$measurement_name[i])
+    sched_times = atmoschem.process:::as_interval(acals_ds$dates[i])
+    stime = hm(gsub('^[[(]|,.*$', '', acals_ds$times[i]))
+    etime = hm(gsub('^.*, ?|[])]$', '', acals_ds$times[i]))
+    if (is.na(int_end(sched_times))) int_end(sched_times) = Sys.time()
+    meas[meas$time %within% sched_times &
+         meas$time_hms >= stime & meas$time_hms <= etime, flagname] = T
+  }
+}
 # manual flags
 mflags_ds = manual_flags[manual_flags$site == site &
                          manual_flags$data_source == data_source, ]
