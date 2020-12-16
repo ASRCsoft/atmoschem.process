@@ -8,20 +8,6 @@ CREATE TYPE timerange AS RANGE (
   subtype_diff = _time_diff_seconds
 );
 
-/* Inefficient but flexible median aggregate */
-CREATE OR REPLACE FUNCTION median_finalfn(numeric[]) RETURNS double precision AS $$
-  select percentile_cont(.5) within group (order by v)
-    from unnest($1) v;
-$$ LANGUAGE sql IMMUTABLE;
-
-CREATE AGGREGATE median(numeric) (
-  stype = numeric[],
-  sfunc = array_append,
-  finalfunc = median_finalfn,
-  initcond = '{}',
-  PARALLEL = SAFE
-);
-
 /* A few functions to help with time ranges */
 CREATE AGGREGATE range_union(anyrange) (
   stype = anyrange,
