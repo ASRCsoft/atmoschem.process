@@ -21,8 +21,9 @@ transform_calibration = function(f, site, ds) {
 
 transform_measurement = function(f, site, ds) {
   if (ds == 'campbell') {
-    transform_campbell(f, site)
-  } else if (ds == 'ultrafine') {
+    return(transform_campbell(f, site))
+  }
+  res = if (ds == 'ultrafine') {
     transform_ultrafine(f)
   } else if (ds == 'mesonet') {
     transform_mesonet(f)
@@ -33,6 +34,10 @@ transform_measurement = function(f, site, ds) {
   } else if (site == 'WFML' && ds == 'envidas') {
     transform_wfml_envidas(f)
   }
+  res %>%
+    transform(time = as.POSIXct(instrument_time, tz = 'EST')) %>%
+    reshape(timevar = 'measurement_name', idvar = 'time', direction = 'wide',
+            drop = c('record', 'instrument_time'))
 }
 
 transform_file = function(f, out_file, site, measurement, ds) {
