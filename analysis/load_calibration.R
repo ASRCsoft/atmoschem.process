@@ -165,6 +165,7 @@ mcals$manual = T
 # get the automated cals
 # first let's get a data frame of the cal times
 acals0 = autocals %>%
+  subset(type %in% c('zero', 'span', 'CE')) %>%
   transform(dt_int = as_interval(dates))
 acals0 = acals0[acals0$site == site, ]
 if (nrow(acals0)) {
