@@ -96,6 +96,10 @@ mcals = file.path('analysis', 'raw', 'raw_data_v0.3', site, 'calibrations', '*',
               ds = ds, SIMPLIFY = F)) %>%
   do.call(rbind, .) %>%
   transform(times = as_interval(times))
+# ideally, the data source would be assigned via the config files. But for now,
+# hardcoded
+mcals$data_source = switch(site, WFMS = 'campbell', WFML = 'campbell',
+                           PSP = 'envidas')
 
 if (site == 'PSP') {
   # find NO conversion efficiency results, which weren't recorded in the PSP cal
@@ -145,9 +149,10 @@ if (site == 'PSP') {
   no_ces = no_ces[, !names(no_ces) %in% c('start_time', 'end_time')]
   no_ces = no_ces[, c(1:2, 5, 3:4)]
   no_ces$corrected = F
+  no_ces$data_source = 'envidas'
   
   # add NO CE values to the other manual cals
-  mcals = rbind(mcals, no_ces)
+  mcals = rbind(mcals, no_ces[, names(mcals)])
 }
 
 # fix up mcal formatting
