@@ -1,16 +1,5 @@
 ## transform measurement files
 
-fast_lookup = function(vals, dict) {
-  ## This code to get dictionary (named vector) entries shouldn't need
-  ## to be this long but the current version of R seems to have a very
-  ## slow lookup function for named vectors, so we need extra code to
-  ## work around that.
-  res = rep(NA, length(vals))
-  has_entry = vals %in% names(dict)
-  res[has_entry] = dict[vals[has_entry]]
-  res
-}
-
 wfms_flags = c(NO = 'NOX', NOx = 'NOX', T = 'TRH',
                RH = 'TRH', NOy = 'NOY', SO2 = 'SO2',
                CO = 'CO')
@@ -67,8 +56,6 @@ transform_campbell = function(f, site) {
   
   ## clean and reorganize the data
   is_flag = grepl('^F_', names(campbell))
-  campbell_long = campbell[, !is_flag] %>%
-    tidyr::gather(measurement_name, value, -c(instrument_time, RECORD))
   if (site == 'WFMS') {
     flag_mat = as.matrix(campbell[, is_flag]) != 1
     flag_dict = wfms_flags
@@ -76,20 +63,20 @@ transform_campbell = function(f, site) {
     flag_mat = as.matrix(campbell[, is_flag]) != 0
     flag_dict = wfml_flags
   }
-  row.names(flag_mat) = campbell$instrument_time
-  campbell_long$measurement_name =
-    gsub('_Avg$', '', campbell_long$measurement_name)
-  flag_rows = match(campbell_long$instrument_time,
-                    campbell$instrument_time)
-  flag_cols = match(paste('F',
-                          fast_lookup(campbell_long$measurement_name,
-                                      flag_dict),
-                          'Avg', sep = '_'),
-                    colnames(flag_mat))
-  campbell_long$flagged = flag_mat[cbind(flag_rows, flag_cols)]
-  
-  names(campbell_long) = tolower(names(campbell_long))
-  ## reorder the columns to match the database table
-  campbell_long[, c('measurement_name', 'instrument_time',
-                    'record', 'value', 'flagged')]
+  campbell2 = campbell[, !is_flag]
+  campbell2$RECORD = NULL
+  for (i in 2:ncol(campbell2)) {
+    varname = names(campbell2)[i]
+    flagname = paste0('flagged.', varname)
+    if (varname %in% names(flag_dict)) {
+      flag_col = paste0('F_', flag_dict[i])
+      campbell2[, flagname] = flag_mat[, flag_col]
+    } else {
+      campbell2[, flagname] = FALSE
+    }
+    names(campbell2)[i] = paste0('value.', names(campbell2)[i])
+  }
+  names(campbell2)[1] = 'time'
+  campbell2$time = as.POSIXct(campbell2$time, tz = 'EST')
+  campbell2
 }

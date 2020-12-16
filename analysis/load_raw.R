@@ -15,10 +15,7 @@ data_source = commandArgs(trailingOnly = T)[2]
 
 # organize raw data from an `etl_transform`ed file
 read_raw = function(f) {
-  atmoschem.process:::transform_measurement(f, site, data_source) %>%
-    transform(time = as.POSIXct(instrument_time, tz = 'EST')) %>%
-    reshape(timevar = 'measurement_name', idvar = 'time', direction = 'wide',
-            drop = c('record', 'instrument_time'))
+  atmoschem.process:::transform_measurement(f, site, data_source)
 }
 
 # get the manual raw
@@ -36,7 +33,8 @@ fill_df = function(x) {
 }
 rawdf = raw_list %>%
   lapply(fill_df) %>%
-  do.call(rbind, .)
+  do.call(rbind, .) %>%
+  transform(time = as.POSIXct(time, tz = 'EST', origin = '1970-01-01'))
 
 # write to sqlite file
 # convert time to character for compatibility with sqlite
