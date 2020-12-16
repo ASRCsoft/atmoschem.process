@@ -98,6 +98,19 @@ nonderived = sub('^value\\.', '', names(meas)[grep('^value', names(meas))])
 
 # 2.5) add miscellaneous flags that aren't included in
 # `atmoschem.process:::is_flagged`
+# manual calibrations
+# ...
+# autocals
+# ...
+# manual flags
+mflags_ds = manual_flags[manual_flags$site == site &
+                         manual_flags$data_source == data_source, ]
+for (mname in unique(mflags_ds$measurement_name)) {
+  meas_flags = subset(mflags_ds, measurement_name == mname)
+  meas_flag_periods = atmoschem.process:::as_interval(meas_flags$times)
+  flagname = paste0('flagged.', mname)
+  meas[meas$time %within% as.list(meas_flag_periods), flagname] = T
+}
 # power outage flags
 if (site %in% c('WFMS', 'WFML') & data_source == 'campbell') {
   if (site == 'WFMS') {

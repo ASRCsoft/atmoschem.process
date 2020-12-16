@@ -1,19 +1,6 @@
 /* Determing flag values. */
 
-create table manual_flags (
-  measurement_type_id int references measurement_types,
-  times tsrange,
-  aqs_flag text not null,
-  explanation text,
-  primary key(measurement_type_id, times),
-  CONSTRAINT no_duplicated_flags EXCLUDE USING GIST (
-    measurement_type_id WITH =,
-    explanation WITH =,
-    times WITH &&
-  )
-);
-
--- gather all flagged periods
+-- gather all flagged calibration periods
 CREATE or replace VIEW _flagged_periods AS
   select measurement_type_id,
 	 times
@@ -21,11 +8,7 @@ CREATE or replace VIEW _flagged_periods AS
    union
   select measurement_type_id,
 	 times
-    from scheduled_autocals
-   union
-  select measurement_type_id,
-	 times
-    from manual_flags;
+    from scheduled_autocals;
 
 -- combine overlapping periods
 CREATE materialized VIEW flagged_periods AS
