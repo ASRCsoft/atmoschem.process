@@ -247,6 +247,7 @@ all_cals$measurement_type_id =
                                               add_new = F)
 all_cals$time = as.POSIXct(all_cals$end_time, tz = 'EST')
 all_cals = all_cals[!is.na(all_cals$time), ]
+all_cals = all_cals[!is.na(all_cals$measurement_type_id), ]
 all_cals = all_cals[, c('measurement_type_id', 'type', 'time', 'provided_value',
                         'measured_value', 'flagged')]
 tbl_name = paste0('calibrations_', tolower(site))
