@@ -1,19 +1,5 @@
 /* Instrument calibration */
 
-create table autocals (
-  measurement_type_id int references measurement_types,
-  type text,
-  dates tsrange,
-  times timerange,
-  value numeric default 0,
-  primary key(measurement_type_id, dates, times),
-  CONSTRAINT no_overlapping_autocals EXCLUDE USING GIST (
-    measurement_type_id WITH =,
-    dates WITH &&,
-    times WITH &&
-  )
-);
-
 create table manual_calibrations (
   file_id int references files on delete cascade,
   measurement_type_id int references measurement_types,
@@ -38,14 +24,6 @@ create table gilibrator (
   measured_value numeric,
   changed boolean,
   primary key(site_id, measurement_name, time)
-);
-
-create table calibration_flags (
-  measurement_type_id int references measurement_types,
-  type text,
-  times tsrange,
-  explanation text,
-  primary key(measurement_type_id, type, times)
 );
 
 -- calibration results calculated in load_calibration.R

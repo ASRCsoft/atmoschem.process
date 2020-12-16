@@ -45,14 +45,6 @@ update_measurement_types = function(pg, df) {
                       action = 'update')
 }
 
-update_autocals = function(pg, df) {
-  update_metadata_tbl(pg, 'autocals', df)
-}
-
-update_cal_flags = function(pg, df) {
-  update_metadata_tbl(pg, 'calibration_flags', df)
-}
-
 update_gilibrator = function(pg, df) {
   df$site_id = get_site_id(pg, df$site)
   df$site = NULL
@@ -112,8 +104,6 @@ etl_init.etl_atmoschem.process = function(obj, script = NULL,
 
   ## add supporting data
   update_measurement_types(pg, measurement_types)
-  update_autocals(pg, autocals)
-  update_cal_flags(pg, cal_flags)
   update_gilibrator(pg, gilibrator)
   
   invisible(obj)
