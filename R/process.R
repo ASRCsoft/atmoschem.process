@@ -43,20 +43,6 @@ get_mtype_params = function(obj, m_id) {
     as.list()
 }
 
-get_flagged_periods = function(obj, m_id) {
-  fp = obj %>% tbl('flagged_periods') %>%
-    filter(measurement_type_id == m_id) %>%
-    mutate(start_time = timezone('EST', lower(times)),
-           end_time = timezone('EST', upper(times))) %>%
-    select(start_time, end_time) %>%
-    arrange(start_time) %>%
-    collect()
-  if (nrow(fp) == 0) return(vector())
-  fp %>%
-    mutate(interval = lubridate::interval(start_time, end_time)) %>%
-    pull(interval)
-}
-
 in_interval = function(x, l, u, l_inc, u_inc) {
   res = TRUE
   if (!is.na(l)) {
@@ -169,15 +155,12 @@ is_flagged = function(obj, m_id, times, x, flagged = FALSE) {
   ## get the mtype attributes
   mtype = get_mtype_params(obj, m_id)
 
-  flagged_periods = as.list(get_flagged_periods(obj, m_id))
-  in_flagged_period = times %within% flagged_periods
-
   ## check for outliers
   if (!is.na(mtype$remove_outliers) && mtype$remove_outliers) {
     is_outlier = x %>%
       ## don't use previously flagged data (often indicating
       ## calibrations) during outlier detection
-      replace(flagged | in_flagged_period, NA) %>%
+      replace(flagged, NA) %>%
       { if (is_true(mtype$spike_log_transform)) log(.) else . } %>%
       hampel_outlier(mtype$spike_window) %>%
       replace(., is.na(.), FALSE)
@@ -201,5 +184,5 @@ is_flagged = function(obj, m_id, times, x, flagged = FALSE) {
   } else {
     is_jump = FALSE
   }
-  flagged | in_flagged_period | is_outlier | !is_valid | is_jump
+  flagged | is_outlier | !is_valid | is_jump
 }

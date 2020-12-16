@@ -95,7 +95,7 @@ etl_init.etl_atmoschem.process = function(obj, script = NULL,
   pg = obj$con
 
   ## set up tables and functions
-  sql_files = c('utilities', 'setup', 'calibration', 'flags', 'processing')
+  sql_files = c('setup', 'calibration')
   for (sql_file in sql_files) {
     ## sql_file = etl::find_schema(obj, sql_file, ext = 'sql')
     sql_file = find_schema(obj, sql_file, ext = 'sql')

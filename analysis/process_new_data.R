@@ -78,15 +78,7 @@ mtypes = nysac %>%
 
 # make processed data
 
-# 1) update database stuff
-message('Updating processing inputs ...')
-q_in = 'select update_processing_inputs(?site, ?ds, ?start, ?end)'
-sql_in = sqlInterpolate(nysac$con, q_in, site = site_id, ds = data_source,
-                        start = format(start_time, tz = 'EST'),
-                        end = format(end_time, tz = 'EST'))
-dbExecute(nysac$con, sql_in)
-
-# 2) get measurements
+# 1) get measurements
 dbpath = file.path('analysis', 'intermediate',
                    paste0('raw_', site, '_', data_source, '.sqlite'))
 db = dbConnect(SQLite(), dbpath)
@@ -96,10 +88,34 @@ meas$time = as.POSIXct(meas$time, tz = 'EST')
 # keep track of the non-derived measurements, for later
 nonderived = sub('^value\\.', '', names(meas)[grep('^value', names(meas))])
 
-# 2.5) add miscellaneous flags that aren't included in
+# 2) add miscellaneous flags that aren't included in
 # `atmoschem.process:::is_flagged`
 # manual calibrations
-# ...
+dbpath = file.path('analysis', 'intermediate', paste0('cals_', site, '.sqlite'))
+db = dbConnect(SQLite(), dbpath)
+mcals = dbGetQuery(db, 'select * from calibrations where manual')
+dbDisconnect(db)
+mcals = mcals[mcals$data_source == data_source, ]
+if (nrow(mcals)) {
+  mcals$start_time = as.POSIXct(mcals$start_time, tz = 'EST')
+  mcals$end_time = as.POSIXct(mcals$end_time, tz = 'EST')
+  if (any(is.na(mcals$end_time))) {
+    nmiss = sum(is.na(mcals$end_time))
+    warning('Missing ', nmiss,
+            ' manual calibration end times. Guessing the end times.')
+    mcals$end_time[is.na(mcals$end_time)] =
+      mcals$start_time[is.na(mcals$end_time)] + as.difftime(1, units = 'hours')
+  }
+  # print(head(mcals))
+  for (mname in unique(mcals$measurement_name)) {
+    message('starting ', mname)
+    flagname = paste0('flagged.', mname)
+    mcal_periods = mcals %>%
+      subset(measurement_name == mname) %>%
+      with(interval(start_time, end_time))
+    meas[meas$time %within% as.list(mcal_periods), flagname] = T
+  }
+}
 # autocals
 acals_ds = autocals[autocals$site == site &
                     autocals$data_source == data_source, ]
