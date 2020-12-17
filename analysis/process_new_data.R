@@ -106,9 +106,7 @@ if (nrow(mcals)) {
     mcals$end_time[is.na(mcals$end_time)] =
       mcals$start_time[is.na(mcals$end_time)] + as.difftime(1, units = 'hours')
   }
-  # print(head(mcals))
   for (mname in unique(mcals$measurement_name)) {
-    message('starting ', mname)
     flagname = paste0('flagged.', mname)
     mcal_periods = mcals %>%
       subset(measurement_name == mname) %>%
