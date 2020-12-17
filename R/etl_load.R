@@ -108,18 +108,9 @@ etl_load.etl_atmoschem.process = function(obj, sites = NULL,
         DBI::dbSendQuery(obj$con, rmv_file_sql)
       }
     }
-    ## drop a few constraints to make bulk loading substantially
-    ## faster
-    message('Dropping table constraints...')
-    DBI::dbSendQuery(obj$con, 'alter table measurements drop constraint measurements_observation_id_fkey')
-    DBI::dbSendQuery(obj$con, 'alter table measurements drop constraint measurements_measurement_type_id_fkey')
     mapply(even_smarter_upload, f = f_paths, site = sites,
            measurement = is_measurement, ds = dss, clobber = clobber,
            MoreArgs = list(obj = obj))
-    ## recreate the constraints
-    message('Recreating table constraints...')
-    DBI::dbSendQuery(obj$con, 'alter table measurements add constraint measurements_observation_id_fkey foreign key (observation_id) references observations on delete cascade')
-    DBI::dbSendQuery(obj$con, 'alter table measurements add constraint measurements_measurement_type_id_fkey foreign key (measurement_type_id) references measurement_types on delete cascade')
   }
   
   invisible(obj)
