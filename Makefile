@@ -41,9 +41,20 @@ routine_dataset: $(old_routine_out) $(hourly_files)
 $(interm_dir)/hourly_%.sqlite: $(interm_dir)/processed_%.sqlite analysis/aggregate_hourly.R
 	Rscript analysis/aggregate_hourly.R $(shell echo $* | sed "s/_/ /")
 
-$(interm_dir)/processed_%.sqlite: $(interm_dir)/raw_%.sqlite processingdb \
-                                  analysis/process_new_data.R
+# The way calibration files are created for each site (without data source)
+# makes things a bit awkward. Processed site/data source files depend on the
+# calibration site file
+.SECONDEXPANSION:
+$(interm_dir)/processed_%.sqlite: $(interm_dir)/raw_%.sqlite \
+                                  $(interm_dir)/cals_$$(shell echo $$* | sed "s/_.*//").sqlite \
+                                  processingdb analysis/process_new_data.R
 	Rscript analysis/process_new_data.R $(shell echo $* | sed "s/_/ /")
+
+# Calibration site file depends on all the raw site/calibration files
+make_cal_deps = $(patsubst %,$(interm_dir)/raw_%.sqlite, $(filter $(1)%, $(data_sources)))
+$(interm_dir)/cals_%.sqlite: $$(call make_cal_deps,$$*) \
+                             #raw_data analysis/load_calibration.R
+	Rscript analysis/load_calibration.R $*
 
 $(interm_dir)/raw_%.sqlite: raw_data analysis/load_raw.R
 	Rscript analysis/load_raw.R $(shell echo $* | sed "s/_/ /")
