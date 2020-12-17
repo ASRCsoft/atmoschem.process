@@ -94,12 +94,33 @@ mcals = file.path('analysis', 'raw', 'raw_data_v0.3', site, 'calibrations', '*',
   transform(ds = gsub('^.*calibrations/|/[0-9]{4}/[^/].*$', '', f)) %>%
   with(mapply(atmoschem.process:::transform_calibration, f = f, site = site,
               ds = ds, SIMPLIFY = F)) %>%
-  do.call(rbind, .) %>%
-  transform(times = as_interval(times))
+  do.call(rbind, .)
 # ideally, the data source would be assigned via the config files. But for now,
 # hardcoded
 mcals$data_source = switch(site, WFMS = 'campbell', WFML = 'campbell',
                            PSP = 'envidas')
+
+# add manual cals to postgres so we don't require `etl_load`
+# also write to postgres. This keeps the code running until I get a chance to
+# rewrite the R code so it doesn't look for calibrations in postgres.
+pg = src_postgres(dbname = 'nysatmoschemdb')
+pgmcals = mcals
+pgmcals$measurement_type_id =
+  atmoschem.process:::get_measurement_type_id(pg$con, site, pgmcals$data_source,
+                                              pgmcals$measurement_name,
+                                              add_new = F)
+pgmcals = pgmcals[!is.na(pgmcals$measurement_type_id), ]
+pgmcals = pgmcals[, c('measurement_type_id', 'type', 'times', 'provided_value',
+                      'measured_value', 'corrected')]
+site_id = switch(site, WFMS = 1, WFML = 2, PSP = 3, QC = 4)
+del_sql = paste0('delete from manual_calibrations where measurement_type_id=any(get_data_source_ids(',
+                site_id, ", '", mcals$data_source[1], "'))")
+dbExecute(pg$con, del_sql)
+dbWriteTable(pg$con, 'manual_calibrations', pgmcals, row.names = F, append = T)
+dbDisconnect(pg$con)
+
+mcals$times = as_interval(mcals$times)
+
 
 if (site == 'PSP') {
   # find NO conversion efficiency results, which weren't recorded in the PSP cal
