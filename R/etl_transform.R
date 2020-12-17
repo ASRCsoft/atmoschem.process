@@ -24,6 +24,8 @@ transform_measurement = function(f, site, ds) {
     return(transform_campbell(f, site))
   } else if (site == 'PSP' & ds == 'envidas') {
     return(transform_psp_envidas(f))
+  } else if (site == 'WFML' && ds == 'envidas') {
+    return(transform_wfml_envidas(f))
   }
   res = if (ds == 'ultrafine') {
     transform_ultrafine(f)
@@ -31,8 +33,6 @@ transform_measurement = function(f, site, ds) {
     transform_mesonet(f)
   } else if (site == 'WFMS' && ds == 'aethelometer') {
     transform_wfms_aethelometer(f)
-  } else if (site == 'WFML' && ds == 'envidas') {
-    transform_wfml_envidas(f)
   }
   res %>%
     transform(time = as.POSIXct(instrument_time, tz = 'EST')) %>%

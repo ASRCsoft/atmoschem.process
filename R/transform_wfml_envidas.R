@@ -16,8 +16,8 @@ patch_wfml_envidas = function(df) {
   # flag left on after instrument installed, 2020-01-03 14:02 to 2020-01-07
   # 09:04
   if ('PM25C : Status' %in% names(df)) {
-    df$`PM25C : Status`[df$instrument_time >= as.POSIXct('2020-01-03 14:02', tz = 'UTC') &
-                        df$instrument_time < as.POSIXct('2020-01-07 09:04', tz = 'UTC')] = 1
+    df$`PM25C : Status`[df$instrument_time >= as.POSIXct('2020-01-03 14:02', tz = 'EST') &
+                        df$instrument_time < as.POSIXct('2020-01-07 09:04', tz = 'EST')] = 1
   }
   df
 }
@@ -27,28 +27,20 @@ transform_wfml_envidas = function(f) {
   ## get timestamps from date and time columns
   df$instrument_time = as.POSIXct(paste(df$Date, df$Time),
                                   format = '%m/%d/%Y %I:%M %p',
-                                  tz = 'UTC')
-  ## ^ it's not really UTC but this keeps R from mucking with time
-  ## zones
-  df$record = 1:nrow(df) + 2
-
+                                  tz = 'EST')
   df = patch_wfml_envidas(df)
-
-  ## get data frame of values
-  df_vals = df[, grep(' : Value|instrument_time|record', names(df))]
-  names(df_vals) = gsub(' : Value', '', names(df_vals))
-  long_vals = tidyr::gather(df_vals, measurement_name, value,
-                            -c(instrument_time, record))
-
-  ## get data frame of flags
-  df_flags = df[, grep(' : Status|instrument_time|record', names(df))]
-  names(df_flags) = gsub(' : Status', '', names(df_flags))
-  long_flags = tidyr::gather(df_flags, measurement_name, flag,
-                             -c(instrument_time, record))
-
-  long_df = merge(long_vals, long_flags)
-  long_df$flagged = long_df$flag != 1
-  
-  long_df[, c('measurement_name', 'instrument_time',
-              'record', 'value', 'flagged')]
+  # put the time column first and drop the separate date and time columns
+  df = df[, c(ncol(df), 3:(ncol(df) - 1))]
+  names(df)[1] = 'time'
+  flagcols = grep(' : Status', names(df))
+  names(df)[flagcols] =
+    sub('(.*) : Status', 'flagged.\\1', names(df)[flagcols])
+  valcols = setdiff(2:ncol(df), flagcols)
+  names(df)[valcols] =
+    paste0('value.', sub(' : Value', '', names(df)[valcols]))
+  for (i in flagcols) {
+    # convert envidas flags to binary flagged value
+    df[, i] = is.na(df[, i]) | df[, i] != 1
+  }
+  df
 }
