@@ -22,13 +22,13 @@ transform_calibration = function(f, site, ds) {
 transform_measurement = function(f, site, ds) {
   if (ds == 'campbell') {
     return(transform_campbell(f, site))
+  } else if (site == 'PSP' & ds == 'envidas') {
+    return(transform_psp_envidas(f))
   }
   res = if (ds == 'ultrafine') {
     transform_ultrafine(f)
   } else if (ds == 'mesonet') {
     transform_mesonet(f)
-  } else if (site == 'PSP' & ds == 'envidas') {
-    transform_psp_envidas(f)
   } else if (site == 'WFMS' && ds == 'aethelometer') {
     transform_wfms_aethelometer(f)
   } else if (site == 'WFML' && ds == 'envidas') {
