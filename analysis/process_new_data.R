@@ -210,8 +210,8 @@ for (n in 1:nrow(mtypes)) {
         msmts$value = msmts$value /
           atmoschem.process:::estimate_ces(nysac, m_id, msmts$time)
       }
-      msmts$flagged = atmoschem.process:::is_flagged(nysac, m_id, msmts$time,
-                                                     msmts$value, msmts$flagged)
+      msmts$flagged = atmoschem.process:::is_flagged(msmts$value, params,
+                                                     msmts$flagged)
       # write to pr_meas
       pr_meas[, paste0('value.', mname)] = msmts$value
       pr_meas[, paste0('flagged.', mname)] = msmts$flagged
@@ -331,8 +331,8 @@ for (mname in derived) {
       msmts$value = msmts$value /
         atmoschem.process:::estimate_ces(nysac, m_id, msmts$time)
     }
-    msmts$flagged = atmoschem.process:::is_flagged(nysac, m_id, msmts$time,
-                                                   msmts$value, msmts$flagged)
+    msmts$flagged = atmoschem.process:::is_flagged(msmts$value, params,
+                                                   msmts$flagged)
     # write to pr_meas
     pr_meas[, paste0('value.', mname)] = msmts$value
     pr_meas[, paste0('flagged.', mname)] = msmts$flagged

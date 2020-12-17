@@ -146,40 +146,38 @@ hampel_outlier = function(x, k, threshold = 3.5) {
   (mads != 0) & (abs(x - medians) / mads > threshold)
 }
 
-is_flagged = function(obj, m_id, times, x, flagged = FALSE) {
-  if (length(times) == 0) {
+is_flagged = function(x, config, flagged = FALSE) {
+  if (length(x) == 0) {
     return(logical(0))
   }
   ## treat missing flagged values as false
   flagged = is_true(flagged)
-  ## get the mtype attributes
-  mtype = get_mtype_params(obj, m_id)
 
   ## check for outliers
-  if (!is.na(mtype$remove_outliers) && mtype$remove_outliers) {
+  if (!is.na(config$remove_outliers) && config$remove_outliers) {
     is_outlier = x %>%
       ## don't use previously flagged data (often indicating
       ## calibrations) during outlier detection
       replace(flagged, NA) %>%
-      { if (is_true(mtype$spike_log_transform)) log(.) else . } %>%
-      hampel_outlier(mtype$spike_window) %>%
+      { if (is_true(config$spike_log_transform)) log(.) else . } %>%
+      hampel_outlier(config$spike_window) %>%
       replace(., is.na(.), FALSE)
   } else {
     is_outlier = FALSE
   }
 
   ## check for invalid numbers
-  if (!is.na(mtype$valid_range)) {
-    is_valid = in_interval(x, mtype$lower_range, mtype$upper_range,
-                           mtype$lower_inc, mtype$upper_inc)
+  if (!is.na(config$valid_range)) {
+    is_valid = in_interval(x, config$lower_range, config$upper_range,
+                           config$lower_inc, config$upper_inc)
     is_valid[is.na(is_valid)] = FALSE
   } else {
     is_valid = TRUE
   }
 
   ## check for abrupt jumps
-  if (!is.na(mtype$max_jump)) {
-    is_jump = c(FALSE, abs(diff(x)) > mtype$max_jump)
+  if (!is.na(config$max_jump)) {
+    is_jump = c(FALSE, abs(diff(x)) > config$max_jump)
     is_jump[is.na(is_jump)] = FALSE
   } else {
     is_jump = FALSE
