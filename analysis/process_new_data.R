@@ -322,10 +322,20 @@ for (mname in derived) {
   names(msmts) = c('time', 'value', 'flagged')
   msmts$measurement_type_id = mtypes$id[n]
   tryCatch({
-    pr_msmts = atmoschem.process:::process(nysac, msmts, mtypes$id[n])
+    params = atmoschem.process:::get_mtype_params(nysac, m_id)
+    if (is_true(params$has_calibration)) {
+      msmts$value =
+        atmoschem.process:::apply_cal(nysac, m_id, msmts$time, msmts$value)
+    }
+    if (is_true(params$apply_ce)) {
+      msmts$value = msmts$value /
+        atmoschem.process:::estimate_ces(nysac, m_id, msmts$time)
+    }
+    msmts$flagged = atmoschem.process:::is_flagged(nysac, m_id, msmts$time,
+                                                   msmts$value, msmts$flagged)
     # write to pr_meas
-    pr_meas[, paste0('value.', mname)] = pr_msmts$value
-    pr_meas[, paste0('flagged.', mname)] = pr_msmts$flagged
+    pr_meas[, paste0('value.', mname)] = msmts$value
+    pr_meas[, paste0('flagged.', mname)] = msmts$flagged
   },
   error = function(e) {
     warning('derived value (', mname, ') processing failed: ', e)
