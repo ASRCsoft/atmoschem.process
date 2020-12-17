@@ -13,36 +13,37 @@ library(RSQLite)
 site = commandArgs(trailingOnly = T)[1]
 data_source = commandArgs(trailingOnly = T)[2]
 
-# organize raw data from an `etl_transform`ed file
-read_raw = function(f) {
-  atmoschem.process:::transform_measurement(f, site, data_source)
+# read the file and add it to the sqlite database
+load_file = function(f, db) {
+  dat = atmoschem.process:::transform_measurement(f, site, data_source)
+  # add columns to the db table if needed
+  cur_fields = dbListFields(db, 'measurements')
+  if (!all(names(dat) %in% cur_fields)) {
+    new_fields = setdiff(names(dat), cur_fields)
+    for (fname in new_fields) {
+      sql_text = 'alter table measurements add column ?'
+      sql = sqlInterpolate(db, sql_text, dbQuoteIdentifier(db, fname))
+      dbExecute(db, sql)
+    }
+  }
+  dat$time = format(dat$time, '%Y-%m-%d %H:%M:%S', tz = 'EST')
+  dbWriteTable(db, 'measurements', dat, append = T)
 }
 
-# get the manual raw
-raw_list = file.path('analysis', 'raw', 'raw_data_v0.3', site, 'measurements',
-                     data_source, '*', '*') %>%
-  Sys.glob %>%
-  lapply(read_raw)
-# make sure columns match
-all_names = unique(unlist(lapply(raw_list, names)))
-fill_df = function(x) {
-  setdiff(all_names, names(x)) %>%
-    sapply(function(y) NA) %>%
-    c(x, .) %>%
-    data.frame
-}
-rawdf = raw_list %>%
-  lapply(fill_df) %>%
-  do.call(rbind, .) %>%
-  transform(time = as.POSIXct(time, tz = 'EST', origin = '1970-01-01'))
-
-# write to sqlite file
-# convert time to character for compatibility with sqlite
-rawdf$time = format(rawdf$time, '%Y-%m-%d %H:%M:%S', tz = 'EST')
+# set up the sqlite database
 interm_dir = file.path('analysis', 'intermediate')
 dir.create(interm_dir, F, T)
 dbpath = paste0('raw_', site, '_', data_source, '.sqlite') %>%
   file.path(interm_dir, .)
+if (file.exists(dbpath)) file.remove(dbpath)
 db = dbConnect(SQLite(), dbpath)
-dbWriteTable(db, 'measurements', rawdf, overwrite = T)
+dbExecute(db, 'create table measurements(time text)')
+
+# load data into sqlite
+files = file.path('analysis', 'raw', 'raw_data_v0.3', site, 'measurements',
+          data_source, '*', '*') %>%
+  Sys.glob
+message('Loading ', length(files), ' files into ', basename(dbpath), '...')
+for (f in files) load_file(f, db)
+
 dbDisconnect(db)
