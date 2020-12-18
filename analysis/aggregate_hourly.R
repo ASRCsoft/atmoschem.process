@@ -66,6 +66,9 @@ site_data$time = as.POSIXct(site_data$time, tz = 'EST')
 # aggregate
 time_hours = as.POSIXct(trunc(site_data$time, 'hour'))
 val_mat = site_data[, grep('value', names(site_data)), drop = F]
+flag_mat = site_data[, grep('flagged', names(site_data)), drop = F]
+# remove flagged data
+val_mat[!is.na(flag_mat) & flag_mat] = NA
 agg_funs = names(val_mat) %>%
   sub('^value\\.', '', .) %>%
   get_agg_fun
@@ -95,7 +98,7 @@ hourly_vals = agg_funs %>%
   subset(select = c('time', names(val_mat)))
 
 # for flags, need count and below_mdl
-count_mat = site_data[, grep('flagged', names(site_data)), drop = F] %>%
+count_mat = flag_mat %>%
   aggregate(by = list(time = time_hours),
             FUN = function(x) sum(!is.na(x) & !x)) %>%
   subset(select = -1) %>%
