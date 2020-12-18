@@ -126,7 +126,7 @@ if (nrow(acals_ds)) {
     etime = hm(gsub('^.*, ?|[])]$', '', acals_ds$times[i]))
     if (is.na(int_end(sched_times))) int_end(sched_times) = Sys.time()
     meas[meas$time %within% sched_times &
-         meas$time_hms >= stime & meas$time_hms <= etime, flagname] = T
+         time_hms >= stime & time_hms <= etime, flagname] = T
   }
 }
 # manual flags
