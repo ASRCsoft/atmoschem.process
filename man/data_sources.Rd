@@ -5,7 +5,7 @@
 \alias{data_sources}
 \title{Data sources}
 \format{
-An object of class \code{data.frame} with 8 rows and 3 columns.
+An object of class \code{data.frame} with 9 rows and 3 columns.
 }
 \usage{
 data_sources

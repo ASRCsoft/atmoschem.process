@@ -248,6 +248,10 @@ if (site == 'WFMS') {
            wood_smoke(value.concentration_370, value.concentration_880))
     meas$`flagged.Wood smoke` =
       with(pr_meas, flagged.concentration_370 | flagged.concentration_880)
+  } else if (data_source == 'DEC_envidas') {
+    # Ozone (ppbv)
+    meas$value.O3_ppbv = pr_meas$value.O3 * 1000
+    meas$flagged.O3_ppbv = pr_meas$flagged.O3
   }
 } else if (site == 'WFML') {
   if (data_source == 'campbell') {
