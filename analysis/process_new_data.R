@@ -82,7 +82,10 @@ mtypes = nysac %>%
 dbpath = file.path('analysis', 'intermediate',
                    paste0('raw_', site, '_', data_source, '.sqlite'))
 db = dbConnect(SQLite(), dbpath)
-meas = dbReadTable(db, 'measurements', check.names = F)
+sql_text = 'select * from measurements where time >= ? and time <= ? order by time asc'
+sql = sqlInterpolate(db, sql_text, format(start_time, '%Y-%m-%d %H:%M:%S', tz = 'EST'),
+                     format(end_time, '%Y-%m-%d %H:%M:%S', tz = 'EST'))
+meas = dbGetQuery(db, sql, check.names = F)
 dbDisconnect(db)
 meas$time = as.POSIXct(meas$time, tz = 'EST')
 # keep track of the non-derived measurements, for later
