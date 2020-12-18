@@ -89,8 +89,7 @@ remotes::install_github('ASRCsoft/atmoschem.process', dependencies = TRUE)
 - R and R package dependencies
 - PostgreSQL, and a user with permission to create and delete databases
 
-The processing is currently very computationally intensive and requires about
-8GB of RAM and 30GB of disk space.
+The processing requires about 30GB of disk space.
 
 ### Creating the dataset
 

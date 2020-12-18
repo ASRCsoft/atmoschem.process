@@ -84,8 +84,7 @@ remotes::install_github('ASRCsoft/atmoschem.process', dependencies = TRUE)
   - PostgreSQL, and a user with permission to create and delete
     databases
 
-The processing is currently very computationally intensive and requires
-about 8GB of RAM and 30GB of disk space.
+The processing requires about 30GB of disk space.
 
 ### Creating the dataset
 
@@ -124,8 +123,9 @@ The package citation can be obtained by running
 
 To cite package 'atmoschem.process' in publications use:
 
-  William May (2020). atmoschem.process: ASRC Atmospheric Chemistry Data Processing. R
-  package version 0.5.0. https://github.com/ASRCsoft/atmoschem.process
+  William May (2020). atmoschem.process: ASRC Atmospheric Chemistry
+  Data Processing. R package version 0.5.0.
+  https://github.com/ASRCsoft/atmoschem.process
 
 A BibTeX entry for LaTeX users is
 
