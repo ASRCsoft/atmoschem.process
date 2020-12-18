@@ -87,10 +87,11 @@ guess_42C_ce = function(meas, noxval) {
 }
 
 # get the manual cals
-mcals = file.path('analysis', 'raw', 'raw_data_v0.3', site, 'calibrations', '*',
+files = file.path('analysis', 'raw', 'raw_data_v0.3', site, 'calibrations', '*',
                   '*', '*') %>%
-  Sys.glob %>%
-  data.frame(f = .) %>%
+  Sys.glob
+message('Loading ', length(files), ' files into cals_', site, '.sqlite...')
+mcals = data.frame(f = files) %>%
   transform(ds = gsub('^.*calibrations/|/[0-9]{4}/[^/].*$', '', f)) %>%
   with(mapply(atmoschem.process:::transform_calibration, f = f, site = site,
               ds = ds, SIMPLIFY = F)) %>%
@@ -116,7 +117,14 @@ site_id = switch(site, WFMS = 1, WFML = 2, PSP = 3, QC = 4)
 del_sql = paste0('delete from manual_calibrations where measurement_type_id=any(get_data_source_ids(',
                 site_id, ", '", mcals$data_source[1], "'))")
 dbExecute(pg$con, del_sql)
-dbWriteTable(pg$con, 'manual_calibrations', pgmcals, row.names = F, append = T)
+# load cals one at a time to isolate the failures
+for (i in 1:nrow(pgmcals)) {
+  tryCatch({
+    dbWriteTable(pg$con, 'manual_calibrations', pgmcals[i, ], row.names = F,
+                 append = T)
+  },
+  error = function(e) warning(row.names(pgmcals)[i], ' failed: ', e))
+}
 dbDisconnect(pg$con)
 
 mcals$times = as_interval(mcals$times)
