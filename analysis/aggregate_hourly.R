@@ -80,7 +80,8 @@ hourly_vals = agg_funs %>%
     if (x == 'mean') {
       aggregate(xmat, by = list(time = time_hours), mean, na.rm = T)
     } else if (x == 'max') {
-      aggregate(xmat, by = list(time = time_hours), max, na.rm = T)
+      aggregate(xmat, by = list(time = time_hours),
+                function(x) if (all(is.na(x))) NA else max(x, na.rm = T))
     } else if (x == 'sum') {
       aggregate(xmat, by = list(time = time_hours), sum, na.rm = T)
     } else if (x == 'head') {
