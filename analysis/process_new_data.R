@@ -14,7 +14,7 @@ site = commandArgs(trailingOnly = T)[1]
 data_source = commandArgs(trailingOnly = T)[2]
 
 start_time = as.POSIXct('2018-10-01', tz = 'EST')
-end_time = as.POSIXct('2020-07-01', tz = 'EST')
+end_time = as.POSIXct('2020-10-01', tz = 'EST')
 
 # organize the ETL object
 dbcon = src_postgres(dbname = 'nysatmoschemdb')
@@ -61,6 +61,16 @@ pad_interval = function(interval, start, end) {
   interval(int_start(interval) - start, int_end(interval) - end)
 }
 
+# add parameters used by `is_flagged` to a list of parameter values
+add_flag_params = function(l) {
+  l$lower_range = as.numeric(gsub('^[[(]|,.*$', '', l$valid_range))
+  l$upper_range = as.numeric(gsub('^.*, ?|[])]$', '', l$valid_range))
+  l$lower_inc = substr(l$valid_range, 1, 1) == '['
+  len = nchar(l$valid_range)
+  l$upper_inc = substr(l$valid_range, len, len) == ']'
+  l
+}
+
 # organize data from processed_measurements
 
 # get all the measurement IDs for a data source
@@ -97,14 +107,23 @@ dbpath = file.path('analysis', 'intermediate',
 db = dbConnect(SQLite(), dbpath)
 cals = dbReadTable(db, 'calibrations')
 dbDisconnect(db)
-cals = cals[cals$site == site & cals$data_source == data_source, ]
+cals = cals[cals$data_source == data_source, ]
 cals$start_time = as.POSIXct(cals$start_time, tz = 'EST')
 cals$end_time = as.POSIXct(cals$end_time, tz = 'EST')
-cals$time = cals$end_time # for convenience
 cals$manual = as.logical(cals$manual)
+if (any(is.na(cals$end_time))) {
+  nmiss = sum(is.na(cals$end_time))
+  warning('Missing ', nmiss,
+          ' manual calibration end times. Guessing the end times.')
+  cals$end_time[is.na(cals$end_time)] =
+    cals$start_time[is.na(cals$end_time)] + as.difftime(1, units = 'hours')
+}
+cals$time = cals$end_time # for convenience
+cals = cals[order(cals$time), ]
 
 # also get flow cals
 site_flows = gilibrator[gilibrator$site == site, ]
+site_flows$time = as.Date(site_flows$time, tz = 'EST')
 
 # 2) add miscellaneous flags that aren't included in
 # `atmoschem.process:::is_flagged`
@@ -114,13 +133,6 @@ mcals = mcals[mcals$data_source == data_source, ]
 if (nrow(mcals)) {
   mcals$start_time = as.POSIXct(mcals$start_time, tz = 'EST')
   mcals$end_time = as.POSIXct(mcals$end_time, tz = 'EST')
-  if (any(is.na(mcals$end_time))) {
-    nmiss = sum(is.na(mcals$end_time))
-    warning('Missing ', nmiss,
-            ' manual calibration end times. Guessing the end times.')
-    mcals$end_time[is.na(mcals$end_time)] =
-      mcals$start_time[is.na(mcals$end_time)] + as.difftime(1, units = 'hours')
-  }
   for (mname in unique(mcals$measurement_name)) {
     flagname = paste0('flagged.', mname)
     mcal_periods = mcals %>%
@@ -217,20 +229,19 @@ for (n in 1:nrow(mtypes)) {
     m_zeros = subset(m_cals, type == 'zero')
     m_spans = subset(m_cals, type == 'span')
     m_ces = subset(m_cals, type == 'CE')
-    m_conf = subset(mtypes, name == mname)
+    m_conf = add_flag_params(subset(mtypes, name == mname))
     if (!is.na(m_conf$gilibrator_span)) {
       m_flows = subset(site_flows, measurement_name == m_conf$gilibrator_span)
     } else {
       m_flows = NULL
     }
     tryCatch({
-      params = atmoschem.process:::get_mtype_params(nysac, m_id)
-      if (is_true(params$has_calibration)) {
+      if (is_true(m_conf$has_calibration)) {
         msmts$value =
           atmoschem.process:::drift_correct(msmts$time, msmts$value, m_zeros,
                                             m_spans, m_flows, m_conf)
       }
-      if (is_true(params$apply_ce)) {
+      if (is_true(m_conf$apply_ce)) {
         # correct the conversion efficiency measurements for instrument drift
         m_ces$measured_value =
           atmoschem.process:::drift_correct(m_ces$time, m_ces$measured_value,
@@ -244,7 +255,8 @@ for (n in 1:nrow(mtypes)) {
           atmoschem.process:::ceff_correct(msmts$time, msmts$value, m_ces,
                                            ce_flows, m_conf)
       }
-      msmts$flagged = atmoschem.process:::is_flagged(msmts$value, params,
+      m_conf$remove_outliers = F
+      msmts$flagged = atmoschem.process:::is_flagged(msmts$value, m_conf,
                                                      msmts$flagged)
       # write to pr_meas
       pr_meas[, paste0('value.', mname)] = msmts$value
@@ -363,20 +375,19 @@ for (mname in derived) {
   m_zeros = subset(m_cals, type == 'zero')
   m_spans = subset(m_cals, type == 'span')
   m_ces = subset(m_cals, type == 'CE')
-  m_conf = subset(mtypes, name == mname)
+  m_conf = add_flag_params(subset(mtypes, name == mname))
   if (!is.na(m_conf$gilibrator_span)) {
     m_flows = subset(site_flows, measurement_name == m_conf$gilibrator_span)
   } else {
     m_flows = NULL
   }
   tryCatch({
-    params = atmoschem.process:::get_mtype_params(nysac, m_id)
-    if (is_true(params$has_calibration)) {
+    if (is_true(m_conf$has_calibration)) {
       msmts$value =
         atmoschem.process:::drift_correct(msmts$time, msmts$value, m_zeros,
                                           m_spans, config = m_conf)
     }
-    if (is_true(params$apply_ce)) {
+    if (is_true(m_conf$apply_ce)) {
       # correct the conversion efficiency measurements for instrument drift
       m_ces$measured_value =
         atmoschem.process:::drift_correct(m_ces$time, m_ces$measured_value,
@@ -390,7 +401,8 @@ for (mname in derived) {
         atmoschem.process:::ceff_correct(msmts$time, msmts$value, m_ces,
                                          ce_flows, m_conf)
     }
-    msmts$flagged = atmoschem.process:::is_flagged(msmts$value, params,
+    m_conf$remove_outliers = F
+    msmts$flagged = atmoschem.process:::is_flagged(msmts$value, m_conf,
                                                    msmts$flagged)
     # write to pr_meas
     pr_meas[, paste0('value.', mname)] = msmts$value
