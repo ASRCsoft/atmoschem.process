@@ -86,7 +86,7 @@ drift_correct = function(t, v, z = NULL, s = NULL, f = NULL, config) {
   # zeros
   if (!is.null(z) && nrow(z)) {
     # zero values estimated at the measurement times
-    z_breaks = z$time[z$corrected]
+    z_breaks = z$time[is_true(z$corrected)]
     zeros = estimate_cals(z$time, z$measured_value, config$zero_smooth_window,
                           t, z_breaks)
   } else {
@@ -96,7 +96,7 @@ drift_correct = function(t, v, z = NULL, s = NULL, f = NULL, config) {
   if (!is.null(s) && nrow(s)) {
     if (!is.null(f) && nrow(f)) {
       # flow values estimated at the span times
-      f_breaks = f$time[f$corrected]
+      f_breaks = f$time[is_true(f$changed)]
       provided_value = estimate_cals(f$time, f$measured_value, NA, s$time,
                                      f_breaks)
     } else {
@@ -113,7 +113,7 @@ drift_correct = function(t, v, z = NULL, s = NULL, f = NULL, config) {
     # convert to ratio
     ratio = measured_value / provided_value
     # span ratios estimated at the measurement times
-    s_breaks = s$time[s$corrected]
+    s_breaks = s$time[is_true(s$corrected)]
     spans = estimate_cals(s$time, ratio, config$span_smooth_window, t, s_breaks)
   } else {
     spans = NULL
@@ -129,17 +129,17 @@ drift_correct = function(t, v, z = NULL, s = NULL, f = NULL, config) {
 ceff_correct = function(t, v, ceff, f = NULL, config) {
   if (!is.null(f) && nrow(f)) {
     # flow values estimated at the ceff times
-    f_breaks = f$time[f$corrected]
+    f_breaks = f$time[is_true(f$changed)]
     provided_value = estimate_cals(f$time, f$measured_value, NA, ceff$time,
                                    f_breaks)
   } else {
     provided_value = ceff$provided_value
   }
-  raw_efficiency = measured_value / provided_value
+  raw_efficiency = ceff$measured_value / provided_value
   # get smoothed conversion efficiencies estimated at the measurement times
-  s_breaks = s$time[s$corrected]
-  smoothed_efficiency = estimate_cals(s$time, raw_efficiency,
-                                      config$span_smooth_window, t, s_breaks)
+  ceff_breaks = ceff$time[is_true(ceff$corrected)]
+  smoothed_efficiency = estimate_cals(ceff$time, raw_efficiency,
+                                      config$ce_smooth_window, t, ceff_breaks)
   # conversion efficiencies can't go above 1
   v / pmin(smoothed_efficiency, 1)
 }
