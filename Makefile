@@ -52,16 +52,12 @@ $(interm_dir)/processed_%.sqlite: $(interm_dir)/raw_%.sqlite \
 
 # Calibration site file depends on all the raw site/calibration files
 make_cal_deps = $(patsubst %,$(interm_dir)/raw_%.sqlite, $(filter $(1)%, $(data_sources)))
-$(interm_dir)/cals_%.sqlite: $$(call make_cal_deps,$$*) processingdb \
+$(interm_dir)/cals_%.sqlite: $$(call make_cal_deps,$$*) \
                              raw_data analysis/load_calibration.R
 	Rscript analysis/load_calibration.R $*
 
 $(interm_dir)/raw_%.sqlite: raw_data analysis/load_raw.R
 	Rscript analysis/load_raw.R $(shell echo $* | sed "s/_/ /")
-
-.INTERMEDIATE: processingdb
-processingdb: $(sql_files) raw_data
-	Rscript analysis/initdb.R
 
 $(interm_dir)/old_%.csv: $(routine_zip) analysis/clean_old_routine.R
 	unzip -nq $(routine_zip) -d $(raw_dir) && \
