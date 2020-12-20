@@ -100,33 +100,6 @@ mcals = data.frame(f = files) %>%
 # hardcoded
 mcals$data_source = switch(site, WFMS = 'campbell', WFML = 'campbell',
                            PSP = 'envidas')
-
-# add manual cals to postgres so we don't require `etl_load`
-# also write to postgres. This keeps the code running until I get a chance to
-# rewrite the R code so it doesn't look for calibrations in postgres.
-pg = src_postgres(dbname = 'nysatmoschemdb')
-pgmcals = mcals
-pgmcals$measurement_type_id =
-  atmoschem.process:::get_measurement_type_id(pg$con, site, pgmcals$data_source,
-                                              pgmcals$measurement_name,
-                                              add_new = F)
-pgmcals = pgmcals[!is.na(pgmcals$measurement_type_id), ]
-pgmcals = pgmcals[, c('measurement_type_id', 'type', 'times', 'provided_value',
-                      'measured_value', 'corrected')]
-site_id = switch(site, WFMS = 1, WFML = 2, PSP = 3, QC = 4)
-del_sql = paste0('delete from manual_calibrations where measurement_type_id=any(get_data_source_ids(',
-                site_id, ", '", mcals$data_source[1], "'))")
-dbExecute(pg$con, del_sql)
-# load cals one at a time to isolate the failures
-for (i in 1:nrow(pgmcals)) {
-  tryCatch({
-    dbWriteTable(pg$con, 'manual_calibrations', pgmcals[i, ], row.names = F,
-                 append = T)
-  },
-  error = function(e) warning(row.names(pgmcals)[i], ' failed: ', e))
-}
-dbDisconnect(pg$con)
-
 mcals$times = as_interval(mcals$times)
 mcals$measured_value = as.numeric(mcals$measured_value)
 
@@ -302,22 +275,3 @@ dbpath = paste0('cals_', site, '.sqlite') %>%
 db = dbConnect(SQLite(), dbpath)
 dbWriteTable(db, 'calibrations', all_cals, overwrite = T)
 dbDisconnect(db)
-
-# also write to postgres. This keeps the code running until I get a chance to
-# rewrite the R code so it doesn't look for calibrations in postgres.
-pg = src_postgres(dbname = 'nysatmoschemdb')
-data_source = switch(site, WFMS = 'campbell', WFML = 'campbell',
-                     PSP = 'envidas')
-all_cals$measurement_type_id =
-  atmoschem.process:::get_measurement_type_id(pg$con, site, data_source,
-                                              all_cals$measurement_name,
-                                              add_new = F)
-all_cals$time = as.POSIXct(all_cals$end_time, tz = 'EST')
-all_cals = all_cals[!is.na(all_cals$time), ]
-all_cals = all_cals[!is.na(all_cals$measurement_type_id), ]
-all_cals = all_cals[, c('measurement_type_id', 'type', 'time', 'provided_value',
-                        'measured_value', 'flagged')]
-tbl_name = paste0('calibrations_', tolower(site))
-dbSendQuery(pg$con, paste('delete from', tbl_name))
-dbWriteTable(pg$con, tbl_name, all_cals, row.names = F, append = T)
-dbDisconnect(pg$con)
