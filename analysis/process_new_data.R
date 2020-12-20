@@ -97,10 +97,14 @@ dbpath = file.path('analysis', 'intermediate',
 db = dbConnect(SQLite(), dbpath)
 cals = dbReadTable(db, 'calibrations')
 dbDisconnect(db)
+cals = cals[cals$site == site & cals$data_source == data_source, ]
 cals$start_time = as.POSIXct(cals$start_time, tz = 'EST')
 cals$end_time = as.POSIXct(cals$end_time, tz = 'EST')
 cals$time = cals$end_time # for convenience
 cals$manual = as.logical(cals$manual)
+
+# also get flow cals
+site_flows = gilibrator[gilibrator$site == site, ]
 
 # 2) add miscellaneous flags that aren't included in
 # `atmoschem.process:::is_flagged`
@@ -213,17 +217,32 @@ for (n in 1:nrow(mtypes)) {
     m_zeros = subset(m_cals, type == 'zero')
     m_spans = subset(m_cals, type == 'span')
     m_ces = subset(m_cals, type == 'CE')
-    m_conf = subset(measurement_types, site == 'PSP' & name == mname)
+    m_conf = subset(mtypes, name == mname)
+    if (!is.na(m_conf$gilibrator_span)) {
+      m_flows = subset(site_flows, measurement_name == m_conf$gilibrator_span)
+    } else {
+      m_flows = NULL
+    }
     tryCatch({
       params = atmoschem.process:::get_mtype_params(nysac, m_id)
       if (is_true(params$has_calibration)) {
         msmts$value =
           atmoschem.process:::drift_correct(msmts$time, msmts$value, m_zeros,
-                                            m_spans, config = m_conf)
+                                            m_spans, m_flows, m_conf)
       }
       if (is_true(params$apply_ce)) {
-        msmts$value = msmts$value /
-          atmoschem.process:::estimate_ces(nysac, m_id, msmts$time)
+        # correct the conversion efficiency measurements for instrument drift
+        m_ces$measured_value =
+          atmoschem.process:::drift_correct(m_ces$time, m_ces$measured_value,
+                                            m_zeros, m_spans, m_flows, m_conf)
+        if (!is.na(m_conf$gilibrator_ce)) {
+          ce_flows = subset(site_flows, measurement_name == m_conf$gilibrator_ce)
+        } else {
+          ce_flows = NULL
+        }
+        msmts$value =
+          atmoschem.process:::ceff_correct(msmts$time, msmts$value, m_ces,
+                                           ce_flows, m_conf)
       }
       msmts$flagged = atmoschem.process:::is_flagged(msmts$value, params,
                                                      msmts$flagged)
@@ -344,7 +363,12 @@ for (mname in derived) {
   m_zeros = subset(m_cals, type == 'zero')
   m_spans = subset(m_cals, type == 'span')
   m_ces = subset(m_cals, type == 'CE')
-  m_conf = subset(measurement_types, site == 'PSP' & name == mname)
+  m_conf = subset(mtypes, name == mname)
+  if (!is.na(m_conf$gilibrator_span)) {
+    m_flows = subset(site_flows, measurement_name == m_conf$gilibrator_span)
+  } else {
+    m_flows = NULL
+  }
   tryCatch({
     params = atmoschem.process:::get_mtype_params(nysac, m_id)
     if (is_true(params$has_calibration)) {
@@ -353,8 +377,18 @@ for (mname in derived) {
                                           m_spans, config = m_conf)
     }
     if (is_true(params$apply_ce)) {
-      msmts$value = msmts$value /
-        atmoschem.process:::estimate_ces(nysac, m_id, msmts$time)
+      # correct the conversion efficiency measurements for instrument drift
+      m_ces$measured_value =
+        atmoschem.process:::drift_correct(m_ces$time, m_ces$measured_value,
+                                          m_zeros, m_spans, m_flows, m_conf)
+      if (!is.na(m_conf$gilibrator_ce)) {
+        ce_flows = subset(site_flows, measurement_name == m_conf$gilibrator_ce)
+      } else {
+        ce_flows = NULL
+      }
+      msmts$value =
+        atmoschem.process:::ceff_correct(msmts$time, msmts$value, m_ces,
+                                         ce_flows, m_conf)
     }
     msmts$flagged = atmoschem.process:::is_flagged(msmts$value, params,
                                                    msmts$flagged)
