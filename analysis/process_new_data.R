@@ -91,13 +91,21 @@ meas$time = as.POSIXct(meas$time, tz = 'EST')
 # keep track of the non-derived measurements, for later
 nonderived = sub('^value\\.', '', names(meas)[grep('^value', names(meas))])
 
+# also get calibrations
+dbpath = file.path('analysis', 'intermediate',
+                   paste0('cals_', site, '.sqlite'))
+db = dbConnect(SQLite(), dbpath)
+cals = dbReadTable(db, 'calibrations')
+dbDisconnect(db)
+cals$start_time = as.POSIXct(cals$start_time, tz = 'EST')
+cals$end_time = as.POSIXct(cals$end_time, tz = 'EST')
+cals$time = cals$end_time # for convenience
+cals$manual = as.logical(cals$manual)
+
 # 2) add miscellaneous flags that aren't included in
 # `atmoschem.process:::is_flagged`
 # manual calibrations
-dbpath = file.path('analysis', 'intermediate', paste0('cals_', site, '.sqlite'))
-db = dbConnect(SQLite(), dbpath)
-mcals = dbGetQuery(db, 'select * from calibrations where manual')
-dbDisconnect(db)
+mcals = subset(cals, manual)
 mcals = mcals[mcals$data_source == data_source, ]
 if (nrow(mcals)) {
   mcals$start_time = as.POSIXct(mcals$start_time, tz = 'EST')
@@ -201,11 +209,17 @@ for (n in 1:nrow(mtypes)) {
     msmts = meas[, msmt_cols]
     names(msmts) = c('time', 'value', 'flagged')
     m_id = mtypes$id[n]
+    m_cals = subset(cals, measurement_name == mname)
+    m_zeros = subset(m_cals, type == 'zero')
+    m_spans = subset(m_cals, type == 'span')
+    m_ces = subset(m_cals, type == 'CE')
+    m_conf = subset(measurement_types, site == 'PSP' & name == mname)
     tryCatch({
       params = atmoschem.process:::get_mtype_params(nysac, m_id)
       if (is_true(params$has_calibration)) {
         msmts$value =
-          atmoschem.process:::apply_cal(nysac, m_id, msmts$time, msmts$value)
+          atmoschem.process:::drift_correct(msmts$time, msmts$value, m_zeros,
+                                            m_spans, config = m_conf)
       }
       if (is_true(params$apply_ce)) {
         msmts$value = msmts$value /
@@ -326,11 +340,17 @@ for (mname in derived) {
   msmts = meas[, msmt_cols]
   names(msmts) = c('time', 'value', 'flagged')
   msmts$measurement_type_id = mtypes$id[n]
+  m_cals = subset(cals, measurement_name == mname)
+  m_zeros = subset(m_cals, type == 'zero')
+  m_spans = subset(m_cals, type == 'span')
+  m_ces = subset(m_cals, type == 'CE')
+  m_conf = subset(measurement_types, site == 'PSP' & name == mname)
   tryCatch({
     params = atmoschem.process:::get_mtype_params(nysac, m_id)
     if (is_true(params$has_calibration)) {
       msmts$value =
-        atmoschem.process:::apply_cal(nysac, m_id, msmts$time, msmts$value)
+        atmoschem.process:::drift_correct(msmts$time, msmts$value, m_zeros,
+                                          m_spans, config = m_conf)
     }
     if (is_true(params$apply_ce)) {
       msmts$value = msmts$value /
