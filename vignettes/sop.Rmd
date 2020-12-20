@@ -27,22 +27,6 @@ header-includes:
 knitr::opts_chunk$set(echo = FALSE, cache = FALSE)
 ```
 
-# Database Organization
-
-The nysatmoschem database is designed as a small data warehouse. That is, an Extract, Transform, Load (ETL) process standardizes and imports data from a variety of sources to prepare the data for analysis. Figure \@ref(fig:dbschema) shows the resulting data schema. A set of automated reports serve as a data mart providing simplified access to the data.
-
-The ETL functions are implemented in R and organized using the etl package [@baumer_etl:_2017; @baumer_grammar_2017]. Data files are reorganized to match the format of the measurements table. When instrument flags are provided along with measurement values, the flag information is parsed to provide a boolean data quality flag indicating whether the measurement is usable.
-
-```{r dbschema, fig.cap='The NYS Atmospheric Chemistry database schema.'}
-library(datamodelr)
-schema_file = 'nysacdb_schema.rda'
-load(schema_file)
-
-dm_atmoschemdm = as.data_model(nysacdb_schema)
-graph = dm_create_graph(dm_atmoschemdm, rankdir = "RL", columnArrows = T)
-dm_render_graph(graph)
-```
-
 # Getting Data
 
 The Whiteface Mountain datasets can be obtained on the atmoschem server. These include a calibration sheet, a flag report sheet, and the individual data files. Data can also be accessed through the Campbell datalogger, currently made available on the webdev server.
