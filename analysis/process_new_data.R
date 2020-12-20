@@ -16,10 +16,6 @@ data_source = commandArgs(trailingOnly = T)[2]
 start_time = as.POSIXct('2018-10-01', tz = 'EST')
 end_time = as.POSIXct('2020-10-01', tz = 'EST')
 
-# organize the ETL object
-dbcon = src_postgres(dbname = 'nysatmoschemdb')
-nysac = etl('atmoschem.process', db = dbcon)
-
 is_true = function(x) !is.na(x) & x
 
 # R's lead and lag functions aren't so useful. These are better.
@@ -74,17 +70,9 @@ add_flag_params = function(l) {
 # organize data from processed_measurements
 
 # get all the measurement IDs for a data source
-site_id = switch(site, WFMS = 1, WFML = 2, PSP = 3, QC = 4)
-data_sources = nysac %>%
-  tbl('data_sources') %>%
-  filter(site_id == local(site_id),
-         name == data_source) %>%
-  collect()
-mtypes = nysac %>%
-  tbl('measurement_types') %>%
-  filter(data_source_id == local(data_sources$id),
-         is.na(derived) | !derived) %>%
-  collect()
+mtypes = measurement_types[measurement_types$site == site &
+                           measurement_types$data_source == data_source, ] %>%
+  subset(is.na(derived) | !derived)
 
 # make processed data
 
@@ -211,12 +199,10 @@ if (site == 'WFMS' & data_source == 'campbell') {
 # 3) process measurements
 pr_meas = data.frame(time = meas$time)
 # update mtypes with only processed measurement types
-mtypes = nysac %>%
-  tbl('measurement_types') %>%
-  filter(data_source_id == local(data_sources$id),
-         !is.na(apply_processing) & apply_processing,
-         is.na(derived) | !derived) %>%
-  collect()
+mtypes = measurement_types[measurement_types$site == site &
+                           measurement_types$data_source == data_source, ] %>%
+  subset(!is.na(apply_processing) & apply_processing) %>%
+  subset(is.na(derived) | !derived)
 for (n in 1:nrow(mtypes)) {
   mname = mtypes$name[n]
   message('Processing ', mname, '...')
@@ -359,11 +345,9 @@ if (site == 'WFMS') {
 all_meas = sub('^value\\.', '', names(meas)[grep('^value', names(meas))])
 derived = setdiff(all_meas, nonderived)
 # update mtypes, including derived values
-mtypes = nysac %>%
-  tbl('measurement_types') %>%
-  filter(data_source_id == local(data_sources$id),
-         !is.na(apply_processing) & apply_processing) %>%
-  collect()
+mtypes = measurement_types[measurement_types$site == site &
+                           measurement_types$data_source == data_source, ] %>%
+  subset(!is.na(apply_processing) & apply_processing)
 for (mname in derived) {
   n = match(mname, mtypes$name)
   message('Processing ', mname, '...')
