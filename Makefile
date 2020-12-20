@@ -47,7 +47,7 @@ $(interm_dir)/hourly_%.sqlite: $(interm_dir)/processed_%.sqlite analysis/aggrega
 .SECONDEXPANSION:
 $(interm_dir)/processed_%.sqlite: $(interm_dir)/raw_%.sqlite \
                                   $(interm_dir)/cals_$$(shell echo $$* | sed "s/_.*//").sqlite \
-                                  processingdb analysis/process_new_data.R
+                                  analysis/process_new_data.R
 	Rscript analysis/process_new_data.R $(shell echo $* | sed "s/_/ /")
 
 # Calibration site file depends on all the raw site/calibration files
