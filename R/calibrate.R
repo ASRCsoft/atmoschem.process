@@ -143,6 +143,24 @@ drift_correct = function(t, v, z = NULL, s = NULL, f = NULL, config) {
   res
 }
 
+# apply conversion efficiency corrections to measured values
+ceff_correct = function(t, v, ceff, f = NULL, config) {
+  if (!is.null(f) && nrow(f)) {
+    # flow values estimated at the ceff times
+    f_breaks = f$time[f$corrected]
+    provided_value = estimate_cals(f$time, f$measured_value, NA, ceff$time,
+                                   f_breaks)
+  } else {
+    provided_value = ceff$provided_value
+  }
+  raw_efficiency = measured_value / provided_value
+  # get smoothed conversion efficiencies estimated at the measurement times
+  s_breaks = s$time[s$corrected]
+  smoothed_efficiency = estimate_cals(s$time, raw_efficiency,
+                                      config$span_smooth_window, t, s_breaks)
+  v / smoothed_efficiency
+}
+
 get_cal_zeros = function(obj, m_id) {
   obj %>%
     tbl('calibration_results') %>%
