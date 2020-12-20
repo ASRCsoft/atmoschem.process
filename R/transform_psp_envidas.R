@@ -68,7 +68,7 @@ transform_psp_envidas = function(f) {
   df = read_psp_envidas(f)
   ## check for newer files with the absurd date format
   file_date = gsub('.*envi_rpt-|\\.csv', '', f)
-  if (file_date >= '1809') {
+  if (file_date >= '1809' && file_date <= '2007') {
     date_format = '%d/%m/%Y %H:%M'
   } else {
     date_format = '%m/%d/%Y %I:%M %p'
