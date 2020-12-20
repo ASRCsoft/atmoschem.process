@@ -270,10 +270,10 @@ if (site == 'WFMS') {
     m_ces = subset(m_cals, type == 'CE')
     m_conf = subset(measurement_types, site == 'PSP' & name == mname)
     m_ces[, mname] =
-      atmoschem.process:::drift_adjust(m_ces$time, m_ces$measured_value,
-                                       m_cals[m_cals$type == 'zero', ],
-                                       m_cals[m_cals$type == 'span', ],
-                                       config = m_conf)
+      atmoschem.process:::drift_correct(m_ces$time, m_ces$measured_value,
+                                        m_cals[m_cals$type == 'zero', ],
+                                        m_cals[m_cals$type == 'span', ],
+                                        config = m_conf)
     ces_list[[mname]] = m_ces
   }
   # the NO and NOx start and end times aren't exactly the same, so match by date

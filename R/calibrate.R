@@ -100,7 +100,7 @@ estimate_cals = function(x, y, k, xout, breaks) {
   }
 }
 
-drift_adjust = function(t, v, z = NULL, s = NULL, f = NULL, config) {
+drift_correct = function(t, v, z = NULL, s = NULL, f = NULL, config) {
   # zeros
   if (!is.null(z) && nrow(z)) {
     # zero values estimated at the measurement times
