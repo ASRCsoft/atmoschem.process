@@ -253,6 +253,44 @@ for (n in unique(all_cals$measurement_name)) {
   }
 }
 
+# Calculate NO2 conversion efficiencies (derived from NOx and NO results)
+if (site == 'WFMS') {
+  # WFMS NO2 conversion efficiencies are recorded on the NOx channel
+  no2_ce = all_cals$measurement_name == 'NOx' & all_cals$type == 'CE'
+  all_cals$measurement_name[no2_ce] = 'NO2'
+} else if (site == 'PSP') {
+  # PSP NO2 conversion efficiencies require subtracting NO (because the CE air
+  # includes both NO2 and NO I think?)
+  all_cals2 = all_cals
+  all_cals2$time = all_cals2$end_time
+  all_cals2$date = as.Date(all_cals2$time)
+  ces_list = list()
+  for (mname in c('NO', 'NOx')) {
+    m_cals = subset(all_cals2, measurement_name == mname)
+    m_ces = subset(m_cals, type == 'CE')
+    m_conf = subset(measurement_types, site == 'PSP' & name == mname)
+    m_ces[, mname] =
+      atmoschem.process:::drift_adjust(m_ces$time, m_ces$measured_value,
+                                       m_cals[m_cals$type == 'zero', ],
+                                       m_cals[m_cals$type == 'span', ],
+                                       config = m_conf)
+    ces_list[[mname]] = m_ces
+  }
+  # the NO and NOx start and end times aren't exactly the same, so match by date
+  # instead
+  same_cols = c('date', 'type', 'provided_value', 'data_source', 'manual',
+                'corrected')
+  both_ces = merge(ces_list[['NO']], ces_list[['NOx']], by = same_cols)
+  no2_ces = both_ces %>%
+    transform(measurement_name = 'NO2',
+              measured_value = NOx - NO,
+              flagged = flagged.x | flagged.y,
+              start_time = start_time.x, end_time = end_time.x) %>%
+    subset(select = c(same_cols[-1], 'measurement_name', 'start_time',
+                      'end_time', 'measured_value', 'flagged'))
+  all_cals = rbind(all_cals, no2_ces[, names(all_cals)])
+}
+
 # write to sqlite file
 # fix time formatting for sqlite compatibility
 all_cals$start_time = format(all_cals$start_time, '%Y-%m-%d %H:%M:%S', tz = 'EST')

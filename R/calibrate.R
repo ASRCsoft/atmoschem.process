@@ -250,65 +250,6 @@ apply_cal = function(obj, m_id, times, x) {
   }
 }
 
-wfms_no2_ce_inputs = function(obj) {
-  wfms_nox_id = get_measurement_type_id(obj$con, 'WFMS', 'campbell',
-                                        'NOx')
-  obj %>%
-    tbl('calibration_results') %>%
-    filter(measurement_type_id == wfms_nox_id,
-           type == 'CE',
-           !is.na(measured_value)) %>%
-    mutate(time = timezone('EST', time)) %>%
-    collect() %>%
-    mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'WFMS', 'campbell',
-                                     'NO2'),
-           measured_value =
-             apply_cal(obj$con, wfms_nox_id, time, measured_value)) %>%
-    select(time, measured_value, provided_value, flagged) %>%
-    arrange(time)
-}
-
-psp_no2_ce_inputs = function(obj) {
-  psp_no_id = get_measurement_type_id(obj$con, 'PSP', 'envidas', 'NO')
-  psp_nox_id = get_measurement_type_id(obj$con, 'PSP', 'envidas',
-                                       'NOx')
-  no_tbl = obj %>%
-    tbl('calibration_results') %>%
-    filter(measurement_type_id == psp_no_id,
-           type == 'CE',
-           !flagged,
-           !is.na(measured_value),
-           !is.na(provided_value)) %>%
-    mutate(time = timezone('EST', time)) %>%
-    collect() %>%
-    mutate(measured_no =
-             apply_cal(obj$con, psp_no_id, time, measured_value),
-           no_flagged = flagged) %>%
-    select(time, measured_no, no_flagged)
-  nox_tbl = obj %>%
-    tbl('calibration_results') %>%
-    filter(measurement_type_id == psp_nox_id,
-           type == 'CE',
-           !is.na(measured_value),
-           !is.na(provided_value)) %>%
-    mutate(time = timezone('EST', time)) %>%
-    collect() %>%
-    mutate(measured_nox =
-             apply_cal(obj$con, psp_nox_id, time, measured_value),
-           nox_flagged = flagged) %>%
-    select(time, measured_nox, provided_value, nox_flagged)
-  no_tbl %>%
-    inner_join(nox_tbl) %>%
-    mutate(measurement_type_id =
-             get_measurement_type_id(obj$con, 'PSP', 'envidas', 'NO2'),
-           measured_value = measured_nox - measured_no,
-           flagged = no_flagged | nox_flagged) %>%
-    select(time, measured_value, provided_value, flagged) %>%
-    arrange(time) %>%
-    collect()
-}
-
 get_ces = function(obj, m_id) {
   ces = obj %>%
     tbl('calibration_results') %>%
@@ -320,17 +261,6 @@ get_ces = function(obj, m_id) {
     select(time, measured_value, provided_value, flagged) %>%
     arrange(time) %>%
     collect()
-  if (nrow(ces) == 0) {
-    wfms_no2_id = get_measurement_type_id(obj$con, 'WFMS', 'campbell',
-                                          'NO2')
-    psp_no2_id = get_measurement_type_id(obj$con, 'PSP', 'envidas',
-                                         'NO2')
-    if (m_id == wfms_no2_id) {
-      ces = wfms_no2_ce_inputs(obj)
-    } else if (m_id == psp_no2_id) {
-      ces = psp_no2_ce_inputs(obj)
-    }
-  }
   if (nrow(ces) == 0) {
     return(ces)
   }
