@@ -128,7 +128,7 @@ for (i in 1:nrow(pgmcals)) {
 dbDisconnect(pg$con)
 
 mcals$times = as_interval(mcals$times)
-
+mcals$measured_value = as.numeric(mcals$measured_value)
 
 if (site == 'PSP') {
   # find NO conversion efficiency results, which weren't recorded in the PSP cal
