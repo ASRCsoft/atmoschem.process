@@ -158,7 +158,8 @@ ceff_correct = function(t, v, ceff, f = NULL, config) {
   s_breaks = s$time[s$corrected]
   smoothed_efficiency = estimate_cals(s$time, raw_efficiency,
                                       config$span_smooth_window, t, s_breaks)
-  v / smoothed_efficiency
+  # conversion efficiencies can't go above 1
+  v / pmin(smoothed_efficiency, 1)
 }
 
 get_cal_zeros = function(obj, m_id) {
