@@ -100,6 +100,49 @@ estimate_cals = function(x, y, k, xout, breaks) {
   }
 }
 
+drift_adjust = function(t, v, z = NULL, s = NULL, f = NULL, config) {
+  # zeros
+  if (!is.null(z) && nrow(z)) {
+    # zero values estimated at the measurement times
+    z_breaks = z$time[z$corrected]
+    zeros = estimate_cals(z$time, z$measured_value, config$zero_smooth_window,
+                          t, z_breaks)
+  } else {
+    zeros = NULL
+  }
+  # spans
+  if (!is.null(s) && nrow(s)) {
+    if (!is.null(f) && nrow(f)) {
+      # flow values estimated at the span times
+      f_breaks = f$time[f$corrected]
+      provided_value = estimate_cals(f$time, f$measured_value, NA, s$time,
+                                     f_breaks)
+    } else {
+      provided_value = s$provided_value
+    }
+    if (!is.null(zeros)) {
+      # apply zero corrections to measured spans
+      s_zeros = estimate_cals(z$time, z$measured_value,
+                              config$zero_smooth_window, s$time, z_breaks)
+      measured_value = s$measured_value - s_zeros
+    } else {
+      measured_value = s$measured_value
+    }
+    # convert to ratio
+    ratio = measured_value / provided_value
+    # span ratios estimated at the measurement times
+    s_breaks = s$time[s$corrected]
+    spans = estimate_cals(s$time, ratio, config$span_smooth_window, t, s_breaks)
+  } else {
+    spans = NULL
+  }
+  # adjust the measurement values
+  res = v
+  if (!is.null(zeros)) res = res - zeros
+  if (!is.null(spans)) res = res / spans
+  res
+}
+
 get_cal_zeros = function(obj, m_id) {
   obj %>%
     tbl('calibration_results') %>%
