@@ -1,7 +1,5 @@
 /* Creating tables used by multiple instruments */
 
-create extension btree_gist;
-
 /* site table */
 create table sites (
   id serial primary key,
@@ -19,14 +17,6 @@ create table data_sources (
   site_id int references sites,
   name text not null,
   unique(site_id, name)
-);
-
-create table files (
-  id serial primary key,
-  data_source_id int references data_sources,
-  name text not null,
-  calibration boolean not null,
-  unique(data_source_id, name, calibration)
 );
 
 create table measurement_types (

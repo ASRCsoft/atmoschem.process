@@ -45,14 +45,6 @@ update_measurement_types = function(pg, df) {
                       action = 'update')
 }
 
-update_gilibrator = function(pg, df) {
-  df$site_id = get_site_id(pg, df$site)
-  df$site = NULL
-  ## purge old data then add new data
-  dbxDelete(pg, 'gilibrator')
-  dbxInsert(pg, 'gilibrator', df)
-}
-
 ## Very weird issue-- this is find_schema from `etl`. But it must be
 ## defined here to work with devtools, which makes adjustments to
 ## `system.file` to run unit tests. devtools can't change the
@@ -95,7 +87,7 @@ etl_init.etl_atmoschem.process = function(obj, script = NULL,
   pg = obj$con
 
   ## set up tables and functions
-  sql_files = c('setup', 'calibration')
+  sql_files = 'setup'
   for (sql_file in sql_files) {
     ## sql_file = etl::find_schema(obj, sql_file, ext = 'sql')
     sql_file = find_schema(obj, sql_file, ext = 'sql')
@@ -104,7 +96,6 @@ etl_init.etl_atmoschem.process = function(obj, script = NULL,
 
   ## add supporting data
   update_measurement_types(pg, measurement_types)
-  update_gilibrator(pg, gilibrator)
   
   invisible(obj)
 }
