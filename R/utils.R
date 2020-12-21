@@ -18,12 +18,3 @@ is_psp_TEI43i_SO2_cal = function(f)
 is_psp_TEI49i_O3_49i_cal = function(f)
   startsWith(basename(f), 'Pinnacle_TEI49i_O3_49i_Weekly') |
     startsWith(basename(f), 'Pinnacle_TEI49i_O3_Weekly')
-
-
-#' @export
-view_processing = function(obj) {
-  shiny::shinyOptions(obj = obj)
-  shiny::shinyOptions(pg = obj$con)
-  shiny::shinyOptions(dir = getwd())
-  shiny::runApp(system.file('processing_viewer', package = 'atmoschem.process'))
-}

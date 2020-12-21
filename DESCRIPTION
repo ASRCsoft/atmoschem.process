@@ -16,7 +16,6 @@ Imports:
     Rdpack (>= 0.7),
     readxl,
     R.utils,
-    shiny,
     staplr (>= 2.10),
     tidyr
 Depends: R (>= 3.4.4)
@@ -35,6 +34,7 @@ Suggests:
     knitr,
     rmarkdown,
     RSQLite,
+    shiny,
     shinyWidgets,
     testthat,
     tools,

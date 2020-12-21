@@ -71,6 +71,10 @@ $(raw_dir)/%.zip:
 	mkdir -p $(raw_dir) && \
 	wget --user=aqm --ask-password -O $@ $(download_url)/$(shell echo $* | sed -E s/_v[0-9.]+$$//)/$*.zip
 
+.PHONY: view
+view:
+	Rscript -e 'shiny::runApp("analysis/processing_viewer", launch.browser = T)'
+
 ## R package
 
 .PHONY: check

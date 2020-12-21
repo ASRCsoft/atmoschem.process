@@ -100,15 +100,10 @@ website](http://atmoschem.asrc.cestm.albany.edu/).
 ### Viewing the data
 
 The R package comes with a Shiny app for viewing the processing steps.
-After data has been processed, it can be opened from within R:
+After data has been processed, it can be launched with `make`:
 
-``` r
-library(atmoschem.process)
-# Create a postgres database connection and atmoschem.process dataset object
-dbcon = src_postgres(dbname = 'nysatmoschemdb', user = 'user')
-nysac = etl('atmoschem.process', db = dbcon, dir = 'data')
-# Open the Shiny app
-view_processing(nysac)
+``` sh
+make view
 ```
 
 ## Citation
