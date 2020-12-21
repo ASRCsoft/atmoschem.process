@@ -32,17 +32,6 @@ narsto_agg_flag = function(p, below_mdl = FALSE) {
   }
 }
 
-get_mtype_params = function(obj, m_id) {
-  obj %>% tbl('measurement_types') %>%
-    filter(id == m_id) %>%
-    mutate(lower_range = lower(valid_range),
-           upper_range = upper(valid_range),
-           lower_inc = lower_inc(valid_range),
-           upper_inc = upper_inc(valid_range)) %>%
-    collect() %>%
-    as.list()
-}
-
 in_interval = function(x, l, u, l_inc, u_inc) {
   res = TRUE
   if (!is.na(l)) {
