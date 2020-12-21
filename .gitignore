@@ -47,3 +47,6 @@ docs
 
 # readme preview
 README.html
+
+# LibreOffice locks
+.~lock.*#
