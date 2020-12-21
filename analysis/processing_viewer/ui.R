@@ -1,19 +1,14 @@
+library(atmoschem.process)
 library(shiny)
 library(shinyWidgets)
-library(dplyr)
-library(DBI)
 
-pg = getShinyOption('pg')
-
-## get sites and measurements
-sites = as.data.frame(tbl(pg, 'sites'))
-site_dict = setNames(sites$id, sites$long_name)
+# get sites and measurements
+site_dict = setNames(sites$abbreviation, sites$long_name)
 plotTypes = c(Raw = 'raw', `Calibration Zero` = 'zero',
               `Calibration Span` = 'span',
               `Conversion Efficiency` = 'ce',
               Processed = 'processed',
               `Hourly Processed` = 'hourly')
-
 
 shinyUI(fluidPage(
     titlePanel('Data Processing Viewer'),

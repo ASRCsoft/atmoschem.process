@@ -5,25 +5,15 @@ library(ggplot2)
 library(DBI)
 library(atmoschem.process)
 
-obj = getShinyOption('obj')
-pg = getShinyOption('pg')
-curdir = getShinyOption('dir')
+# obj = getShinyOption('obj')
+# pg = getShinyOption('pg')
+# curdir = getShinyOption('dir')
 
-## get measurement info
-measurements = tbl(pg, 'measurement_types') %>%
-  collect()
-data_sources = tbl(pg, 'data_sources') %>%
-  collect()
-
-get_site_data_sources = function(x) {
-  site_dss = subset(data_sources, site_id == x)
-  setNames(site_dss$id, site_dss$name)
-}
-
-get_data_source_measurements = function(x) {
-  ds_measurements = subset(measurements, data_source_id == x)
-  setNames(ds_measurements$id, ds_measurements$name)
-}
+# ## get measurement info
+# measurements = tbl(pg, 'measurement_types') %>%
+#   collect()
+# data_sources = tbl(pg, 'data_sources') %>%
+#   collect()
 
 # get only true values
 is_true = function(x) !is.na(x) & x
@@ -320,12 +310,13 @@ make_processing_plot = function(m, t1, t2, plot_types,
 
 shinyServer(function(input, output) {
   output$data_sources = renderUI({
-    selectInput('data_source', 'Data Source:',
-                get_site_data_sources(input$site))
+    site_data_sources = subset(data_sources, site == input$site)
+    selectInput('data_source', 'Data Source:', site_data_sources$name)
   })
   output$measurements = renderUI({
-    selectInput('measurement', 'Measurement:',
-                get_data_source_measurements(input$data_source))
+    source_measurements = measurement_types %>%
+      subset(site == input$site & data_source == input$data_source)
+    selectInput('measurement', 'Measurement:', source_measurements$name)
   })
   output$plots = renderPlot({
     ## to make sure the time zone is handled correctly
