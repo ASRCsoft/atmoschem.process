@@ -85,11 +85,9 @@ remotes::install_github('ASRCsoft/atmoschem.process', dependencies = TRUE)
 
 ### Requirements
 
-- Linux
 - R and R package dependencies
-- PostgreSQL, and a user with permission to create and delete databases
-
-The processing requires about 30GB of disk space.
+- GNU Make
+- 15GB of disk space
 
 ### Creating the dataset
 
