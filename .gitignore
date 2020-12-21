@@ -42,7 +42,9 @@ vignettes/*.pdf
 docs/
 
 # dataset build files
-analysis/*/
+analysis/raw/
+analysis/intermediate/
+analysis/out/
 docs
 
 # readme preview
