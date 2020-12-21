@@ -12,21 +12,14 @@ Description: Functions, configuration files, and scripts for creating the ASRC's
     data and generate reports are also included.
 Imports:
     caTools,
-    DBI,
-    dbplyr,
-    dbx,
-    dplyr,
     lubridate,
     Rdpack (>= 0.7),
     readxl,
-    RPostgreSQL,
     R.utils,
     shiny,
     staplr (>= 2.10),
     tidyr
-Depends:
-    R (>= 3.4.4),
-    etl
+Depends: R (>= 3.4.4)
 License: MIT + file LICENSE
 URL: https://github.com/ASRCsoft/atmoschem.process
 BugReports: https://github.com/ASRCsoft/atmoschem.process/issues
@@ -35,7 +28,9 @@ LazyData: true
 Suggests: 
     bookdown,
     datamodelr,
+    DBI,
     DiagrammeR,
+    dplyr,
     ggplot2 (>= 3.0),
     knitr,
     rmarkdown,
@@ -45,7 +40,6 @@ Suggests:
     tools,
     usethis
 Remotes:
-    beanumber/etl,
     bergant/datamodelr,
     pridiltal/staplr
 VignetteBuilder: knitr
