@@ -6,6 +6,7 @@
 # produces file analysis/intermediate/hourly_<site>_<data_source>.sqlite
 
 library(atmoschem.process)
+library(magrittr)
 library(DBI)
 library(RSQLite)
 

@@ -7,6 +7,7 @@
 
 library(atmoschem.process)
 library(lubridate)
+library(magrittr)
 library(DBI)
 library(RSQLite)
 

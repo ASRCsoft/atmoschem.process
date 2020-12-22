@@ -31,6 +31,7 @@ Suggests:
     DiagrammeR,
     ggplot2 (>= 3.0),
     knitr,
+    magrittr,
     rmarkdown,
     RSQLite,
     shiny,
