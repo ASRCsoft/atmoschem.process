@@ -1,38 +1,23 @@
+library(atmoschem.process)
 library(shiny)
+library(DBI)
+library(RSQLite)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
-library(DBI)
-library(atmoschem.process)
 
-# obj = getShinyOption('obj')
-# pg = getShinyOption('pg')
-# curdir = getShinyOption('dir')
-
-# ## get measurement info
-# measurements = tbl(pg, 'measurement_types') %>%
-#   collect()
-# data_sources = tbl(pg, 'data_sources') %>%
-#   collect()
+# relative path to the sqlite files from the app directory
+interm_dir = file.path('..', 'intermediate')
 
 # get only true values
 is_true = function(x) !is.na(x) & x
 
 ## retrieve data from table based on timerange and measure
-get_raw = function(measure, t1, t2) {
-  # get site, data source, and parameter name from measurement id
-  param = measurements$name[match(measure, measurements$id)]
-  data_source_id = measurements$data_source_id[match(measure, measurements$id)]
-  data_source = data_sources$name[match(data_source_id, data_sources$id)]
-  site_id = data_sources$site_id[match(data_source_id, data_sources$id)]
-  site = c('WFMS', 'WFML', 'PSP', 'QC')[site_id]
-  # get requested data
-  # for now, assume we're at the project root
-  dbpath = file.path(curdir, 'analysis', 'intermediate',
-                     paste0('raw_', site, '_', data_source, '.sqlite'))
-  param_col = paste0('value.', param)
-  param_fcol = paste0('flagged.', param)
-  db = dbConnect(RSQLite::SQLite(), dbpath)
+get_raw = function(s, ds, m, t1, t2) {
+  dbpath = file.path(interm_dir, paste0('raw_', s, '_', ds, '.sqlite'))
+  param_col = paste0('value.', m)
+  param_fcol = paste0('flagged.', m)
+  db = dbConnect(SQLite(), dbpath)
   q = paste0('select time, ?, ? from measurements where time >= ? and time <= ? order by time asc')
   sql = sqlInterpolate(db, q, dbQuoteIdentifier(db, param_col),
                        dbQuoteIdentifier(db, param_fcol),
@@ -45,20 +30,11 @@ get_raw = function(measure, t1, t2) {
   res
 }
 
-get_processed = function(measure, t1, t2) {
-  # get site, data source, and parameter name from measurement id
-  param = measurements$name[match(measure, measurements$id)]
-  data_source_id = measurements$data_source_id[match(measure, measurements$id)]
-  data_source = data_sources$name[match(data_source_id, data_sources$id)]
-  site_id = data_sources$site_id[match(data_source_id, data_sources$id)]
-  site = c('WFMS', 'WFML', 'PSP', 'QC')[site_id]
-  # get requested data
-  # for now, assume we're at the project root
-  dbpath = file.path(curdir, 'analysis', 'intermediate',
-                     paste0('processed_', site, '_', data_source, '.sqlite'))
-  param_col = paste0('value.', param)
-  param_fcol = paste0('flagged.', param)
-  db = dbConnect(RSQLite::SQLite(), dbpath)
+get_processed = function(s, ds, m, t1, t2) {
+  dbpath = file.path(interm_dir, paste0('processed_', s, '_', ds, '.sqlite'))
+  param_col = paste0('value.', m)
+  param_fcol = paste0('flagged.', m)
+  db = dbConnect(SQLite(), dbpath)
   q = paste0('select time, ?, ? from measurements where time >= ? and time <= ? order by time asc')
   sql = sqlInterpolate(db, q, dbQuoteIdentifier(db, param_col),
                        dbQuoteIdentifier(db, param_fcol),
@@ -67,7 +43,7 @@ get_processed = function(measure, t1, t2) {
   dbDisconnect(db)
   res[, 1] = as.POSIXct(res[, 1], tz = 'EST')
   # booleans are stored as numbers in SQLite so they need to be converted
-  res[, 3] = as.logical(res[, 3])
+  res[, 3] = !is.na(res[, 3]) & as.logical(res[, 3])
   res
 }
 
@@ -165,31 +141,27 @@ get_ces = function(measure, t1, t2) {
   ces
 }
 
-get_hourly = function(measure, t1, t2) {
-  # get site, data source, and parameter name from measurement id
-  param = measurements$name[match(measure, measurements$id)]
-  data_source_id = measurements$data_source_id[match(measure, measurements$id)]
-  data_source = data_sources$name[match(data_source_id, data_sources$id)]
-  site_id = data_sources$site_id[match(data_source_id, data_sources$id)]
-  site = c('WFMS', 'WFML', 'PSP', 'QC')[site_id]
-  # get requested data
-  # for now, assume we're at the project root
-  dbpath = file.path(curdir, 'analysis', 'intermediate',
-                     paste0('hourly_', site, '_', data_source, '.sqlite'))
-  param_col = paste0('value.', param)
-  db = dbConnect(RSQLite::SQLite(), dbpath)
-  q = paste0('select time, ? from measurements where time >= ? and time <= ? order by time asc')
+get_hourly = function(s, ds, m, t1, t2) {
+  dbpath = file.path(interm_dir, paste0('hourly_', s, '_', ds, '.sqlite'))
+  param_col = paste0('value.', m)
+  param_fcol = paste0('flag.', m)
+  db = dbConnect(SQLite(), dbpath)
+  q = paste0('select time, ?, ? from measurements where time >= ? and time <= ? order by time asc')
   sql = sqlInterpolate(db, q, dbQuoteIdentifier(db, param_col),
+                       dbQuoteIdentifier(db, param_fcol),
                        format(t1, tz = 'EST'), format(t2, tz = 'EST'))
   res = dbGetQuery(db, sql)
   dbDisconnect(db)
+  res[, 1] = as.POSIXct(res[, 1], tz = 'EST')
+  # convert hourly NARSTO flag to boolean
+  res[, 3] = !is.na(res[, 3]) & startsWith(res[, 3], 'M')
   res
 }
 
-make_processing_plot = function(m, t1, t2, plot_types,
-                                logt = F, show_flagged = T) {
+make_processing_plot = function(s, ds, m, t1, t2, plot_types, logt = F,
+                                show_flagged = T) {
   ## get measurement info
-  m_info = subset(measurements, id == m)
+  m_info = subset(measurement_types, site == s & data_source == ds & name == m)
   has_raw = 'raw' %in% plot_types
   has_processing = is_true(m_info$apply_processing) &
     'processed' %in% plot_types
@@ -200,12 +172,16 @@ make_processing_plot = function(m, t1, t2, plot_types,
   has_hourly = is_true(m_info$apply_processing) &
     'hourly' %in% plot_types
 
+  # temporarily, until I fix the functions
+  has_cal = F
+  has_ce = F
+
   ## get the data
-  if (has_raw) raw = get_raw(m, t1, t2)
-  if (has_processing) processed = get_processed(m, t1, t2)
+  if (has_raw) raw = get_raw(s, ds, m, t1, t2)
+  if (has_processing) processed = get_processed(s, ds, m, t1, t2)
   if (has_cal) cals = get_cals(m, t1, t2)
   if (has_ce) ces = get_ces(m, t1, t2)
-  if (has_hourly) hourly = get_hourly(m, t1, t2)
+  if (has_hourly) hourly = get_hourly(s, ds, m, t1, t2)
 
   ## organize for ggplot2
   df_list = list()
@@ -237,8 +213,8 @@ make_processing_plot = function(m, t1, t2, plot_types,
   }
   if (has_hourly && nrow(hourly) > 0) {
     hourly$label = 'Hourly'
-    hourly$flag = FALSE
-    hourly$filtered = FALSE
+    hourly = hourly[, c(1:2, 4, 3)]
+    hourly$filtered = F
     df_list$hourly = hourly
   }
   df_names = c('Time', 'Value', 'Label', 'Flagged', 'Filtered')
@@ -322,9 +298,8 @@ shinyServer(function(input, output) {
     ## to make sure the time zone is handled correctly
     date_range = as.POSIXct(as.character(input$dateRange),
                             tz = 'EST')
-    make_processing_plot(input$measurement,
-                         date_range[1], date_range[2],
-                         input$plotTypes,
+    make_processing_plot(input$site, input$data_source, input$measurement,
+                         date_range[1], date_range[2], input$plotTypes,
                          input$log, input$showFlagged)
   },
   height = 700, res = 100)
