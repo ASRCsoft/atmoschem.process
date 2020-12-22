@@ -39,9 +39,7 @@ Suggests:
     testthat,
     tools,
     usethis
-Remotes:
-    bergant/datamodelr,
-    pridiltal/staplr
+Remotes: bergant/datamodelr
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1
 RdMacros: Rdpack
