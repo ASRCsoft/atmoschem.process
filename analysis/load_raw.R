@@ -15,7 +15,11 @@ data_source = commandArgs(trailingOnly = T)[2]
 
 # read the file and add it to the sqlite database
 load_file = function(f, db) {
-  dat = atmoschem.process:::transform_measurement(f, site, data_source)
+  dat = tryCatch(atmoschem.process:::transform_measurement(f, site, data_source),
+                 error = function(e) {
+                   stop(f, ' loading failed: ', e)
+                 })
+  if (!nrow(dat)) return()
   # add columns to the db table if needed
   cur_fields = dbListFields(db, 'measurements')
   if (!all(names(dat) %in% cur_fields)) {

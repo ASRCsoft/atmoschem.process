@@ -37,6 +37,7 @@ transform_measurement = function(f, site, ds) {
   } else if (site == 'WFMS' && ds == 'aethelometer') {
     transform_wfms_aethelometer(f)
   }
+  if (!nrow(res)) return(data.frame())
   res %>%
     transform(time = as.POSIXct(instrument_time, tz = 'EST')) %>%
     reshape(timevar = 'measurement_name', idvar = 'time', direction = 'wide',

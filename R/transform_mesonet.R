@@ -1,5 +1,6 @@
 transform_mesonet = function(f) {
   df = read.csv(f, check.names = F)
+  if (!nrow(df)) return(data.frame())
   df$instrument_time = as.POSIXct(df$datetime,
                                   format = '%Y%m%dT%H%M%S',
                                   tz = 'UTC')
