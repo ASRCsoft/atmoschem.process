@@ -34,9 +34,9 @@ all: routine_dataset
 .PHONY: routine_dataset
 routine_dataset: $(old_routine_out) $(hourly_files)
 	mkdir -p $(out_dir)/$(routine_out) && \
-	Rscript analysis/routine_package.R $(out_dir)/$(routine_out)
-	cp analysis/README.txt $(out_dir)/$(routine_out)
-	cd $(out_dir); zip -r $(routine_out).zip $(routine_out)
+	Rscript analysis/routine_package.R $(out_dir)/$(routine_out) && \
+	cp analysis/README.txt $(out_dir)/$(routine_out) && \
+	Rscript -e 'setwd("$(out_dir)"); zip("$(routine_out).zip", "$(routine_out)")'
 
 $(interm_dir)/hourly_%.sqlite: $(interm_dir)/processed_%.sqlite analysis/aggregate_hourly.R
 	Rscript analysis/aggregate_hourly.R $(shell echo $* | sed "s/_/ /")
@@ -60,12 +60,12 @@ $(interm_dir)/raw_%.sqlite: raw_data analysis/load_raw.R
 	Rscript analysis/load_raw.R $(shell echo $* | sed "s/_/ /")
 
 $(interm_dir)/old_%.csv: $(routine_zip) analysis/clean_old_routine.R
-	unzip -nq $(routine_zip) -d $(raw_dir) && \
+	Rscript -e 'unzip("$(routine_zip)", overwrite = F, exdir = "$(raw_dir)")' && \
 	Rscript analysis/clean_old_routine.R $*
 
 .INTERMEDIATE: raw_data
 raw_data: $(raw_zip)
-	unzip -nq $(raw_zip) -d $(raw_dir)
+	Rscript -e 'unzip("$(raw_zip)", overwrite = F, exdir = "$(raw_dir)")'
 
 $(raw_dir)/%.zip:
 	mkdir -p $(raw_dir) && \
