@@ -32,13 +32,13 @@ bucket_precip = function(val, val.max = .5, err.min = -.02) {
   out = c(NA, diff(val))
   resetting = out < err.min
   # if resetting in one step
-  reset1 = resetting & !lag2(resetting) & !lead2(resetting)
+  reset1 = which(resetting & !lag2(resetting) & !lead2(resetting))
   out[reset1] = out[reset1] + val.max
   # if 1st step, resetting in 2 steps-- split the difference over the two steps
-  reset2_1 = resetting & lead2(resetting)
+  reset2_1 = which(resetting & lead2(resetting))
   out[reset2_1] = (lead2(out)[reset2_1] - lag2(out)[reset2_1] + val.max) / 2
   # if 2nd step, resetting in 2 steps-- this should be the same as above
-  reset2_2 = resetting & lag2(resetting)
+  reset2_2 = which(resetting & lag2(resetting))
   out[reset2_2] = (out[reset2_2] - lag2(out, 2)[reset2_2] + val.max) / 2
   out
 }
@@ -312,7 +312,7 @@ if (site == 'WFMS') {
     meas$flagged.HNO3 = with(pr_meas, flagged.NOy | `flagged.NOy-HNO3`)
     # Precip (get changes from cumulative value and convert to mm)
     meas$value.Precip = bucket_precip(pr_meas$value.Rain, .5, -.02) * 25.4
-    meas$flagged.Precip = with(pr_meas, flagged.Rain | is.na(value.Precip))
+    meas$flagged.Precip = pr_meas$flagged.Rain
     # TEOMA(2.5)BaseMC
     meas$`value.TEOMA(2.5)BaseMC` =
       with(pr_meas, `value.TEOMA(2.5)MC` + `value.TEOMA(2.5)RefMC`)
