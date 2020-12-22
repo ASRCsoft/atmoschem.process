@@ -1,9 +1,8 @@
 library(atmoschem.process)
 library(shiny)
+library(magrittr)
 library(DBI)
 library(RSQLite)
-library(dplyr)
-library(tidyr)
 library(ggplot2)
 
 # relative path to the sqlite files from the app directory
@@ -47,99 +46,100 @@ get_processed = function(s, ds, m, t1, t2) {
   res
 }
 
-get_filtered_cals = function(m, times, type) {
-  if (type == 'zero') {
-    cals = atmoschem.process:::estimate_zeros(obj, m, times)
-  } else if (type == 'span') {
-    cals = atmoschem.process:::estimate_spans(obj, m, times)
-  } else {
-    stop('calibration type not recognized')
-  }
-  breaks = atmoschem.process:::get_cal_breaks(obj, m, type)
-  if (length(breaks) > 0) {
-    segments = findInterval(times, breaks)
-    time_list = split(times, segments)
-    cal_list = split(cals, segments)
-    break_ind = as.integer(names(cal_list))
-    lower = breaks[replace(break_ind, break_ind == 0, NA)]
-    upper = breaks[replace(break_ind, break_ind == length(breaks), NA) + 1]
-    cal_df_list = mapply(function(x, y, l, u) {
-      if (!is.na(l)) {
-        x = c(l, x)
-        y = c(y[1], y)
-      }
-      if (!is.na(u)) {
-        x = c(x, u)
-        y = c(y, tail(y, 1))
-      }
-      data.frame(time = x, value = y)
-    }, time_list, cal_list, lower, upper, SIMPLIFY = FALSE)
-    cal_df = do.call(rbind, cal_df_list)
-    row.names(cal_df) = NULL
-  } else {
-    cal_df = data.frame(time = times, value = cals)
-  }
-  cal_df$flagged = FALSE
-  cal_df$filtered = TRUE
-  cal_df$label = type
-  cal_df
-}
+get_cals = function(s, ds, m, t1, t2) {
+  dbpath = file.path(interm_dir, paste0('cals_', s, '.sqlite'))
+  db = dbConnect(SQLite(), dbpath)
+  q = "
+select *,
+       end_time as time,
+       measured_value as value
+  from calibrations
+ where data_source = ?
+   and measurement_name = ?
+   and type = ?
+ order by start_time asc"
+  sql = sqlInterpolate(db, q, ds, m, 'zero')
+  zeros = dbGetQuery(db, sql)
+  sql = sqlInterpolate(db, q, ds, m, 'span')
+  spans = dbGetQuery(db, sql)
+  dbDisconnect(db)
+  zeros$time = as.POSIXct(zeros$time, tz = 'EST')
+  spans$time = as.POSIXct(spans$time, tz = 'EST')
+  zeros$flagged = as.logical(zeros$flagged)
+  spans$flagged = as.logical(spans$flagged)
+  zeros$filtered = F
+  spans$filtered = F
+  zeros$label = 'zero'
+  spans$label = 'span'
 
-get_cals = function(measure, t1, t2) {
-  zeros = obj %>%
-    atmoschem.process:::get_cal_zeros(measure)
-  if (nrow(zeros) > 0) {
-    zeros = zeros %>%
-      ## If we keep the values before and after the time range
-      ## [t1,t2], they will influence ggplot2's y-axis bounds
-      ## calculations, which we don't want. But we also want the
-      ## preceding and succeeding points so that the zero/span lines
-      ## can be drawn to the edges of the graph.
-      filter(ifelse(is.na(lead(time)), time > t1, lead(time) > t1),
-             ifelse(is.na(lag(time)), time < t2, lag(time) < t2))
-    if (nrow(zeros) > 0) {
-      zeros = zeros %>%
-        mutate(value = measured_value, filtered = FALSE, label = 'zero') %>%
-        select(time, value, flagged, filtered, label)
-      filtered_zeros = get_filtered_cals(measure, zeros$time, 'zero')
-      zeros = rbind(zeros, filtered_zeros)
-    }
-  }
-  ## now the spans
-  spans = obj %>%
-    atmoschem.process:::get_cal_spans(measure)
+  # Get the estimated (median filtered) zeros from the raw values. These
+  # calculations are the same as in `drift_correct`
+  m_conf = subset(measurement_types, site == s & data_source == ds & name == m)
+  z_breaks = zeros$time[is_true(zeros$corrected)]
+  # If we keep the values before and after the time range [t1,t2], they will
+  # influence ggplot2's y-axis bounds calculations, which we don't want. But we
+  # also want the preceding and succeeding points so that the zero/span lines
+  # can be drawn to the edges of the graph.
+  zeros0 = zeros
+  zeros = zeros %>%
+    transform(lead_time = c(tail(time, -1), NA),
+              lag_time = c(NA, head(time, -1))) %>%
+    subset(ifelse(is.na(lead_time), time > t1, lead_time > t1) &
+           ifelse(is.na(lag_time), time < t2, lag_time < t2))
+  fzeros = zeros
+  good_zeros = replace(zeros0$value, zeros0$flagged, NA)
+  fzeros$value =
+    atmoschem.process:::estimate_cals(zeros0$time, good_zeros,
+                                      m_conf$zero_smooth_window, zeros$time,
+                                      z_breaks)
+  fzeros$filtered = T
+  zeros = rbind(zeros, fzeros)
+
+  # convert spans to ratios
   if (nrow(spans) > 0) {
+    szeros = atmoschem.process:::estimate_cals(zeros0$time, good_zeros,
+                                               m_conf$zero_smooth_window,
+                                               spans$time, z_breaks)
+    measured_value = spans$value - szeros
+    # convert to ratio
+    spans$measured_value = measured_value / spans$provided_value
+    s_breaks = spans$time[is_true(spans$corrected)]
+    spans0 = spans
     spans = spans %>%
-      select(time, ratio, flagged) %>%
-      filter(ifelse(is.na(lead(time)), time > t1, lead(time) > t1),
-             ifelse(is.na(lag(time)), time < t2, lag(time) < t2))
-    if (nrow(spans) > 0) {
-      spans = spans %>%
-        mutate(value = ratio, filtered = FALSE, label = 'span') %>%
-        select(time, value, flagged, filtered, label)
-      filtered_spans = get_filtered_cals(measure, spans$time, 'span')
-      spans = rbind(spans, filtered_spans)
-    }
+      transform(lead_time = c(tail(time, -1), NA),
+                lag_time = c(NA, head(time, -1))) %>%
+      subset(ifelse(is.na(lead_time), time > t1, lead_time > t1) &
+             ifelse(is.na(lag_time), time < t2, lag_time < t2))
+    fspans = spans
+    good_spans = replace(spans0$value, spans0$flagged, NA)
+    fspans$value =
+      atmoschem.process:::estimate_cals(spans0$time, good_spans,
+                                        m_conf$span_smooth_window, spans$time,
+                                        s_breaks)
+    fspans$filtered = T
+    spans = rbind(spans, fspans)
   }
-  rbind(zeros, spans)
+
+  cols = c('time', 'value', 'flagged', 'filtered', 'label')
+  rbind(zeros, spans)[, cols]
 }
 
-get_ces = function(measure, t1, t2) {
-  ces = obj %>%
-    atmoschem.process:::get_ces(measure)
-  if (nrow(ces) > 0) {
-    ces = ces %>%
-      select(time, efficiency, flagged) %>%
-      mutate(filtered_value =
-               atmoschem.process:::estimate_ces(obj, measure, time)) %>%
-      filter(ifelse(is.na(lead(time)), time > t1, lead(time) > t1),
-             ifelse(is.na(lag(time)), time < t2, lag(time) < t2)) %>%
-      gather(filtered, value, -time, -flagged) %>%
-      mutate(filtered = filtered == 'filtered_value',
-             flagged = ifelse(filtered, FALSE, flagged))
-  }
-  ces
-}
+# get_ces = function(measure, t1, t2) {
+#   ces = obj %>%
+#     atmoschem.process:::get_ces(measure)
+#   if (nrow(ces) > 0) {
+#     ces = ces %>%
+#       select(time, efficiency, flagged) %>%
+#       mutate(filtered_value =
+#                atmoschem.process:::estimate_ces(obj, measure, time)) %>%
+#       filter(ifelse(is.na(lead(time)), time > t1, lead(time) > t1),
+#              ifelse(is.na(lag(time)), time < t2, lag(time) < t2)) %>%
+#       gather(filtered, value, -time, -flagged) %>%
+#       mutate(filtered = filtered == 'filtered_value',
+#              flagged = ifelse(filtered, FALSE, flagged))
+#   }
+#   ces
+# }
 
 get_hourly = function(s, ds, m, t1, t2) {
   dbpath = file.path(interm_dir, paste0('hourly_', s, '_', ds, '.sqlite'))
@@ -173,13 +173,12 @@ make_processing_plot = function(s, ds, m, t1, t2, plot_types, logt = F,
     'hourly' %in% plot_types
 
   # temporarily, until I fix the functions
-  has_cal = F
   has_ce = F
 
   ## get the data
   if (has_raw) raw = get_raw(s, ds, m, t1, t2)
   if (has_processing) processed = get_processed(s, ds, m, t1, t2)
-  if (has_cal) cals = get_cals(m, t1, t2)
+  if (has_cal) cals = get_cals(s, ds, m, t1, t2)
   if (has_ce) ces = get_ces(m, t1, t2)
   if (has_hourly) hourly = get_hourly(s, ds, m, t1, t2)
 
@@ -240,8 +239,10 @@ make_processing_plot = function(s, ds, m, t1, t2, plot_types, logt = F,
   if (any(df$Filtered)) {
     raw_df = subset(df, !Filtered)
     filtered_df = subset(df, Filtered)
-    zero_breaks = atmoschem.process:::get_cal_breaks(obj, m, 'zero')
-    span_breaks = atmoschem.process:::get_cal_breaks(obj, m, 'span')
+    # zero_breaks = atmoschem.process:::get_cal_breaks(obj, m, 'zero')
+    # span_breaks = atmoschem.process:::get_cal_breaks(obj, m, 'span')
+    zero_breaks = numeric(0)
+    span_breaks = numeric(0)
     combined_breaks = c(zero_breaks, span_breaks)
     if (!is.null(combined_breaks)) {
       breaks_df = data.frame(breaks = c(zero_breaks, span_breaks),
