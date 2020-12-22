@@ -4,14 +4,12 @@
 PKGNAME := $(shell sed -n "s/Package: *\([^ ]*\)/\1/p" DESCRIPTION)
 PKGVERS := $(shell sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION)
 r_files := $(wildcard R/*.R)
-sql_files := $(wildcard inst/sql/*.sql)
 pkgdata_csv := $(wildcard data-raw/package_data/*.csv)
 pkgdata_rda := $(patsubst data-raw/package_data/%.csv,data/%.rda,$(pkgdata_csv))
 build_file := $(PKGNAME)_$(PKGVERS).tar.gz
 ## Data processing variables
 sites := WFMS WFML PSP QC
 raw_dir := analysis/raw
-cleaned_dir := analysis/cleaned
 interm_dir := analysis/intermediate
 out_dir := analysis/out
 download_url := http://atmoschem.asrc.cestm.albany.edu/~aqm/AQM_Products/downloads
