@@ -2,6 +2,7 @@
 # processed data and combines it with the new processed data.
 
 library(atmoschem.process)
+library(magrittr)
 library(DBI)
 library(RSQLite)
 options(warn = 1) # print warnings immediately
