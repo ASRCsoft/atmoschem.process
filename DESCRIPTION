@@ -29,7 +29,6 @@ Suggests:
     datamodelr,
     DBI,
     DiagrammeR,
-    dplyr,
     ggplot2 (>= 3.0),
     knitr,
     rmarkdown,
