@@ -124,6 +124,27 @@ select *,
   rbind(zeros, spans)[, cols]
 }
 
+get_cal_breaks = function(s, ds, m, type, t1, t2) {
+  dbpath = file.path(interm_dir, paste0('cals_', s, '.sqlite'))
+  db = dbConnect(SQLite(), dbpath)
+  q = "
+select end_time as time
+  from calibrations
+ where data_source = ?
+   and measurement_name = ?
+   and type = ?
+   and corrected
+   and end_time > ?
+   and end_time < ?
+ order by end_time asc"
+  sql = sqlInterpolate(db, q, ds, m, type,
+                       format(t1, '%Y-%m-%d %H:%M:%S', tz = 'EST'),
+                       format(t2, '%Y-%m-%d %H:%M:%S', tz = 'EST'))
+  res = dbGetQuery(db, sql)
+  dbDisconnect(db)
+  as.POSIXct(res[, 1], tz = 'EST')
+}
+
 # get_ces = function(measure, t1, t2) {
 #   ces = obj %>%
 #     atmoschem.process:::get_ces(measure)
@@ -239,10 +260,8 @@ make_processing_plot = function(s, ds, m, t1, t2, plot_types, logt = F,
   if (any(df$Filtered)) {
     raw_df = subset(df, !Filtered)
     filtered_df = subset(df, Filtered)
-    # zero_breaks = atmoschem.process:::get_cal_breaks(obj, m, 'zero')
-    # span_breaks = atmoschem.process:::get_cal_breaks(obj, m, 'span')
-    zero_breaks = numeric(0)
-    span_breaks = numeric(0)
+    zero_breaks = get_cal_breaks(s, ds, m, 'zero', t1, t2)
+    span_breaks = get_cal_breaks(s, ds, m, 'span', t1, t2)
     combined_breaks = c(zero_breaks, span_breaks)
     if (!is.null(combined_breaks)) {
       breaks_df = data.frame(breaks = c(zero_breaks, span_breaks),
