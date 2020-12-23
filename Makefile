@@ -8,6 +8,7 @@ pkgdata_csv := $(wildcard data-raw/package_data/*.csv)
 pkgdata_rda := $(patsubst data-raw/package_data/%.csv,data/%.rda,$(pkgdata_csv))
 build_file := $(PKGNAME)_$(PKGVERS).tar.gz
 ## Data processing variables
+rscript := Rscript --vanilla
 sites := WFMS WFML PSP QC
 raw_dir := analysis/raw
 interm_dir := analysis/intermediate
@@ -32,12 +33,12 @@ all: routine_dataset
 .PHONY: routine_dataset
 routine_dataset: $(old_routine_out) $(hourly_files)
 	mkdir -p $(out_dir)/$(routine_out) && \
-	Rscript analysis/routine_package.R $(out_dir)/$(routine_out) && \
+	$(rscript) analysis/routine_package.R $(out_dir)/$(routine_out) && \
 	cp analysis/README.txt $(out_dir)/$(routine_out) && \
-	Rscript -e 'setwd("$(out_dir)"); zip("$(routine_out).zip", "$(routine_out)")'
+	$(rscript) -e 'setwd("$(out_dir)"); zip("$(routine_out).zip", "$(routine_out)")'
 
 $(interm_dir)/hourly_%.sqlite: $(interm_dir)/processed_%.sqlite analysis/aggregate_hourly.R
-	Rscript analysis/aggregate_hourly.R $(shell echo $* | sed "s/_/ /")
+	$(rscript) analysis/aggregate_hourly.R $(shell echo $* | sed "s/_/ /")
 
 # The way calibration files are created for each site (without data source)
 # makes things a bit awkward. Processed site/data source files depend on the
@@ -46,24 +47,24 @@ $(interm_dir)/hourly_%.sqlite: $(interm_dir)/processed_%.sqlite analysis/aggrega
 $(interm_dir)/processed_%.sqlite: $(interm_dir)/raw_%.sqlite \
                                   $(interm_dir)/cals_$$(shell echo $$* | sed "s/_.*//").sqlite \
                                   analysis/process_new_data.R
-	Rscript analysis/process_new_data.R $(shell echo $* | sed "s/_/ /")
+	$(rscript) analysis/process_new_data.R $(shell echo $* | sed "s/_/ /")
 
 # Calibration site file depends on all the raw site/calibration files
 make_cal_deps = $(patsubst %,$(interm_dir)/raw_%.sqlite, $(filter $(1)%, $(data_sources)))
 $(interm_dir)/cals_%.sqlite: $$(call make_cal_deps,$$*) \
                              raw_data analysis/load_calibration.R
-	Rscript analysis/load_calibration.R $*
+	$(rscript) analysis/load_calibration.R $*
 
 $(interm_dir)/raw_%.sqlite: raw_data analysis/load_raw.R
-	Rscript analysis/load_raw.R $(shell echo $* | sed "s/_/ /")
+	$(rscript) analysis/load_raw.R $(shell echo $* | sed "s/_/ /")
 
 $(interm_dir)/old_%.csv: $(routine_zip) analysis/clean_old_routine.R
-	Rscript -e 'unzip("$(routine_zip)", overwrite = F, exdir = "$(raw_dir)")' && \
-	Rscript analysis/clean_old_routine.R $*
+	$(rscript) -e 'unzip("$(routine_zip)", overwrite = F, exdir = "$(raw_dir)")' && \
+	$(rscript) analysis/clean_old_routine.R $*
 
 .INTERMEDIATE: raw_data
 raw_data: $(raw_zip)
-	Rscript -e 'unzip("$(raw_zip)", overwrite = F, exdir = "$(raw_dir)")'
+	$(rscript) -e 'unzip("$(raw_zip)", overwrite = F, exdir = "$(raw_dir)")'
 
 $(raw_dir)/%.zip:
 	mkdir -p $(raw_dir) && \
@@ -71,7 +72,7 @@ $(raw_dir)/%.zip:
 
 .PHONY: view
 view:
-	Rscript -e 'shiny::runApp("analysis/processing_viewer", launch.browser = T)'
+	$(rscript) -e 'shiny::runApp("analysis/processing_viewer", launch.browser = T)'
 
 ## R package
 
@@ -105,7 +106,7 @@ docs: $(pkgdata_rda) $(r_files) README.md
 	-e 'roxygen2::roxygenise()'
 
 data/%.rda: data-raw/package_data/%.csv data-raw/package_data.R
-	Rscript data-raw/package_data.R $<
+	$(rscript) data-raw/package_data.R $<
 
 README.md: README.Rmd DESCRIPTION
 	Rscript \
