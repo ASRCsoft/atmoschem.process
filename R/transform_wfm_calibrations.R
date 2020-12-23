@@ -1,16 +1,37 @@
-## get manual calibrations from pdf cal sheets
+# get manual calibrations from pdf cal sheets
 
-## Get the fields from a calibration pdf form.
+#' Get fields from a pdf form
+#'
+#' Get the field values from a pdf form (AcroForms). This function is a
+#' streamlined alternative to \code{staplr::get_fields} that's about twice as
+#' fast.
+#'
+#' @param f Path to pdf file.
+#' @return A list of the field values.
+#' @examples
+#' # read the staplr example file
+#' pdf = system.file('testForm.pdf', package = 'staplr')
+#' head(read_pdf_form(pdf))
+#'
+#' @seealso \link[staplr]{get_fields}
+#' @importFrom magrittr %>%
+#' @export
 read_pdf_form = function(f) {
-  f1 = staplr::get_fields(f)
-  ## simplify the list
-  lapply(f1, function(x) {
-    if (is.na(x$value) || x$value == '') {
-      NA
-    } else {
-      x$value
-    }
-  })
+  out = tempfile()
+  cmd = paste(staplr:::pdftk_cmd(), shQuote(f), "dump_data_fields", "output",
+              shQuote(out))
+  system(cmd)
+  on.exit(file.remove(out))
+  data.frame(lines = readLines(out)) %>%
+    transform(field_id = cumsum(lines == '---')) %>%
+    subset(lines != '---') %>%
+    transform(attr = sub('Field([^:]*):.*', '\\1', lines),
+              val = sub('Field[^:]*: +(.*)', '\\1', lines)) %>%
+    subset(attr != 'StateOption') %>%
+    reshape(timevar = 'attr', idvar = 'field_id', direction = 'wide',
+            drop = 'lines') %>%
+    with(setNames(val.Value, val.Name)) %>%
+    as.list
 }
 
 ## return True if the box is checked, otherwise False

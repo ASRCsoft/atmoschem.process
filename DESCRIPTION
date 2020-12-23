@@ -13,6 +13,7 @@ Description: Functions, configuration files, and scripts for creating the ASRC's
 Imports:
     caTools,
     lubridate,
+    magrittr,
     Rdpack (>= 0.7),
     readxl,
     R.utils,
@@ -31,7 +32,6 @@ Suggests:
     DiagrammeR,
     ggplot2 (>= 3.0),
     knitr,
-    magrittr,
     rmarkdown,
     RSQLite,
     shiny,
