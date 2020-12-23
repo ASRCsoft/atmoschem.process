@@ -23,19 +23,18 @@ hourly_files := $(patsubst %,$(interm_dir)/hourly_%.sqlite,$(data_sources))
 routine_out := routine_chemistry_v$(PKGVERS)
 
 .PHONY: all
-all: routine_dataset
+all: routine
 
 ## Atmoschem Dataset
 
 # save intermediate sqlite files for the processing viewer
 .SECONDARY:
 
-.PHONY: routine_dataset
-routine_dataset: $(old_routine_out) $(hourly_files)
-	mkdir -p $(out_dir)/$(routine_out) && \
-	$(rscript) analysis/routine_package.R $(out_dir)/$(routine_out) && \
-	cp analysis/README.txt $(out_dir)/$(routine_out) && \
-	$(rscript) -e 'setwd("$(out_dir)"); zip("$(routine_out).zip", "$(routine_out)")'
+.PHONY: routine
+routine: $(routine_out).zip
+
+$(routine_out).zip: $(old_routine_out) $(hourly_files)
+	$(rscript) analysis/routine_package.R $(out_dir)/$(routine_out)
 
 $(interm_dir)/hourly_%.sqlite: $(interm_dir)/processed_%.sqlite analysis/aggregate_hourly.R
 	$(rscript) analysis/aggregate_hourly.R $(shell echo $* | sed "s/_/ /")

@@ -1,5 +1,9 @@
-# This file creates the routine chemistry bulk data files. It takes the old
-# processed data and combines it with the new processed data.
+# Create the routine chemistry dataset package.
+
+# run this script from the project root directory with
+# Rscript analysis/routine_package.R <out directory>
+
+# produces file analysis/out/routine_chemistry_v$(PKGVERS).zip
 
 library(atmoschem.process)
 library(magrittr)
@@ -7,9 +11,9 @@ library(DBI)
 library(RSQLite)
 options(warn = 1) # print warnings immediately
 
-old_processed_dir = 'analysis/intermediate'
 out_dir = commandArgs(trailingOnly = TRUE)[1]
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+old_processed_dir = file.path('analysis', 'intermediate')
 
 # combine site/data source hourly files into a single site hourly file, using
 # column names from report_columns
@@ -55,7 +59,7 @@ for (site in sites$abbreviation) {
   message('Organizing ', site, ' data')
   csv_file = paste0('old_', site, '.csv')
   old_processed_file = file.path(old_processed_dir, csv_file)
-  out_file = file.path(out_dir, csv_file)
+  out_file = file.path(out_dir, paste0(site, '.csv'))
 
   oldp = read.csv(old_processed_file, na.strings = c('NA', '-999'),
                   check.names = FALSE)
@@ -137,3 +141,11 @@ instr_cols = c('site', 'column', 'times', 'brand', 'model', 'serial_number')
 instruments = column_insts[, instr_cols]
 instr_path = file.path(out_dir, 'instruments.csv')
 write.csv(instruments, file = instr_path, na = '', row.names = FALSE)
+# readme
+file.copy(file.path('analysis', 'README.txt'), out_dir, overwrite = T)
+
+# zip
+# paths in the zipped file are determined by the working directory
+setwd(dirname(out_dir))
+routine_dir = basename(out_dir)
+zip(paste0(routine_dir, '.zip'), routine_dir)

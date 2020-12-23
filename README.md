@@ -90,7 +90,7 @@ by running (from a terminal)
 
 ``` sh
 cd path/to/atmoschem.process
-make routine_dataset
+make routine
 ```
 
 You will be asked for the atmoschem server’s data password (twice),
