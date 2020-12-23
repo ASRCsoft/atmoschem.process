@@ -266,8 +266,8 @@ if (site == 'WFMS') {
     meas$flagged.NO2 = with(pr_meas, flagged.NOx | flagged.NO)
     # SLP
     meas$value.SLP =
-      with(pr_meas, sea_level_pressure(value.BP, value.PTemp_C, 1483.5))
-    meas$flagged.SLP = with(pr_meas, flagged.BP | flagged.PTemp_C)
+      with(pr_meas, sea_level_pressure(value.BP, value.T, 1483.5))
+    meas$flagged.SLP = with(pr_meas, flagged.BP | flagged.T)
     # WS (wind shadow corrected)
     meas$value.WS = with(pr_meas, pmax(value.WS3Cup, value.WS3CupB, na.rm = T))
     meas$flagged.WS = with(pr_meas, flagged.WS3Cup & flagged.WS3CupB)
