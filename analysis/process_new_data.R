@@ -211,7 +211,6 @@ for (n in 1:nrow(mtypes)) {
     msmt_cols = c('time', paste0('value.', mname), paste0('flagged.', mname))
     msmts = meas[, msmt_cols]
     names(msmts) = c('time', 'value', 'flagged')
-    m_id = mtypes$id[n]
     m_cals = subset(cals, measurement_name == mname)
     m_zeros = subset(m_cals, type == 'zero')
     m_spans = subset(m_cals, type == 'span')
