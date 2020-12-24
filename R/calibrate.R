@@ -60,6 +60,18 @@ piecewise_runmed = function(x, k, segments, ...) {
   unlist(res_list, use.names = FALSE)
 }
 
+#' Estimate calibration values
+#'
+#' Estimate calibration values by applying a median filter and interpolating
+#' between the filtered values.
+#'
+#' @param x Calibration check times (POSIXct).
+#' @param y Calibration check values.
+#' @param k Median filter window width. If \code{NA} no smoothing is applied.
+#' @param xout Times at which to estimate the calibration value.
+#' @param breaks Times of discontinuities caused by instrument adjustments.
+#' @return Estimated calibration values at times \code{xout}.
+#' @export
 estimate_cals = function(x, y, k, xout, breaks) {
   has_smoothing = !is.na(k) && k > 1
   has_breaks = length(breaks) > 0 &&

@@ -88,18 +88,15 @@ select *,
            ifelse(is.na(lag_time), time < t2, lag_time < t2))
   fzeros = zeros
   good_zeros = replace(zeros0$value, zeros0$flagged, NA)
-  fzeros$value =
-    atmoschem.process:::estimate_cals(zeros0$time, good_zeros,
-                                      m_conf$zero_smooth_window, zeros$time,
-                                      z_breaks)
+  fzeros$value = estimate_cals(zeros0$time, good_zeros,
+                               m_conf$zero_smooth_window, zeros$time, z_breaks)
   fzeros$filtered = T
   zeros = rbind(zeros, fzeros)
 
   # convert spans to ratios
   if (nrow(spans) > 0) {
-    szeros = atmoschem.process:::estimate_cals(zeros0$time, good_zeros,
-                                               m_conf$zero_smooth_window,
-                                               spans$time, z_breaks)
+    szeros = estimate_cals(zeros0$time, good_zeros, m_conf$zero_smooth_window,
+                           spans$time, z_breaks)
     measured_value = spans$value - szeros
     # convert to ratio
     spans$measured_value = measured_value / spans$provided_value
@@ -112,10 +109,9 @@ select *,
              ifelse(is.na(lag_time), time < t2, lag_time < t2))
     fspans = spans
     good_spans = replace(spans0$value, spans0$flagged, NA)
-    fspans$value =
-      atmoschem.process:::estimate_cals(spans0$time, good_spans,
-                                        m_conf$span_smooth_window, spans$time,
-                                        s_breaks)
+    fspans$value = estimate_cals(spans0$time, good_spans,
+                                 m_conf$span_smooth_window, spans$time,
+                                 s_breaks)
     fspans$filtered = T
     spans = rbind(spans, fspans)
   }
