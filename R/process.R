@@ -51,52 +51,6 @@ in_interval = function(x, l, u, l_inc, u_inc) {
   res
 }
 
-#' Rolling median absolute deviation (MAD)
-#'
-#' Calculate the median absolute deviation (MAD) of a rolling window of values.
-#'
-#' The median absolute deviation (MAD) is a median-based alternative to the
-#' standard deviation often preferred for its robustness to outliers
-#' \insertCite{leys_detecting_2013}{atmoschem.process}. The MAD for a collection
-#' of values \eqn{X} is defined as
-#'
-#' \deqn{1.4826 \times \textrm{med}(\left| X - \textrm{med}(X) \right|)}{1.4826 * med(|X - med(X)|)}
-#'
-#' where the constant 1.4826 scales the result to estimate the standard
-#' deviation.
-#'
-#' @param x A vector of numbers.
-#' @param k Width of the rolling window (an odd integer).
-#' @return A vector of MADs.
-#' @examples
-#' rolling_mad(rnorm(20), 5)
-#'
-#' @references \insertAllCited{}
-#' @export
-rolling_mad = function(x, k) {
-  n = length(x)
-  k2 = floor(k / 2)
-  ## surprisingly this seems to be the most practical way to calculate
-  ## running medians with NA values in R
-  m = caTools::runquantile(x, k, .5)
-  ## for each segment of sequential equal medians, get rolling median
-  ## of |x - median|
-  seg_inds = c(1, which(m[2:n] != m[1:(n - 1)]) + 1, n + 1)
-  seg_m = m[seg_inds]
-  mads = lapply(2:length(seg_inds), function(y) {
-    ## index bounds, padding the range with k/2 values on each side
-    ## (if available)
-    lpad = max(1, seg_inds[y - 1] - k2)
-    upad = min(n, seg_inds[y] - 1 + k2)
-    ## the bounds, removing the padding
-    lbound = seg_inds[y - 1] - lpad + 1
-    ubound = seg_inds[y] - lpad
-    caTools::runquantile(abs(x[lpad:upad] - seg_m[y - 1]), k, .5)[lbound:ubound]
-  })
-  ## multiply by 1.4826 to estimate standard deviation
-  unlist(mads) * 1.4826
-}
-
 #' Rolling outlier detection using the Hampel identifier
 #'
 #' Detect outliers in a rolling window using the Hampel identifier.
@@ -130,8 +84,8 @@ rolling_mad = function(x, k) {
 #' @references \insertAllCited{}
 #' @export
 hampel_outlier = function(x, k, threshold = 3.5) {
-  medians = caTools::runquantile(x, k, probs = .5)
-  mads = rolling_mad(x, k)
+  medians = caTools::runquantile(x, k, .5)
+  mads = caTools::runmad(x, k, medians)
   (mads != 0) & (abs(x - medians) / mads > threshold)
 }
 
