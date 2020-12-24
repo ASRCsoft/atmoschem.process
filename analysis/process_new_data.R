@@ -13,9 +13,8 @@ library(RSQLite)
 
 site = commandArgs(trailingOnly = T)[1]
 data_source = commandArgs(trailingOnly = T)[2]
-
 start_time = as.POSIXct('2018-10-01', tz = 'EST')
-end_time = as.POSIXct('2020-10-01', tz = 'EST')
+end_time = as.POSIXct(Sys.getenv('processing_end'), tz = 'EST')
 
 is_true = function(x) !is.na(x) & x
 
