@@ -6,9 +6,6 @@
 #' Calibration flags
 "cal_flags"
 
-#' Clock audit results
-"clock_audits"
-
 #' Data sources
 "data_sources"
 
