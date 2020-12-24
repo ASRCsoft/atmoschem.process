@@ -222,15 +222,13 @@ for (n in 1:nrow(mtypes)) {
     }
     tryCatch({
       if (is_true(m_conf$has_calibration)) {
-        msmts$value =
-          atmoschem.process:::drift_correct(msmts$time, msmts$value, m_zeros,
-                                            m_spans, m_flows, m_conf)
+        msmts$value = drift_correct(msmts$time, msmts$value, m_zeros, m_spans,
+                                    m_flows, m_conf)
       }
       if (is_true(m_conf$apply_ce)) {
         # correct the conversion efficiency measurements for instrument drift
-        m_ces$measured_value =
-          atmoschem.process:::drift_correct(m_ces$time, m_ces$measured_value,
-                                            m_zeros, m_spans, m_flows, m_conf)
+        m_ces$measured_value = drift_correct(m_ces$time, m_ces$measured_value,
+                                             m_zeros, m_spans, m_flows, m_conf)
         if (!is.na(m_conf$gilibrator_ce)) {
           ce_flows = subset(site_flows, measurement_name == m_conf$gilibrator_ce)
         } else {
@@ -366,15 +364,13 @@ for (mname in derived) {
   }
   tryCatch({
     if (is_true(m_conf$has_calibration)) {
-      msmts$value =
-        atmoschem.process:::drift_correct(msmts$time, msmts$value, m_zeros,
-                                          m_spans, config = m_conf)
+      msmts$value = drift_correct(msmts$time, msmts$value, m_zeros, m_spans,
+                                  config = m_conf)
     }
     if (is_true(m_conf$apply_ce)) {
       # correct the conversion efficiency measurements for instrument drift
-      m_ces$measured_value =
-        atmoschem.process:::drift_correct(m_ces$time, m_ces$measured_value,
-                                          m_zeros, m_spans, m_flows, m_conf)
+      m_ces$measured_value = drift_correct(m_ces$time, m_ces$measured_value,
+                                           m_zeros, m_spans, m_flows, m_conf)
       if (!is.na(m_conf$gilibrator_ce)) {
         ce_flows = subset(site_flows, measurement_name == m_conf$gilibrator_ce)
       } else {
