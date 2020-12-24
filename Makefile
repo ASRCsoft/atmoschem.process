@@ -10,6 +10,7 @@ build_file := $(PKGNAME)_$(PKGVERS).tar.gz
 ## Data processing variables
 rscript := Rscript --vanilla
 processing_end := 2020-10-01
+raw_version := 0.3
 sites := WFMS WFML PSP QC
 raw_dir := analysis/raw
 interm_dir := analysis/intermediate
@@ -17,7 +18,8 @@ out_dir := analysis/out
 download_url := http://atmoschem.asrc.cestm.albany.edu/~aqm/AQM_Products/downloads
 routine_zip := $(raw_dir)/routine_chemistry_v0.1.zip
 old_routine_out := $(patsubst %,$(interm_dir)/old_%.csv,$(sites))
-raw_zip := $(raw_dir)/raw_data_v0.3.zip
+raw_data := $(raw_dir)/raw_data_v$(raw_version)
+raw_zip := $(raw_dir)/raw_data_v$(raw_version).zip
 # get <site>_<data_source> for each entry in data_sources.csv
 data_sources := $(shell sed "1d;s/^\([^,]*\),\([^,]*\).*/\1_\2/" data-raw/package_data/data_sources.csv)
 hourly_files := $(patsubst %,$(interm_dir)/hourly_%.sqlite,$(data_sources))

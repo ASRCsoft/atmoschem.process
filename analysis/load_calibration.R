@@ -13,6 +13,7 @@ library(DBI)
 library(RSQLite)
 
 site = commandArgs(trailingOnly = T)[1]
+raw_folder = paste0('raw_data_v', Sys.getenv('raw_version'))
 
 # calibration-related functions
 min_ma = function(x, k, ...) min(runmean(x, k, ...), na.rm = TRUE)
@@ -87,8 +88,8 @@ guess_42C_ce = function(meas, noxval) {
 }
 
 # get the manual cals
-files = file.path('analysis', 'raw', 'raw_data_v0.3', site, 'calibrations', '*',
-                  '*', '*') %>%
+files = file.path('analysis', 'raw', raw_folder, site, 'calibrations', '*', '*',
+                  '*') %>%
   Sys.glob
 message('Loading ', length(files), ' files into cals_', site, '.sqlite...')
 mcals = data.frame(f = files) %>%
