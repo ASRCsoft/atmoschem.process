@@ -13,6 +13,7 @@ library(DBI)
 library(RSQLite)
 
 site = commandArgs(trailingOnly = T)[1]
+raw_folder = paste0('raw_data_v', Sys.getenv('raw_version'))
 
 # calibration-related functions
 min_ma = function(x, k, ...) min(runmean(x, k, ...), na.rm = TRUE)
@@ -87,8 +88,8 @@ guess_42C_ce = function(meas, noxval) {
 }
 
 # get the manual cals
-files = file.path('analysis', 'raw', 'raw_data_v0.3', site, 'calibrations', '*',
-                  '*', '*') %>%
+files = file.path('analysis', 'raw', raw_folder, site, 'calibrations', '*', '*',
+                  '*') %>%
   Sys.glob
 message('Loading ', length(files), ' files into cals_', site, '.sqlite...')
 mcals = data.frame(f = files) %>%
@@ -243,10 +244,9 @@ if (site == 'WFMS') {
     m_ces = subset(m_cals, type == 'CE')
     m_conf = subset(measurement_types, site == 'PSP' & name == mname)
     m_ces[, mname] =
-      atmoschem.process:::drift_correct(m_ces$time, m_ces$measured_value,
-                                        m_cals[m_cals$type == 'zero', ],
-                                        m_cals[m_cals$type == 'span', ],
-                                        config = m_conf)
+      drift_correct(m_ces$time, m_ces$measured_value,
+                    m_cals[m_cals$type == 'zero', ],
+                    m_cals[m_cals$type == 'span', ], config = m_conf)
     ces_list[[mname]] = m_ces
   }
   # the NO and NOx start and end times aren't exactly the same, so match by date

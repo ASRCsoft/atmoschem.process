@@ -4,6 +4,7 @@ library(magrittr)
 library(DBI)
 library(RSQLite)
 library(ggplot2)
+library(cowplot)
 
 # relative path to the sqlite files from the app directory
 interm_dir = file.path('..', 'intermediate')
@@ -88,21 +89,18 @@ select *,
            ifelse(is.na(lag_time), time < t2, lag_time < t2))
   fzeros = zeros
   good_zeros = replace(zeros0$value, zeros0$flagged, NA)
-  fzeros$value =
-    atmoschem.process:::estimate_cals(zeros0$time, good_zeros,
-                                      m_conf$zero_smooth_window, zeros$time,
-                                      z_breaks)
+  fzeros$value = estimate_cals(zeros0$time, good_zeros,
+                               m_conf$zero_smooth_window, zeros$time, z_breaks)
   fzeros$filtered = T
   zeros = rbind(zeros, fzeros)
 
   # convert spans to ratios
   if (nrow(spans) > 0) {
-    szeros = atmoschem.process:::estimate_cals(zeros0$time, good_zeros,
-                                               m_conf$zero_smooth_window,
-                                               spans$time, z_breaks)
+    szeros = estimate_cals(zeros0$time, good_zeros, m_conf$zero_smooth_window,
+                           spans$time, z_breaks)
     measured_value = spans$value - szeros
     # convert to ratio
-    spans$measured_value = measured_value / spans$provided_value
+    spans$value = measured_value / spans$provided_value
     s_breaks = spans$time[is_true(spans$corrected)]
     spans0 = spans
     spans = spans %>%
@@ -112,10 +110,9 @@ select *,
              ifelse(is.na(lag_time), time < t2, lag_time < t2))
     fspans = spans
     good_spans = replace(spans0$value, spans0$flagged, NA)
-    fspans$value =
-      atmoschem.process:::estimate_cals(spans0$time, good_spans,
-                                        m_conf$span_smooth_window, spans$time,
-                                        s_breaks)
+    fspans$value = estimate_cals(spans0$time, good_spans,
+                                 m_conf$span_smooth_window, spans$time,
+                                 s_breaks)
     fspans$filtered = T
     spans = rbind(spans, fspans)
   }
@@ -174,8 +171,6 @@ get_hourly = function(s, ds, m, t1, t2) {
   res = dbGetQuery(db, sql)
   dbDisconnect(db)
   res[, 1] = as.POSIXct(res[, 1], tz = 'EST')
-  # convert hourly NARSTO flag to boolean
-  res[, 3] = !is.na(res[, 3]) & startsWith(res[, 3], 'M')
   res
 }
 
@@ -183,8 +178,10 @@ make_processing_plot = function(s, ds, m, t1, t2, plot_types, logt = F,
                                 show_flagged = T) {
   ## get measurement info
   m_info = subset(measurement_types, site == s & data_source == ds & name == m)
+  ylabel = paste0(m, ' (', m_info$units, ')')
+  if (logt) ylabel = paste('Log', ylabel)
   has_raw = 'raw' %in% plot_types
-  has_processing = is_true(m_info$apply_processing) &
+  has_processed = is_true(m_info$apply_processing) &
     'processed' %in% plot_types
   has_cal = is_true(m_info$has_calibration) &
     any(c('zero','span') %in% plot_types)
@@ -193,115 +190,104 @@ make_processing_plot = function(s, ds, m, t1, t2, plot_types, logt = F,
   has_hourly = is_true(m_info$apply_processing) &
     'hourly' %in% plot_types
 
-  # temporarily, until I fix the functions
+  # temporarily, until I rewrite the CE functions
   has_ce = F
-
-  ## get the data
-  if (has_raw) raw = get_raw(s, ds, m, t1, t2)
-  if (has_processing) processed = get_processed(s, ds, m, t1, t2)
-  if (has_cal) cals = get_cals(s, ds, m, t1, t2)
   if (has_ce) ces = get_ces(m, t1, t2)
-  if (has_hourly) hourly = get_hourly(s, ds, m, t1, t2)
-
-  ## organize for ggplot2
-  df_list = list()
-  if (has_raw && nrow(raw) > 0) {
-    raw$label = 'Raw'
-    raw = raw[, c(1:2, 4, 3)]
-    raw$filtered = F
-    df_list$raw = raw
-  }
-  if (has_cal && nrow(cals) > 0) {
-    cals = cals[, c('time', 'value', 'label', 'flagged', 'filtered')]
-    if (!'zero' %in% plot_types) {
-      cals = subset(cals, label != 'zero')
-    } else if (!'span' %in% plot_types) {
-      cals = subset(cals, label != 'span')
-    }
-    df_list$cals = cals
-  }
   if (has_ce && nrow(ces) > 0) {
     ces$label = 'Conversion Efficiency'
     ces = ces[, c('time', 'value', 'label', 'flagged', 'filtered')]
     df_list$ces = ces
   }
-  if (has_processing && nrow(processed) > 0) {
-    processed$label = 'Processed'
-    processed = processed[, c(1:2, 4, 3)]
-    processed$filtered = F
-    df_list$processed = processed
-  }
-  if (has_hourly && nrow(hourly) > 0) {
-    hourly$label = 'Hourly'
-    hourly = hourly[, c(1:2, 4, 3)]
-    hourly$filtered = F
-    df_list$hourly = hourly
-  }
-  df_names = c('Time', 'Value', 'Label', 'Flagged', 'Filtered')
-  for (df_name in names(df_list)) {
-    names(df_list[[df_name]]) = df_names
-  }
-  df = do.call(rbind, df_list)
-  if (nrow(df) == 0) return(NULL)
-  attributes(df$Time)$tzone = 'EST'
-  df$Label = factor(df$Label,
-                    levels=c('Raw', 'zero', 'span',
-                             'Conversion Efficiency',
-                             'Processed', 'Hourly'))
-  if (logt) {
-    is_cal = df$Label %in% c('zero', 'span')
-    df[!is_cal, 'Value'] = log(df$Value[!is_cal])
-  }
-  if (!show_flagged && any(df$Flagged)) {
-    # remove flagged data, but only from the processed data
-    df$Value[df$Flagged] = NA
-  }
-  
-  if (any(df$Filtered)) {
-    raw_df = subset(df, !Filtered)
-    filtered_df = subset(df, Filtered)
-    zero_breaks = get_cal_breaks(s, ds, m, 'zero', t1, t2)
-    span_breaks = get_cal_breaks(s, ds, m, 'span', t1, t2)
-    combined_breaks = c(zero_breaks, span_breaks)
-    if (!is.null(combined_breaks)) {
-      breaks_df = data.frame(breaks = c(zero_breaks, span_breaks),
-                             Label = c(rep('zero', length(zero_breaks)),
-                                       rep('span', length(span_breaks))))
-    } else {
-      breaks_df = data.frame(breaks = numeric(0))
-    }
 
-    ## getting ggplot2 to plot different linetypes along with
-    ## different colors, and create correct legends, requires an
-    ## elaborate ruse with a fake dataset
-    df_fake = df[1:2, ]
-    df_fake$Filtered = factor(c('Original', 'Filtered'),
-                              c('Original', 'Filtered'))
-    ltype_values = c('Original' = 'solid', 'Filtered' = 'twodash')
-    ggplot(raw_df, aes(Time, Value)) +
-      geom_line(aes(color = Flagged, group = 1), size = .2) +
-      geom_line(data = filtered_df,
-                linetype = 'twodash', size = .2) +
-      geom_vline(aes(xintercept = breaks), breaks_df,
-                 color = 'darkgray', size = .3) +
-      ## I'm adding this invisible line to trick ggplot2 into showing
-      ## the legend for the linetype
-      geom_line(aes(linetype = Filtered), df_fake,
-                color = NA, size = .2) +
-      scale_x_datetime(expand = expand_scale(mult = .01)) +
-      scale_color_manual(values = c('black', 'red')) +
-      scale_linetype_manual('Data', values = ltype_values) +
-      coord_cartesian(xlim = as.POSIXct(as.character(c(t1, t2)))) +
-      facet_grid(Label ~ ., scales = 'free_y') +
-      guides(linetype = guide_legend(override.aes = list(color = 'black')))
-  } else {
-    ggplot(df, aes(Time, Value, color = Flagged, group = 1)) +
-      geom_line(size = .2) +
-      scale_x_datetime(expand = expand_scale(mult = .01)) +
-      scale_color_manual(values = c('black', 'red')) +
-      coord_cartesian(xlim = as.POSIXct(as.character(c(t1, t2)))) +
-      facet_grid(Label ~ ., scales = 'free_y')
+  # organize subplots
+  n = 1
+  plist = list()
+  rel_heights = numeric()
+  if (has_raw || has_processed) {
+    df_list = list()
+    if (has_raw && nrow(raw <- get_raw(s, ds, m, t1, t2))) {
+      raw$label = 'raw'
+      df_list$raw = raw
+    }
+    if (has_processed && nrow(processed <- get_processed(s, ds, m, t1, t2))) {
+      processed$label = 'processed'
+      df_list$processed = processed
+    }
+    if (length(df_list)) {
+      meas_orig = do.call(rbind, df_list)
+      names(meas_orig)[2:3] = c('value', 'flagged')
+      if (logt) meas_orig$value = log(meas_orig$value)
+      if (!show_flagged) meas_orig$value[meas_orig$flagged] = NA
+      plist[[n]] = ggplot(meas_orig, aes(x = time, y = value, color = flagged,
+                                         group = 1)) +
+        geom_line(size = .2) +
+        scale_color_manual(values = c('black', 'red')) +
+        xlim(t1, t2) +
+        facet_wrap(~ label, ncol = 1, scales = 'free_y',
+                   strip.position = 'right') +
+        xlab('Time (EST)') + ylab(ylabel)
+      rel_heights = length(df_list)
+      n = n + 1
+    }
   }
+
+  if (has_cal && nrow(cals <- get_cals(s, ds, m, t1, t2))) {
+    cals$segment = 0
+    breaks = as.POSIXct(numeric(), tz = 'EST', origin = '1970-01-01')
+    labels = character()
+    for (type in c('zero', 'span')) {
+      if (type %in% plot_types) {
+        zero_breaks = get_cal_breaks(s, ds, m, type, t1, t2)
+        cals$segment[cals$label == type] =
+          findInterval(cals$time[cals$label == type], zero_breaks)
+        breaks = c(breaks, zero_breaks)
+        labels = c(labels, rep(type, length(zero_breaks)))
+      } else {
+        cals = subset(cals, label != type)
+      }
+    }
+    breaks_df = data.frame(breaks = breaks, label = labels)
+    if (!show_flagged) cals$value[cals$flagged] = NA
+    plist[[n]] = ggplot(cals, aes(x = time, y = value, color = flagged,
+                                  group = interaction(filtered, segment))) +
+      geom_point(aes(shape = filtered)) +
+      geom_line(aes(linetype = filtered), color = 'black') +
+      geom_vline(aes(xintercept = breaks), breaks_df, color = 'darkgray',
+                 size = .3) +
+      scale_color_manual(values = c('black', 'red')) +
+      scale_shape_manual(values = c(19, NA)) +
+      scale_linetype_manual(values = c('blank', 'solid')) +
+      xlim(t1, t2) +
+      facet_wrap(~ label, ncol = 1, scales = 'free_y',
+                 strip.position = 'right') +
+      xlab('Time (EST)') + ylab('value')
+    rel_heights = c(rel_heights, length(unique(cals$label)))
+    n = n + 1
+  }
+
+  if (has_hourly && nrow(hourly <- get_hourly(s, ds, m, t1, t2))) {
+    hourly$label = 'hourly'
+    names(hourly)[2:3] = c('value', 'flag')
+    if (logt) hourly$value = log(hourly$value)
+    if (!show_flagged) hourly$value[startsWith(hourly$flag, 'M')] = NA
+    plist[[n]] = ggplot(hourly, aes(x = time, y = value, color = flag, group = 1)) +
+      geom_line() +
+      xlim(t1, t2) +
+      facet_wrap(~ label, ncol = 1, scales = 'free_y', strip.position = 'right') +
+      xlab('Time (EST)') + ylab(ylabel)
+    rel_heights = c(rel_heights, 1)
+  }
+
+  # remove bottom axis, except for bottom plot
+  plist[1:(length(plist) - 1)] =
+    lapply(head(plist, -1), function(x) {
+      x + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+                axis.title.x=element_blank())
+    })
+  # add space for the bottom axis labels
+  rel_heights = .94 * rel_heights / sum(rel_heights)
+  rel_heights[length(rel_heights)] = rel_heights[length(rel_heights)] + .06
+  plot_grid(plotlist = plist, align = "v", ncol = 1, rel_heights = rel_heights)
 }
 
 shinyServer(function(input, output) {

@@ -27,6 +27,7 @@ Encoding: UTF-8
 LazyData: true
 Suggests: 
     bookdown,
+    cowplot,
     datamodelr,
     DBI,
     DiagrammeR,

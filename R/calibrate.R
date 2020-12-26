@@ -60,6 +60,18 @@ piecewise_runmed = function(x, k, segments, ...) {
   unlist(res_list, use.names = FALSE)
 }
 
+#' Estimate calibration values
+#'
+#' Estimate calibration values by applying a median filter and interpolating
+#' between the filtered values.
+#'
+#' @param x Calibration check times (POSIXct).
+#' @param y Calibration check values.
+#' @param k Median filter window width. If \code{NA} no smoothing is applied.
+#' @param xout Times at which to estimate the calibration value.
+#' @param breaks Times of discontinuities caused by instrument adjustments.
+#' @return Estimated calibration values at times \code{xout}.
+#' @export
 estimate_cals = function(x, y, k, xout, breaks) {
   has_smoothing = !is.na(k) && k > 1
   has_breaks = length(breaks) > 0 &&
@@ -82,6 +94,35 @@ estimate_cals = function(x, y, k, xout, breaks) {
   }
 }
 
+#' Instrument drift corrections
+#'
+#' Apply instrument drift corrections based on calibration and flow check
+#' results.
+#'
+#' Zero, span, and flow values are estimated using
+#' \code{\link{estimate_cals}}. Measured span values are corrected for
+#' instrument drift, then converted to a ratio by dividing by the flow values
+#' (if provided) or the \code{provided_values} column. If not provided, zeros
+#' and spans are assumed to be 0 and 1, respectively. The corrected values are
+#' calculated as \eqn{(measurement - zero) / span}.
+#'
+#' @param t Measurement times (POSIXct).
+#' @param v Measurement values.
+#' @param z Data frame of zero calibration checks. Should contain columns
+#'   \code{time}, \code{measured_value}, and \code{corrected} (logical, whether
+#'   the instrument was adjusted).
+#' @param s Data frame of span calibration checks. Should contain columns
+#'   \code{time}, \code{measured_value}, and \code{corrected} (logical, whether
+#'   the instrument was adjusted), and optionally \code{provided_value}. One of
+#'   \code{provided_value} or \code{f} should be supplied.
+#' @param f Data frame of flow checks for calibration spans. Should contain
+#'   columns \code{time}, \code{measured_value}, and \code{changed} (logical,
+#'   whether the source has changed).
+#' @param config list of Configuration options from the
+#'   \code{\link{measurement_types}} table.
+#' @return Drift-corrected measurements.
+#' @seealso \code{\link{estimate_cals}}, \code{\link{measurement_types}}
+#' @export
 drift_correct = function(t, v, z = NULL, s = NULL, f = NULL, config) {
   # zeros
   if (!is.null(z) && nrow(z)) {

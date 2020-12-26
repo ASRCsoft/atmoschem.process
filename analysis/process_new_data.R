@@ -13,9 +13,8 @@ library(RSQLite)
 
 site = commandArgs(trailingOnly = T)[1]
 data_source = commandArgs(trailingOnly = T)[2]
-
 start_time = as.POSIXct('2018-10-01', tz = 'EST')
-end_time = as.POSIXct('2020-10-01', tz = 'EST')
+end_time = as.POSIXct(Sys.getenv('processing_end'), tz = 'EST')
 
 is_true = function(x) !is.na(x) & x
 
@@ -223,15 +222,13 @@ for (n in 1:nrow(mtypes)) {
     }
     tryCatch({
       if (is_true(m_conf$has_calibration)) {
-        msmts$value =
-          atmoschem.process:::drift_correct(msmts$time, msmts$value, m_zeros,
-                                            m_spans, m_flows, m_conf)
+        msmts$value = drift_correct(msmts$time, msmts$value, m_zeros, m_spans,
+                                    m_flows, m_conf)
       }
       if (is_true(m_conf$apply_ce)) {
         # correct the conversion efficiency measurements for instrument drift
-        m_ces$measured_value =
-          atmoschem.process:::drift_correct(m_ces$time, m_ces$measured_value,
-                                            m_zeros, m_spans, m_flows, m_conf)
+        m_ces$measured_value = drift_correct(m_ces$time, m_ces$measured_value,
+                                             m_zeros, m_spans, m_flows, m_conf)
         if (!is.na(m_conf$gilibrator_ce)) {
           ce_flows = subset(site_flows, measurement_name == m_conf$gilibrator_ce)
         } else {
@@ -354,7 +351,6 @@ for (mname in derived) {
   msmt_cols = c('time', paste0('value.', mname), paste0('flagged.', mname))
   msmts = meas[, msmt_cols]
   names(msmts) = c('time', 'value', 'flagged')
-  msmts$measurement_type_id = mtypes$id[n]
   m_cals = subset(cals, measurement_name == mname)
   m_zeros = subset(m_cals, type == 'zero')
   m_spans = subset(m_cals, type == 'span')
@@ -367,15 +363,13 @@ for (mname in derived) {
   }
   tryCatch({
     if (is_true(m_conf$has_calibration)) {
-      msmts$value =
-        atmoschem.process:::drift_correct(msmts$time, msmts$value, m_zeros,
-                                          m_spans, config = m_conf)
+      msmts$value = drift_correct(msmts$time, msmts$value, m_zeros, m_spans,
+                                  config = m_conf)
     }
     if (is_true(m_conf$apply_ce)) {
       # correct the conversion efficiency measurements for instrument drift
-      m_ces$measured_value =
-        atmoschem.process:::drift_correct(m_ces$time, m_ces$measured_value,
-                                          m_zeros, m_spans, m_flows, m_conf)
+      m_ces$measured_value = drift_correct(m_ces$time, m_ces$measured_value,
+                                           m_zeros, m_spans, m_flows, m_conf)
       if (!is.na(m_conf$gilibrator_ce)) {
         ce_flows = subset(site_flows, measurement_name == m_conf$gilibrator_ce)
       } else {

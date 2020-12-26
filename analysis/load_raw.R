@@ -12,6 +12,7 @@ library(RSQLite)
 
 site = commandArgs(trailingOnly = T)[1]
 data_source = commandArgs(trailingOnly = T)[2]
+raw_folder = paste0('raw_data_v', Sys.getenv('raw_version'))
 
 # read the file and add it to the sqlite database
 load_file = function(f, db) {
@@ -44,8 +45,8 @@ db = dbConnect(SQLite(), dbpath)
 dbExecute(db, 'create table measurements(time text)')
 
 # load data into sqlite
-files = file.path('analysis', 'raw', 'raw_data_v0.3', site, 'measurements',
-          data_source, '*', '*') %>%
+files = file.path('analysis', 'raw', raw_folder, site, 'measurements',
+                  data_source, '*', '*') %>%
   Sys.glob
 message('Loading ', length(files), ' files into ', basename(dbpath), '...')
 for (f in files) load_file(f, db)
