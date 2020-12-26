@@ -28,7 +28,7 @@ whether the source has changed).}
 \code{\link{measurement_types}} table.}
 }
 \value{
-Estimated calibration values at times \code{xout}.
+Drift-corrected measurements.
 }
 \description{
 Apply instrument drift corrections based on calibration and flow check
