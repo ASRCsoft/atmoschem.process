@@ -238,7 +238,6 @@ for (n in 1:nrow(mtypes)) {
           atmoschem.process:::ceff_correct(msmts$time, msmts$value, m_ces,
                                            ce_flows, m_conf)
       }
-      m_conf$remove_outliers = F
       msmts$flagged = atmoschem.process:::is_flagged(msmts$value, m_conf,
                                                      msmts$flagged)
       # write to pr_meas
@@ -379,7 +378,6 @@ for (mname in derived) {
         atmoschem.process:::ceff_correct(msmts$time, msmts$value, m_ces,
                                          ce_flows, m_conf)
     }
-    m_conf$remove_outliers = F
     msmts$flagged = atmoschem.process:::is_flagged(msmts$value, m_conf,
                                                    msmts$flagged)
     # write to pr_meas
