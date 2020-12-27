@@ -7,6 +7,7 @@
 status](https://github.com/ASRCsoft/atmoschem.process/workflows/R-CMD-check/badge.svg)](https://github.com/ASRCsoft/atmoschem.process/actions)
 [![Codecov test
 coverage](https://codecov.io/gh/ASRCsoft/atmoschem.process/branch/master/graph/badge.svg)](https://codecov.io/gh/ASRCsoft/atmoschem.process?branch=master)
+[![DOI](https://zenodo.org/badge/157783204.svg)](https://zenodo.org/badge/latestdoi/157783204)
 
 <img src="man/figures/whiteface-station.jpg" width="400px" align="right" style="padding:0px 10px 10px 10px;" />
 
