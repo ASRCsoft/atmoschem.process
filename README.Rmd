@@ -18,6 +18,7 @@ knitr::opts_chunk$set(
 
 [![R build status](https://github.com/ASRCsoft/atmoschem.process/workflows/R-CMD-check/badge.svg)](https://github.com/ASRCsoft/atmoschem.process/actions)
 [![Codecov test coverage](https://codecov.io/gh/ASRCsoft/atmoschem.process/branch/master/graph/badge.svg)](https://codecov.io/gh/ASRCsoft/atmoschem.process?branch=master)
+[![DOI](https://zenodo.org/badge/157783204.svg)](https://zenodo.org/badge/latestdoi/157783204)
 
 ```{r wfms, echo = FALSE, fig.height = 3.3, fig.width = 3.8, out.width = "400px", out.extra='align="right" style="padding:0px 10px 10px 10px;"'}
 knitr::include_graphics('man/figures/whiteface-station.jpg')
