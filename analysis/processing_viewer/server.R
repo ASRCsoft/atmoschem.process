@@ -176,6 +176,7 @@ get_hourly = function(s, ds, m, t1, t2) {
 
 make_processing_plot = function(s, ds, m, t1, t2, plot_types, logt = F,
                                 show_flagged = T) {
+  if (is.null(ds) || m == '') return(NULL)
   ## get measurement info
   m_info = subset(measurement_types, site == s & data_source == ds & name == m)
   ylabel = paste0(m, ' (', m_info$units, ')')
