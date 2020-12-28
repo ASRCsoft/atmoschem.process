@@ -18,12 +18,12 @@ get_raw = function(s, ds, m, t1, t2) {
   param_col = paste0('value.', m)
   param_fcol = paste0('flagged.', m)
   db = dbConnect(SQLite(), dbpath)
+  on.exit(dbDisconnect(db))
   q = paste0('select time, ?, ? from measurements where time >= ? and time <= ? order by time asc')
   sql = sqlInterpolate(db, q, dbQuoteIdentifier(db, param_col),
                        dbQuoteIdentifier(db, param_fcol),
                        format(t1, tz = 'EST'), format(t2, tz = 'EST'))
   res = dbGetQuery(db, sql)
-  dbDisconnect(db)
   res[, 1] = as.POSIXct(res[, 1], tz = 'EST')
   # booleans are stored as numbers in SQLite so they need to be converted
   res[, 3] = !is.na(res[, 3]) & as.logical(res[, 3])
@@ -35,12 +35,12 @@ get_processed = function(s, ds, m, t1, t2) {
   param_col = paste0('value.', m)
   param_fcol = paste0('flagged.', m)
   db = dbConnect(SQLite(), dbpath)
+  on.exit(dbDisconnect(db))
   q = paste0('select time, ?, ? from measurements where time >= ? and time <= ? order by time asc')
   sql = sqlInterpolate(db, q, dbQuoteIdentifier(db, param_col),
                        dbQuoteIdentifier(db, param_fcol),
                        format(t1, tz = 'EST'), format(t2, tz = 'EST'))
   res = dbGetQuery(db, sql)
-  dbDisconnect(db)
   res[, 1] = as.POSIXct(res[, 1], tz = 'EST')
   # booleans are stored as numbers in SQLite so they need to be converted
   res[, 3] = !is.na(res[, 3]) & as.logical(res[, 3])
@@ -50,6 +50,7 @@ get_processed = function(s, ds, m, t1, t2) {
 get_cals = function(s, ds, m, t1, t2) {
   dbpath = file.path(interm_dir, paste0('cals_', s, '.sqlite'))
   db = dbConnect(SQLite(), dbpath)
+  on.exit(dbDisconnect(db))
   q = "
 select *,
        end_time as time,
@@ -63,7 +64,6 @@ select *,
   zeros = dbGetQuery(db, sql)
   sql = sqlInterpolate(db, q, ds, m, 'span')
   spans = dbGetQuery(db, sql)
-  dbDisconnect(db)
   zeros$time = as.POSIXct(zeros$time, tz = 'EST')
   spans$time = as.POSIXct(spans$time, tz = 'EST')
   zeros$flagged = as.logical(zeros$flagged)
@@ -124,6 +124,7 @@ select *,
 get_cal_breaks = function(s, ds, m, type, t1, t2) {
   dbpath = file.path(interm_dir, paste0('cals_', s, '.sqlite'))
   db = dbConnect(SQLite(), dbpath)
+  on.exit(dbDisconnect(db))
   q = "
 select end_time as time
   from calibrations
@@ -138,7 +139,6 @@ select end_time as time
                        format(t1, '%Y-%m-%d %H:%M:%S', tz = 'EST'),
                        format(t2, '%Y-%m-%d %H:%M:%S', tz = 'EST'))
   res = dbGetQuery(db, sql)
-  dbDisconnect(db)
   as.POSIXct(res[, 1], tz = 'EST')
 }
 
@@ -164,12 +164,12 @@ get_hourly = function(s, ds, m, t1, t2) {
   param_col = paste0('value.', m)
   param_fcol = paste0('flag.', m)
   db = dbConnect(SQLite(), dbpath)
+  on.exit(dbDisconnect(db))
   q = paste0('select time, ?, ? from measurements where time >= ? and time <= ? order by time asc')
   sql = sqlInterpolate(db, q, dbQuoteIdentifier(db, param_col),
                        dbQuoteIdentifier(db, param_fcol),
                        format(t1, tz = 'EST'), format(t2, tz = 'EST'))
   res = dbGetQuery(db, sql)
-  dbDisconnect(db)
   res[, 1] = as.POSIXct(res[, 1], tz = 'EST')
   res
 }
