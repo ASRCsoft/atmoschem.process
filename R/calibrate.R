@@ -56,7 +56,8 @@ piecewise_approx = function(x, y, xout, breaks, ..., interp_missing = TRUE) {
 ## running median with observations split into independent groups
 ## given by `segments`
 piecewise_runmed = function(x, k, segments, ...) {
-  res_list = by(x, segments, runmed, k = k, ...)
+  res_list =
+    by(x, segments, function(x, ...) suppressWarnings(runmed(x, k, ...)), ...)
   unlist(res_list, use.names = FALSE)
 }
 
