@@ -1,7 +1,7 @@
 ## get PSP calibrations
 
 read_excel_cell = function(f, cell, ...) {
-  as.data.frame(readxl::read_excel(f, range = cell, ...))[1, 1]
+  as.data.frame(suppressMessages(readxl::read_excel(f, range = cell, ...)))[1, 1]
 }
 
 parse_psp_cal_time = function(d, time) {
@@ -46,7 +46,7 @@ read_psp_NO_cal_table = function(f, trange = 'F33:AD35',
     readf = readxl::read_xls
   }
   ## first the zero and span
-  df = readf(f, range = trange, col_names = F)
+  df = suppressMessages(readf(f, range = trange, col_names = F))
   cals = as.data.frame(df[c(1, 3), c(1, 8, 14)])
   names(cals) = c('cert_span', 'zero', 'span')
   row.names(cals) = chem_names
@@ -62,7 +62,7 @@ read_psp_NO_cal_table = function(f, trange = 'F33:AD35',
                     corrected = FALSE)
   ## and now the conversion efficiencies
   ce_range = paste0('O', ce_row, ':W', ce_row)
-  df2 = readf(f, range = ce_range, col_names = F)
+  df2 = suppressMessages(readf(f, range = ce_range, col_names = F))
   ces = as.data.frame(df2[, c(1, 9)])
   names(ces) = c('calibrator', 'response')
   responses = strsplit(as.character(ces$response), ' +')[[1]]
@@ -89,7 +89,7 @@ read_psp_NO_cal_table = function(f, trange = 'F33:AD35',
 ## get "zero, span and PC checks" section
 read_psp_cal_table = function(f, trange = 'U36:AA40',
                               chem_name = 'CO', cal_times) {
-  df = readxl::read_xlsx(f, range = trange, col_names = F)
+  df = suppressMessages(readxl::read_xlsx(f, range = trange, col_names = F))
   cals = as.data.frame(df[c(1, nrow(df)), c(1, ncol(df))])
   names(cals) = c('provided_value', 'measured_value')
   row.names(cals) = c('span', 'zero')
