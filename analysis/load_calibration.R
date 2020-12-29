@@ -47,7 +47,7 @@ get_cal_results = function(dt_int, t_int, p, d, agg_f) {
   stime = hm(gsub('^[[(]|,.*$', '', t_int))
   etime = hm(gsub('^.*, ?|[])]$', '', t_int))
   meas %>%
-    transform(hms = hms(strftime(time, format = '%H:%M:%S'))) %>%
+    transform(hms = hms(strftime(time, format = '%H:%M:%S', tz = 'EST'))) %>%
     subset(hms >= stime & hms <= etime) %>%
     transform(date = as.Date(time, tz = 'EST')) %>%
     aggregate(value ~ date, FUN = agg_f, data = .)
