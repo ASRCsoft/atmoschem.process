@@ -181,7 +181,7 @@ make_processing_plot = function(s, ds, m, t1, t2, plot_types, logt = F,
   m_info = subset(measurement_types, site == s & data_source == ds & name == m)
   ylabel = paste0(m, ' (', m_info$units, ')')
   if (logt) ylabel = paste('Log', ylabel)
-  has_raw = 'raw' %in% plot_types
+  has_raw = 'raw' %in% plot_types && !is_true(m_info$derived)
   has_processed = is_true(m_info$apply_processing) &
     'processed' %in% plot_types
   has_cal = is_true(m_info$has_calibration) &
