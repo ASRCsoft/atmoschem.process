@@ -6,7 +6,7 @@
 # produces file analysis/intermediate/processed_<site>_<data_source>.sqlite
 
 library(atmoschem.process)
-library(lubridate)
+suppressPackageStartupMessages(library(lubridate))
 library(magrittr)
 library(DBI)
 library(RSQLite)
