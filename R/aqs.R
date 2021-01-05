@@ -19,3 +19,59 @@
 #'   \url{https://www3.epa.gov/ttn/amtic/calendar.html}
 #' @export
 epa_schedule = function(d) as.integer(d - as.Date('2020-01-05')) %% 12 + 1
+
+# combine state, county, and site numbers into an AQS site ID string (makes
+# subsetting by site easier)
+format_aqs_site = function(state, county, site) {
+  paste(formatC(state, width = 2, format = "d", flag = "0"),
+        formatC(county, width = 3, format = "d", flag = "0"),
+        formatC(site, width = 4, format = "d", flag = "0"), sep = '-')
+}
+
+# Download a set of AQS bulk download (zipped csv) files. See the available
+# files at https://aqs.epa.gov/aqsweb/airdata/download_files.html.
+download_aqs = function(name, years, destdir, overwrite = FALSE) {
+  aqsweb = 'https://aqs.epa.gov/aqsweb/'
+  zips = paste0('https://aqs.epa.gov/aqsweb/airdata/', name, '_', years, '.zip')
+  for (z in zips) {
+    dest_path = file.path(destdir, basename(z))
+    if (overwrite || !file.exists(dest_path)) download.file(z, dest_path)
+  }
+}
+
+# `read.table` is slow when applied to unz connections (the normal way of
+# reading a zipped csv). For unclear reasons, this version using `readChar` is
+# faster.
+read_zipped_csv = function(z, f, ...) {
+  zlist = zip::zip_list(z)
+  size = zlist$uncompressed_size[zlist$filename == f]
+  con = unz(z, f)
+  on.exit(close(con))
+  read.csv(text = readChar(con, nchars = size, useBytes = TRUE), ...)
+}
+
+# Some of the zipped datasets are very large. In order to read them into memory,
+# they need to be subsetted one year at a time while loading. (The dataset name
+# is the file name without including the year.)
+subset_aqs_dataset = function(name, sites, datadir) {
+  zips = list.files(datadir, paste0(name, '.*\\.zip'), full.names = TRUE)
+  dat_list = lapply(zips, function(x) {
+    csv = basename(sub('\\.zip$', '.csv', x))
+    subset(read_zipped_csv(x, csv, check.names = FALSE),
+           format_aqs_site(`State Code`, `County Code`, `Site Num`) %in% sites)
+  })
+  do.call(rbind, dat_list)
+}
+
+# Make a param x year matrix of AQS data availability. Availability is
+# determined using the yearly summary data, as suggested at
+# https://aqs.epa.gov/aqsweb/documents/data_api.html#tips.
+aqs_availability_matrix = function(params, sites, years, datadir) {
+  download_aqs('annual_conc_by_monitor', years, datadir, overwrite = FALSE)
+  annual = subset_aqs_dataset('annual_conc_by_monitor', sites, datadir)
+  avail = sapply(years, function(x) {
+    params %in% annual$`Parameter Code`[annual$Year == x]
+  })
+  dimnames(avail) = list(params, years)
+  avail
+}
