@@ -51,9 +51,11 @@ get_cals = function(s, ds, m, t1, t2) {
   dbpath = file.path(interm_dir, paste0('cals_', s, '.sqlite'))
   db = dbConnect(SQLite(), dbpath)
   on.exit(dbDisconnect(db))
+  # if end_time is missing, crudely estimate it by adding an hour to the
+  # start_time
   q = "
 select *,
-       end_time as time,
+       coalesce(end_time, datetime(start_time, '+1 hour')) as time,
        measured_value as value
   from calibrations
  where data_source = ?
