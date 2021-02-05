@@ -93,7 +93,7 @@ select *,
   good_zeros = replace(zeros0$value, zeros0$flagged, NA)
   fzeros$value = estimate_cals(zeros0$time, good_zeros,
                                m_conf$zero_smooth_window, zeros$time, z_breaks)
-  fzeros$filtered = T
+  fzeros$filtered = if (nrow(fzeros)) T else logical()
   zeros = rbind(zeros, fzeros)
 
   # convert spans to ratios
@@ -115,7 +115,7 @@ select *,
     fspans$value = estimate_cals(spans0$time, good_spans,
                                  m_conf$span_smooth_window, spans$time,
                                  s_breaks)
-    fspans$filtered = T
+    fspans$filtered = if (nrow(fspans)) T else logical()
     spans = rbind(spans, fspans)
   }
 
@@ -282,7 +282,7 @@ make_processing_plot = function(s, ds, m, t1, t2, plot_types, logt = F,
   }
 
   # remove bottom axis, except for bottom plot
-  plist[1:(length(plist) - 1)] =
+  plist[seq_len(length(plist) - 1)] =
     lapply(head(plist, -1), function(x) {
       x + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),
                 axis.title.x=element_blank())
