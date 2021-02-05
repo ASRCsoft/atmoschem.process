@@ -9,7 +9,7 @@ pkgdata_rda := $(patsubst data-raw/package_data/%.csv,data/%.rda,$(pkgdata_csv))
 build_file := $(PKGNAME)_$(PKGVERS).tar.gz
 ## Data processing variables
 rscript := Rscript --vanilla
-export processing_end := 2020-10-01
+export processing_end := 2021-01-01
 export raw_version := 0.3
 sites := WFMS WFML PSP QC
 raw_dir := analysis/raw
