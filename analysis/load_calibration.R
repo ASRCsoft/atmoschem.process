@@ -187,6 +187,7 @@ acals0 = autocals %>%
   transform(dt_int = as_interval(dates))
 acals0 = acals0[acals0$site == site, ]
 if (nrow(acals0)) {
+  message('Calculating autocal results...')
   # for ongoing schedules use the current time as the end
   int_end(acals0$dt_int[is.na(int_end(acals0$dt_int))]) = Sys.time()
   acals_list = list()
