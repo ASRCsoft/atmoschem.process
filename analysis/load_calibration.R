@@ -37,6 +37,21 @@ as_interval = atmoschem.process:::as_interval
 pad_interval = function(interval, start, end) {
   interval(int_start(interval) - start, int_end(interval) - end)
 }
+# add time around a character clock time interval
+pad_time_interval = function(interval, start, end) {
+  stime = as.POSIXct(gsub('^[[(]|,.*$', '', interval), tz = 'EST',
+                     format = '%H:%M')
+  etime = as.POSIXct(gsub('^.*, ?|[])]$', '', interval), tz = 'EST',
+                     format = '%H:%M')
+  stime_min = as.POSIXct('00:00', tz = 'EST', format = '%H:%M')
+  etime_max = as.POSIXct('23:59', tz = 'EST', format = '%H:%M')
+  stime = max(stime - start, stime_min)
+  etime = min(etime + end, etime_max)
+  c(stime, etime) %>%
+    strftime(format = '%H:%M') %>%
+    paste(collapse = ',') %>%
+    paste0('[', ., ')')
+}
 # get a set of calibration results for a scheduled autocal
 get_cal_results = function(dt_int, t_int, p, d, agg_f) {
   meas = get_param(p, d, int_start(dt_int), int_end(dt_int))
@@ -180,14 +195,15 @@ if (nrow(acals0)) {
     agg_f = switch(acalsi$type, zero = function(x) min_ma(x, 5),
                    span = function(x) max_ma(x, 5),
                    CE = function(x) max_ma(x, 5), function(x) NA)
-    dt_intp3 = pad_interval(acalsi$dt_int, as.difftime(3, units = 'mins'),
-                            as.difftime(3, units = 'mins'))
+    # add a few minutes on either end to account for possible clock drift
+    timesp3 = pad_time_interval(acalsi$times, as.difftime(3, units = 'mins'),
+                                 as.difftime(3, units = 'mins'))
     # spans calibrations tend to spike at the beginning, so remove the first 15
     # minutes
     if (acalsi$type == 'span') {
-      dt_intp3 = pad_interval(dt_intp3, as.difftime(-15, units = 'mins'), 0)
+      timesp3 = pad_time_interval(timesp3, as.difftime(-15, units = 'mins'), 0)
     }
-    c1 = with(acalsi, get_cal_results(dt_intp3, times, measurement_name,
+    c1 = with(acalsi, get_cal_results(dt_int, timesp3, measurement_name,
                                       data_source, agg_f))
     if (nrow(c1) == 0) next()
     names(c1)[2] = 'measured_value'
