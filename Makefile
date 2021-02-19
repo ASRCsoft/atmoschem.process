@@ -30,6 +30,12 @@ all: routine
 
 ## Atmoschem Dataset
 
+.PHONY: check_data
+check_data:
+	$(rscript) \
+	-e 'if (!requireNamespace("testthat")) install.packages("testthat")' \
+	-e 'testthat::test_dir("analysis/tests")'
+
 # save intermediate sqlite files for the processing viewer
 .SECONDARY:
 
