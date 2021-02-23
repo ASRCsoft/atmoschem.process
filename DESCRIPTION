@@ -30,9 +30,8 @@ LazyData: true
 Suggests: 
     bookdown,
     cowplot,
-    datamodelr,
     DBI,
-    DiagrammeR,
+    ggplot2 (>= 3.0),
     knitr,
     rmarkdown,
     RSQLite,
@@ -41,7 +40,6 @@ Suggests:
     testthat,
     tools,
     usethis
-Remotes: bergant/datamodelr
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1
 RdMacros: Rdpack
