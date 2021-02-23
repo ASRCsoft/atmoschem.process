@@ -10,7 +10,7 @@ Authors@R: c(
 Description: Functions, configuration files, and scripts for creating the ASRC's
     cleaned and processed atmospheric chemistry datasets. Tools to visualize the
     data and generate reports are also included.
-Imports:
+Imports: 
     caTools (>= 0.1.18.1),
     lubridate,
     magrittr,
@@ -36,6 +36,7 @@ Suggests:
     shiny,
     shinyWidgets,
     testthat,
+    tinytest,
     tools,
     usethis
 VignetteBuilder: knitr
