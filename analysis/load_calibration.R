@@ -16,8 +16,8 @@ site = commandArgs(trailingOnly = T)[1]
 raw_folder = paste0('raw_data_v', Sys.getenv('raw_version'))
 
 # calibration-related functions
-min_ma = function(x, k, ...) min(runmean(x, k, ...), na.rm = TRUE)
-max_ma = function(x, k, ...) max(runmean(x, k, ...), na.rm = TRUE)
+min_ma = function(x, k) min(runmed(x, k, 'constant'), na.rm = TRUE)
+max_ma = function(x, k) max(runmed(x, k, 'constant'), na.rm = TRUE)
 get_param = function(p, d, t1, t2) {
   dbpath = file.path('analysis', 'intermediate',
                      paste0('raw_', site, '_', d, '.sqlite'))
@@ -36,6 +36,21 @@ as_interval = atmoschem.process:::as_interval
 # add time around a lubridate interval
 pad_interval = function(interval, start, end) {
   interval(int_start(interval) - start, int_end(interval) - end)
+}
+# add time around a character clock time interval
+pad_time_interval = function(interval, start, end) {
+  stime = as.POSIXct(gsub('^[[(]|,.*$', '', interval), tz = 'EST',
+                     format = '%H:%M')
+  etime = as.POSIXct(gsub('^.*, ?|[])]$', '', interval), tz = 'EST',
+                     format = '%H:%M')
+  stime_min = as.POSIXct('00:00', tz = 'EST', format = '%H:%M')
+  etime_max = as.POSIXct('23:59', tz = 'EST', format = '%H:%M')
+  stime = max(stime - start, stime_min)
+  etime = min(etime + end, etime_max)
+  c(stime, etime) %>%
+    strftime(format = '%H:%M') %>%
+    paste(collapse = ',') %>%
+    paste0('[', ., ')')
 }
 # get a set of calibration results for a scheduled autocal
 get_cal_results = function(dt_int, t_int, p, d, agg_f) {
@@ -172,6 +187,7 @@ acals0 = autocals %>%
   transform(dt_int = as_interval(dates))
 acals0 = acals0[acals0$site == site, ]
 if (nrow(acals0)) {
+  message('Calculating autocal results...')
   # for ongoing schedules use the current time as the end
   int_end(acals0$dt_int[is.na(int_end(acals0$dt_int))]) = Sys.time()
   acals_list = list()
@@ -180,14 +196,15 @@ if (nrow(acals0)) {
     agg_f = switch(acalsi$type, zero = function(x) min_ma(x, 5),
                    span = function(x) max_ma(x, 5),
                    CE = function(x) max_ma(x, 5), function(x) NA)
-    dt_intp3 = pad_interval(acalsi$dt_int, as.difftime(3, units = 'mins'),
-                            as.difftime(3, units = 'mins'))
+    # add a few minutes on either end to account for possible clock drift
+    timesp3 = pad_time_interval(acalsi$times, as.difftime(3, units = 'mins'),
+                                 as.difftime(3, units = 'mins'))
     # spans calibrations tend to spike at the beginning, so remove the first 15
     # minutes
     if (acalsi$type == 'span') {
-      dt_intp3 = pad_interval(dt_intp3, as.difftime(-15, units = 'mins'), 0)
+      timesp3 = pad_time_interval(timesp3, as.difftime(-15, units = 'mins'), 0)
     }
-    c1 = with(acalsi, get_cal_results(dt_intp3, times, measurement_name,
+    c1 = with(acalsi, get_cal_results(dt_int, timesp3, measurement_name,
                                       data_source, agg_f))
     if (nrow(c1) == 0) next()
     names(c1)[2] = 'measured_value'

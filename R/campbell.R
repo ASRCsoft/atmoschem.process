@@ -52,6 +52,9 @@ transform_campbell = function(f, site) {
   campbell = read_campbell(f)
   if (site == 'WFMS') {
     campbell = fix_wfms(campbell)
+  } else if (site == 'WFML') {
+    # replace mislabeled NO2 column
+    names(campbell)[names(campbell) == 'NO2_Avg'] = 'NOX_Avg'
   }
   
   ## clean and reorganize the data

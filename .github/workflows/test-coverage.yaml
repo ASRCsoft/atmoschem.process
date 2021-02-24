@@ -37,7 +37,7 @@ jobs:
           restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
 
       - name: Install XQuartz on macOS
-        run: brew cask install xquartz
+        run: brew install --cask xquartz
 
       - name: Install dependencies
         run: |

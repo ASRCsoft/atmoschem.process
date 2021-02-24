@@ -10,8 +10,8 @@ Authors@R: c(
 Description: Functions, configuration files, and scripts for creating the ASRC's
     cleaned and processed atmospheric chemistry datasets. Tools to visualize the
     data and generate reports are also included.
-Imports:
-    caTools,
+Imports: 
+    caTools (>= 0.1.18.1),
     lubridate,
     magrittr,
     Rdpack (>= 0.7),
@@ -29,19 +29,15 @@ LazyData: true
 Suggests: 
     bookdown,
     cowplot,
-    datamodelr,
     DBI,
-    DiagrammeR,
     ggplot2 (>= 3.0),
     knitr,
     rmarkdown,
     RSQLite,
     shiny,
     shinyWidgets,
-    testthat,
-    tools,
-    usethis
-Remotes: bergant/datamodelr
+    tinytest,
+    tools
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1
 RdMacros: Rdpack
