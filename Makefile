@@ -33,8 +33,8 @@ all: routine
 .PHONY: check_data
 check_data:
 	$(rscript) \
-	-e 'if (!requireNamespace("testthat")) install.packages("testthat")' \
-	-e 'testthat::test_dir("analysis/tests")'
+	-e 'if (!requireNamespace("tinytest")) install.packages("tinytest")' \
+	-e 'tinytest::run_test_dir("analysis/tests")'
 
 # save intermediate sqlite files for the processing viewer
 .SECONDARY:
