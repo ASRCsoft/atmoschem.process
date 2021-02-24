@@ -36,8 +36,7 @@ Suggests:
     shiny,
     shinyWidgets,
     tinytest,
-    tools,
-    usethis
+    tools
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1
 RdMacros: Rdpack
