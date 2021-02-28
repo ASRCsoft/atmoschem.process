@@ -27,7 +27,6 @@ BugReports: https://github.com/ASRCsoft/atmoschem.process/issues
 Encoding: UTF-8
 LazyData: true
 Suggests: 
-    bookdown,
     cowplot,
     DBI,
     ggplot2 (>= 3.0),
