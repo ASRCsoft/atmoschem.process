@@ -24,6 +24,8 @@ raw_zip := $(raw_dir)/raw_data_v$(raw_version).zip
 data_sources := $(shell sed "1d;s/^\([^,]*\),\([^,]*\).*/\1_\2/" data-raw/package_data/data_sources.csv)
 hourly_files := $(patsubst %,$(interm_dir)/hourly_%.sqlite,$(data_sources))
 routine_out := routine_chemistry_v$(PKGVERS)
+# ensure R package availability
+check_rpkg = if (!requireNamespace("$(1)")) install.packages("$(1)")
 
 .PHONY: all
 all: routine
@@ -33,7 +35,7 @@ all: routine
 .PHONY: check_data
 check_data:
 	$(rscript) \
-	-e 'if (!requireNamespace("tinytest")) install.packages("tinytest")' \
+	-e '$(call check_rpkg,tinytest)' \
 	-e 'tinytest::run_test_dir("analysis/tests")'
 
 # save intermediate sqlite files for the processing viewer
@@ -80,7 +82,9 @@ $(raw_dir)/%.zip:
 
 .PHONY: view
 view:
-	$(rscript) -e 'shiny::runApp("analysis/processing_viewer", launch.browser = T)'
+	$(rscript) \
+	-e '$(call check_rpkg,shiny)' \
+	-e 'shiny::runApp("analysis/processing_viewer", launch.browser = T)'
 
 ## R package
 
@@ -91,13 +95,13 @@ check: $(build_file)
 .PHONY: website
 website: docs
 	Rscript \
-	-e 'if (!requireNamespace("pkgdown")) install.packages("pkgdown")' \
+	-e '$(call check_rpkg,pkgdown)' \
 	-e 'pkgdown::build_site(preview = TRUE)'
 
 .PHONY: install
 install: docs
 	Rscript \
-	-e 'if (!requireNamespace("devtools")) install.packages("devtools")' \
+	-e '$(call check_rpkg,devtools)' \
 	-e 'devtools::install(build = FALSE)'
 # this alternative installation method is inconvenient due to the very slow
 # build step
@@ -107,7 +111,7 @@ install: docs
 .INTERMEDIATE: install_deps
 install_deps: DESCRIPTION
 	Rscript \
-	-e 'if (!requireNamespace("remotes")) install.packages("remotes")' \
+	-e '$(call check_rpkg,remotes)' \
 	-e 'remotes::install_deps(dependencies = TRUE)'
 
 $(build_file): docs
@@ -116,7 +120,7 @@ $(build_file): docs
 .INTERMEDIATE: docs
 docs: $(pkgdata_rda) $(r_files) README.md
 	Rscript \
-	-e 'if (!requireNamespace("roxygen2")) install.packages("roxygen2")' \
+	-e '$(call check_rpkg,roxygen2)' \
 	-e 'roxygen2::roxygenise()'
 
 data/%.rda: data-raw/package_data/%.csv data-raw/package_data.R
@@ -124,7 +128,7 @@ data/%.rda: data-raw/package_data/%.csv data-raw/package_data.R
 
 README.md: README.Rmd DESCRIPTION
 	Rscript \
-	-e 'if (!requireNamespace("rmarkdown")) install.packages("rmarkdown")' \
+	-e '$(call check_rpkg,rmarkdown)' \
 	-e 'rmarkdown::render("README.Rmd")'
 
 .PHONY: clean
