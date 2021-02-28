@@ -88,6 +88,12 @@ view:
 check: $(build_file)
 	R CMD check --no-manual $(build_file)
 
+.PHONY: website
+website: docs
+	Rscript \
+	-e 'if (!requireNamespace("pkgdown")) install.packages("pkgdown")' \
+	-e 'pkgdown::build_site(preview = TRUE)'
+
 .PHONY: install
 install: docs
 	Rscript \
