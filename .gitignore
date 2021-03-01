@@ -39,13 +39,12 @@ vignettes/*.pdf
 .Renviron
 
 # pkgdown site
-docs/
+/docs/
 
 # dataset build files
 analysis/raw/
 analysis/intermediate/
 analysis/out/
-docs
 
 # readme preview
 README.html
