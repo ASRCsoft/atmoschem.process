@@ -14,6 +14,7 @@ library(RSQLite)
 
 site = commandArgs(trailingOnly = T)[1]
 raw_folder = paste0('raw_data_v', Sys.getenv('raw_version'))
+config = read_csv_dir('analysis/config')
 
 # calibration-related functions
 min_ma = function(x, k) min(runmed(x, k, 'constant'), na.rm = TRUE)
@@ -182,7 +183,7 @@ mcals$manual = T
 
 # get the automated cals
 # first let's get a data frame of the cal times
-acals0 = autocals %>%
+acals0 = config$autocals %>%
   subset(type %in% c('zero', 'span', 'CE')) %>%
   transform(dt_int = as_interval(dates))
 acals0 = acals0[acals0$site == site, ]
@@ -231,7 +232,7 @@ if (nrow(acals0)) {
 
 # apply calibration flags
 all_cals$flagged = F
-cal_flags2 = cal_flags[cal_flags$site == site, ] %>%
+cal_flags2 = config$cal_flags[config$cal_flags$site == site, ] %>%
   transform(times = as_interval(times))
 for (n in unique(all_cals$measurement_name)) {
   cal_flags_n = subset(cal_flags2, measurement_name == n)
@@ -259,7 +260,7 @@ if (site == 'WFMS') {
   for (mname in c('NO', 'NOx')) {
     m_cals = subset(all_cals2, measurement_name == mname)
     m_ces = subset(m_cals, type == 'CE')
-    m_conf = subset(measurement_types, site == 'PSP' & name == mname)
+    m_conf = subset(config$measurement_types, site == 'PSP' & name == mname)
     m_ces[, mname] =
       drift_correct(m_ces$time, m_ces$measured_value,
                     m_cals[m_cals$type == 'zero', ],
