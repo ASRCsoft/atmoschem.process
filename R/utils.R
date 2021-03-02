@@ -18,3 +18,11 @@ is_psp_TEI43i_SO2_cal = function(f)
 is_psp_TEI49i_O3_49i_cal = function(f)
   startsWith(basename(f), 'Pinnacle_TEI49i_O3_49i_Weekly') |
     startsWith(basename(f), 'Pinnacle_TEI49i_O3_Weekly')
+
+#' @export
+read_csv_dir = function(f, ...) {
+  csvs = list.files(f, '\\.csv$', full.names = TRUE)
+  res = lapply(csvs, read.csv, ...)
+  names(res) = sub('\\.csv$', '', basename(csvs))
+  res
+}
