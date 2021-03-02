@@ -12,6 +12,7 @@ library(RSQLite)
 
 site = commandArgs(trailingOnly = T)[1]
 data_source = commandArgs(trailingOnly = T)[2]
+config = read_csv_dir('analysis/config')
 
 # the wind speed and direction variables-- this should be made into a config
 # option somehow
@@ -52,8 +53,8 @@ aggregate_wind = function(x, f, ws, wd) {
 }
 
 # get measurement info
-mtypes = measurement_types[measurement_types$site == site &
-                           measurement_types$data_source == data_source, ] %>%
+mtypes = config$measurement_types[config$measurement_types$site == site &
+                                  config$measurement_types$data_source == data_source, ] %>%
   subset(!is.na(apply_processing) & apply_processing)
 
 # get the processed data
