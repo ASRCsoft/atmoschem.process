@@ -4,8 +4,8 @@
 PKGNAME := $(shell sed -n "s/Package: *\([^ ]*\)/\1/p" DESCRIPTION)
 PKGVERS := $(shell sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION)
 r_files := $(wildcard R/*.R)
-pkgdata_csv := $(wildcard data-raw/package_data/*.csv)
-pkgdata_rda := $(patsubst data-raw/package_data/%.csv,data/%.rda,$(pkgdata_csv))
+pkgdata_csv := $(wildcard data-raw/*.csv)
+pkgdata_rda := $(patsubst data-raw/%.csv,data/%.rda,$(pkgdata_csv))
 build_file := $(PKGNAME)_$(PKGVERS).tar.gz
 ## Data processing variables
 rscript := Rscript --vanilla
@@ -123,8 +123,9 @@ docs: $(pkgdata_rda) $(r_files) README.md
 	-e '$(call check_rpkg,roxygen2)' \
 	-e 'roxygen2::roxygenise()'
 
-data/%.rda: data-raw/package_data/%.csv data-raw/package_data.R
-	$(rscript) data-raw/package_data.R $<
+$(pkgdata_rda): data-raw/package_data.R data-raw/narsto_flags.csv \
+                data-raw/aqs_flags.csv
+	$(rscript) data-raw/package_data.R
 
 README.md: README.Rmd DESCRIPTION
 	Rscript \
