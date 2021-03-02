@@ -21,7 +21,7 @@ old_routine_out := $(patsubst %,$(interm_dir)/old_%.csv,$(sites))
 raw_data := $(raw_dir)/raw_data_v$(raw_version)
 raw_zip := $(raw_dir)/raw_data_v$(raw_version).zip
 # get <site>_<data_source> for each entry in data_sources.csv
-data_sources := $(shell sed "1d;s/^\([^,]*\),\([^,]*\).*/\1_\2/" data-raw/package_data/data_sources.csv)
+data_sources := $(shell sed "1d;s/^\([^,]*\),\([^,]*\).*/\1_\2/" analysis/config/data_sources.csv)
 hourly_files := $(patsubst %,$(interm_dir)/hourly_%.sqlite,$(data_sources))
 routine_out := routine_chemistry_v$(PKGVERS)
 # ensure R package availability
