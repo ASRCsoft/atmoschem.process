@@ -7,14 +7,16 @@ r_files := $(wildcard R/*.R)
 pkgdata_csv := $(wildcard data-raw/*.csv)
 pkgdata_rda := $(patsubst data-raw/%.csv,data/%.rda,$(pkgdata_csv))
 build_file := $(PKGNAME)_$(PKGVERS).tar.gz
-## Data processing variables
+# processing directories
+raw_dir := analysis/raw
+interm_dir := analysis/intermediate
+out_dir := analysis/out
+scripts_dir := analysis/scripts
+# processing variables
 rscript := Rscript --vanilla
 export processing_end := 2021-01-01
 export raw_version := 0.3
 sites := WFMS WFML PSP QC
-raw_dir := analysis/raw
-interm_dir := analysis/intermediate
-out_dir := analysis/out
 download_url := http://atmoschem.asrc.cestm.albany.edu/~aqm/AQM_Products/downloads
 routine_zip := $(raw_dir)/routine_chemistry_v0.1.zip
 old_routine_out := $(patsubst %,$(interm_dir)/old_%.csv,$(sites))
@@ -45,10 +47,10 @@ check_data:
 routine: $(routine_out).zip
 
 $(routine_out).zip: $(old_routine_out) $(hourly_files)
-	$(rscript) analysis/routine_package.R $(out_dir)/$(routine_out)
+	$(rscript) $(scripts_dir)/routine_package.R $(out_dir)/$(routine_out)
 
-$(interm_dir)/hourly_%.sqlite: $(interm_dir)/processed_%.sqlite analysis/aggregate_hourly.R
-	$(rscript) analysis/aggregate_hourly.R $(shell echo $* | sed "s/_/ /")
+$(interm_dir)/hourly_%.sqlite: $(interm_dir)/processed_%.sqlite $(scripts_dir)/aggregate_hourly.R
+	$(rscript) $(scripts_dir)/aggregate_hourly.R $(shell echo $* | sed "s/_/ /")
 
 # The way calibration files are created for each site (without data source)
 # makes things a bit awkward. Processed site/data source files depend on the
@@ -56,21 +58,21 @@ $(interm_dir)/hourly_%.sqlite: $(interm_dir)/processed_%.sqlite analysis/aggrega
 .SECONDEXPANSION:
 $(interm_dir)/processed_%.sqlite: $(interm_dir)/raw_%.sqlite \
                                   $(interm_dir)/cals_$$(shell echo $$* | sed "s/_.*//").sqlite \
-                                  analysis/process_new_data.R
-	$(rscript) analysis/process_new_data.R $(shell echo $* | sed "s/_/ /")
+                                  $(scripts_dir)/process_new_data.R
+	$(rscript) $(scripts_dir)/process_new_data.R $(shell echo $* | sed "s/_/ /")
 
 # Calibration site file depends on all the raw site/calibration files
 make_cal_deps = $(patsubst %,$(interm_dir)/raw_%.sqlite, $(filter $(1)%, $(data_sources)))
 $(interm_dir)/cals_%.sqlite: $$(call make_cal_deps,$$*) \
-                             raw_data analysis/load_calibration.R
-	$(rscript) analysis/load_calibration.R $*
+                             raw_data $(scripts_dir)/load_calibration.R
+	$(rscript) $(scripts_dir)/load_calibration.R $*
 
-$(interm_dir)/raw_%.sqlite: raw_data analysis/load_raw.R
-	$(rscript) analysis/load_raw.R $(shell echo $* | sed "s/_/ /")
+$(interm_dir)/raw_%.sqlite: raw_data $(scripts_dir)/load_raw.R
+	$(rscript) $(scripts_dir)/load_raw.R $(shell echo $* | sed "s/_/ /")
 
-$(interm_dir)/old_%.csv: $(routine_zip) analysis/clean_old_routine.R
+$(interm_dir)/old_%.csv: $(routine_zip) $(scripts_dir)/clean_old_routine.R
 	$(rscript) -e 'unzip("$(routine_zip)", overwrite = F, exdir = "$(raw_dir)")' && \
-	$(rscript) analysis/clean_old_routine.R $*
+	$(rscript) $(scripts_dir)/clean_old_routine.R $*
 
 .INTERMEDIATE: raw_data
 raw_data: $(raw_zip)
