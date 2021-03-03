@@ -399,4 +399,5 @@ dbpath = paste0('processed_', site, '_', data_source, '.sqlite') %>%
   file.path(interm_dir, .)
 db = dbConnect(SQLite(), dbpath)
 dbWriteTable(db, 'measurements', pr_meas, overwrite = T)
+dbExecute(db, 'create index time_index on measurements(time)')
 dbDisconnect(db)
