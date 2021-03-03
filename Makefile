@@ -104,7 +104,7 @@ website: docs
 install: docs
 	Rscript \
 	-e '$(call check_rpkg,devtools)' \
-	-e 'devtools::install(build = FALSE)'
+	-e 'devtools::install(build = FALSE, upgrade = FALSE)'
 # this alternative installation method is inconvenient due to the very slow
 # build step
 # install: install_deps $(build_file)
