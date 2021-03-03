@@ -18,19 +18,6 @@ config = read_csv_dir('analysis/config')
 # calibration-related functions
 min_ma = function(x, k) min(suppressWarnings(runmed(x, k, 'constant')), na.rm = TRUE)
 max_ma = function(x, k) max(suppressWarnings(runmed(x, k, 'constant')), na.rm = TRUE)
-get_param = function(p, d, t1, t2) {
-  dbpath = file.path('analysis', 'intermediate',
-                     paste0('raw_', site, '_', d, '.sqlite'))
-  db = dbConnect(SQLite(), dbpath)
-  sql_str = 'select time, ? as value from measurements where time>=? and time<=? order by time asc'
-  valname = dbQuoteIdentifier(db, paste0('value.', p))
-  sql = sqlInterpolate(db, sql_str, valname, format(t1, tz = 'EST'),
-                       format(t2, tz = 'EST'))
-  meas = try(dbGetQuery(db, sql))
-  dbDisconnect(db)
-  meas$time = as.POSIXct(meas$time, tz = 'EST')
-  meas
-}
 # start and end times from interval notation
 as_interval = atmoschem.process:::as_interval
 # add time around a lubridate interval
@@ -54,16 +41,33 @@ pad_time_interval = function(interval, start, end) {
 }
 # get a set of calibration results for a scheduled autocal
 get_cal_results = function(dt_int, t_int, p, d, agg_f) {
-  meas = get_param(p, d, int_start(dt_int), int_end(dt_int))
+  stime = gsub('^[[(]|,.*$', '', t_int)
+  etime = gsub('^.*, ?|[])]$', '', t_int)
+  dbpath = file.path('analysis', 'intermediate',
+                     paste0('raw_', site, '_', d, '.sqlite'))
+  db = dbConnect(SQLite(), dbpath)
+  sql_str = '
+select time,
+       ? as value
+  from measurements
+ where time>=?
+   and time<=?
+   and substr(time, 12, 5)>=?
+   and substr(time, 12, 5)<=?
+ order by time asc'
+  valname = dbQuoteIdentifier(db, paste0('value.', p))
+  sql = sqlInterpolate(db, sql_str, valname,
+                       format(int_start(dt_int), tz = 'EST'),
+                       format(int_end(dt_int), tz = 'EST'), stime, etime)
+  meas = try(dbGetQuery(db, sql))
+  dbDisconnect(db)
+  meas$time = as.POSIXct(meas$time, tz = 'EST')
+  meas
   if (nrow(meas) == 0) {
     warning('No measurements found for ', p, ' / ', d)
     return(data.frame())
   }
-  stime = hm(gsub('^[[(]|,.*$', '', t_int))
-  etime = hm(gsub('^.*, ?|[])]$', '', t_int))
   meas %>%
-    transform(hms = hms(strftime(time, format = '%H:%M:%S', tz = 'EST'))) %>%
-    subset(hms >= stime & hms <= etime) %>%
     transform(date = as.Date(time, tz = 'EST')) %>%
     aggregate(value ~ date, FUN = agg_f, data = .)
 }
