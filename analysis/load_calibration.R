@@ -260,7 +260,7 @@ if (site == 'WFMS') {
   for (mname in c('NO', 'NOx')) {
     m_cals = subset(all_cals2, measurement_name == mname)
     m_ces = subset(m_cals, type == 'CE')
-    m_conf = subset(config$measurement_types, site == 'PSP' & name == mname)
+    m_conf = subset(config$channels, site == 'PSP' & name == mname)
     m_ces[, mname] =
       drift_correct(m_ces$time, m_ces$measured_value,
                     m_cals[m_cals$type == 'zero', ],

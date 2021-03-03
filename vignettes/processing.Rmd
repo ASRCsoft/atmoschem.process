@@ -80,8 +80,8 @@ stored under `analysis/config`. The files are organized like a normalized
 relational database, as shown below.
 
 ```{r config, fig.cap='Data model of the configuration files. Each arrow is a foreign key relationship. For example, A->B can be read as "each A has a B".'}
-configs = c('sites', 'data sources', 'measurement types', 'instruments',
-            'measurement sources', 'autocals', 'gilibrator', 'manual flags',
+configs = c('sites', 'dataloggers', 'channels', 'instruments',
+            'channel instruments', 'autocals', 'cal_flows', 'manual flags',
             'cal flags', 'report columns')
 g2adj = matrix(0, length(configs), length(configs),
                dimnames = list(configs, configs))

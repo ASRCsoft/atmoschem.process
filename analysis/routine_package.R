@@ -19,7 +19,7 @@ config = read_csv_dir('analysis/config')
 # combine site/data source hourly files into a single site hourly file, using
 # column names from report_columns
 get_site_df = function(site) {
-  site_sources = config$data_sources$name[config$data_sources$site == site]
+  site_sources = config$dataloggers$name[config$dataloggers$site == site]
   meas_list = list()
   for (s in site_sources) {
     dbpath = file.path('analysis', 'intermediate',
@@ -34,8 +34,8 @@ get_site_df = function(site) {
     params = c('time', s_cols$measurement)
     meas = meas[, sub('^value\\.|^flag\\.', '', names(meas)) %in% params]
     # add units to vals column names
-    mtypes = config$measurement_types[config$measurement_types$site == site &
-                                      config$measurement_types$data_source == s, ]
+    mtypes = config$channels[config$channels$site == site &
+                             config$channels$data_source == s, ]
     val_cols = grep('^value\\.', names(meas))
     units = names(meas)[val_cols] %>%
       sub('^value\\.', '', .) %>%
@@ -133,7 +133,7 @@ write.csv(config$sites, file = file.path(out_dir, 'sites.csv'), na = '',
 
 ## instrument info
 # match column measurements to measurement instruments
-measurement_insts = merge(config$measurement_sources, config$instruments,
+measurement_insts = merge(config$channel_instruments, config$instruments,
                           by.x = c('site', 'instrument'),
                           by.y = c('site', 'name'))
 column_insts = atmoschem.process:::merge_timerange(config$report_columns,

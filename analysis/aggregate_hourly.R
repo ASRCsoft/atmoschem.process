@@ -53,8 +53,8 @@ aggregate_wind = function(x, f, ws, wd) {
 }
 
 # get measurement info
-mtypes = config$measurement_types[config$measurement_types$site == site &
-                                  config$measurement_types$data_source == data_source, ] %>%
+mtypes = config$channels[config$channels$site == site &
+                         config$channels$data_source == data_source, ] %>%
   subset(!is.na(apply_processing) & apply_processing)
 
 # get the processed data
@@ -114,7 +114,7 @@ below_mdl = hourly_vals %>%
   subset(select = -1) %>%
   scale(mdls, scale = F) %>%
   {!is.na(.) & . < 0}
-# put this info in a data_sources config file
+# put this info in a dataloggers config file
 hourly_freq = switch(data_source, aethelometer = 4, mesonet = 12, 60)
 flags = narsto_agg_flag(count_mat / hourly_freq, below_mdl)
 

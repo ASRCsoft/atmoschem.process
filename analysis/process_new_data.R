@@ -71,8 +71,8 @@ add_flag_params = function(l) {
 # organize data from processed_measurements
 
 # get all the measurement IDs for a data source
-mtypes = config$measurement_types[config$measurement_types$site == site &
-                                  config$measurement_types$data_source == data_source, ] %>%
+mtypes = config$channels[config$channels$site == site &
+                         config$channels$data_source == data_source, ] %>%
   subset(is.na(derived) | !derived)
 
 # make processed data
@@ -111,7 +111,7 @@ cals$time = cals$end_time # for convenience
 cals = cals[order(cals$time), ]
 
 # also get flow cals
-site_flows = config$gilibrator[config$gilibrator$site == site, ]
+site_flows = config$cal_flows[config$cal_flows$site == site, ]
 site_flows$time = as.Date(site_flows$time, tz = 'EST')
 
 # 2) add miscellaneous flags that aren't included in
@@ -200,8 +200,8 @@ if (site == 'WFMS' & data_source == 'campbell') {
 # 3) process measurements
 pr_meas = data.frame(time = meas$time)
 # update mtypes with only processed measurement types
-mtypes = config$measurement_types[config$measurement_types$site == site &
-                                  config$measurement_types$data_source == data_source, ] %>%
+mtypes = config$channels[config$channels$site == site &
+                         config$channels$data_source == data_source, ] %>%
   subset(!is.na(apply_processing) & apply_processing) %>%
   subset(is.na(derived) | !derived)
 for (n in 1:nrow(mtypes)) {
@@ -342,8 +342,8 @@ if (site == 'WFMS') {
 all_meas = sub('^value\\.', '', names(meas)[grep('^value', names(meas))])
 derived = setdiff(all_meas, nonderived)
 # update mtypes, including derived values
-mtypes = config$measurement_types[config$measurement_types$site == site &
-                                  config$measurement_types$data_source == data_source, ] %>%
+mtypes = config$channels[config$channels$site == site &
+                         config$channels$data_source == data_source, ] %>%
   subset(!is.na(apply_processing) & apply_processing)
 for (mname in derived) {
   n = match(mname, mtypes$name)
