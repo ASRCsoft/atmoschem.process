@@ -8,7 +8,6 @@
 library(atmoschem.process)
 library(magrittr)
 suppressPackageStartupMessages(library(lubridate))
-library(caTools)
 library(DBI)
 library(RSQLite)
 
