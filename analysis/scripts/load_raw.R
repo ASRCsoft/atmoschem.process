@@ -51,4 +51,6 @@ files = file.path('analysis', 'raw', raw_folder, site, 'measurements',
 message('Loading ', length(files), ' files into ', basename(dbpath), '...')
 for (f in files) load_file(f, db)
 
+# speed up future queries somewhat
+dbExecute(db, 'create index time_index on measurements(time)')
 dbDisconnect(db)
