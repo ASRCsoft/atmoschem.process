@@ -24,9 +24,9 @@ opts_chunk$set(echo = FALSE)
 
 # Scripts
 
-Data processing instructions are stored as a set of scripts under the `analysis`
-folder. The following flowchart shows the relationship between scripts and data
-files, leading to the final packaged dataset:
+Data processing instructions are stored as a set of scripts under the
+`analysis/scripts` folder. The following flowchart shows the relationship
+between scripts and data files, leading to the final packaged dataset:
 
 ```{r scripts, fig.height = 8.5, fig.cap='Processing flowchart. Green boxes are data files and gray ellipses are scripts. Text in angle brackets depends on options provided to the script.'}
 scripts = c('clean_old_routine', 'load_raw', 'load_calibration',
