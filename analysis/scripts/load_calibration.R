@@ -17,8 +17,8 @@ raw_folder = paste0('raw_data_v', Sys.getenv('raw_version'))
 config = read_csv_dir('analysis/config')
 
 # calibration-related functions
-min_ma = function(x, k) min(runmed(x, k, 'constant'), na.rm = TRUE)
-max_ma = function(x, k) max(runmed(x, k, 'constant'), na.rm = TRUE)
+min_ma = function(x, k) min(suppressWarnings(runmed(x, k, 'constant')), na.rm = TRUE)
+max_ma = function(x, k) max(suppressWarnings(runmed(x, k, 'constant')), na.rm = TRUE)
 get_param = function(p, d, t1, t2) {
   dbpath = file.path('analysis', 'intermediate',
                      paste0('raw_', site, '_', d, '.sqlite'))
