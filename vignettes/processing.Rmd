@@ -1,0 +1,106 @@
+---
+title: "Data Processing Steps and Configuration"
+author: "William May"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Data Processing Steps and Configuration}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(graph)
+library(Rgraphviz)
+opts_chunk$set(echo = FALSE)
+```
+
+```{css}
+.caption {
+	font-style: italic;
+}
+```
+
+# Scripts
+
+Data processing instructions are stored as a set of scripts under the
+`analysis/scripts` folder. The following flowchart shows the relationship
+between scripts and data files, leading to the final packaged dataset:
+
+```{r scripts, fig.height = 8.5, fig.cap='Processing flowchart. Green boxes are data files and gray ellipses are scripts. Text in angle brackets depends on options provided to the script.'}
+scripts = c('clean_old_routine', 'load_raw', 'load_calibration',
+            'process_new_data', 'aggregate_hourly', 'routine_package')
+scripts = paste0(scripts, '.R')
+files = c('old hourly files', 'measurement files', 'calibraton files',
+          'old_<site>.csv', 'raw_<site>_<logger>.sqlite', 'cals_<site>.sqlite',
+          'processed_<site>_<logger>.sqlite', 'hourly_<site>_<logger>.sqlite',
+          'routine_chemistry_v<version>.zip')
+nodes = c(scripts, files)
+nnodes = length(nodes)
+gadj = matrix(0, nnodes, nnodes, dimnames = list(nodes, nodes))
+edge_inds = c(
+    7, 1,
+    1, 10,
+    8, 2,
+    2, 11,
+    9, 3,
+    11, 3,
+    3, 12,
+    11, 4,
+    12, 4,
+    4, 13,
+    13, 5,
+    5, 14,
+    10, 6,
+    14, 6,
+    6, 15
+)
+gadj[matrix(edge_inds, ncol = 2, byrow = T)] = 1
+g = graphAM(gadj, 'directed')
+
+attrs = list(node = list(shape = 'ellipse', fixedsize = F, fillcolor = 'gray88',
+                         fontsize = 15))
+nAttrs = list(shape = sapply(files, function(x) 'box'),
+              fillcolor = sapply(files, function(x) '#ADF0BB'))
+plot(g, nodeAttrs = nAttrs, attrs = attrs)
+```
+
+The scripts are typically run indirectly via `make`, but instructions for
+running them individually can be found at the top of each script.
+
+Data files are stored under `analysis/raw`, `analysis/intermediate`, and
+`analysis/out`. Most intermediate files are stored in sqlite format so that they
+can be easily queried by the viewer app.
+
+# Configuration
+
+Many aspects of the data processing are controlled by a collection of csv files
+stored under `analysis/config`. The files are organized like a normalized
+relational database, as shown below.
+
+```{r config, fig.cap='Data model of the configuration files. Each arrow is a foreign key relationship. For example, A->B can be read as "each A has a B".'}
+configs = c('sites', 'dataloggers', 'channels', 'instruments',
+            'channel instruments', 'autocals', 'cal_flows', 'manual flags',
+            'cal flags', 'report columns')
+g2adj = matrix(0, length(configs), length(configs),
+               dimnames = list(configs, configs))
+edge_inds = c(
+    2, 1,
+    3, 2,
+    3, 7,
+    4, 1,
+    5, 3,
+    5, 4,
+    6, 3,
+    7, 1,
+    8, 3,
+    9, 3,
+    10, 3
+)
+g2adj[matrix(edge_inds, ncol = 2, byrow = T)] = 1
+g2 = graphAM(g2adj, 'directed')
+
+attrs = list(node = list(shape = 'box', fixedsize = F, fillcolor = 'burlywood2'))
+plot(g2, 'neato', attrs = attrs)
+```

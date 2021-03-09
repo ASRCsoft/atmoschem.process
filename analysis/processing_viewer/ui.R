@@ -2,8 +2,10 @@ library(atmoschem.process)
 library(shiny)
 library(shinyWidgets)
 
+config = read_csv_dir('../config')
+
 # get sites and measurements
-site_dict = setNames(sites$abbreviation, sites$long_name)
+site_dict = setNames(config$sites$abbreviation, config$sites$long_name)
 plotTypes = c(Raw = 'raw', `Calibration Zero` = 'zero',
               `Calibration Span` = 'span',
               `Conversion Efficiency` = 'ce',

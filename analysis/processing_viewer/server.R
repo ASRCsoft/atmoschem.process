@@ -8,6 +8,7 @@ library(cowplot)
 
 # relative path to the sqlite files from the app directory
 interm_dir = file.path('..', 'intermediate')
+config = read_csv_dir('../config')
 
 # get only true values
 is_true = function(x) !is.na(x) & x
@@ -77,7 +78,7 @@ select *,
 
   # Get the estimated (median filtered) zeros from the raw values. These
   # calculations are the same as in `drift_correct`
-  m_conf = subset(measurement_types, site == s & data_source == ds & name == m)
+  m_conf = subset(config$channels, site == s & data_source == ds & name == m)
   z_breaks = zeros$time[is_true(zeros$corrected)]
   # If we keep the values before and after the time range [t1,t2], they will
   # influence ggplot2's y-axis bounds calculations, which we don't want. But we
@@ -180,7 +181,7 @@ make_processing_plot = function(s, ds, m, t1, t2, plot_types, logt = F,
                                 show_flagged = T) {
   if (is.null(ds) || m == '') return(NULL)
   ## get measurement info
-  m_info = subset(measurement_types, site == s & data_source == ds & name == m)
+  m_info = subset(config$channels, site == s & data_source == ds & name == m)
   ylabel = paste0(m, ' (', m_info$units, ')')
   if (logt) ylabel = paste('Log', ylabel)
   has_raw = 'raw' %in% plot_types && !is_true(m_info$derived)
@@ -295,11 +296,11 @@ make_processing_plot = function(s, ds, m, t1, t2, plot_types, logt = F,
 
 shinyServer(function(input, output) {
   output$data_sources = renderUI({
-    site_data_sources = subset(data_sources, site == input$site)
+    site_data_sources = subset(config$dataloggers, site == input$site)
     selectInput('data_source', 'Data Source:', site_data_sources$name)
   })
   output$measurements = renderUI({
-    source_measurements = measurement_types %>%
+    source_measurements = config$channels %>%
       subset(site == input$site & data_source == input$data_source)
     selectInput('measurement', 'Measurement:', source_measurements$name)
   })

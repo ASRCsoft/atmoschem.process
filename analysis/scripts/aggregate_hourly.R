@@ -12,6 +12,7 @@ library(RSQLite)
 
 site = commandArgs(trailingOnly = T)[1]
 data_source = commandArgs(trailingOnly = T)[2]
+config = read_csv_dir('analysis/config')
 
 # the wind speed and direction variables-- this should be made into a config
 # option somehow
@@ -52,8 +53,8 @@ aggregate_wind = function(x, f, ws, wd) {
 }
 
 # get measurement info
-mtypes = measurement_types[measurement_types$site == site &
-                           measurement_types$data_source == data_source, ] %>%
+mtypes = config$channels[config$channels$site == site &
+                         config$channels$data_source == data_source, ] %>%
   subset(!is.na(apply_processing) & apply_processing)
 
 # get the processed data
@@ -113,7 +114,7 @@ below_mdl = hourly_vals %>%
   subset(select = -1) %>%
   scale(mdls, scale = F) %>%
   {!is.na(.) & . < 0}
-# put this info in a data_sources config file
+# put this info in a dataloggers config file
 hourly_freq = switch(data_source, aethelometer = 4, mesonet = 12, 60)
 flags = narsto_agg_flag(count_mat / hourly_freq, below_mdl)
 
@@ -138,4 +139,5 @@ dbpath = paste0('hourly_', site, '_', data_source, '.sqlite') %>%
   file.path(interm_dir, .)
 db = dbConnect(SQLite(), dbpath)
 dbWriteTable(db, 'measurements', hourly_ds, overwrite = T)
+dbExecute(db, 'create index time_index on measurements(time)')
 dbDisconnect(db)

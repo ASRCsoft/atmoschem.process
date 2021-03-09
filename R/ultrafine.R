@@ -1,10 +1,11 @@
-hexToBinStr = function(h)
-  format(R.utils::intToBin(strtoi(h, 16L)),
-         justify = 'right', width = 16)
-
 ## return TRUE for a 1 in any position except 9 and 15, which are
 ## 'Pulse Height Fault' and 'Service Reminder', respectively
-parse_ultrafine_flag = function(f) !grepl('^[0 ]*.[0 ]{5}.0$', hexToBinStr(f))
+parse_ultrafine_flag = function(f, ignore = c(9, 15)) {
+  dont_ignore = setdiff(1:16, ignore)
+  # subtract 1 because the indexing starts at zero
+  comp = sum(2^(dont_ignore - 1))
+  bitops::bitAnd(strtoi(f, 16L), comp) > 0
+}
 
 # convert character data frame columns to numeric
 make_char_numeric = function(x) {

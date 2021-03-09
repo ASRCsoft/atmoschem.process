@@ -15,6 +15,7 @@ site = commandArgs(trailingOnly = T)[1]
 data_source = commandArgs(trailingOnly = T)[2]
 start_time = as.POSIXct('2018-10-01', tz = 'EST')
 end_time = as.POSIXct(Sys.getenv('processing_end'), tz = 'EST')
+config = read_csv_dir('analysis/config')
 
 is_true = function(x) !is.na(x) & x
 
@@ -70,8 +71,8 @@ add_flag_params = function(l) {
 # organize data from processed_measurements
 
 # get all the measurement IDs for a data source
-mtypes = measurement_types[measurement_types$site == site &
-                           measurement_types$data_source == data_source, ] %>%
+mtypes = config$channels[config$channels$site == site &
+                         config$channels$data_source == data_source, ] %>%
   subset(is.na(derived) | !derived)
 
 # make processed data
@@ -110,7 +111,7 @@ cals$time = cals$end_time # for convenience
 cals = cals[order(cals$time), ]
 
 # also get flow cals
-site_flows = gilibrator[gilibrator$site == site, ]
+site_flows = config$cal_flows[config$cal_flows$site == site, ]
 site_flows$time = as.Date(site_flows$time, tz = 'EST')
 
 # 2) add miscellaneous flags that aren't included in
@@ -130,8 +131,8 @@ if (nrow(mcals)) {
   }
 }
 # autocals
-acals_ds = autocals[autocals$site == site &
-                    autocals$data_source == data_source, ]
+acals_ds = config$autocals[config$autocals$site == site &
+                           config$autocals$data_source == data_source, ]
 if (nrow(acals_ds)) {
   time_hms = hms(strftime(meas$time, format = '%H:%M:%S', tz = 'EST'))
   for (i in 1:nrow(acals_ds)) {
@@ -145,8 +146,8 @@ if (nrow(acals_ds)) {
   }
 }
 # manual flags
-mflags_ds = manual_flags[manual_flags$site == site &
-                         manual_flags$data_source == data_source, ]
+mflags_ds = config$manual_flags[config$manual_flags$site == site &
+                                config$manual_flags$data_source == data_source, ]
 for (mname in unique(mflags_ds$measurement_name)) {
   meas_flags = subset(mflags_ds, measurement_name == mname)
   meas_flag_periods = atmoschem.process:::as_interval(meas_flags$times)
@@ -199,8 +200,8 @@ if (site == 'WFMS' & data_source == 'campbell') {
 # 3) process measurements
 pr_meas = data.frame(time = meas$time)
 # update mtypes with only processed measurement types
-mtypes = measurement_types[measurement_types$site == site &
-                           measurement_types$data_source == data_source, ] %>%
+mtypes = config$channels[config$channels$site == site &
+                         config$channels$data_source == data_source, ] %>%
   subset(!is.na(apply_processing) & apply_processing) %>%
   subset(is.na(derived) | !derived)
 for (n in 1:nrow(mtypes)) {
@@ -341,8 +342,8 @@ if (site == 'WFMS') {
 all_meas = sub('^value\\.', '', names(meas)[grep('^value', names(meas))])
 derived = setdiff(all_meas, nonderived)
 # update mtypes, including derived values
-mtypes = measurement_types[measurement_types$site == site &
-                           measurement_types$data_source == data_source, ] %>%
+mtypes = config$channels[config$channels$site == site &
+                         config$channels$data_source == data_source, ] %>%
   subset(!is.na(apply_processing) & apply_processing)
 for (mname in derived) {
   n = match(mname, mtypes$name)
@@ -398,4 +399,5 @@ dbpath = paste0('processed_', site, '_', data_source, '.sqlite') %>%
   file.path(interm_dir, .)
 db = dbConnect(SQLite(), dbpath)
 dbWriteTable(db, 'measurements', pr_meas, overwrite = T)
+dbExecute(db, 'create index time_index on measurements(time)')
 dbDisconnect(db)

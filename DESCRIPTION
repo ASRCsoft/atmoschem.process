@@ -10,13 +10,14 @@ Authors@R: c(
 Description: Functions, configuration files, and scripts for creating the ASRC's
     cleaned and processed atmospheric chemistry datasets. Tools to visualize the
     data and generate reports are also included.
-Imports: 
+biocViews:
+Imports:
+    bitops,
     caTools (>= 0.1.18.1),
     lubridate,
     magrittr,
     Rdpack (>= 0.7),
     readxl,
-    R.utils,
     staplr (>= 2.10),
     tidyr,
     zip
@@ -27,17 +28,17 @@ BugReports: https://github.com/ASRCsoft/atmoschem.process/issues
 Encoding: UTF-8
 LazyData: true
 Suggests: 
-    bookdown,
     cowplot,
     DBI,
     ggplot2 (>= 3.0),
+    graph,
     knitr,
+    Rgraphviz,
     rmarkdown,
     RSQLite,
     shiny,
     shinyWidgets,
-    tinytest,
-    tools
+    tinytest
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1
 RdMacros: Rdpack

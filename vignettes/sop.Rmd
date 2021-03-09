@@ -1,26 +1,12 @@
 ---
 title: "Data Manager Standard Operating Procedures"
 author: "William May"
-date: "`r gsub(' 0', ' ', format(Sys.Date(), '%B %d, %Y'))`"
-output:
-  bookdown::html_document2:
-    toc: true
-    number_sections: false
-pkgdown:
-  as_is: true
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Data Manager Standard Operating Procedures}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 urlcolor: blue
-bibliography: sop.bib
-link-citations: yes
-header-includes:
-   - \usepackage[section]{placeins}
-   - \usepackage{caption}
-   - \DeclareMathOperator{\median}{median}
-   - \DeclareMathOperator{\MAD}{MAD}
-   - \DeclareMathOperator{\atantwo}{atan2}
 ---
 
 ```{r setup, include=FALSE}
@@ -29,18 +15,36 @@ knitr::opts_chunk$set(echo = FALSE, cache = FALSE)
 
 # Getting Data
 
-The Whiteface Mountain datasets can be obtained on the atmoschem server. These include a calibration sheet, a flag report sheet, and the individual data files. Data can also be accessed through the Campbell datalogger, currently made available on the webdev server.
+The Whiteface Mountain datasets can be obtained on the atmoschem server. These
+include a calibration sheet, a flag report sheet, and the individual data
+files. Data can also be accessed through the Campbell datalogger, currently made
+available on the webdev server.
 
-Most Pinnacle State Park data is recieved via email from the site operator, with the exception of the Envidas files. Currently the data manager accesses the Pinnacle computer using VNC, then generates the data file with Envidas and downloads it over VNC. Some relevant data is stored in a logbook. Sections of the logbook are scanned and emailed periodically to the ASRC data manager, and when logbooks are filled they're sent to the ASRC for more scanning and archiving, before being sent back to Pinnacle.
+Most Pinnacle State Park data is recieved via email from the site operator, with
+the exception of the Envidas files. Currently the data manager accesses the
+Pinnacle computer using VNC, then generates the data file with Envidas and
+downloads it over VNC. Some relevant data is stored in a logbook. Sections of
+the logbook are scanned and emailed periodically to the ASRC data manager, and
+when logbooks are filled they're sent to the ASRC for more scanning and
+archiving, before being sent back to Pinnacle.
 
-Most Queens College data is obtained from the [EPA Air Quality System Data Mart](https://aqs.epa.gov/aqsweb/documents/data_mart_welcome.html). Ultrafine data is emailed monthly from the Queens College data manager.
+Most Queens College data is obtained from the [EPA Air Quality System Data
+Mart](https://aqs.epa.gov/aqsweb/documents/data_mart_welcome.html). Ultrafine
+data is emailed monthly from the Queens College data manager.
 
 # Making Changes
 
-Any changes to the processing procedures should be clearly documented. This means the new code (if applicable) should be available on Github, and the change should be noted in the Github repository changelog as well as the data manager SOP.
+Any changes to the processing procedures should be clearly documented. This
+means the new code (if applicable) should be available on Github, and the change
+should be noted in the Github repository changelog as well as the data manager
+SOP.
 
-When making changes to the processing code, experimental changes and works in progress should be saved to separate git branches so that others can still use the code from the master branch. When the changes are completed and ready for use in the production database they should be merged into the master branch. Before merging into master it should also be verified that the code passes all automated tests.
+When making changes to the processing code, experimental changes and works in
+progress should be saved to separate git branches so that others can still use
+the code from the master branch. When the changes are completed and ready for
+use in the production database they should be merged into the master
+branch. Before merging into master it should also be verified that the code
+passes all automated tests.
 
-The changelog follows the format described at [keepachangelog.com](https://keepachangelog.com).
-
-# References
+The changelog follows the format described at
+[keepachangelog.com](https://keepachangelog.com).
