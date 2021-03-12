@@ -82,3 +82,34 @@ aqs_availability_matrix = function(site, years, datadir) {
   row.names(mat) = wide$Year
   !is.na(mat) & mat > 0
 }
+
+# get all available samples for the given parameters, site, and years
+#' @export
+aqs_bulk_samples = function(params, datasets, site, years, datadir) {
+  # add 'hourly' to the front because these are sample datasets
+  datasets = paste0('hourly_', datasets)
+  avail_mat = aqs_availability_matrix(site, years, datadir)
+  years_avail = as.integer(row.names(avail_mat)[rowSums(avail_mat) > 0])
+  if (!all(years %in% years_avail)) {
+    years_str = paste(setdiff(years, years_avail), collapse = ', ')
+    warning('Some years are missing data: ', years_str)
+    years = years_avail
+  }
+  params_avail = colnames(avail_mat)[colSums(avail_mat) > 0]
+  if (!all(params %in% params_avail)) {
+    params_str = paste(setdiff(params, params_avail), collapse = ', ')
+    warning('Some params are missing data: ', params_str)
+    params = intersect(params, params_avail)
+  }
+  # for each dataset, extract the contained parameters
+  res = list()
+  for (ds in unique(datasets)) {
+    message('Getting ', ds, ' samples')
+    ds_params = params[datasets == ds]
+    ds_avail = avail_mat[, ds_params, drop = FALSE]
+    ds_years = row.names(ds_avail)[rowSums(ds_avail) > 0]
+    download_aqs(ds, ds_years, datadir, overwrite = FALSE)
+    res[[ds]] = subset_aqs_dataset(ds, site, datadir, ds_years)
+  }
+  do.call(rbind, unname(res))
+}
