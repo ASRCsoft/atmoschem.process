@@ -66,12 +66,15 @@ subset_aqs_dataset = function(name, sites, datadir) {
 # Make a param x year matrix of AQS data availability. Availability is
 # determined using the yearly summary data, as suggested at
 # https://aqs.epa.gov/aqsweb/documents/data_api.html#tips.
-aqs_availability_matrix = function(params, sites, years, datadir) {
+aqs_availability_matrix = function(site, years, datadir) {
   download_aqs('annual_conc_by_monitor', years, datadir, overwrite = FALSE)
-  annual = subset_aqs_dataset('annual_conc_by_monitor', sites, datadir)
-  avail = sapply(years, function(x) {
-    params %in% annual$`Parameter Code`[annual$Year == x]
-  })
-  dimnames(avail) = list(params, years)
-  avail
+  annual = subset_aqs_dataset('annual_conc_by_monitor', site, datadir)
+  long = aggregate(`Observation Count` ~ `Parameter Code` + Year, data = annual,
+                   FUN = sum)
+  wide = reshape(long, v.names = 'Observation Count',
+                 timevar = 'Parameter Code', idvar = 'Year', direction = 'wide')
+  mat = as.matrix(wide[, -1])
+  colnames(mat) = sub('Observation Count\\.', '', colnames(mat))
+  row.names(mat) = wide$Year
+  !is.na(mat) & mat > 0
 }
