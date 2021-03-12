@@ -53,8 +53,12 @@ read_zipped_csv = function(z, f, ...) {
 # Some of the zipped datasets are very large. In order to read them into memory,
 # they need to be subsetted one year at a time while loading. (The dataset name
 # is the file name without including the year.)
-subset_aqs_dataset = function(name, sites, datadir) {
+subset_aqs_dataset = function(name, sites, datadir, years = NULL) {
   zips = list.files(datadir, paste0(name, '.*\\.zip'), full.names = TRUE)
+  if (!is.null(years)) {
+    zip_years = as.integer(gsub('.*_|\\.zip', '', zips))
+    zips = zips[zip_years %in% years]
+  }
   dat_list = lapply(zips, function(x) {
     csv = basename(sub('\\.zip$', '.csv', x))
     subset(read_zipped_csv(x, csv, check.names = FALSE),
@@ -68,7 +72,7 @@ subset_aqs_dataset = function(name, sites, datadir) {
 # https://aqs.epa.gov/aqsweb/documents/data_api.html#tips.
 aqs_availability_matrix = function(site, years, datadir) {
   download_aqs('annual_conc_by_monitor', years, datadir, overwrite = FALSE)
-  annual = subset_aqs_dataset('annual_conc_by_monitor', site, datadir)
+  annual = subset_aqs_dataset('annual_conc_by_monitor', site, datadir, years)
   long = aggregate(`Observation Count` ~ `Parameter Code` + Year, data = annual,
                    FUN = sum)
   wide = reshape(long, v.names = 'Observation Count',
