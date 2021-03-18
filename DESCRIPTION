@@ -14,8 +14,10 @@ biocViews:
 Imports:
     bitops,
     caTools (>= 0.1.18.1),
+    jsonlite,
     lubridate,
     magrittr,
+    ratelimitr,
     Rdpack (>= 0.7),
     readxl,
     staplr (>= 2.10),

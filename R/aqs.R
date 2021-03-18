@@ -143,3 +143,29 @@ aqs_bulk_samples = function(params, datasets, site, years, datadir) {
   }
   do.call(rbind, unname(res))
 }
+
+# `limit_rate` controls the time between the beginning of one request and the
+# beginning of the next, but AQS wants us to put 5 seconds between the *end* of
+# a request and the beginning of the next. This is kind of a silly workaround to
+# make that happen.
+aqs_5sec1 = ratelimitr::limit_rate(function() {}, rate(1, period = 5))
+aqs_5sec2 = ratelimitr::limit_rate(function() {}, rate(1, period = 5))
+aqs_5sec_toggle = TRUE
+aqs_wait_5sec = function() if (aqs_5sec_toggle) aqs_5sec1() else aqs_5sec2()
+aqs_restart_5sec = function() {
+  # flip the toggle to switch timers
+  aqs_5sec_toggle <<- !aqs_5sec_toggle
+  aqs_wait_5sec()
+}
+.aqs_request = function(x) {
+  aqs_wait_5sec()
+  res = jsonlite::fromJSON(URLencode(x))
+  aqs_restart_5sec()
+  res
+}
+
+# send a request to the AQS data mart, following the API terms:
+# https://aqs.epa.gov/aqsweb/documents/data_api.html#terms
+# and caching results to avoid needlessly repeating requests
+aqs_request =
+  ratelimitr::limit_rate(.aqs_request, ratelimitr::rate(n = 10, period = 60))
