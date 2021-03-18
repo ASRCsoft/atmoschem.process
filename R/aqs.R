@@ -144,22 +144,19 @@ aqs_bulk_samples = function(params, datasets, site, years, datadir) {
   do.call(rbind, unname(res))
 }
 
-# `limit_rate` controls the time between the beginning of one request and the
-# beginning of the next, but AQS wants us to put 5 seconds between the *end* of
-# a request and the beginning of the next. This is kind of a silly workaround to
-# make that happen.
-aqs_5sec1 = ratelimitr::limit_rate(function() {}, rate(1, period = 5))
-aqs_5sec2 = ratelimitr::limit_rate(function() {}, rate(1, period = 5))
-aqs_5sec_toggle = TRUE
-aqs_wait_5sec = function() if (aqs_5sec_toggle) aqs_5sec1() else aqs_5sec2()
-aqs_restart_5sec = function() {
-  # flip the toggle to switch timers
-  aqs_5sec_toggle <<- !aqs_5sec_toggle
-  aqs_wait_5sec()
+# kind of a silly workaround to put 5 seconds between the *end* of a request and
+# the beginning of the next
+aqs_env = new.env()
+aqs_env$aqs_5sec = Sys.time() - as.difftime(5, units = 'secs')
+aqs_wait_5sec = function() {
+  wait_time = aqs_env$aqs_5sec + as.difftime(5, units = 'secs') - Sys.time()
+  if (wait_time > 0) Sys.sleep(as.numeric(wait_time, units='secs'))
 }
+aqs_restart_5sec = function() assign('aqs_5sec', Sys.time(), aqs_env)
 .aqs_request = function(x) {
   aqs_wait_5sec()
-  res = jsonlite::fromJSON(URLencode(x))
+  url = paste0('https://aqs.epa.gov/data/api/', URLencode(x))
+  res = jsonlite::fromJSON(url)
   aqs_restart_5sec()
   res
 }
@@ -169,3 +166,57 @@ aqs_restart_5sec = function() {
 # and caching results to avoid needlessly repeating requests
 aqs_request =
   ratelimitr::limit_rate(.aqs_request, ratelimitr::rate(n = 10, period = 60))
+
+# get a year of samples for up to 5 parameters
+.get_year_samples = function(param, site, year, email, key) {
+  login_str = paste0('email=', email, '&key=', key)
+  site_str = paste0('state=', substr(site, 1, 2), '&county=',
+                    substr(site, 4, 6), '&site=', substr(site, 8, 11))
+  year_str = paste0('bdate=', year, '0101&edate=', year, '1231')
+  params_str = paste0('param=', paste(param, collapse = ','))
+  url_params = paste(login_str, site_str, year_str, params_str, sep = '&')
+  query = paste0('sampleData/bySite?', url_params)
+  res = aqs_request(query)
+  if (!res$Header$rows) {
+    data.frame()
+  } else {
+    res$Data
+  }
+}
+
+get_year_samples = function(params, site, year, email, key) {
+  groups = (1:length(params) - 1) %/% 5 # split params into groups of 5
+  res = by(params, groups, .get_year_samples, site, year, email, key)
+  do.call(rbind, res)
+}
+
+# get all available samples for the given parameters and years
+#' @export
+aqs_api_samples = function(params, site, years, email, key,  datadir) {
+  avail_mat = aqs_availability_matrix(site, years, datadir)
+  params_avail = params %in% colnames(avail_mat)
+  # avail_mat = avail_mat[, params]
+  # params_avail = colSums(avail_mat) > 0
+  if (!all(params_avail)) {
+    params_str = paste(params[!params_avail], collapse = ', ')
+    warning('Some params are missing data: ', params_str)
+    params = params[params_avail]
+    avail_mat = avail_mat[, params]
+  }
+  years_avail = as.character(years) %in% row.names(avail_mat)
+  # years_avail = rowSums(avail_mat) > 0
+  if (!all(years_avail)) {
+    years_str = paste(years[!years_avail], collapse = ', ')
+    warning('Some years are missing data: ', years_str)
+    years = years[years_avail]
+  }
+  # for each year, get the available parameters
+  res = list()
+  for (y in years) {
+    message('Getting ', y, ' samples...')
+    year_str = as.character(y)
+    y_params = params[avail_mat[year_str, ]]
+    res[[year_str]] = get_year_samples(y_params, site, y, email, key)
+  }
+  do.call(rbind, res)
+}
