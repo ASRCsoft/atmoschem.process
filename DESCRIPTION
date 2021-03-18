@@ -19,8 +19,7 @@ Imports:
     Rdpack (>= 0.7),
     readxl,
     staplr (>= 2.10),
-    tidyr,
-    zip
+    tidyr
 Depends: R (>= 3.4.4)
 License: MIT + file LICENSE
 URL: https://github.com/ASRCsoft/atmoschem.process

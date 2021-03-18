@@ -39,15 +39,46 @@ download_aqs = function(name, years, destdir, overwrite = FALSE) {
   }
 }
 
-# `read.table` is slow when applied to unz connections (the normal way of
-# reading a zipped csv). For unclear reasons, this version using `readChar` is
-# faster.
-read_zipped_csv = function(z, f, ...) {
-  zlist = zip::zip_list(z)
-  size = zlist$uncompressed_size[zlist$filename == f]
-  con = unz(z, f)
-  on.exit(close(con))
-  read.csv(text = readChar(con, nchars = size, useBytes = TRUE), ...)
+# Efficiently subset large AQS zipped csv's by site, without using large amounts
+# of RAM
+subset_zipped_csv = function(z, f, sites, ...) {
+  # Strategy: read chunks from zipped file, apply strsplit with `fixed` which is
+  # very fast, and also startsWith instead of grep (also really fast)
+  zfile = unz(z, f, 'rb')
+  on.exit(close(zfile))
+  site_txt = paste0('"', gsub('-', '","', sites), '"')
+  contains_site = function(x) {
+    if (length(x) == 1) {
+      any(startsWith(x, site_txt))
+    } else {
+      rowSums(sapply(site_txt, function(y) startsWith(x, y))) > 0
+    }
+  }
+  mb100 = 20 * 2 ^ 20 # 20MB. No particular reason
+  # `readChar`, unlike `readLines`, does not require file seeking, which the unz
+  # connection can't do
+  chunk = readChar(zfile, mb100, useBytes = TRUE)
+  last_line = ''
+  res = list()
+  i = 1
+  while(length(chunk)) {
+    lines = strsplit(chunk, '\n', fixed = TRUE)[[1]]
+    # get the header
+    if (i == 1) {
+      res[[1]] = lines[1]
+      i = 2
+    }
+    # piece together the new first line, adding the ending line fragment from
+    # the previous chunk
+    lines[1] = paste0(last_line, lines[1])
+    last_line = tail(lines, 1)
+    lines = head(lines, -1)
+    res[[i]] = lines[contains_site(lines)]
+    i = i + 1
+    chunk = readChar(zfile, mb100, useBytes = TRUE)
+  }
+  if (contains_site(last_line)) res[[i]] = last_line
+  read.csv(text = unlist(res), check.names = FALSE)
 }
 
 # Some of the zipped datasets are very large. In order to read them into memory,
@@ -61,8 +92,7 @@ subset_aqs_dataset = function(name, sites, datadir, years = NULL) {
   }
   dat_list = lapply(zips, function(x) {
     csv = basename(sub('\\.zip$', '.csv', x))
-    subset(read_zipped_csv(x, csv, check.names = FALSE),
-           format_aqs_site(`State Code`, `County Code`, `Site Num`) %in% sites)
+    subset_zipped_csv(x, csv, sites)
   })
   do.call(rbind, dat_list)
 }
