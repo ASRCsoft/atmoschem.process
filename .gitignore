@@ -45,6 +45,7 @@ vignettes/*.pdf
 analysis/raw/
 analysis/intermediate/
 analysis/out/
+analysis/docs/*.md
 
 # readme preview
 README.html

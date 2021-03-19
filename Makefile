@@ -12,6 +12,7 @@ raw_dir := analysis/raw
 interm_dir := analysis/intermediate
 out_dir := analysis/out
 scripts_dir := analysis/scripts
+docs_dir := analysis/docs
 # processing variables
 rscript := Rscript --vanilla
 export processing_end := 2021-01-01
@@ -46,8 +47,13 @@ check_data:
 .PHONY: routine
 routine: $(routine_out).zip
 
-$(routine_out).zip: $(old_routine_out) $(hourly_files)
+$(routine_out).zip: $(old_routine_out) $(hourly_files) $(docs_dir)/routine.md
 	$(rscript) $(scripts_dir)/routine_package.R $(out_dir)/$(routine_out)
+
+$(docs_dir)/routine.md: $(docs_dir)/routine.Rmd $(docs_dir)/routine.bib
+	Rscript \
+	-e '$(call check_rpkg,rmarkdown)' \
+	-e 'rmarkdown::render("analysis/docs/routine.Rmd")'
 
 $(interm_dir)/hourly_%.sqlite: $(interm_dir)/processed_%.sqlite $(scripts_dir)/aggregate_hourly.R
 	$(rscript) $(scripts_dir)/aggregate_hourly.R $(shell echo $* | sed "s/_/ /")

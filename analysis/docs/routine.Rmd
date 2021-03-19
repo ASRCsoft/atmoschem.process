@@ -1,4 +1,13 @@
-# ASRC Routine Meteorological and Chemistry Data
+---
+title: "ASRC Routine Meteorological and Chemistry Data"
+author: "William May"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  md_document:
+    variant: markdown_strict-raw_html+pandoc_title_block
+bibliography: routine.bib
+nocite: '@*'
+---
 
 These files contain the ASRC's routine meteorological and chemistry data from
 the Whiteface Mountain summit (WFMS), the Whiteface Mountain lodge (WFML),
@@ -11,15 +20,15 @@ The data has been processed to remove values that don't reflect ambient
 conditions, to adjust values for instrument calibrations, and to aggregate
 measurements to hourly values. All measurements are accompanied by flags
 following NARSTO guidelines (see
-cdiac.ess-dive.lbl.gov/programs/NARSTO/metadatastandards/consensus_flag_standard_20011105.pdf).
+<https://cdiac.ess-dive.lbl.gov/programs/NARSTO/metadatastandards/consensus_flag_standard_20011105.pdf>).
 Whiteface Mountain data before 2001 was not originally flagged, and M1 and V0
 flags have been added retroactively. Queens College data is collected from the
 EPA's Air Quality System and updated on a different schedule than other sites.
 
-WS_raw and WD_raw columns are raw averages of wind speed and wind direction
+`WS_raw` and `WD_raw` columns are raw averages of wind speed and wind direction
 measurements, respectively. These values are sometimes misleading and should be
-used with caution. All other WS and WD values are vector averages that combine
-wind speeds and directions.
+used with caution. All other WS and WD values are resultant wind speeds and
+directions.
 
 Whiteface Mountain lodge CO measurements seem to be affected by room temperature
 and should also be used with caution.
@@ -28,3 +37,8 @@ The instruments.csv file contains instrument information for some recent data.
 
 Any questions should be directed to Mr. William May at wcmay@albany.edu or
 Dr. James Schwab at jschwab@albany.edu.
+
+## Recommended Citations
+
+If using the data for research, we suggest including the following citations
+(whichever are relevant):

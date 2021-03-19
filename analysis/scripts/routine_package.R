@@ -143,7 +143,8 @@ instruments = column_insts[, instr_cols]
 instr_path = file.path(out_dir, 'instruments.csv')
 write.csv(instruments, file = instr_path, na = '', row.names = FALSE)
 # readme
-file.copy(file.path('analysis', 'docs', 'README.txt'), out_dir, overwrite = T)
+file.copy(file.path('analysis', 'docs', 'routine.md'),
+          file.path(out_dir, 'README.txt'), overwrite = T)
 
 # zip
 # paths in the zipped file are determined by the working directory
