@@ -213,7 +213,7 @@ aqs_api_samples = function(params, site, years, email, key) {
   for (y in years) {
     message('Getting ', y, ' samples...')
     year_str = as.character(y)
-    y_params = names(avail_mat)[avail_mat[year_str, ] > 0]
+    y_params = colnames(avail_mat)[avail_mat[year_str, ] > 0]
     res[[year_str]] = get_year_samples(y_params, site, y, email, key)
   }
   do.call(rbind, res)
