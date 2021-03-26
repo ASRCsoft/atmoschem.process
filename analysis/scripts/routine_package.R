@@ -137,6 +137,8 @@ instr_cols = c('site', 'column', 'times', 'brand', 'model', 'serial_number')
 instruments = column_insts[, instr_cols]
 instr_path = file.path(out_dir, 'instruments.csv')
 write.csv(instruments, file = instr_path, na = '', row.names = FALSE)
+write.csv(narsto_flags[, 1:2], file = file.path(out_dir, 'flags.csv'),
+          row.names = FALSE)
 # readme
 file.copy(file.path('analysis', 'docs', 'routine.md'),
           file.path(out_dir, 'README.txt'), overwrite = T)
