@@ -30,31 +30,33 @@ between scripts and data files, leading to the final packaged dataset:
 
 ```{r scripts, fig.height = 8.5, fig.cap='Processing flowchart. Green boxes are data files and gray ellipses are scripts. Text in angle brackets depends on options provided to the script.'}
 scripts = c('clean_old_routine', 'load_raw', 'load_calibration',
-            'process_new_data', 'aggregate_hourly', 'routine_package')
+            'process_new_data', 'aggregate_hourly', 'queens', 'routine_package')
 scripts = paste0(scripts, '.R')
 files = c('old hourly files', 'measurement files', 'calibraton files',
           'old_<site>.csv', 'raw_<site>_<logger>.sqlite', 'cals_<site>.sqlite',
           'processed_<site>_<logger>.sqlite', 'hourly_<site>_<logger>.sqlite',
-          'routine_chemistry_v<version>.zip')
+          'hourly_QC_AQS.sqlite', 'routine_chemistry_v<version>.zip')
 nodes = c(scripts, files)
 nnodes = length(nodes)
 gadj = matrix(0, nnodes, nnodes, dimnames = list(nodes, nodes))
 edge_inds = c(
-    7, 1,
-    1, 10,
-    8, 2,
-    2, 11,
-    9, 3,
-    11, 3,
-    3, 12,
-    11, 4,
+    8, 1,
+    1, 11,
+    9, 2,
+    2, 12,
+    10, 3,
+    12, 3,
+    3, 13,
     12, 4,
-    4, 13,
-    13, 5,
-    5, 14,
-    10, 6,
-    14, 6,
-    6, 15
+    13, 4,
+    4, 14,
+    14, 5,
+    5, 15,
+    6, 16,
+    11, 7,
+    15, 7,
+    16, 7,
+    7, 17
 )
 gadj[matrix(edge_inds, ncol = 2, byrow = T)] = 1
 g = graphAM(gadj, 'directed')
