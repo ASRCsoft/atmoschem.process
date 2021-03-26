@@ -46,8 +46,11 @@ check_data:
 .PHONY: routine
 routine: $(routine_out).zip
 
-$(routine_out).zip: $(old_routine_out) $(hourly_files)
+$(routine_out).zip: $(old_routine_out) $(hourly_files) $(interm_dir)/hourly_queens.sqlite
 	$(rscript) $(scripts_dir)/routine_package.R $(out_dir)/$(routine_out)
+
+$(interm_dir)/hourly_queens.sqlite: $(scripts_dir)/queens.R
+	$(rscript) $(scripts_dir)/queens.R
 
 $(interm_dir)/hourly_%.sqlite: $(interm_dir)/processed_%.sqlite $(scripts_dir)/aggregate_hourly.R
 	$(rscript) $(scripts_dir)/aggregate_hourly.R $(shell echo $* | sed "s/_/ /")

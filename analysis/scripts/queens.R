@@ -1,12 +1,19 @@
 # collect and organize Queens College data
 
+# run this script from the project root directory with
+# Rscript analysis/scripts/queens.R
+
+# produces file analysis/intermediate/hourly_queens.sqlite
+
 library(magrittr)
 library(atmoschem.process)
+library(DBI)
+library(RSQLite)
 
 years = 2001:2021
 site = '36-081-0124'
-email = ''
-key = ''
+email = Sys.getenv('aqs_email')
+key = Sys.getenv('aqs_key')
 aqs_params = read.csv('analysis/config/aqs_queens.csv')
 aqs_params$aqs_code = as.character(aqs_params$aqs_code)
 
@@ -22,7 +29,6 @@ narsto_from_aqs = function(val, aqs) {
     missing_str = paste(missing, collapse = ', ')
     stop('Untranslated flags: ', missing_str)
   }
-  # stopifnot(all(na.omit(aqs) %in% names(aqs_dict)))
   flag = aqs_dict[aqs]
   # if there's no data (flag or value), NARSTO says M1
   flag[is.na(val) & is.na(flag)] = 'M1'
@@ -34,33 +40,80 @@ narsto_from_aqs = function(val, aqs) {
   flag
 }
 
-
-s1 = aqs_api_samples(aqs_params$aqs_code, site, years, email, key)
-
-
-make_wide = function(samples) {
-  wide = samples %>%
-    transform(time = as.POSIXct(paste(date_gmt, time_gmt), tz = 'UTC')) %>%
-    subset(select = c('time', 'parameter_code', 'sample_measurement', 'qualifier')) %>%
-    reshape(v.names = c('sample_measurement', 'qualifier'),
-            timevar = 'parameter_code', idvar = 'time', direction = 'wide')
-  # wide = wide[order(wide$date_local), ]
-  names(wide) = names(wide) %>%
-    # sub('time', 'sdatel', .) %>%
-    sub('sample_measurement\\.', '', .) %>%
-    sub('qualifier\\.(.*)', '\\1 (flag)', .)
-  attr(wide$sdatel, 'tzone') = 'EST'
-  wide
+# NARSTO flags, ordered by importance
+narsto_priority = c('H1', 'M1', 'M2', paste0('V', 7:0))
+prioritize_narsto_flag = function(x, y) {
+  x_priority = match(x, narsto_priority)
+  y_priority = match(y, narsto_priority)
+  ifelse(x_priority < y_priority, x, y)
 }
 
-w1 = make_wide(s1)
+# Make method table (with method time ranges) from sample table. For each
+# parameter, prefer the newest available method
+get_methods = function(samples) {
+  # get method date ranges
+  starts = aggregate(time ~ parameter_code + method, FUN = min, data = samples)
+  names(starts)[3] = 'method_start'
+  starts = starts[with(starts, order(parameter_code, method_start)), ]
+  starts %>%
+    transform(method_end = c(tail(method_start, -1), NA),
+              param_changes = c(diff(as.integer(parameter_code)) != 0, F)) %>%
+    transform(method_end = replace(method_end, param_changes, NA)) %>%
+    subset(select = c('parameter_code', 'method', 'method_start', 'method_end'))
+}
 
-# just need to: fix column names, convert flags, choose methods
-w2 = w1
-param_codes = sub(' .*', '', names(w2)[-1])
-keep = !param_codes %in% c('43101', '43102')
-w2 = w2[, c(TRUE, keep)]
-param_codes = param_codes[keep]
-param_names = aqs_params$column[match(param_codes, aqs_params$aqs_code)]
-names(w2)[-1] = paste0(param_names, sub('[0-9]+', '', names(w2)[-1]))
 
+samples = aqs_api_samples(aqs_params$aqs_code, site, years, email, key)
+
+# save(samples, file = 'tmp.RData')
+# load('tmp.RData')
+
+samples %<>%
+  subset(sample_duration == '1 HOUR') %>%
+  transform(time = as.POSIXct(paste(date_gmt, time_gmt), tz = 'UTC'))
+# print the times in EST
+attr(samples$time, 'tzone') = 'EST'
+
+# when multiple values are collected simultaneously, use only the newest method
+methods = get_methods(samples)
+samples %<>%
+  merge(methods) %>%
+  subset(is.na(method_end) | time < method_end,
+         select = -c(method_start, method_end))
+
+# get NARSTO flags
+samples %<>%
+  transform(qualifier = sub(' -.*', '', qualifier)) %>%
+  transform(narsto = narsto_from_aqs(sample_measurement, qualifier))
+
+# organize into wide format
+wide = samples %>%
+  subset(select = c('time', 'parameter_code', 'sample_measurement', 'narsto')) %>%
+  reshape(v.names = c('sample_measurement', 'narsto'),
+          timevar = 'parameter_code', idvar = 'time', direction = 'wide')
+wide = wide[order(wide$time), ]
+names(wide) %<>%
+  sub('sample_measurement\\.', '', .) %>%
+  sub('narsto\\.(.*)', '\\1 (flag)', .)
+param_code = sub(' .*', '', names(wide)[-1])
+parameter = aqs_params$column[match(param_code, aqs_params$aqs_code)]
+names(wide)[-1] = paste0(parameter, sub('[0-9]+', '', names(wide)[-1]))
+
+# calculate NMHC
+wide %<>%
+  within(NMHC <- `Total hydrocarbons` - CH4) %>%
+  within(`NMHC (flag)` <- prioritize_narsto_flag(`CH4 (flag)`,
+                                                 `Total hydrocarbons (flag)`)) %>%
+  subset(select = -c(`Total hydrocarbons`, `Total hydrocarbons (flag)`))
+# should impossible/improbable values be flagged?
+
+# write to sqlite
+wide = within(wide, time <- format(time, '%Y-%m-%d %H:%M:%S', tz = 'EST'))
+interm_dir = file.path('analysis', 'intermediate')
+dir.create(interm_dir, F, T)
+dbpath = paste0('hourly_queens.sqlite') %>%
+  file.path(interm_dir, .)
+db = dbConnect(SQLite(), dbpath)
+dbWriteTable(db, 'measurements', wide, overwrite = T)
+dbExecute(db, 'create index time_index on measurements(time)')
+dbDisconnect(db)

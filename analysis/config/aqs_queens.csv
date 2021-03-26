@@ -1,16 +1,16 @@
-column,parameter,aqs_code,comment
-NO,NO,42601,
-NO2,NO2,42602,
-NOy,NOy,42600,
-Ozone,Ozone,44201,
-CO,CO,42101,
-SO2,SO2,42401,
-CH4,CH4,43201,methane?
-,NMOC,43102,is this the same as NMOC?
-,Total hydrocarbons,43101,
-T,T,62101,
-RH,RH,62201,
-WS,WS,61103,
-WD,WD,61104,
-BP,BP,68108,
-Ultrafine PM,Ultrafine PM,87101,"is this right, ""Particle Number, Total Count""?"
+column,aqs_code
+NO,42601
+NO2,42602
+NOy,42600
+Ozone,44201
+CO,42101
+SO2,42401
+CH4,43201
+NMOC,43102
+Total hydrocarbons,43101
+T,62101
+RH,62201
+WS,61103
+WD,61104
+BP,68108
+Ultrafine PM,87101
