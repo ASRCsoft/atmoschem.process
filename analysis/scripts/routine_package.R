@@ -60,7 +60,7 @@ for (site in config$sites$abbreviation) {
   message('Organizing ', site, ' data')
   csv_file = paste0('old_', site, '.csv')
   old_processed_file = file.path(old_processed_dir, csv_file)
-  out_file = file.path(out_dir, paste0(site, '.csv'))
+  out_file = file.path(out_dir, paste0('hourly_', site, '.csv'))
 
   oldp = read.csv(old_processed_file, na.strings = c('NA', '-999'),
                   check.names = FALSE)
