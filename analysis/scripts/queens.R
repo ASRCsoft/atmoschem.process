@@ -71,6 +71,7 @@ samples = aqs_api_samples(aqs_params$aqs_code, site, years, email, key)
 samples %<>%
   subset(sample_duration == '1 HOUR') %>%
   transform(time = as.POSIXct(paste(date_gmt, time_gmt), tz = 'UTC'))
+names(samples) = sub('sample_measurement', 'value', names(samples))
 # print the times in EST
 attr(samples$time, 'tzone') = 'EST'
 
@@ -84,31 +85,33 @@ samples %<>%
 # get NARSTO flags
 samples %<>%
   transform(qualifier = sub(' -.*', '', qualifier)) %>%
-  transform(narsto = narsto_from_aqs(sample_measurement, qualifier))
+  transform(flag = narsto_from_aqs(value, qualifier))
 
 # organize into wide format
 wide = samples %>%
-  subset(select = c('time', 'parameter_code', 'sample_measurement', 'narsto')) %>%
-  reshape(v.names = c('sample_measurement', 'narsto'),
-          timevar = 'parameter_code', idvar = 'time', direction = 'wide')
+  subset(select = c('time', 'parameter_code', 'value', 'flag')) %>%
+  reshape(v.names = c('value', 'flag'), timevar = 'parameter_code',
+          idvar = 'time', direction = 'wide')
 wide = wide[order(wide$time), ]
-names(wide) %<>%
-  sub('sample_measurement\\.', '', .) %>%
-  sub('narsto\\.(.*)', '\\1 (flag)', .)
-param_code = sub(' .*', '', names(wide)[-1])
+param_code = sub('.*\\.', '', names(wide)[-1])
 parameter = aqs_params$column[match(param_code, aqs_params$aqs_code)]
-names(wide)[-1] = paste0(parameter, sub('[0-9]+', '', names(wide)[-1]))
+names(wide)[-1] = paste0(sub('[0-9]+', '', names(wide)[-1]), parameter)
 
-# calculate NMHC
-wide %<>%
-  within(NMHC <- `Total hydrocarbons` - CH4) %>%
-  within(`NMHC (flag)` <- prioritize_narsto_flag(`CH4 (flag)`,
-                                                 `Total hydrocarbons (flag)`)) %>%
-  subset(select = -c(`Total hydrocarbons`, `Total hydrocarbons (flag)`))
-# should impossible/improbable values be flagged?
+# get derived values
+
+# NMHC
+wide$value.NMHC = with(wide, `value.Total hydrocarbons` - value.CH4)
+wide$flag.NMHC =
+  with(wide, prioritize_narsto_flag(flag.CH4, `flag.Total hydrocarbons`))
+# should impossible/improbable NMHC values be flagged?
+# unit conversions
+wide$value.T_C = (wide$value.T - 32) * 5 / 9
+wide$flag.T_C = wide$flag.T
+wide$value.WS_ms = wide$value.WS / 1.944
+wide$flag.WS_ms = wide$flag.WS
 
 # write to sqlite
-wide = within(wide, time <- format(time, '%Y-%m-%d %H:%M:%S', tz = 'EST'))
+wide$time = format(wide$time, '%Y-%m-%d %H:%M:%S', tz = 'EST')
 interm_dir = file.path('analysis', 'intermediate')
 dir.create(interm_dir, F, T)
 dbpath = paste0('hourly_QC_AQS.sqlite') %>%
