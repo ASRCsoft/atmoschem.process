@@ -1,164 +1,164 @@
-"code","description","type","type_code","active","legacy_code","narsto"
-"1","Deviation from a CFR/Critical Criteria Requirement.","Quality Assurance Qualifier","QA",TRUE,NA,"V4"
-"1C","A 1-Point QC check exceeds acceptance criteria but there is compelling evidence that the analyzer data is valid.","Null Data Qualifier","NULL",TRUE,NA,NA
-"1V","Data reviewed and validated.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"2","Operational Deviation.","Quality Assurance Qualifier","QA",TRUE,NA,"V4"
-"3","Field Issue.","Quality Assurance Qualifier","QA",TRUE,NA,"V4"
-"4","Lab Issue.","Quality Assurance Qualifier","QA",TRUE,NA,"V4"
-"5","Outlier.","Quality Assurance Qualifier","QA",TRUE,NA,"M2"
-"6","QAPP Issue.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"7","Below Lowest Calibration Level.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"8","QA/QC Unknown.","Quality Assurance Qualifier","QA",FALSE,NA,NA
-"9","Negative value detected - zero reported.","Quality Assurance Qualifier","QA",TRUE,NA,"V7"
-"A","High Winds.","Informational Only","INFORM",FALSE,NA,NA
-"AA","Sample Pressure out of Limits.","Null Data Qualifier","NULL",TRUE,9967,NA
-"AB","Technician Unavaliable.","Null Data Qualifier","NULL",TRUE,9968,"M1"
-"AC","Construction/Repairs in Area.","Null Data Qualifier","NULL",TRUE,9969,"M2"
-"AD","Shelter Storm Damage.","Null Data Qualifier","NULL",TRUE,9970,NA
-"AE","Shelter Temperature Outside Limits.","Null Data Qualifier","NULL",TRUE,9971,"V4"
-"AF","Scheduled but not Collected.","Null Data Qualifier","NULL",TRUE,9972,"M1"
-"AG","Sample Time out of Limits.","Null Data Qualifier","NULL",TRUE,9973,"V6"
-"AH","Sample Flow Rate or CV out of Limits.","Null Data Qualifier","NULL",TRUE,9974,"M2"
-"AI","Insufficient Data (cannot calculate).","Null Data Qualifier","NULL",TRUE,9975,"M1"
-"AJ","Filter Damage.","Null Data Qualifier","NULL",TRUE,9976,"M1"
-"AK","Filter Leak.","Null Data Qualifier","NULL",TRUE,9977,"M1"
-"AL","Voided by Operator.","Null Data Qualifier","NULL",TRUE,9978,"M2"
-"AM","Miscellaneous Void.","Null Data Qualifier","NULL",TRUE,9979,"M2"
-"AN","Machine Malfunction.","Null Data Qualifier","NULL",TRUE,9980,"M2"
-"AO","Bad Weather.","Null Data Qualifier","NULL",TRUE,9981,"V0"
-"AP","Vandalism.","Null Data Qualifier","NULL",TRUE,9982,NA
-"AQ","Collection Error.","Null Data Qualifier","NULL",TRUE,9983,"M1"
-"AR","Lab Error.","Null Data Qualifier","NULL",TRUE,9984,"M1"
-"AS","Poor Quality Assurance Results.","Null Data Qualifier","NULL",TRUE,9985,"V4"
-"AT","Calibration.","Null Data Qualifier","NULL",TRUE,9986,NA
-"AU","Monitoring Waived.","Null Data Qualifier","NULL",TRUE,9987,"M1"
-"AV","Power Failure.","Null Data Qualifier","NULL",TRUE,9988,"M1"
-"AW","Wildlife Damage.","Null Data Qualifier","NULL",TRUE,9989,NA
-"AX","Precision Check.","Null Data Qualifier","NULL",TRUE,9990,NA
-"AY","Q C Control Points (zero/span).","Null Data Qualifier","NULL",TRUE,9991,NA
-"AZ","Q C Audit.","Null Data Qualifier","NULL",TRUE,9992,"M1"
-"B","Stratospheric Ozone Intrusion.","Informational Only","INFORM",FALSE,NA,NA
-"BA","Maintenance/Routine Repairs.","Null Data Qualifier","NULL",TRUE,9993,"M1"
-"BB","Unable to Reach Site.","Null Data Qualifier","NULL",TRUE,9994,"M1"
-"BC","Multi-point Calibration.","Null Data Qualifier","NULL",TRUE,9995,NA
-"BD","Auto Calibration.","Null Data Qualifier","NULL",TRUE,9996,NA
-"BE","Building/Site Repair.","Null Data Qualifier","NULL",TRUE,9997,"M1"
-"BF","Precision/Zero/Span.","Null Data Qualifier","NULL",TRUE,9998,NA
-"BG","Missing ozone data not likely to exceed level of standard.","Null Data Qualifier","NULL",TRUE,9966,NA
-"BH","Interference/co-elution/misidentification.","Null Data Qualifier","NULL",TRUE,9965,"M1"
-"BI","Lost or damaged in transit.","Null Data Qualifier","NULL",TRUE,9964,"M1"
-"BJ","Operator Error.","Null Data Qualifier","NULL",TRUE,9963,"M1"
-"BK","Site computer/data logger down.","Null Data Qualifier","NULL",TRUE,9962,NA
-"BL","QA Audit.","Null Data Qualifier","NULL",TRUE,9961,NA
-"BM","Accuracy check.","Null Data Qualifier","NULL",TRUE,9960,NA
-"BN","Sample Value Exceeds Media Limit.","Null Data Qualifier","NULL",TRUE,9947,NA
-"BR","Sample Value Below Acceptable Range.","Null Data Qualifier","NULL",TRUE,NA,NA
-"C","Volcanic Eruption.","Informational Only","INFORM",FALSE,NA,NA
-"CB","Values have been Blank Corrected.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"CC","Clean Canister Residue.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"CL","Surrogate Recoveries Outside Control Limits.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"CS","Laboratory Calibration Standard.","Null Data Qualifier","NULL",TRUE,9953,NA
-"D","Sandblasting.","Informational Only","INFORM",FALSE,NA,"M2"
-"DA","Aberrant Data (Corrupt Files, Aberrant Chromatography, Spikes, Shifts).","Null Data Qualifier","NULL",TRUE,9951,NA
-"DI","Sample was diluted for analysis.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"DL","Detection Limit Analyses.","Null Data Qualifier","NULL",TRUE,9949,NA
-"DN","DNPH peak less than NATTS TAD requirement, reported value should be considered an estimate.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"E","Forest Fire.","Request Exclusion","REQEXC",FALSE,NA,"V0"
-"EC","Exceeds Critical Criteria.","Null Data Qualifier","NULL",TRUE,NA,NA
-"EH","Estimated;  Exceeds Upper Range.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"F","Structural Fire.","Informational Only","INFORM",FALSE,NA,NA
-"FB","Field Blank Value Above Acceptable Limit.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"FI","Filter Inspection Flag.","Null Data Qualifier","NULL",TRUE,9959,NA
-"FX","Filter Integrity Issue.","Quality Assurance Qualifier","QA",TRUE,NA,"V4"
-"G","High Pollen Count.","Informational Only","INFORM",FALSE,NA,NA
-"H","Chem. Spills & Indust. Accidents.","Informational Only","INFORM",FALSE,NA,NA
-"HT","Sample pick-up hold time exceeded.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"I","Unusual Traffic Congestion.","Informational Only","INFORM",FALSE,NA,NA
-"IA","African Dust.","Informational Only","INFORM",TRUE,NA,NA
-"IB","Asian Dust.","Informational Only","INFORM",TRUE,NA,NA
-"IC","Chem. Spills & Indust Accidents.","Informational Only","INFORM",TRUE,NA,NA
-"ID","Cleanup After a Major Disaster.","Informational Only","INFORM",TRUE,NA,NA
-"IE","Demolition.","Informational Only","INFORM",TRUE,NA,"M2"
-"IF","Fire - Canadian.","Informational Only","INFORM",TRUE,NA,NA
-"IG","Fire - Mexico/Central America.","Informational Only","INFORM",TRUE,NA,NA
-"IH","Fireworks.","Informational Only","INFORM",TRUE,NA,"V0"
-"II","High Pollen Count.","Informational Only","INFORM",TRUE,NA,"V0"
-"IJ","High Winds.","Informational Only","INFORM",TRUE,NA,"V0"
-"IK","Infrequent Large Gatherings.","Informational Only","INFORM",TRUE,NA,"M2"
-"IL","Other.","Informational Only","INFORM",TRUE,NA,"V4"
-"IM","Prescribed Fire.","Informational Only","INFORM",TRUE,NA,NA
-"IN","Seismic Activity.","Informational Only","INFORM",TRUE,NA,NA
-"IO","Stratospheric Ozone Intrusion.","Informational Only","INFORM",TRUE,NA,NA
-"IP","Structural Fire.","Informational Only","INFORM",TRUE,NA,"M1"
-"IQ","Terrorist Act.","Informational Only","INFORM",TRUE,NA,NA
-"IR","Unique Traffic Disruption.","Informational Only","INFORM",TRUE,NA,NA
-"IS","Volcanic Eruptions.","Informational Only","INFORM",TRUE,NA,NA
-"IT","Wildfire-U. S.","Informational Only","INFORM",TRUE,NA,"V0"
-"IU","Wildland Fire Use Fire-U. S.","Informational Only","INFORM",FALSE,NA,NA
-"J","Construction.","Informational Only","INFORM",TRUE,NA,"M2"
-"K","Agricultural Tilling.","Informational Only","INFORM",FALSE,NA,NA
-"L","Highway Construction.","Informational Only","INFORM",FALSE,NA,"M2"
-"LB","Lab blank value above acceptable limit.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"LJ","Identification Of Analyte Is Acceptable; Reported Value Is An Estimate.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"LK","Analyte Identified; Reported Value May Be Biased High.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"LL","Analyte Identified; Reported Value May Be Biased Low.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"M","Rerouting of Traffic.","Informational Only","INFORM",FALSE,NA,NA
-"MB","Method Blank (Analytical).","Null Data Qualifier","NULL",TRUE,9955,NA
-"MC","Module End Cap Missing.","Null Data Qualifier","NULL",TRUE,9958,NA
-"MD","Value less than MDL.","Quality Assurance Qualifier","QA",TRUE,NA,"V1"
-"MS","Value reported is 1/2 MDL substituted.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"MX","Matrix Effect.","Quality Assurance Qualifier","QA",TRUE,NA,"V4"
-"N","Sanding/Salting of Streets.","Informational Only","INFORM",FALSE,NA,"M2"
-"ND","No Value Detected, Zero Reported.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"NS","Influenced by nearby source.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"O","Infrequent Large Gatherings.","Informational Only","INFORM",FALSE,NA,NA
-"P","Roofing Operations.","Informational Only","INFORM",FALSE,NA,NA
-"PQ","Values Between PQL And MDL.","Quality Assurance Qualifier","QA",FALSE,NA,NA
-"Q","Prescribed Burning.","Informational Only","INFORM",FALSE,NA,NA
-"QP","Pressure Sensor Questionable.","Quality Assurance Qualifier","QA",TRUE,NA,"V4"
-"QT","Temperature Sensor Questionable.","Quality Assurance Qualifier","QA",TRUE,NA,"V4"
-"QV","Quality Control Multi-point Verification.","Null Data Qualifier","NULL",TRUE,NA,NA
-"QX","Does not meet QC criteria.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"R","Cleanup After a Major Disaster.","Informational Only","INFORM",FALSE,NA,NA
-"RA","African Dust.","Request Exclusion","REQEXC",TRUE,NA,NA
-"RB","Asian Dust.","Request Exclusion","REQEXC",TRUE,NA,NA
-"RC","Chemical Spills & Industrial Accidents.","Request Exclusion","REQEXC",TRUE,NA,NA
-"RD","Cleanup After a Major Disaster.","Request Exclusion","REQEXC",TRUE,NA,NA
-"RE","Demolition.","Request Exclusion","REQEXC",TRUE,NA,NA
-"RF","Fire - Canadian.","Request Exclusion","REQEXC",TRUE,NA,NA
-"RG","Fire - Mexico/Central America.","Request Exclusion","REQEXC",TRUE,NA,NA
-"RH","Fireworks.","Request Exclusion","REQEXC",TRUE,NA,NA
-"RI","High Pollen Count.","Request Exclusion","REQEXC",TRUE,NA,NA
-"RJ","High Winds.","Request Exclusion","REQEXC",TRUE,NA,NA
-"RK","Infrequent Large Gatherings.","Request Exclusion","REQEXC",TRUE,NA,NA
-"RL","Other.","Request Exclusion","REQEXC",TRUE,NA,NA
-"RM","Prescribed Fire.","Request Exclusion","REQEXC",TRUE,NA,NA
-"RN","Seismic Activity.","Request Exclusion","REQEXC",TRUE,NA,NA
-"RO","Stratospheric Ozone Intrusion.","Request Exclusion","REQEXC",TRUE,NA,NA
-"RP","Structural Fire.","Request Exclusion","REQEXC",TRUE,NA,NA
-"RQ","Terrorist Act.","Request Exclusion","REQEXC",TRUE,NA,NA
-"RR","Unique Traffic Disruption.","Request Exclusion","REQEXC",TRUE,NA,NA
-"RS","Volcanic Eruptions.","Request Exclusion","REQEXC",TRUE,NA,NA
-"RT","Wildfire-U. S.","Request Exclusion","REQEXC",TRUE,NA,NA
-"RU","Wildland Fire Use Fire-U. S.","Request Exclusion","REQEXC",FALSE,NA,NA
-"S","Seismic Activity.","Informational Only","INFORM",FALSE,NA,NA
-"SA","Storm Approaching.","Null Data Qualifier","NULL",TRUE,9957,"V0"
-"SC","Sampler Contamination.","Null Data Qualifier","NULL",TRUE,9948,NA
-"SQ","Values Between SQL and MDL.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"SS","Value substituted from secondary monitor.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"ST","Calibration Verification Standard.","Null Data Qualifier","NULL",TRUE,9954,NA
-"SV","Sample Volume out of limits.","Null Data Qualifier","NULL",TRUE,NA,NA
-"SX","Does Not Meet Siting Criteria.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"T","Multiple PM2.5 Validity Flags.","Quality Assurance Qualifier","QA",FALSE,NA,NA
-"TB","Trip Blank Value Above Acceptable Limit.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"TC","Component Check & Retention Time Standard.","Null Data Qualifier","NULL",TRUE,9952,NA
-"TS","Holding Time Or Transport Temperature Is Out Of Specs.","Null Data Qualifier","NULL",TRUE,9956,NA
-"TT","Transport Temperaure is Out of Specs.","Quality Assurance Qualifier","QA",TRUE,NA,"V6"
-"U","Sahara Dust.","Informational Only","INFORM",FALSE,NA,NA
-"V","Validated Value.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"VB","Value below normal; no reason to invalidate.","Quality Assurance Qualifier","QA",TRUE,NA,NA
-"W","Flow Rate Average out of Spec.","Quality Assurance Qualifier","QA",TRUE,NA,"V4"
-"X","Filter Temperature Difference or Average out of Spec.","Quality Assurance Qualifier","QA",TRUE,NA,"V4"
-"XX","Experimental Data.","Null Data Qualifier","NULL",TRUE,9950,NA
-"Y","Elapsed Sample Time out of Spec.","Quality Assurance Qualifier","QA",TRUE,NA,"V6"
-"Z","Other event.","Informational Only","INFORM",FALSE,NA,NA
+"code","description","type","type_code","active","legacy_code"
+"1","Deviation from a CFR/Critical Criteria Requirement.","Quality Assurance Qualifier","QA",TRUE,NA
+"1C","A 1-Point QC check exceeds acceptance criteria but there is compelling evidence that the analyzer data is valid.","Null Data Qualifier","NULL",TRUE,NA
+"1V","Data reviewed and validated.","Quality Assurance Qualifier","QA",TRUE,NA
+"2","Operational Deviation.","Quality Assurance Qualifier","QA",TRUE,NA
+"3","Field Issue.","Quality Assurance Qualifier","QA",TRUE,NA
+"4","Lab Issue.","Quality Assurance Qualifier","QA",TRUE,NA
+"5","Outlier.","Quality Assurance Qualifier","QA",TRUE,NA
+"6","QAPP Issue.","Quality Assurance Qualifier","QA",TRUE,NA
+"7","Below Lowest Calibration Level.","Quality Assurance Qualifier","QA",TRUE,NA
+"8","QA/QC Unknown.","Quality Assurance Qualifier","QA",FALSE,NA
+"9","Negative value detected - zero reported.","Quality Assurance Qualifier","QA",TRUE,NA
+"A","High Winds.","Informational Only","INFORM",FALSE,NA
+"AA","Sample Pressure out of Limits.","Null Data Qualifier","NULL",TRUE,9967
+"AB","Technician Unavaliable.","Null Data Qualifier","NULL",TRUE,9968
+"AC","Construction/Repairs in Area.","Null Data Qualifier","NULL",TRUE,9969
+"AD","Shelter Storm Damage.","Null Data Qualifier","NULL",TRUE,9970
+"AE","Shelter Temperature Outside Limits.","Null Data Qualifier","NULL",TRUE,9971
+"AF","Scheduled but not Collected.","Null Data Qualifier","NULL",TRUE,9972
+"AG","Sample Time out of Limits.","Null Data Qualifier","NULL",TRUE,9973
+"AH","Sample Flow Rate or CV out of Limits.","Null Data Qualifier","NULL",TRUE,9974
+"AI","Insufficient Data (cannot calculate).","Null Data Qualifier","NULL",TRUE,9975
+"AJ","Filter Damage.","Null Data Qualifier","NULL",TRUE,9976
+"AK","Filter Leak.","Null Data Qualifier","NULL",TRUE,9977
+"AL","Voided by Operator.","Null Data Qualifier","NULL",TRUE,9978
+"AM","Miscellaneous Void.","Null Data Qualifier","NULL",TRUE,9979
+"AN","Machine Malfunction.","Null Data Qualifier","NULL",TRUE,9980
+"AO","Bad Weather.","Null Data Qualifier","NULL",TRUE,9981
+"AP","Vandalism.","Null Data Qualifier","NULL",TRUE,9982
+"AQ","Collection Error.","Null Data Qualifier","NULL",TRUE,9983
+"AR","Lab Error.","Null Data Qualifier","NULL",TRUE,9984
+"AS","Poor Quality Assurance Results.","Null Data Qualifier","NULL",TRUE,9985
+"AT","Calibration.","Null Data Qualifier","NULL",TRUE,9986
+"AU","Monitoring Waived.","Null Data Qualifier","NULL",TRUE,9987
+"AV","Power Failure.","Null Data Qualifier","NULL",TRUE,9988
+"AW","Wildlife Damage.","Null Data Qualifier","NULL",TRUE,9989
+"AX","Precision Check.","Null Data Qualifier","NULL",TRUE,9990
+"AY","Q C Control Points (zero/span).","Null Data Qualifier","NULL",TRUE,9991
+"AZ","Q C Audit.","Null Data Qualifier","NULL",TRUE,9992
+"B","Stratospheric Ozone Intrusion.","Informational Only","INFORM",FALSE,NA
+"BA","Maintenance/Routine Repairs.","Null Data Qualifier","NULL",TRUE,9993
+"BB","Unable to Reach Site.","Null Data Qualifier","NULL",TRUE,9994
+"BC","Multi-point Calibration.","Null Data Qualifier","NULL",TRUE,9995
+"BD","Auto Calibration.","Null Data Qualifier","NULL",TRUE,9996
+"BE","Building/Site Repair.","Null Data Qualifier","NULL",TRUE,9997
+"BF","Precision/Zero/Span.","Null Data Qualifier","NULL",TRUE,9998
+"BG","Missing ozone data not likely to exceed level of standard.","Null Data Qualifier","NULL",TRUE,9966
+"BH","Interference/co-elution/misidentification.","Null Data Qualifier","NULL",TRUE,9965
+"BI","Lost or damaged in transit.","Null Data Qualifier","NULL",TRUE,9964
+"BJ","Operator Error.","Null Data Qualifier","NULL",TRUE,9963
+"BK","Site computer/data logger down.","Null Data Qualifier","NULL",TRUE,9962
+"BL","QA Audit.","Null Data Qualifier","NULL",TRUE,9961
+"BM","Accuracy check.","Null Data Qualifier","NULL",TRUE,9960
+"BN","Sample Value Exceeds Media Limit.","Null Data Qualifier","NULL",TRUE,9947
+"BR","Sample Value Below Acceptable Range.","Null Data Qualifier","NULL",TRUE,NA
+"C","Volcanic Eruption.","Informational Only","INFORM",FALSE,NA
+"CB","Values have been Blank Corrected.","Quality Assurance Qualifier","QA",TRUE,NA
+"CC","Clean Canister Residue.","Quality Assurance Qualifier","QA",TRUE,NA
+"CL","Surrogate Recoveries Outside Control Limits.","Quality Assurance Qualifier","QA",TRUE,NA
+"CS","Laboratory Calibration Standard.","Null Data Qualifier","NULL",TRUE,9953
+"D","Sandblasting.","Informational Only","INFORM",FALSE,NA
+"DA","Aberrant Data (Corrupt Files, Aberrant Chromatography, Spikes, Shifts).","Null Data Qualifier","NULL",TRUE,9951
+"DI","Sample was diluted for analysis.","Quality Assurance Qualifier","QA",TRUE,NA
+"DL","Detection Limit Analyses.","Null Data Qualifier","NULL",TRUE,9949
+"DN","DNPH peak less than NATTS TAD requirement, reported value should be considered an estimate.","Quality Assurance Qualifier","QA",TRUE,NA
+"E","Forest Fire.","Request Exclusion","REQEXC",FALSE,NA
+"EC","Exceeds Critical Criteria.","Null Data Qualifier","NULL",TRUE,NA
+"EH","Estimated;  Exceeds Upper Range.","Quality Assurance Qualifier","QA",TRUE,NA
+"F","Structural Fire.","Informational Only","INFORM",FALSE,NA
+"FB","Field Blank Value Above Acceptable Limit.","Quality Assurance Qualifier","QA",TRUE,NA
+"FI","Filter Inspection Flag.","Null Data Qualifier","NULL",TRUE,9959
+"FX","Filter Integrity Issue.","Quality Assurance Qualifier","QA",TRUE,NA
+"G","High Pollen Count.","Informational Only","INFORM",FALSE,NA
+"H","Chem. Spills & Indust. Accidents.","Informational Only","INFORM",FALSE,NA
+"HT","Sample pick-up hold time exceeded.","Quality Assurance Qualifier","QA",TRUE,NA
+"I","Unusual Traffic Congestion.","Informational Only","INFORM",FALSE,NA
+"IA","African Dust.","Informational Only","INFORM",TRUE,NA
+"IB","Asian Dust.","Informational Only","INFORM",TRUE,NA
+"IC","Chem. Spills & Indust Accidents.","Informational Only","INFORM",TRUE,NA
+"ID","Cleanup After a Major Disaster.","Informational Only","INFORM",TRUE,NA
+"IE","Demolition.","Informational Only","INFORM",TRUE,NA
+"IF","Fire - Canadian.","Informational Only","INFORM",TRUE,NA
+"IG","Fire - Mexico/Central America.","Informational Only","INFORM",TRUE,NA
+"IH","Fireworks.","Informational Only","INFORM",TRUE,NA
+"II","High Pollen Count.","Informational Only","INFORM",TRUE,NA
+"IJ","High Winds.","Informational Only","INFORM",TRUE,NA
+"IK","Infrequent Large Gatherings.","Informational Only","INFORM",TRUE,NA
+"IL","Other.","Informational Only","INFORM",TRUE,NA
+"IM","Prescribed Fire.","Informational Only","INFORM",TRUE,NA
+"IN","Seismic Activity.","Informational Only","INFORM",TRUE,NA
+"IO","Stratospheric Ozone Intrusion.","Informational Only","INFORM",TRUE,NA
+"IP","Structural Fire.","Informational Only","INFORM",TRUE,NA
+"IQ","Terrorist Act.","Informational Only","INFORM",TRUE,NA
+"IR","Unique Traffic Disruption.","Informational Only","INFORM",TRUE,NA
+"IS","Volcanic Eruptions.","Informational Only","INFORM",TRUE,NA
+"IT","Wildfire-U. S.","Informational Only","INFORM",TRUE,NA
+"IU","Wildland Fire Use Fire-U. S.","Informational Only","INFORM",FALSE,NA
+"J","Construction.","Informational Only","INFORM",TRUE,NA
+"K","Agricultural Tilling.","Informational Only","INFORM",FALSE,NA
+"L","Highway Construction.","Informational Only","INFORM",FALSE,NA
+"LB","Lab blank value above acceptable limit.","Quality Assurance Qualifier","QA",TRUE,NA
+"LJ","Identification Of Analyte Is Acceptable; Reported Value Is An Estimate.","Quality Assurance Qualifier","QA",TRUE,NA
+"LK","Analyte Identified; Reported Value May Be Biased High.","Quality Assurance Qualifier","QA",TRUE,NA
+"LL","Analyte Identified; Reported Value May Be Biased Low.","Quality Assurance Qualifier","QA",TRUE,NA
+"M","Rerouting of Traffic.","Informational Only","INFORM",FALSE,NA
+"MB","Method Blank (Analytical).","Null Data Qualifier","NULL",TRUE,9955
+"MC","Module End Cap Missing.","Null Data Qualifier","NULL",TRUE,9958
+"MD","Value less than MDL.","Quality Assurance Qualifier","QA",TRUE,NA
+"MS","Value reported is 1/2 MDL substituted.","Quality Assurance Qualifier","QA",TRUE,NA
+"MX","Matrix Effect.","Quality Assurance Qualifier","QA",TRUE,NA
+"N","Sanding/Salting of Streets.","Informational Only","INFORM",FALSE,NA
+"ND","No Value Detected, Zero Reported.","Quality Assurance Qualifier","QA",TRUE,NA
+"NS","Influenced by nearby source.","Quality Assurance Qualifier","QA",TRUE,NA
+"O","Infrequent Large Gatherings.","Informational Only","INFORM",FALSE,NA
+"P","Roofing Operations.","Informational Only","INFORM",FALSE,NA
+"PQ","Values Between PQL And MDL.","Quality Assurance Qualifier","QA",FALSE,NA
+"Q","Prescribed Burning.","Informational Only","INFORM",FALSE,NA
+"QP","Pressure Sensor Questionable.","Quality Assurance Qualifier","QA",TRUE,NA
+"QT","Temperature Sensor Questionable.","Quality Assurance Qualifier","QA",TRUE,NA
+"QV","Quality Control Multi-point Verification.","Null Data Qualifier","NULL",TRUE,NA
+"QX","Does not meet QC criteria.","Quality Assurance Qualifier","QA",TRUE,NA
+"R","Cleanup After a Major Disaster.","Informational Only","INFORM",FALSE,NA
+"RA","African Dust.","Request Exclusion","REQEXC",TRUE,NA
+"RB","Asian Dust.","Request Exclusion","REQEXC",TRUE,NA
+"RC","Chemical Spills & Industrial Accidents.","Request Exclusion","REQEXC",TRUE,NA
+"RD","Cleanup After a Major Disaster.","Request Exclusion","REQEXC",TRUE,NA
+"RE","Demolition.","Request Exclusion","REQEXC",TRUE,NA
+"RF","Fire - Canadian.","Request Exclusion","REQEXC",TRUE,NA
+"RG","Fire - Mexico/Central America.","Request Exclusion","REQEXC",TRUE,NA
+"RH","Fireworks.","Request Exclusion","REQEXC",TRUE,NA
+"RI","High Pollen Count.","Request Exclusion","REQEXC",TRUE,NA
+"RJ","High Winds.","Request Exclusion","REQEXC",TRUE,NA
+"RK","Infrequent Large Gatherings.","Request Exclusion","REQEXC",TRUE,NA
+"RL","Other.","Request Exclusion","REQEXC",TRUE,NA
+"RM","Prescribed Fire.","Request Exclusion","REQEXC",TRUE,NA
+"RN","Seismic Activity.","Request Exclusion","REQEXC",TRUE,NA
+"RO","Stratospheric Ozone Intrusion.","Request Exclusion","REQEXC",TRUE,NA
+"RP","Structural Fire.","Request Exclusion","REQEXC",TRUE,NA
+"RQ","Terrorist Act.","Request Exclusion","REQEXC",TRUE,NA
+"RR","Unique Traffic Disruption.","Request Exclusion","REQEXC",TRUE,NA
+"RS","Volcanic Eruptions.","Request Exclusion","REQEXC",TRUE,NA
+"RT","Wildfire-U. S.","Request Exclusion","REQEXC",TRUE,NA
+"RU","Wildland Fire Use Fire-U. S.","Request Exclusion","REQEXC",FALSE,NA
+"S","Seismic Activity.","Informational Only","INFORM",FALSE,NA
+"SA","Storm Approaching.","Null Data Qualifier","NULL",TRUE,9957
+"SC","Sampler Contamination.","Null Data Qualifier","NULL",TRUE,9948
+"SQ","Values Between SQL and MDL.","Quality Assurance Qualifier","QA",TRUE,NA
+"SS","Value substituted from secondary monitor.","Quality Assurance Qualifier","QA",TRUE,NA
+"ST","Calibration Verification Standard.","Null Data Qualifier","NULL",TRUE,9954
+"SV","Sample Volume out of limits.","Null Data Qualifier","NULL",TRUE,NA
+"SX","Does Not Meet Siting Criteria.","Quality Assurance Qualifier","QA",TRUE,NA
+"T","Multiple PM2.5 Validity Flags.","Quality Assurance Qualifier","QA",FALSE,NA
+"TB","Trip Blank Value Above Acceptable Limit.","Quality Assurance Qualifier","QA",TRUE,NA
+"TC","Component Check & Retention Time Standard.","Null Data Qualifier","NULL",TRUE,9952
+"TS","Holding Time Or Transport Temperature Is Out Of Specs.","Null Data Qualifier","NULL",TRUE,9956
+"TT","Transport Temperaure is Out of Specs.","Quality Assurance Qualifier","QA",TRUE,NA
+"U","Sahara Dust.","Informational Only","INFORM",FALSE,NA
+"V","Validated Value.","Quality Assurance Qualifier","QA",TRUE,NA
+"VB","Value below normal; no reason to invalidate.","Quality Assurance Qualifier","QA",TRUE,NA
+"W","Flow Rate Average out of Spec.","Quality Assurance Qualifier","QA",TRUE,NA
+"X","Filter Temperature Difference or Average out of Spec.","Quality Assurance Qualifier","QA",TRUE,NA
+"XX","Experimental Data.","Null Data Qualifier","NULL",TRUE,9950
+"Y","Elapsed Sample Time out of Spec.","Quality Assurance Qualifier","QA",TRUE,NA
+"Z","Other event.","Informational Only","INFORM",FALSE,NA
