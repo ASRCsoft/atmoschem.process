@@ -46,10 +46,10 @@ get_site_df = function(site) {
     names(meas) = names(meas) %>%
       sub('^value\\.', '', .) %>%
       sub('^flag\\.(.*)', '\\1 (flag)', .)
-    old_params = sub(' \\(flag\\)$', '', names(meas)[-1])
+    old_params = sub(' \\(.*\\)$', '', names(meas)[-1])
     new_params = s_cols$column[match(old_params, s_cols$measurement)]
     names(meas)[-1] =
-      paste0(new_params, sub('.*( \\(flag\\))$', '\\1', names(meas)[-1]))
+      paste0(new_params, sub('.*( \\(.*\\))$', '\\1', names(meas)[-1]))
     names(meas)[1] = 'Time (EST)'
     meas_list[[s]] = meas
   }
