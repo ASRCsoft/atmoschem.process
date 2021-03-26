@@ -3,7 +3,7 @@
 # run this script from the project root directory with
 # Rscript analysis/scripts/queens.R
 
-# produces file analysis/intermediate/hourly_queens.sqlite
+# produces file analysis/intermediate/hourly_QC_AQS.sqlite
 
 library(magrittr)
 library(atmoschem.process)
@@ -111,7 +111,7 @@ wide %<>%
 wide = within(wide, time <- format(time, '%Y-%m-%d %H:%M:%S', tz = 'EST'))
 interm_dir = file.path('analysis', 'intermediate')
 dir.create(interm_dir, F, T)
-dbpath = paste0('hourly_queens.sqlite') %>%
+dbpath = paste0('hourly_QC_AQS.sqlite') %>%
   file.path(interm_dir, .)
 db = dbConnect(SQLite(), dbpath)
 dbWriteTable(db, 'measurements', wide, overwrite = T)
