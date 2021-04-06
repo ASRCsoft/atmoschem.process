@@ -24,7 +24,8 @@ get_raw = function(s, ds, m, t1, t2) {
   sql = sqlInterpolate(db, q, dbQuoteIdentifier(db, param_col),
                        dbQuoteIdentifier(db, param_fcol),
                        format(t1, tz = 'EST'), format(t2, tz = 'EST'))
-  res = dbGetQuery(db, sql)
+  res = try(dbGetQuery(db, sql))
+  if (inherits(res, 'try-error')) return(data.frame())
   res[, 1] = as.POSIXct(res[, 1], tz = 'EST')
   # booleans are stored as numbers in SQLite so they need to be converted
   res[, 3] = !is.na(res[, 3]) & as.logical(res[, 3])
@@ -41,7 +42,8 @@ get_processed = function(s, ds, m, t1, t2) {
   sql = sqlInterpolate(db, q, dbQuoteIdentifier(db, param_col),
                        dbQuoteIdentifier(db, param_fcol),
                        format(t1, tz = 'EST'), format(t2, tz = 'EST'))
-  res = dbGetQuery(db, sql)
+  res = try(dbGetQuery(db, sql))
+  if (inherits(res, 'try-error')) return(data.frame())
   res[, 1] = as.POSIXct(res[, 1], tz = 'EST')
   # booleans are stored as numbers in SQLite so they need to be converted
   res[, 3] = !is.na(res[, 3]) & as.logical(res[, 3])
@@ -172,7 +174,8 @@ get_hourly = function(s, ds, m, t1, t2) {
   sql = sqlInterpolate(db, q, dbQuoteIdentifier(db, param_col),
                        dbQuoteIdentifier(db, param_fcol),
                        format(t1, tz = 'EST'), format(t2, tz = 'EST'))
-  res = dbGetQuery(db, sql)
+  res = try(dbGetQuery(db, sql))
+  if (inherits(res, 'try-error')) return(data.frame())
   res[, 1] = as.POSIXct(res[, 1], tz = 'EST')
   res
 }
