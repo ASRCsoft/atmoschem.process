@@ -19,6 +19,8 @@ read_campbell = function(f) {
   names(df)[1] = 'instrument_time'
   ## replace 'CupA' with 'Cup' for consistency over time
   names(df) = gsub('CupA', 'Cup', names(df))
+  # ... except for the newer columns that I want to keep for now
+  names(df) = gsub('Cup_S', 'CupA_S', names(df))
   ## remove empty columns
   df[, -grep('Spare', names(df), ignore.case = T)]
 }
@@ -45,6 +47,13 @@ fix_wfms = function(df) {
   ## replace malfunctioning wind direction values with NA
   df[df$WindDir_SD1_WVT == 0,
      c('WindDir_D1_WVT', 'WindDir_SD1_WVT')] = NA
+  # a few column names got messed up 2020-06-30 when changes were made to wind
+  # columns
+  if ('WS3CupB_SWS3CupB_S_WVT' %in% names(df)) {
+    cupb_col = match('WS3CupB_SWS3CupB_S_WVT', names(df))
+    names(df)[cupb_col:(cupb_col + 3)] = 
+      c('WS3CupB_S', 'WS3CupB_S_WVT', 'WindDirB_D1_WVT', 'WindDirB_SD1_WVT')
+  }
   df
 }
 

@@ -264,9 +264,29 @@ if (site == 'WFMS') {
     meas$value.SLP =
       with(pr_meas, sea_level_pressure(value.BP, value.T, 1483.5))
     meas$flagged.SLP = with(pr_meas, flagged.BP | flagged.T)
-    # WS (wind shadow corrected)
+    # WS/WD (wind shadow corrected)
     meas$value.WS = with(pr_meas, pmax(value.WS3Cup, value.WS3CupB, na.rm = T))
     meas$flagged.WS = with(pr_meas, flagged.WS3Cup & flagged.WS3CupB)
+    meas$value.WD = pr_meas$value.WindDir_D1_WVT
+    meas$flagged.WD = pr_meas$flagged.WindDir_D1_WVT
+    # WS/WD continued (new columns starting 2020-06-30)
+    new_winds = pr_meas$time >= as.POSIXct('2020-06-30 13:57', tz = 'EST')
+    a_valid = with(pr_meas[new_winds, ],
+                   !is.na(value.WS3CupA_S_WVT) & !flagged.WS3CupA_S_WVT)
+    a_ge_b = with(pr_meas[new_winds, ],
+                  a_valid & value.WS3CupA_S_WVT >= value.WS3CupB_S_WVT)
+    meas$value.WS[new_winds] =
+      with(pr_meas[new_winds, ],
+           ifelse(a_ge_b, value.WS3CupA_S_WVT, value.WS3CupB_S_WVT))
+    meas$flagged.WS[new_winds] =
+      with(pr_meas[new_winds, ],
+           ifelse(a_ge_b, flagged.WS3CupA_S_WVT, flagged.WS3CupB_S_WVT))
+    meas$value.WD[new_winds] =
+      with(pr_meas[new_winds, ],
+           ifelse(a_ge_b, value.WindDirA_D1_WVT, value.WindDirB_D1_WVT))
+    meas$flagged.WD[new_winds] =
+      with(pr_meas[new_winds, ],
+           ifelse(a_ge_b, flagged.WindDirA_D1_WVT, flagged.WindDirB_D1_WVT))
     # WS_max (wind shadow corrected)
     meas$value.WS_Max =
       with(pr_meas, pmax(value.WS3Cup_Max, value.WS3CupB_Max, na.rm = T))

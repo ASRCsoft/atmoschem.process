@@ -10,7 +10,7 @@ WFMS,T,"[2018-10-01, 2020-07-01)",campbell,T,,
 WFMS,RH,"[2018-10-01, 2020-07-01)",campbell,RH,,
 WFMS,WS,"[2018-10-01, 2020-07-01)",campbell,WS,,
 WFMS,WD,"[2018-10-01, 2020-07-01)",,,,degrees
-WFMS,WD_V,"[2018-10-01, 2020-07-01)",campbell,WindDir_D1_WVT,,
+WFMS,WD_V,"[2018-10-01, 2020-07-01)",campbell,WD,,
 WFMS,WS_Max,"[2018-10-01, 2020-07-01)",campbell,WS_Max,,
 WFMS,BP,"[2018-10-01, 2020-07-01)",campbell,BP,,
 WFMS,SLP,"[2018-10-01, 2020-07-01)",campbell,SLP,,
