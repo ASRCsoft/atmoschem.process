@@ -62,21 +62,18 @@ for (site in config$sites$abbreviation) {
   old_processed_file = file.path(old_processed_dir, csv_file)
   out_file = file.path(out_dir, paste0('hourly_', site, '.csv'))
 
-  if (site == 'QC') {
-    # reprocessing everything, so don't really need this
-    oldp = read.csv(old_processed_file, na.strings = c('NA', '-999'),
-                    check.names = FALSE, nrows = 1)
-  } else {
+  if (site != 'QC') {
+    # reprocessing all QC data, so don't care about the old QC files
     oldp = read.csv(old_processed_file, na.strings = c('NA', '-999'),
                     check.names = FALSE)
     oldp$`Time (EST)` = as.POSIXct(oldp$`Time (EST)`, tz = 'EST')
+    names(oldp) = gsub('\\(AQS_flag\\)', '\\(AQS flag\\)', names(oldp))
   }
 
   newp = get_site_df(site)
   # make sure flag column names are all formatted consistently
   names(newp) = gsub('\\(NARSTO\\)', '\\(flag\\)', names(newp))
   names(newp) = gsub('\\(AQS\\)', '\\(AQS flag\\)', names(newp))
-  names(oldp) = gsub('\\(AQS_flag\\)', '\\(AQS flag\\)', names(oldp))
 
   # fix a silly inconsistency in the lodge data
   if (site == 'WFML') {
@@ -84,10 +81,12 @@ for (site in config$sites$abbreviation) {
     names(newp) = gsub('Precip \\(flag\\)', 'Precip since 00Z \\(flag\\)', names(newp))
   }
 
-  # make sure datasets have the same columns
-  all_cols = union(names(newp), names(oldp))
-  oldp[setdiff(names(newp), names(oldp))] = NA
-  newp[setdiff(names(oldp), names(newp))] = NA
+  if (site != 'QC') {
+    # make sure datasets have the same columns
+    all_cols = union(names(newp), names(oldp))
+    oldp[setdiff(names(newp), names(oldp))] = NA
+    newp[setdiff(names(oldp), names(newp))] = NA
+  }
 
   # put the columns in the correct ordering
   cols = data.frame(name = all_cols)
@@ -97,13 +96,12 @@ for (site in config$sites$abbreviation) {
   cols$aqs_flag = grepl('AQS flag\\)$', cols$name)
   cols$order = with(cols, order(!time, param, flag, aqs_flag))
   cols = cols[cols$order, ]
-
-  oldp = oldp[, cols$name]
   newp = newp[, cols$name]
 
   if (site == 'QC') {
     pout = newp
   } else {
+    oldp = oldp[, cols$name]
     pout = rbind(oldp, newp)
   }
 
