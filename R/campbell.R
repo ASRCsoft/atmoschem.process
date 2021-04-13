@@ -44,6 +44,8 @@ fix_wfms = function(df) {
               df$instrument_time < '2019-11-15'] = 1
   df$F_NOX_Avg[df$instrument_time >= '2020-02-25 12:01' &
                df$instrument_time < '2020-03-05 10:37'] = 1
+  df$F_CO_Avg[df$instrument_time >= '2020-07-15 14:03' &
+              df$instrument_time < '2020-07-22 12:00'] = 1
   ## replace malfunctioning wind direction values with NA
   df[df$WindDir_SD1_WVT == 0,
      c('WindDir_D1_WVT', 'WindDir_SD1_WVT')] = NA
