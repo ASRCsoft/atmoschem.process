@@ -158,6 +158,9 @@ WFMS,campbell,CO,"[2020-05-22, 2020-05-29)",AN,pump issues
 WFMS,campbell,CO,"[2020-06-21 14:00, 2020-06-24 09:00)",AN,fuse
 WFMS,campbell,Ozone,"[2020-06-24, 2020-07-01)",AM,unknown
 WFMS,campbell,CO,"[2020-09-09 09:45, 2020-09-09 13:56)",AT,Pico checks
+WFMS,campbell,NOy,"[2020-11-20, 2020-11-20 07:18)",AM,unknown
+WFMS,campbell,SO2,"[2020-12-02 09:40, 2020-12-09 10:40)",AM,unknown
+WFMS,campbell,RH,"[2020-12-23, 2020-12-30 03:00)",AM,unknown
 WFML,campbell,NO,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
 WFML,campbell,NOX,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
 WFML,campbell,CO,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
