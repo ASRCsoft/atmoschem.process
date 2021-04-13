@@ -103,6 +103,7 @@ is_flagged = function(x, config, flagged = FALSE) {
       ## calibrations) during outlier detection
       replace(flagged, NA) %>%
       { if (is_true(config$spike_log_transform)) log(.) else . } %>%
+      replace(., is.infinite(.), NA) %>%
       hampel_outlier(config$spike_window) %>%
       replace(., is.na(.), FALSE)
   } else {
@@ -115,7 +116,7 @@ is_flagged = function(x, config, flagged = FALSE) {
                            config$lower_inc, config$upper_inc)
     is_valid[is.na(is_valid)] = FALSE
   } else {
-    is_valid = TRUE
+    is_valid = !is.na(x) & !is.infinite(x)
   }
 
   ## check for abrupt jumps
