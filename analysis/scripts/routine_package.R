@@ -53,7 +53,10 @@ get_site_df = function(site) {
     names(meas)[1] = 'Time (EST)'
     meas_list[[s]] = meas
   }
-  Reduce(function(x, y) merge(x, y, all = T), meas_list)
+  Reduce(function(x, y) merge(x, y, all = T), meas_list) %>%
+    # when there are multiple columns of the same name, the non-empty rows go
+    # first
+    subset(!duplicated(`Time (EST)`))
 }
 
 for (site in config$sites$abbreviation) {
