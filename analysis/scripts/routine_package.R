@@ -20,7 +20,7 @@ config = read_csv_dir('analysis/config')
 # column names from report_columns
 get_site_df = function(site) {
   site_sources = config$dataloggers$name[config$dataloggers$site == site]
-  meas_list = list()
+  out = data.frame(time = numeric())
   for (s in site_sources) {
     dbpath = file.path('analysis', 'intermediate',
                        paste0('hourly_', site, '_', s, '.sqlite'))
@@ -28,35 +28,36 @@ get_site_df = function(site) {
     meas = dbReadTable(db, 'measurements', check.names = F)
     dbDisconnect(db)
     meas$time = as.POSIXct(meas$time, tz = 'EST')
+    # update out times
+    out = merge(out, meas[, 'time', drop = F], all = T)
     # get only the parameters included in the dataset
     s_cols = config$report_columns[config$report_columns$site == site, ] %>%
       subset(data_source == s)
-    params = c('time', s_cols$measurement)
-    meas = meas[, sub('^value\\.|^flag\\.', '', names(meas)) %in% params]
-    # add units to vals column names
     mtypes = config$channels[config$channels$site == site &
                              config$channels$data_source == s, ]
-    val_cols = grep('^value\\.', names(meas))
-    units = names(meas)[val_cols] %>%
-      sub('^value\\.', '', .) %>%
-      match(mtypes$name) %>%
-      mtypes$units[.]
-    names(meas)[val_cols] = paste0(names(meas)[val_cols], ' (', units, ')')
-    # fix column name formatting
-    names(meas) = names(meas) %>%
-      sub('^value\\.', '', .) %>%
-      sub('^flag\\.(.*)', '\\1 (flag)', .)
-    old_params = sub(' \\(.*\\)$', '', names(meas)[-1])
-    new_params = s_cols$column[match(old_params, s_cols$measurement)]
-    names(meas)[-1] =
-      paste0(new_params, sub('.*( \\(.*\\))$', '\\1', names(meas)[-1]))
-    names(meas)[1] = 'Time (EST)'
-    meas_list[[s]] = meas
+    params = c('time', s_cols$measurement)
+    meas = meas[, sub('^value\\.|^flag\\.', '', names(meas)) %in% params]
+    for (i in seq_len(nrow(s_cols))) {
+      # replace unwanted values with NA, so that the merging works correctly
+      # later
+      param = s_cols$measurement[i]
+      # add units to vals column names
+      units = mtypes$units[match(param, mtypes$name)]
+      column = s_cols$column[i]
+      val_col = paste0(column, ' (', units, ')')
+      flag_col = paste0(column, ' (flag)')
+      if (!val_col %in% names(out)) out[, val_col] = NA
+      if (!flag_col %in% names(out)) out[, flag_col] = NA
+      times = s_cols$times[i]
+      stime = as.POSIXct(gsub('^[[(]|,.*$', '', times), tz = 'EST')
+      etime = as.POSIXct(gsub('^.*, ?|[])]$', '', times), tz = 'EST')
+      param_times = meas$time[meas$time >= stime & meas$time < etime]
+      out[match(param_times, out$time), c(val_col, flag_col)] =
+        meas[match(param_times, meas$time), paste0(c('value.', 'flag.'), param)]
+    }
   }
-  Reduce(function(x, y) merge(x, y, all = T), meas_list) %>%
-    # when there are multiple columns of the same name, the non-empty rows go
-    # first
-    subset(!duplicated(`Time (EST)`))
+  names(out)[1] = 'Time (EST)'
+  out
 }
 
 for (site in config$sites$abbreviation) {
