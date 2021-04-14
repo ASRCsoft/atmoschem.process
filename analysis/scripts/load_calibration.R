@@ -35,7 +35,7 @@ pad_time_interval = function(interval, start, end) {
   stime = max(stime - start, stime_min)
   etime = min(etime + end, etime_max)
   c(stime, etime) %>%
-    strftime(format = '%H:%M') %>%
+    strftime(format = '%H:%M', tz = 'EST') %>%
     paste(collapse = ',') %>%
     paste0('[', ., ')')
 }
