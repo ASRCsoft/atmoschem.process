@@ -34,6 +34,10 @@ patch_psp_envidas_daily = function(df) {
   # fix some incorrectly set flags
   df$`NOy (status)`[df$instrument_time >= '2020-01-24 12:00' &
                     df$instrument_time < '2020-01-27 11:00'] = 1
+  df$`CO (status)`[df$instrument_time >= '2020-08-17 14:10' &
+                   df$instrument_time < '2020-08-18 10:00'] = 1
+  df$`NOy (status)`[df$instrument_time >= '2020-08-19 14:00' &
+                    df$instrument_time < '2020-08-20 09:00'] = 1
   df
 }
 

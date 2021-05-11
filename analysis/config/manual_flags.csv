@@ -372,6 +372,16 @@ PSP,envidas,BC6,"[2019-12-19 10:40, 2019-12-19 10:48)",AV,power failure
 PSP,envidas,CO,"[2020-03-10 10:00, 2020-03-13 12:44)",BA,DEC modifying instrument
 PSP,envidas,Wood smoke,"[2020-04-13, 2020-04-13 13:00)",AM,negative values
 PSP,envidas,CO,"[2020-05-14 12:00, 2020-05-26 12:00)",AM,unknown
+PSP,envidas,NOy-DEC,"[2020-07-03 08:00, 2020-07-09 12:00)",AM,unknown
 PSP,envidas,NO,"[2020-07-08 07:41, 2020-07-08 08:30)",BA,instrument cleaning
 PSP,envidas,NOx,"[2020-07-08 07:41, 2020-07-08 08:30)",BA,instrument cleaning
 PSP,envidas,NOy,"[2020-07-08 07:41, 2020-07-08 08:30)",BA,instrument cleaning
+PSP,envidas,CO,"[2020-09-03, 2020-09-06)",AM,unknown
+PSP,envidas,Concentration,"[2020-11-23 16:05, 2020-11-23 16:30)",AM,unknown
+PSP,envidas,BC1,"[2020-11-23 16:05, 2020-11-23 16:30)",AM,unknown
+PSP,envidas,BC6,"[2020-11-23 16:05, 2020-11-23 16:30)",AM,unknown
+PSP,envidas,NGN3a-BScatt,"[2020-11-23 16:05, 2020-11-23 16:30)",AM,unknown
+PSP,envidas,PM_2_5,"[2020-11-23 16:10, 2020-11-23 16:45)",AM,unknown
+PSP,envidas,Concentration,"[2020-12-18 14:15, 2020-12-18 14:45)",AM,unknown
+PSP,envidas,BC1,"[2020-12-18 14:15, 2020-12-18 14:45)",AM,unknown
+PSP,envidas,BC6,"[2020-12-18 14:15, 2020-12-18 14:45)",AM,unknown
