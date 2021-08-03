@@ -69,6 +69,8 @@ $(interm_dir)/processed_%.sqlite: $(interm_dir)/raw_%.sqlite \
                                   $(interm_dir)/cals_$$(shell echo $$* | sed "s/_.*//").sqlite \
                                   $(scripts_dir)/process_new_data.R
 	$(rscript) $(scripts_dir)/process_new_data.R $(shell echo $* | sed "s/_/ /")
+# the WFML campbell processing also depends on the processed Mesonet data
+$(interm_dir)/processed_WFML_campbell.sqlite: $(interm_dir)/processed_WFML_mesonet.sqlite
 
 # Calibration site file depends on all the raw site/calibration files
 make_cal_deps = $(patsubst %,$(interm_dir)/raw_%.sqlite, $(filter $(1)%, $(data_sources)))

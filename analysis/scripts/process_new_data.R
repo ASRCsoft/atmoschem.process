@@ -309,10 +309,31 @@ if (site == 'WFMS') {
     # NO2
     meas$value.NO2 = with(pr_meas, value.NOX - value.NO)
     meas$flagged.NO2 = with(pr_meas, flagged.NOX | flagged.NO)
-    # SLP
-    meas$value.SLP =
-      with(pr_meas, sea_level_pressure(value.BP2, value.PTemp_C, 604))
-    meas$flagged.SLP = with(pr_meas, flagged.BP2 | flagged.PTemp_C)
+    # SLP. This is a bit awkward because outside temps are only measured by the
+    # Mesonet, at a different frequency than Campbell's barometric
+    # pressure. Solution is to interpolate Mesonet outside temps at Campbell
+    # measurement times.
+    dbpath = file.path('analysis', 'intermediate',
+                       'processed_WFML_mesonet.sqlite')
+    db = dbConnect(SQLite(), dbpath)
+    sql_text =
+'select time,
+        "value.temperature_2m [degC]",
+        "flagged.temperature_2m [degC]"
+   from measurements
+  where time >= ? and time <= ?
+  order by time asc'
+    sql = sqlInterpolate(db, sql_text, format(start_time, '%Y-%m-%d %H:%M:%S', tz = 'EST'),
+                         format(end_time, '%Y-%m-%d %H:%M:%S', tz = 'EST'))
+    meso_temps = dbGetQuery(db, sql, check.names = F)
+    dbDisconnect(db)
+    meso_temps$time = as.POSIXct(meso_temps$time, tz = 'EST')
+    meso_temps$`value.temperature_2m [degC]`[meso_temps$`flagged.temperature_2m [degC]`] = NA
+    interp_temps = approx(meso_temps$time,
+                          meso_temps$`value.temperature_2m [degC]`, meas$time,
+                          na.rm = F)$y
+    meas$value.SLP = sea_level_pressure(pr_meas$value.BP2, interp_temps, 604)
+    meas$flagged.SLP = with(pr_meas, flagged.BP2 | is.na(interp_temps))
   } else if (data_source == 'envidas') {
     # Ozone_ppbv
     meas$value.Ozone_ppbv = pr_meas$`value.API-T400-OZONE` * 1000
