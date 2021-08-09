@@ -28,7 +28,7 @@ transform_measurement = function(f, site, ds) {
     return(transform_wfml_envidas(f))
   } else if (site == 'WFMS' && ds == 'DEC_envidas') {
     # this is really the same format as the WFML envidas
-    return(transform_wfml_envidas(f))
+    return(transform_wfml_envidas(f, 'WFMS'))
   }
   res = if (ds == 'ultrafine') {
     transform_ultrafine(f)
