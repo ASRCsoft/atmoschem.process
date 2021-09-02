@@ -112,6 +112,16 @@ transform_wfm_cal_list = function(pdf, measurement_name,
                                       measured_times[1:n])
       end_time = get_cal_end_time(start_times[n:3], online_time,
                                   measured_times[n])
+      # This is an embarrassing workaround to get the correct span values for
+      # the WFMS NO autocals. The span numbers really shouldn't be hardcoded in
+      # the first place and I should just rewrite how this whole thing works so
+      # that it gets the values from the autocal schedule.
+      if (end_time > '2020-08-12 06:00' & end_time < '2020-08-19 06:00' &
+          measurement_name %in% c('NO', 'NOx', 'NO 42Cs', 'NOy')) {
+        # make sure it's the WFMS and not WFML instrument
+        if (provided[2] == 4) provided[2] = 4.2
+      }
+
       if (!is.null(start_time) && !is.null(end_time)) {
         times_str = paste0('[', start_time, ', ', end_time, ']')
         bool_corrected = !is.na(corrected[n]) &&

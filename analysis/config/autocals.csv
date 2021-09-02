@@ -1,19 +1,25 @@
 site,data_source,measurement_name,type,dates,times,value,comment
 WFMS,campbell,NO,zero,"[2018-01-01,)","[0:00,0:15)",,
-WFMS,campbell,NO,span,"[2018-01-01,)","[0:15,0:45)",4,
+WFMS,campbell,NO,span,"[2018-01-01, 2020-08-12 06:00)","[0:15,0:45)",4,
+WFMS,campbell,NO,span,"[2020-08-12 06:00, 2020-08-19 06:00)","[0:15,0:45)",4.2,the span value was changed by accident
+WFMS,campbell,NO,span,"[2020-08-19 06:00,)","[0:15,0:45)",4,
 WFMS,campbell,NO,zero check,"[2018-01-01,)","[0:45,1:05)",,
 WFMS,campbell,NO,zero,"[2018-01-01,)","[6:00,6:20)",,
 WFMS,campbell,NO,zero,"[2018-01-01,)","[12:00,13:05)",,
 WFMS,campbell,NO,zero,"[2018-01-01,)","[18:00,18:20)",,
 WFMS,campbell,NOx,zero,"[2018-01-01,)","[0:00,0:15)",,
-WFMS,campbell,NOx,span,"[2018-01-01,)","[0:15,0:45)",4,
+WFMS,campbell,NOx,span,"[2018-01-01, 2020-08-12 06:00)","[0:15,0:45)",4,
+WFMS,campbell,NOx,span,"[2020-08-12 06:00, 2020-08-19 06:00)","[0:15,0:45)",4.2,the span value was changed by accident
+WFMS,campbell,NOx,span,"[2020-08-19 06:00,)","[0:15,0:45)",4,
 WFMS,campbell,NOx,zero check,"[2018-01-01,)","[0:45,1:05)",,
 WFMS,campbell,NOx,zero,"[2018-01-01,)","[6:00,6:20)",,
 WFMS,campbell,NOx,zero,"[2018-01-01,)","[12:00,12:15)",,
 WFMS,campbell,NOx,CE,"[2018-01-01,)","[12:15,13:05)",,
 WFMS,campbell,NOx,zero,"[2018-01-01,)","[18:00,18:20)",,
 WFMS,campbell,NOy,zero,"[2018-01-01,)","[0:00,0:15)",,
-WFMS,campbell,NOy,span,"[2018-01-01,)","[0:15,0:45)",4,
+WFMS,campbell,NOy,span,"[2018-01-01, 2020-08-12 06:00)","[0:15,0:45)",4,
+WFMS,campbell,NOy,span,"[2020-08-12 06:00, 2020-08-19 06:00)","[0:15,0:45)",4.2,the span value was changed by accident
+WFMS,campbell,NOy,span,"[2020-08-19 06:00,)","[0:15,0:45)",4,
 WFMS,campbell,NOy,zero check,"[2018-01-01,)","[0:45,1:05)",,
 WFMS,campbell,NOy,zero,"[2018-01-01,)","[6:00,6:20)",,
 WFMS,campbell,NOy,zero,"[2018-01-01,)","[12:00,12:15)",,
