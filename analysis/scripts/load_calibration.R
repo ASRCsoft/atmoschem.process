@@ -240,11 +240,11 @@ cal_flags2 = config$cal_flags[config$cal_flags$site == site, ] %>%
 for (n in unique(all_cals$measurement_name)) {
   cal_flags_n = subset(cal_flags2, measurement_name == n)
   if (!nrow(cal_flags_n)) next()
-  for (i in 1:nrow(cal_flags_n)) {
-    matches = with(all_cals, measurement_name == n &
-                             type == cal_flags_n$type[i])
+  for (ntype in unique(cal_flags_n$type)) {
+    ntype_flags = subset(cal_flags_n, type == ntype)
+    matches = with(all_cals, measurement_name == n & type == ntype)
     all_cals[matches, 'flagged'] =
-      all_cals[matches, 'end_time'] %within% cal_flags_n$times[i]
+      all_cals[matches, 'end_time'] %within% as.list(ntype_flags$times)
   }
 }
 

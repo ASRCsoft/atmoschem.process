@@ -94,7 +94,7 @@ nonderived = sub('^value\\.', '', names(meas)[grep('^value', names(meas))])
 dbpath = file.path('analysis', 'intermediate',
                    paste0('cals_', site, '.sqlite'))
 db = dbConnect(SQLite(), dbpath)
-cals = dbReadTable(db, 'calibrations')
+cals = dbGetQuery(db, 'select * from calibrations where not flagged')
 dbDisconnect(db)
 cals = cals[cals$data_source == data_source, ]
 cals$start_time = as.POSIXct(cals$start_time, tz = 'EST')
