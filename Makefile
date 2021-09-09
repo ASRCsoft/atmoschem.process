@@ -13,6 +13,7 @@ interm_dir := analysis/intermediate
 out_dir := analysis/out
 scripts_dir := analysis/scripts
 docs_dir := analysis/docs
+conf_dir := analysis/config
 # processing variables
 rscript := Rscript --vanilla
 export processing_end := 2021-01-01
@@ -67,7 +68,8 @@ $(interm_dir)/hourly_%.sqlite: $(interm_dir)/processed_%.sqlite $(scripts_dir)/a
 .SECONDEXPANSION:
 $(interm_dir)/processed_%.sqlite: $(interm_dir)/raw_%.sqlite \
                                   $(interm_dir)/cals_$$(shell echo $$* | sed "s/_.*//").sqlite \
-                                  $(scripts_dir)/process_new_data.R
+                                  $(scripts_dir)/process_new_data.R \
+                                  $(conf_dir)/manual_flags.csv
 	$(rscript) $(scripts_dir)/process_new_data.R $(shell echo $* | sed "s/_/ /")
 # the WFML campbell processing also depends on the processed Mesonet data
 $(interm_dir)/processed_WFML_campbell.sqlite: $(interm_dir)/processed_WFML_mesonet.sqlite
