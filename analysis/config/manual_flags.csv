@@ -156,7 +156,8 @@ WFMS,aethelometer,concentration_880,"[2020-04-20 04:30, 2020-04-20 07:30)",AM,un
 WFMS,campbell,CO,"[2020-04-23 03:00, 2020-04-23 15:00)",AN,filter issues
 WFMS,campbell,CO,"[2020-05-22, 2020-05-29)",AN,pump issues
 WFMS,campbell,CO,"[2020-06-21 14:00, 2020-06-24 09:00)",AN,fuse
-WFMS,campbell,Ozone,"[2020-06-24, 2020-07-01)",AM,unknown
+WFMS,campbell,Ozone,"[2020-06-24, 2021-07-01)",AM,unknown
+WFMS,DEC_envidas,O3,"[2020-08-11 05:01, 2020-08-11 08:17)",AM,unknown
 WFMS,campbell,CO,"[2020-09-09 09:45, 2020-09-09 13:56)",AT,Pico checks
 WFMS,campbell,NOy,"[2020-11-20, 2020-11-20 07:18)",AM,unknown
 WFMS,campbell,SO2,"[2020-12-02 09:40, 2020-12-09 10:40)",AM,unknown

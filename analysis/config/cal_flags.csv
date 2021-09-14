@@ -78,6 +78,9 @@ WFMS,campbell,CO,span,"[2020-07-02, 2020-07-07 01:00)",unknown
 WFMS,campbell,NO,span,"[2020-07-19, 2020-07-22 03:00)",unknown
 WFMS,campbell,NOx,span,"[2020-07-19, 2020-07-22 03:00)",unknown
 WFMS,campbell,NOy,span,"[2020-07-20, 2020-07-22 03:00)",unknown
+WFMS,campbell,NO,span,"[2020-08-09, 2020-08-12 03:00)",unknown
+WFMS,campbell,NOx,span,"[2020-08-09, 2020-08-12 03:00)",unknown
+WFMS,campbell,NOy,span,"[2020-08-11, 2020-08-12 03:00)",unknown
 WFMS,campbell,CO,zero,"[2020-11-05 03:00, 2020-11-12 09:00)",unknown
 WFMS,campbell,CO,span,"[2020-11-05 03:00, 2020-11-12 09:00)",unknown
 WFMS,campbell,NOy,zero,"[2020-11-21 12:00, 2020-11-23 12:00)",unknown
