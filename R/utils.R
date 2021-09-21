@@ -8,6 +8,7 @@ is_psp_API300EU_cal = function(f)
   startsWith(basename(f), 'Pinnacle_API300EU_CO_Weekly')
 is_psp_ASRC_TEI42i_Y_NOy_cal = function(f)
   startsWith(basename(f), 'Pinnacle_ASRC_TEI42i_Y_NOy_146i_Weekly') |
+    startsWith(basename(f), 'Pinnacle_ASRC_TEI42i_Y_NOy_146i_WEEKLY') |
     startsWith(basename(f), 'Pinnacle_ASRC_TEI42i_Y_NOy_T700_Weekly')
 is_psp_DEC_TEI42i_NOy_cal = function(f)
   startsWith(basename(f), 'Pinnacle DEC TEI42i NOy Weekly') |
