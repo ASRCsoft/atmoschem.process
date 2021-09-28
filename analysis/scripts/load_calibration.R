@@ -98,8 +98,9 @@ guess_42C_ce = function(meas, noxval) {
     transform(no2cal = noxcal - nocal) %>%
     # remove zero calibrations
     subset(nocal > .3) %>%
-    # make sure measured NOx value is within +/- 30% of the recorded NOx value
-    subset(abs(100 * noxcal / noxval - 100) < 30)
+    # make sure measured NOx value is in the ballpark of the recorded NOx value
+    subset(100 * noxcal / noxval - 100 > -30 & 
+           100 * noxcal / noxval - 100 < 50 )
   if (!nrow(candidates)) return(NA)
   candidates[order(candidates$no2cal, decreasing = T), ] %>%
     head(1) %>%
