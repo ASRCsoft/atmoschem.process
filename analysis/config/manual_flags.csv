@@ -260,6 +260,9 @@ WFML,campbell,NO,"[2020-05-20 23:00, 2020-05-26 11:00)",AN,pump failed
 WFML,campbell,NOX,"[2020-05-20 23:00, 2020-05-26 11:00)",AN,pump failed
 WFML,campbell,NO,"[2020-06-02 11:00, 2020-06-04 15:00)",AN,low ozone flow
 WFML,campbell,NOX,"[2020-06-02 11:00, 2020-06-04 15:00)",AN,low ozone flow
+WFML,campbell,NO,"[2020-08-12 13:31, 2020-08-18 10:28)",AN,unknown instrument error
+WFML,campbell,NOX,"[2020-08-12 13:31, 2020-08-18 10:28)",AN,unknown instrument error
+WFML,envidas,PM25C,"[2020-09-26 08:29, 2020-09-28 08:02)",AN,unknown
 PSP,envidas,CO,"[2018-10-03 07:08, 2018-10-03 08:00)",AN,instrument reset
 PSP,envidas,Dichot(10)MC,"[2018-10-04 12:01, 2018-10-04 14:46)",AT,calibration
 PSP,envidas,Dichot(10)RefMC,"[2018-10-04 12:01, 2018-10-04 14:46)",AT,calibration
