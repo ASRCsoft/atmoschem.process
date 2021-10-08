@@ -1,5 +1,14 @@
 ## organize calibration
 
+# try `approx`, return NAs if it fails
+try_approx = function(x, y, xout, method, ...) {
+  if (!length(y) || all(is.na(y))) {
+    rep(NA, times = length(xout))
+  } else {
+    approx(x, y, xout, method, ...)
+  }
+}
+
 ## interpolate a function with discontinuities at `breaks`. `...` is
 ## passed to `approx`. `int_missing` will interpolate values from the
 ## previous and next segment for segments that don't contain values.
@@ -17,38 +26,11 @@ piecewise_approx = function(x, y, xout, breaks, ..., interp_missing = TRUE) {
   ## match x and y lists with xout
   x_list = x_list[names(xout_list)]
   y_list = y_list[names(xout_list)]
-  if (interp_missing) {
-    ## see if any sections have no values
-    empty_inds = which(lengths(x_list) == 0)
-    ## fill in missing segments
-    if (length(empty_inds)) {
-      if (length(x_list) == 1) stop('No non-missing y data')
-      ## the xout_list names are the break numbers
-      break_inds = as.integer(names(xout_list)[empty_inds])
-      for (n in empty_inds) {
-        xs = vector(mode = 'numeric')
-        ys = vector(mode = 'numeric')
-        ## first and last segments are special cases
-        if (n > 1) {
-          ## get the last value from the previous segment, place it at
-          ## the beginning of this segment
-          xs = breaks[n]
-          ys = tail(y_list[[n - 1]], 1)
-        }
-        if (n < length(x_list)) {
-          ## get the first value from the next segment, place it at
-          ## the end of this segment
-          xs = c(xs, breaks[n + 1])
-          ys = c(ys, y_list[[n + 1]][1])
-        }
-        x_list[[n]] = xs
-        y_list[[n]] = ys
-      }
-    }
-  }
-  method_list = as.list(ifelse(lengths(x_list) >= 2, 'linear',
-                               'constant'))
-  res_list = mapply(approx, x_list, y_list, xout_list, method_list,
+  x_counts = sapply(x_list, function(x) length(unique(x)))
+  y_counts = sapply(y_list, function(x) sum(!is.na(x)))
+  method_list =
+    as.list(ifelse(x_counts >= 2 & y_counts >= 2, 'linear', 'constant'))
+  res_list = mapply(try_approx, x_list, y_list, xout_list, method_list,
                     MoreArgs = list(...), SIMPLIFY = FALSE)
   unlist(lapply(res_list, function(x) x$y), use.names = FALSE)
 }
@@ -89,7 +71,19 @@ estimate_cals = function(x, y, k, xout, breaks) {
     smoothed_y = runmed(y, k)
   }
   if (has_breaks) {
-    piecewise_approx(x, smoothed_y, xout, breaks, rule = 2)
+    yout = piecewise_approx(x, smoothed_y, xout, breaks, rule = 2)
+    # Some segments may not have any values, resulting in NAs. In this case
+    # interpolate between the nearest values from neighboring segments.
+    if (any(is.na(yout))) {
+      # get the values from the beginning and end of each segment (immediately
+      # before and immediately after each break)
+      x2 = rep(breaks, each = 2) -
+        rep(as.difftime(1:0, units = "secs"), length(breaks))
+      y2 = piecewise_approx(x, smoothed_y, x2, breaks, rule = 2)
+      # fill the missing y's by interpolating between nearest segment end values
+      yout[is.na(yout)] = approx(x2, y2, xout[is.na(yout)], rule = 2)$y
+    }
+    yout
   } else {
     approx(x, smoothed_y, xout, rule = 2)$y
   }
