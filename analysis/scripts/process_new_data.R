@@ -176,7 +176,8 @@ if (site %in% c('WFMS', 'WFML') & data_source == 'campbell') {
 }
 # freezing anemometers
 if (site == 'WFMS' & data_source == 'campbell') {
-  windcols = c('WS3Cup', 'WS3Cup_Max', 'WS3CupB', 'WS3CupB_Max')
+  windcols = c('WS3Cup', 'WS3Cup_Max', 'WS3CupB', 'WS3CupB_Max',
+               'WS3CupA_S_WVT', 'WS3CupB_S_WVT')
   # has the wind been slow for at least 30 minutes?
   looks_frozen = function(x) {
     int_end(x) - int_start(x) > as.difftime(30, units = 'mins')
