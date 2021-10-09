@@ -86,6 +86,28 @@ WFMS,campbell,CO,span,"[2020-11-05 03:00, 2020-11-12 09:00)",unknown
 WFMS,campbell,NOy,zero,"[2020-11-21 12:00, 2020-11-23 12:00)",unknown
 WFMS,campbell,SO2,zero,"[2020-12-02 09:40, 2020-12-09 10:40)",unknown
 WFMS,campbell,SO2,span,"[2020-12-02 09:40, 2020-12-09 10:40)",unknown
+WFMS,envidas,NO,span,"[2020-12-10, 2020-12-16 03:00)",campbell glitch
+WFMS,envidas,NO,zero,"[2020-12-09 12:00, 2020-12-14 12:00)",campbell glitch
+WFMS,envidas,NOX,span,"[2020-12-10, 2020-12-16 03:00)",campbell glitch
+WFMS,envidas,NOX,zero,"[2020-12-09 12:00, 2020-12-14 12:00)",campbell glitch
+WFMS,envidas,NOX,CE,"[2020-12-10, 2020-12-14)",campbell glitch
+WFMS,envidas,NOY,span,"[2020-12-10, 2020-12-16 03:00)",campbell glitch
+WFMS,envidas,NOY,zero,"[2020-12-09 12:00, 2020-12-14 12:00)",campbell glitch
+WFMS,envidas,NOY,CE,"[2020-12-10, 2020-12-14)",campbell glitch
+WFMS,envidas,CO,span,"[2020-12-10, 2020-12-16 03:00)",campbell glitch
+WFMS,envidas,CO,zero,"[2020-12-09 12:00, 2020-12-14 12:00)",campbell glitch
+WFMS,envidas,SO2,span,"[2020-12-10, 2020-12-16 03:00)",campbell glitch
+WFMS,envidas,SO2,zero,"[2020-12-09 12:00, 2020-12-14 12:00)",campbell glitch
+WFMS,envidas,NO,span,"[2020-12-20, 2020-12-22)",campbell glitch
+WFMS,envidas,NO,zero,"[2020-12-20, 2020-12-21 12:00)",campbell glitch
+WFMS,envidas,NOX,span,"[2020-12-20, 2020-12-22)",campbell glitch
+WFMS,envidas,NOX,zero,"[2020-12-20, 2020-12-21 12:00)",campbell glitch
+WFMS,envidas,NOY,span,"[2020-12-20, 2020-12-22)",campbell glitch
+WFMS,envidas,NOY,zero,"[2020-12-20, 2020-12-21 12:00)",campbell glitch
+WFMS,envidas,CO,span,"[2020-12-20, 2020-12-22)",campbell glitch
+WFMS,envidas,CO,zero,"[2020-12-20, 2020-12-21 12:00)",campbell glitch
+WFMS,envidas,SO2,span,"[2020-12-20, 2020-12-22)",campbell glitch
+WFMS,envidas,SO2,zero,"[2020-12-20, 2020-12-21 12:00)",campbell glitch
 WFML,campbell,NO,zero,"[2018-12-14, 2018-12-18)",
 WFML,campbell,NOX,zero,"[2018-12-14, 2018-12-18)",
 WFML,campbell,CO,zero,"[2018-12-14, 2018-12-18)",

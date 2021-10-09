@@ -159,7 +159,9 @@ WFMS,campbell,CO,"[2020-06-21 14:00, 2020-06-24 09:00)",AN,fuse
 WFMS,campbell,Ozone,"[2020-06-24, 2021-07-01)",AM,unknown
 WFMS,DEC_envidas,O3,"[2020-08-11 05:01, 2020-08-11 08:17)",AM,unknown
 WFMS,campbell,CO,"[2020-09-09 09:45, 2020-09-09 13:56)",AT,Pico checks
-WFMS,campbell,NOy,"[2020-11-20, 2020-11-20 07:18)",AM,unknown
+WFMS,campbell,WindDirA_D1_WVT,"[2020-10-02 12:45, 2020-10-08 08:43)",AN,possibly frozen
+WFMS,campbell,WindDirB_D1_WVT,"[2020-10-02 12:45, 2020-10-08 08:43)",AN,possibly frozen
+WFMS,campbell,NOy,"[2020-11-20, 2020-11-23 07:18)",AM,unknown
 WFMS,campbell,SO2,"[2020-12-02 09:40, 2020-12-09 10:40)",AM,unknown
 WFMS,campbell,RH,"[2020-12-23, 2020-12-30 03:00)",AM,unknown
 WFML,campbell,NO,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
