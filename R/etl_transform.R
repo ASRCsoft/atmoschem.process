@@ -29,6 +29,9 @@ transform_measurement = function(f, site, ds) {
   } else if (site == 'WFMS' && ds == 'DEC_envidas') {
     # this is really the same format as the WFML envidas
     return(transform_wfml_envidas(f, 'WFMS'))
+  } else if (site == 'WFMS' && ds == 'envidas') {
+    # this is the same format as the daily PSP envidas
+    return(transform_psp_envidas(f, 'WFMS'))
   }
   res = if (ds == 'ultrafine') {
     transform_ultrafine(f)

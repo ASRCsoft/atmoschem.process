@@ -293,6 +293,10 @@ if (site == 'WFMS') {
       with(pr_meas, pmax(value.WS3Cup_Max, value.WS3CupB_Max, na.rm = T))
     meas$flagged.WS_Max =
       with(pr_meas, flagged.WS3Cup_Max & flagged.WS3CupB_Max)
+  } else if (data_source == 'envidas') {
+    # NO2
+    meas$value.NO2 = with(pr_meas, value.NOX - value.NO)
+    meas$flagged.NO2 = with(pr_meas, flagged.NOX | flagged.NO)
   } else if (data_source == 'aethelometer') {
     # Wood smoke
     meas$`value.Wood smoke` =

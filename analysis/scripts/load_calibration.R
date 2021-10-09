@@ -123,6 +123,16 @@ mcals$data_source = switch(site, WFMS = 'campbell', WFML = 'campbell',
                            PSP = 'envidas')
 mcals$times = as_interval(mcals$times)
 mcals$measured_value = as.numeric(mcals$measured_value)
+# WFMS calibrations apply to both campbell and envidas data sources, so they
+# need to be duplicated
+if (site == 'WFMS') {
+  envidas_mcals = mcals %>%
+    subset(int_start(times) >= as.POSIXct('2019-01-01', tz = 'EST')) %>%
+    transform(data_source = 'envidas') %>%
+    # NOx is NOX, NOy is NOY in envidas (all uppercase)
+    transform(measurement_name = toupper(measurement_name))
+  mcals = rbind(mcals, envidas_mcals)
+}
 
 if (site == 'PSP') {
   # find NO conversion efficiency results, which weren't recorded in the PSP cal
@@ -191,6 +201,18 @@ acals0 = config$autocals %>%
   subset(type %in% c('zero', 'span', 'CE')) %>%
   transform(dt_int = as_interval(dates))
 acals0 = acals0[acals0$site == site, ]
+# WFMS autocalibrations apply to both campbell and envidas data sources, so they
+# need to be duplicated
+if (site == 'WFMS') {
+  envidas_acals = acals0 %>%
+    transform(data_source = 'envidas') %>%
+    # NOx is NOX, NOy is NOY in envidas (all uppercase)
+    transform(measurement_name = toupper(measurement_name))
+  # envidas data starts in 2019
+  int_start(envidas_acals$dt_int) =
+    pmax(int_start(envidas_acals$dt_int), as.POSIXct('2019-01-01', tz = 'EST'))
+  acals0 = rbind(acals0, envidas_acals)
+}
 if (nrow(acals0)) {
   message('Calculating autocal results...')
   # for ongoing schedules use the current time as the end
@@ -252,7 +274,8 @@ for (n in unique(all_cals$measurement_name)) {
 # Calculate NO2 conversion efficiencies (derived from NOx and NO results)
 if (site == 'WFMS') {
   # WFMS NO2 conversion efficiencies are recorded on the NOx channel
-  no2_ce = all_cals$measurement_name == 'NOx' & all_cals$type == 'CE'
+  no2_ce = all_cals$measurement_name %in% c('NOx', 'NOX') &
+    all_cals$type == 'CE'
   all_cals$measurement_name[no2_ce] = 'NO2'
 } else if (site == 'PSP') {
   # PSP NO2 conversion efficiencies require subtracting NO (because the CE air

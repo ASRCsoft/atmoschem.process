@@ -41,13 +41,15 @@ patch_psp_envidas_daily = function(df) {
   df
 }
 
-transform_envidas_daily = function(f) {
+transform_envidas_daily = function(f, site = 'PSP') {
   df = read_envidas_daily(f)
   df$Date_Time = as.POSIXct(df$Date_Time, format = '%Y-%m-%d %H:%M:%S',
                             tz = 'EST')
   # make some corrections
   names(df)[1] = 'instrument_time'
-  df = patch_psp_envidas_daily(df)
+  if (site == 'PSP') {
+    df = patch_psp_envidas_daily(df)
+  }
   names(df)[1] = 'time'
   flagcols = grep(' \\(status\\)$', names(df))
   names(df)[flagcols] =
@@ -63,11 +65,11 @@ transform_envidas_daily = function(f) {
   df
 }
 
-transform_psp_envidas = function(f) {
+transform_psp_envidas = function(f, site = 'PSP') {
   ## check to see if the file is in the simpler daily format
   is_daily_format = grepl('^[0-9]{8}_envidas.csv$', basename(f))
   if (is_daily_format) {
-    return(transform_envidas_daily(f))
+    return(transform_envidas_daily(f, site))
   }
   df = read_psp_envidas(f)
   ## check for newer files with the absurd date format

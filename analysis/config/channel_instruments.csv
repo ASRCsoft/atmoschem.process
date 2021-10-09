@@ -25,3 +25,9 @@ WFMS,campbell,concentration_370,"[2018-10-01, 2020-07-01)",Magee_AE22-HS
 WFMS,campbell,concentration_880,"[2018-10-01, 2020-07-01)",Magee_AE22-HS
 WFMS,campbell,Wood smoke,"[2018-10-01, 2020-07-01)",Magee_AE22-HS
 WFMS,campbell,Concentration,"[2018-10-01, 2020-07-01)",TSI_EPC3783
+WFMS,envidas,CO,"[2019-01-01, 2020-07-01)",Teledyne_300EU
+WFMS,envidas,SO2,"[2019-01-01, 2020-07-01)",Thermo_43C-TL
+WFMS,envidas,NO,"[2019-01-01, 2020-07-01)",Thermo_42C-TL
+WFMS,envidas,NOx,"[2019-01-01, 2020-07-01)",Thermo_42C-TL
+WFMS,envidas,NO2,"[2019-01-01, 2020-07-01)",Thermo_42C-TL
+WFMS,envidas,NOy,"[2019-01-01, 2020-07-01)",Thermo_42C-TL_2
