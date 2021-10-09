@@ -77,7 +77,8 @@ $(interm_dir)/processed_WFML_campbell.sqlite: $(interm_dir)/processed_WFML_meson
 # Calibration site file depends on all the raw site/calibration files
 make_cal_deps = $(patsubst %,$(interm_dir)/raw_%.sqlite, $(filter $(1)%, $(data_sources)))
 $(interm_dir)/cals_%.sqlite: $$(call make_cal_deps,$$*) \
-                             raw_data $(scripts_dir)/load_calibration.R
+                             raw_data $(scripts_dir)/load_calibration.R \
+                             $(conf_dir)/cal_flags.csv
 	$(rscript) $(scripts_dir)/load_calibration.R $*
 
 $(interm_dir)/raw_%.sqlite: raw_data $(scripts_dir)/load_raw.R
