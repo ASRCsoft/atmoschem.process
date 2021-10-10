@@ -38,6 +38,10 @@ patch_psp_envidas_daily = function(df) {
                    df$instrument_time < '2020-08-18 10:00'] = 1
   df$`NOy (status)`[df$instrument_time >= '2020-08-19 14:00' &
                     df$instrument_time < '2020-08-20 09:00'] = 1
+  df$`VWS (status)`[df$instrument_time >= '2020-11-04 09:23' &
+                    df$instrument_time <= '2020-11-16 09:44'] = 1
+  df$`VWD (status)`[df$instrument_time >= '2020-11-04 09:23' &
+                    df$instrument_time <= '2020-11-16 09:44'] = 1
   df
 }
 
