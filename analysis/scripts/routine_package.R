@@ -9,10 +9,10 @@ library(atmoschem.process)
 library(magrittr)
 library(DBI)
 library(RSQLite)
-options(warn = 1) # print warnings immediately
 
 out_dir = commandArgs(trailingOnly = TRUE)[1]
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+end_time = Sys.getenv('processing_end')
 old_processed_dir = file.path('analysis', 'intermediate')
 config = read_csv_dir('analysis/config')
 
@@ -21,11 +21,12 @@ config = read_csv_dir('analysis/config')
 get_site_df = function(site) {
   site_sources = config$dataloggers$name[config$dataloggers$site == site]
   out = data.frame(time = numeric())
+  query = paste0("select * from measurements where time<'", end_time, "'")
   for (s in site_sources) {
     dbpath = file.path('analysis', 'intermediate',
                        paste0('hourly_', site, '_', s, '.sqlite'))
     db = dbConnect(SQLite(), dbpath)
-    meas = dbReadTable(db, 'measurements', check.names = F)
+    meas = dbGetQuery(db, query, check.names = F)
     dbDisconnect(db)
     meas$time = as.POSIXct(meas$time, tz = 'EST')
     # update out times
