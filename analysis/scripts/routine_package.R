@@ -90,6 +90,8 @@ for (site in config$sites$abbreviation) {
     all_cols = union(names(newp), names(oldp))
     oldp[setdiff(names(newp), names(oldp))] = NA
     newp[setdiff(names(oldp), names(newp))] = NA
+  } else {
+    all_cols = names(newp)
   }
 
   # put the columns in the correct ordering
