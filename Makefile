@@ -48,7 +48,8 @@ check_data:
 .PHONY: routine
 routine: $(routine_out).zip
 
-$(routine_out).zip: $(old_routine_out) $(hourly_files) $(docs_dir)/routine.md
+$(routine_out).zip: $(old_routine_out) $(hourly_files) $(docs_dir)/routine.md \
+                    $(scripts_dir)/routine_package.R
 	$(rscript) $(scripts_dir)/routine_package.R $(routine_out)
 
 $(docs_dir)/routine.md: $(docs_dir)/routine.Rmd $(docs_dir)/routine.bib
