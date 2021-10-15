@@ -16,6 +16,8 @@ end_time = Sys.getenv('processing_end')
 old_processed_dir = file.path('analysis', 'intermediate')
 config = read_csv_dir('analysis/config')
 
+fmt_decimals = function(x, k) format(round(x, k), trim = TRUE, nsmall = k)
+
 # combine site/data source hourly files into a single site hourly file, using
 # column names from report_columns
 get_site_df = function(site) {
@@ -38,6 +40,14 @@ get_site_df = function(site) {
                              config$channels$data_source == s, ]
     params = c('time', s_cols$measurement)
     meas = meas[, sub('^value\\.|^flag\\.', '', names(meas)) %in% params]
+    # format the decimals for each parameter, based on the channels file
+    for (p in params[-1]) {
+      report_decimals = mtypes$report_decimals[mtypes$name == p]
+      if (!is.na(report_decimals)) {
+        param_col = paste0('value.', p)
+        meas[, param_col] = fmt_decimals(meas[, param_col], report_decimals)
+      }
+    }
     for (i in seq_len(nrow(s_cols))) {
       # replace unwanted values with NA, so that the merging works correctly
       # later
@@ -112,14 +122,20 @@ for (site in config$sites$abbreviation) {
     pout = rbind(oldp, newp)
   }
 
+  # somehow the old PSP data has a couple of duplicate times
+  pout = pout[!duplicated(pout$`Time (EST)`), ]
+
   # add missing hours
   hours = seq.POSIXt(min(pout$`Time (EST)`), max(pout$`Time (EST)`), by = 'hour')
   pout = merge(data.frame('Time (EST)' = hours, check.names = F), pout,
                all.x = T)
 
   # replace NA flags with M1
-  flag_cols = subset(cols, flag & !aqs_flag)$name
-  for (f in flag_cols) pout[is.na(pout[, f]), f] = 'M1'
+  flag_cols = with(cols, which(flag & !aqs_flag))
+  for (i in flag_cols) pout[is.na(pout[, i]), i] = 'M1'
+
+  # replace M1/M2 data with NA
+  for (i in flag_cols) pout[startsWith(pout[, i], 'M'), i - 1] = NA
 
   pout$`Time (EST)` = format(pout$`Time (EST)`, format = '%Y-%m-%d %H:%M')
   write.csv(pout, file = out_file, na = '', row.names = FALSE)
