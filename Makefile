@@ -27,7 +27,7 @@ raw_zip := $(raw_dir)/raw_data_v$(raw_version).zip
 # get <site>_<data_source> for each entry in data_sources.csv
 data_sources := $(shell sed "1d;s/^\([^,]*\),\([^,]*\).*/\1_\2/" analysis/config/dataloggers.csv)
 hourly_files := $(patsubst %,$(interm_dir)/hourly_%.sqlite,$(data_sources))
-routine_out := routine_chemistry_v$(PKGVERS)
+export routine_out := $(out_dir)/routine_chemistry_v$(PKGVERS)
 # ensure R package availability
 check_rpkg = if (!requireNamespace("$(1)")) install.packages("$(1)")
 
@@ -49,7 +49,7 @@ check_data:
 routine: $(routine_out).zip
 
 $(routine_out).zip: $(old_routine_out) $(hourly_files) $(docs_dir)/routine.md
-	$(rscript) $(scripts_dir)/routine_package.R $(out_dir)/$(routine_out)
+	$(rscript) $(scripts_dir)/routine_package.R $(routine_out)
 
 $(docs_dir)/routine.md: $(docs_dir)/routine.Rmd $(docs_dir)/routine.bib
 	Rscript \
