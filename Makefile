@@ -103,6 +103,13 @@ view:
 	-e '$(call check_rpkg,shiny)' \
 	-e 'shiny::runApp("analysis/processing_viewer", launch.browser = T)'
 
+## Raw data
+
+.PHONY: save_raw
+save_raw:
+	$(rscript) \
+	-e 'zip("$(out_dir)/raw_data_v$(raw_version).zip", "$(raw_data)")'
+
 ## R package
 
 .PHONY: check
