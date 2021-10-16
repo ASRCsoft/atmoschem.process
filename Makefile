@@ -17,7 +17,7 @@ conf_dir := analysis/config
 # processing variables
 rscript := Rscript --vanilla
 export processing_end := 2021-01-01
-export raw_version := 0.3
+export raw_version := 0.6.0
 sites := WFMS WFML PSP QC
 download_url := http://atmoschem.asrc.cestm.albany.edu/~aqm/AQM_Products/downloads
 routine_zip := $(raw_dir)/routine_chemistry_v0.1.zip

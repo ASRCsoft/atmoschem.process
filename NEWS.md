@@ -1,6 +1,22 @@
 # version (development version) <small>Unreleased</small>
 ## Added
-- Add 2020 3rd quarter WFMS, WFML, and PSP data flags.
+- Add 2021 1st and 2nd quarter WFMS, WFML, and PSP data flags.
+
+# version 0.6.0 <small>2021-10-15</small>
+## Added
+- Add 2020 3rd and 4th quarter WFMS, WFML, and PSP data flags.
+- Add 2018-10-01 to 2021-01-01 Queens College data.
+- Add recommended citations to README file.
+- Add NARSTO flag definitions.
+- Add pkgdown documentation website at
+  <https://asrcsoft.github.io/atmoschem.process/>.
+- Add Zenodo integration.
+  
+## Fixed
+- Use outside temperatures for sea level pressure calculations (starts
+  2018-10-01).
+- Calculate resultant wind speeds instead of mean wind speeds for WFMS
+  minute-resolution wind data (starts 2020-06-30).
 
 # version 0.5.0 <small>2020-10-26</small>
 ## Added
