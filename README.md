@@ -82,21 +82,23 @@ remotes::install_github('ASRCsoft/atmoschem.process', dependencies = TRUE)
 
   - R and R package dependencies
   - GNU Make
-  - 15GB of disk space
+  - 15GB of disk space and 8GB of RAM
+  - An Air Quality System API key (get one
+    [here](https://aqs.epa.gov/aqsweb/documents/data_api.html))
+  - A user/password for the ASRC’s atmoschem server (sign up
+    [here](http://atmoschem.asrc.cestm.albany.edu/))
 
 ### Creating the dataset
 
 Download or clone the repository. The dataset package can be generated
-by running (from a terminal)
+by running, from a terminal,
 
 ``` sh
-cd path/to/atmoschem.process
-make routine
+cd /path/to/atmoschem.process
+make routine asrc_user=youruser asrc_pass=yourpassword aqs_email=youremail aqs_key=yourkey
 ```
 
-You will be asked for the atmoschem server’s data password (twice),
-which can be obtained from [the atmoschem
-website](http://atmoschem.asrc.cestm.albany.edu/).
+(replacing the values with your information).
 
 ### Viewing the data
 
@@ -109,27 +111,8 @@ make view
 
 ## Citation
 
-The package citation can be obtained by running
-`citation('atmoschem.process')`:
-
-``` 
-
-To cite package 'atmoschem.process' in publications use:
-
-  William May (2020). atmoschem.process: ASRC Atmospheric Chemistry
-  Data Processing. R package version 0.5.0.
-  https://github.com/ASRCsoft/atmoschem.process
-
-A BibTeX entry for LaTeX users is
-
-  @Manual{,
-    title = {atmoschem.process: ASRC Atmospheric Chemistry Data Processing},
-    author = {William May},
-    year = {2020},
-    note = {R package version 0.5.0},
-    url = {https://github.com/ASRCsoft/atmoschem.process},
-  }
-```
+Please cite this package using the citation available from Zenodo:
+[![DOI](https://zenodo.org/badge/157783204.svg)](https://zenodo.org/badge/latestdoi/157783204)
 
 ## License
 
@@ -137,7 +120,7 @@ A BibTeX entry for LaTeX users is
 
 ## References
 
-<div id="refs" class="references hanging-indent">
+<div id="refs" class="references">
 
 <div id="ref-brandt_atmospheric_2016">
 
