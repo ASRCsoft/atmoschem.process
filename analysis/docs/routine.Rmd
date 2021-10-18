@@ -1,7 +1,7 @@
 ---
 title: "ASRC Routine Meteorological and Chemistry Data"
 author: "William May"
-date: "`r format(Sys.time(), '%B %d, %Y')`, version `r Sys.getenv('raw_version')`"
+date: "`r format(Sys.time(), '%B %d, %Y')` (version `r Sys.getenv('raw_version')`)"
 output:
   md_document:
     variant: markdown_strict-raw_html+pandoc_title_block
@@ -41,4 +41,6 @@ Dr. James Schwab at jschwab@albany.edu.
 ## Recommended Citations
 
 If using the data for research, we suggest including the following citations
-(whichever are relevant):
+(whichever are relevant). A citation for the processing code that generated this
+version of the data can also be found at
+<https://doi.org/10.5281/zenodo.4394566>.
