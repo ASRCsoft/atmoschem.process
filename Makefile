@@ -107,8 +107,9 @@ view:
 
 .PHONY: save_raw
 save_raw:
+	cd $(raw_dir) && \
 	$(rscript) \
-	-e 'zip("$(out_dir)/raw_data_v$(raw_version).zip", "$(raw_data)")'
+	-e 'zip("../../$(out_dir)/raw_data_v$(raw_version).zip", "raw_data_v$(raw_version)")'
 
 ## R package
 
