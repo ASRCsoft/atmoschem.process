@@ -109,6 +109,8 @@ wide$value.T_C = (wide$value.T - 32) * 5 / 9
 wide$flag.T_C = wide$flag.T
 wide$value.WS_ms = wide$value.WS / 1.944
 wide$flag.WS_ms = wide$flag.WS
+wide$value.Ozone_ppbv = wide$value.Ozone * 1000
+wide$flag.Ozone_ppbv = wide$flag.Ozone
 
 # write to sqlite
 wide$time = format(wide$time, '%Y-%m-%d %H:%M:%S', tz = 'EST')
