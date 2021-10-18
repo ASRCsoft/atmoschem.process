@@ -95,7 +95,7 @@ raw_data: $(raw_zip)
 
 $(raw_dir)/%.zip:
 	mkdir -p $(raw_dir) && \
-	wget --user=aqm --ask-password -O $@ $(download_url)/$(shell echo $* | sed -E s/_v[0-9.]+$$//)/$*.zip
+	wget --user=$(asrc_user) --password=$(asrc_pass) -O $@ $(download_url)/$(shell echo $* | sed -E s/_v[0-9.]+$$//)/$*.zip
 
 .PHONY: view
 view:
