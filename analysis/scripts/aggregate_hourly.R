@@ -139,5 +139,5 @@ dbpath = paste0('hourly_', site, '_', data_source, '.sqlite') %>%
   file.path(interm_dir, .)
 db = dbConnect(SQLite(), dbpath)
 dbWriteTable(db, 'measurements', hourly_ds, overwrite = T)
-dbExecute(db, 'create index time_index on measurements(time)')
+invisible(dbExecute(db, 'create index time_index on measurements(time)'))
 dbDisconnect(db)

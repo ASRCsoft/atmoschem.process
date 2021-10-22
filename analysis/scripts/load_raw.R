@@ -40,9 +40,9 @@ interm_dir = file.path('analysis', 'intermediate')
 dir.create(interm_dir, F, T)
 dbpath = paste0('raw_', site, '_', data_source, '.sqlite') %>%
   file.path(interm_dir, .)
-if (file.exists(dbpath)) file.remove(dbpath)
+if (file.exists(dbpath)) invisible(file.remove(dbpath))
 db = dbConnect(SQLite(), dbpath)
-dbExecute(db, 'create table measurements(time text)')
+invisible(dbExecute(db, 'create table measurements(time text)'))
 
 # load data into sqlite
 files = file.path('analysis', 'raw', raw_folder, site, 'measurements',
@@ -52,5 +52,5 @@ message('Loading ', length(files), ' files into ', basename(dbpath), '...')
 for (f in files) load_file(f, db)
 
 # speed up future queries, especially queries that filter by time of day
-dbExecute(db, 'create index time_index on measurements(time, substr(time, 12, 5))')
+invisible(dbExecute(db, 'create index time_index on measurements(time, substr(time, 12, 5))'))
 dbDisconnect(db)
