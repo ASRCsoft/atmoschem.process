@@ -42,6 +42,10 @@ check_data:
 	-e '$(call check_rpkg,tinytest)' \
 	-e 'tinytest::run_test_dir("analysis/tests")'
 
+.PHONY: clean_data
+clean_data:
+	@rm $(raw_data) && rm -rf $(raw_dir) && rm -rf $(interm_dir) && rm -rf $(out_dir)
+
 # save intermediate sqlite files for the processing viewer
 .SECONDARY:
 
