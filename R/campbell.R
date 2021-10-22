@@ -31,12 +31,14 @@ fix_wfms = function(df) {
   ## replace mislabeled NO2 column
   names(df)[names(df) == 'NO2_Avg'] = 'NOx_Avg'
   ## adjust miscalculated wind speeds
-  df$WS3Cup_Avg[df$instrument_time > '2016-12-14' &
-                df$instrument_time < '2019-02-14 15:57'] =
-    (.5 / .527) * df$WS3Cup_Avg - (.5 / .527) - .5
-  df$WS3Cup_Max[df$instrument_time > '2016-12-14' &
-                df$instrument_time < '2019-02-14 15:57'] =
-    (.5 / .527) * df$WS3Cup_Max - (.5 / .527) - .5
+  wind_miscalculated = df$instrument_time > '2016-12-14' &
+    df$instrument_time < '2019-02-14 15:57'
+  if (any(wind_miscalculated)) {
+    df$WS3Cup_Avg[wind_miscalculated] =
+      (.5 / .527) * df$WS3Cup_Avg[wind_miscalculated] - (.5 / .527) - .5
+    df$WS3Cup_Max[wind_miscalculated] =
+      (.5 / .527) * df$WS3Cup_Max[wind_miscalculated] - (.5 / .527) - .5
+  }
   ## ignore some incorrect flags
   df$F_TRH_Avg[df$instrument_time > '2018-12-01' &
                df$instrument_time < '2019-01-01'] = 1
