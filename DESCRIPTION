@@ -1,6 +1,6 @@
 Package: atmoschem.process
 Title: ASRC Atmospheric Chemistry Data Processing
-Version: 0.6.0
+Version: 0.7.0
 Date: 2020-10-26
 Authors@R: c(
     person("William", "May", email = "wcmay@albany.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-3201-1885")),
