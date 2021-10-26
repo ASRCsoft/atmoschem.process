@@ -47,8 +47,8 @@ get_cal_results = function(dt_int, t_int, p, d, agg_f) {
                      paste0('raw_', site, '_', d, '.sqlite'))
   db = dbConnect(SQLite(), dbpath)
   sql_str = '
-select time,
-       ? as value
+select time, 
+      ? as value
   from measurements
  where time>=?
    and time<=?
@@ -74,10 +74,14 @@ select time,
 # R's lead and lag functions aren't so useful. These are better.
 lag2 = function(x, k = 1) c(rep(NA, k), head(x, -k))
 lead2 = function(x, k = 1) c(tail(x, -k), rep(NA, k))
-# Guess the conversion efficiency calibration time period using the recorded NOx
-# value from the cal sheet (noxval), the range of calibration times, and the
-# NO/NOx divergence
-guess_42C_ce = function(meas, noxval) {
+
+# Find the PSP conversion efficiency check time period using measurements from
+# the overall calibration check period (meas) and the recorded NO2 "instrument
+# response" value from the cal sheet (no2val)
+find_42C_ce = function(meas, no2val) {
+  # get the calibrator info
+  calibrators = config$psp_no2_calibrators
+  calibrator = calibrators[findInterval(meas$time[1], as.POSIXct(calibrators$start_time, tz = 'EST')), ]
   candidates = meas %>%
     transform(no2 = nox - no) %>%
     # split measurements by discontinuities and give each group an ID
@@ -85,8 +89,8 @@ guess_42C_ce = function(meas, noxval) {
     transform(discontinuous = abs(dnox) > 1 | abs(dno2) > 1) %>%
     transform(new_group = discontinuous & !lag2(discontinuous)) %>%
     transform(group = cumsum(!is.na(new_group) & new_group)) %>%
-    # remove short-lived groups
     subset(!discontinuous) %>%
+    # remove short-lived groups
     transform(stime = ave(time, group, FUN = min),
               etime = ave(time, group, FUN = max)) %>%
     subset(etime - stime >= as.difftime(10, units = 'mins')) %>%
@@ -95,16 +99,27 @@ guess_42C_ce = function(meas, noxval) {
               noxcal = ave(nox, group, FUN = function(x) max_ma(x, 5))) %>%
     subset(select = c('stime', 'etime', 'nocal', 'noxcal')) %>%
     unique %>%
-    transform(no2cal = noxcal - nocal) %>%
-    # remove zero calibrations
-    subset(nocal > .3) %>%
-    # make sure measured NOx value is in the ballpark of the recorded NOx value
-    subset(100 * noxcal / noxval - 100 > -30 & 
-           100 * noxcal / noxval - 100 < 50 )
+    transform(no2cal = noxcal - nocal)
+  if (calibrator$model == '146i') {
+    candidates = candidates %>%
+      # no2cal, no2val are both measured NOx - measured NO, should be close
+      # (within 10%)
+      transform(pctdiff = abs(100 * no2cal / no2val - 100)) %>%
+      subset(pctdiff < 10)
+  } else if (calibrator$model == 'T700U') {
+    candidates = candidates %>%
+      # in this case no2val is certified NOx - measured NO
+      transform(noval = calibrator$certified_nox - no2val) %>%
+      # look for NO values within 10% of the implied cal sheet NO value
+      transform(pctdiff = abs(100 * nocal / noval - 100)) %>%
+      subset(pctdiff < 10)
+  } else {
+    stop('Calibrator', calibrator$model, 'is not even possible. What??')
+  }
   if (!nrow(candidates)) return(NA)
-  candidates[order(candidates$no2cal, decreasing = T), ] %>%
+  candidates[order(candidates$pctdiff), ] %>%
     head(1) %>%
-    with(list(start_time = stime, end_time = etime, no = nocal))
+    with(list(start_time = stime, end_time = etime, no = nocal, nox = noxcal))
 }
 
 # get the manual cals
@@ -148,10 +163,10 @@ if (site == 'PSP') {
   dbDisconnect(db)
   meas$time = as.POSIXct(meas$time, tz = 'EST')
 
-  # make a plausible guess about the 42C CE results, since they aren't recorded
-  # in the PSP cal sheets
+  # find the 42C CE results in the raw data since they weren't recorded in the
+  # PSP cal sheets
   ce_mcals = subset(mcals, measurement_name == 'NOx' & type == 'CE')
-  no_ces = meas %>%
+  nox_ces = meas %>%
     transform(is_cal = time %within% as.list(ce_mcals$times)) %>%
     transform(new_cal = is_cal & !lag2(is_cal)) %>%
     transform(cal_id = cumsum(new_cal)) %>%
@@ -161,31 +176,38 @@ if (site == 'PSP') {
     lapply(function(x) {
       # find the matching interval in ce_mcals
       mcal_i = ce_mcals[x$time[1] %within% ce_mcals$times, ]
-      guess = guess_42C_ce(x, mcal_i$measured_value)
+      guess = find_42C_ce(x, mcal_i$measured_value)
       if (!is.list(guess)) {
         data.frame(measurement_name = 'NO', type = 'CE',
                    start_time = int_start(mcal_i$times),
                    end_time = int_end(mcal_i$times),
-                   provided_value = mcal_i$provided_value, measured_value = NA)
+                   provided_value = mcal_i$provided_value, measured_value = NA,
+                   nox = NA)
       } else {
         data.frame(measurement_name = 'NO', type = 'CE',
                    start_time = guess$start_time, end_time = guess$end_time,
                    provided_value = mcal_i$provided_value,
-                   measured_value = guess$no)
+                   measured_value = guess$no, nox = guess$nox)
       }
     }) %>%
     do.call(rbind, .) %>%
     # fix time formatting messed up by rbind
     transform(start_time = as.POSIXct(start_time, tz = 'EST', origin = '1970-01-01'),
               end_time = as.POSIXct(end_time, tz = 'EST', origin = '1970-01-01')) %>%
-    transform(times = interval(start_time, end_time))
-  no_ces = no_ces[, !names(no_ces) %in% c('start_time', 'end_time')]
-  no_ces = no_ces[, c(1:2, 5, 3:4)]
-  no_ces$corrected = F
-  no_ces$data_source = 'envidas'
+    transform(times = interval(start_time, end_time)) %>%
+    subset(select = -c(measurement_name, start_time, end_time))
+  names(nox_ces)[3:4] = c('measured_value.NO', 'measured_value.NOx')
+  nox_ces = reshape(nox_ces, varying = 3:4, timevar = 'measurement_name',
+                    idvar = names(nox_ces)[-(3:4)], direction = 'long')
+  nox_ces$corrected = F
+  nox_ces$data_source = 'envidas'
   
   # add NO CE values to the other manual cals
-  mcals = rbind(mcals, no_ces[, names(mcals)])
+  mcals = mcals %>%
+    # remove the values that came from the cal sheet
+    subset(!(measurement_name == 'NOx' & type == 'CE')) %>%
+    # append the new values
+    rbind(nox_ces[, names(mcals)])
 }
 
 # fix up mcal formatting
