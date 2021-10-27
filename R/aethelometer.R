@@ -1,3 +1,4 @@
+#' @export
 transform_wfms_aethelometer = function(f) {
   if (startsWith(basename(f), 'ae')) {
     df = read.csv(f, header = FALSE, skip = 1)

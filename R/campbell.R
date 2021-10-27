@@ -61,6 +61,7 @@ fix_wfms = function(df) {
   df
 }
 
+#' @export
 transform_campbell = function(f, site) {
   campbell = read_campbell(f)
   if (site == 'WFMS') {

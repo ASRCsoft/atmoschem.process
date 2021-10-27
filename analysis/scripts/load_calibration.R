@@ -15,6 +15,63 @@ site = commandArgs(trailingOnly = T)[1]
 raw_folder = paste0('raw_data_v', Sys.getenv('raw_version'))
 config = read_csv_dir('analysis/config')
 
+is_psp_42C_cal = function(f)
+  startsWith(basename(f), 'Pinnacle_42C')
+is_psp_API300EU_cal = function(f)
+  startsWith(basename(f), 'Pinnacle_API300EU_CO_Weekly')
+is_psp_ASRC_TEI42i_Y_NOy_cal = function(f)
+  startsWith(basename(f), 'Pinnacle_ASRC_TEI42i_Y_NOy_146i_Weekly') |
+    startsWith(basename(f), 'Pinnacle_ASRC_TEI42i_Y_NOy_146i_WEEKLY') |
+    startsWith(basename(f), 'Pinnacle_ASRC_TEI42i_Y_NOy_T700_Weekly')
+is_psp_DEC_TEI42i_NOy_cal = function(f)
+  startsWith(basename(f), 'Pinnacle DEC TEI42i NOy Weekly') |
+    startsWith(basename(f), 'Pinnacle_DEC_TEI42i_NOy_Weekly')
+is_psp_TEI43i_SO2_cal = function(f)
+  startsWith(basename(f), 'Pinnacle_TEI43i_SO2_Weekly') |
+    startsWith(basename(f), 'Pinnacle_TEI43i_SO2_146i_Weekly')
+is_psp_TEI49i_O3_49i_cal = function(f)
+  startsWith(basename(f), 'Pinnacle_TEI49i_O3_49i_Weekly') |
+    startsWith(basename(f), 'Pinnacle_TEI49i_O3_Weekly')
+
+transform_psp_calibrations = function(f) {
+  # figure out which function to use for a Pinnacle calibration file
+  if (is_psp_42C_cal(f)) {
+    transform_psp_42C_calibrations(f)
+  } else if (is_psp_API300EU_cal(f)) {
+    transform_psp_API300EU_calibrations(f)
+  } else if (is_psp_ASRC_TEI42i_Y_NOy_cal(f)) {
+    transform_psp_ASRC_TEI42i_Y_NOy_calibrations(f)
+  } else if (is_psp_DEC_TEI42i_NOy_cal(f)) {
+    transform_psp_DEC_TEI42i_NOy_calibrations(f)
+  } else if (is_psp_TEI43i_SO2_cal(f)) {
+    transform_psp_TEI43i_SO2_calibrations(f)
+  } else if (is_psp_TEI49i_O3_49i_cal(f)) {
+    transform_psp_TEI49i_O3_49i_calibrations(f)
+  } else {
+    warning(paste('Transform not implemented for', f))
+    NULL
+  }
+}
+
+# decide what to do with a calibration file using its site and instrument
+transform_calibration = function(f, site, ds) {
+  if (site == 'PSP') {
+    transform_psp_calibrations(f)
+  } else if (site == 'WFMS' && ds == 'Teledyne_300EU') {
+    transform_wfms_300EU(f)
+  } else if (site == 'WFMS' && ds == 'Thermo_42C') {
+    transform_wfms_42C(f)
+  } else if (site == 'WFMS' && ds == 'Thermo_42Cs') {
+    transform_wfms_42Cs(f)
+  } else if (site == 'WFMS' && ds == 'Thermo_43C') {
+    transform_wfms_43C(f)
+  } else if (site == 'WFML' && ds == 'Thermo_42i') {
+    transform_wfml_42i(f)
+  } else if (site == 'WFML' && ds == 'Thermo_48C') {
+    transform_wfml_48C(f)
+  }
+}
+
 # calibration-related functions
 min_ma = function(x, k) min(suppressWarnings(runmed(x, k, 'constant')), na.rm = TRUE)
 max_ma = function(x, k) max(suppressWarnings(runmed(x, k, 'constant')), na.rm = TRUE)
@@ -132,8 +189,8 @@ files = files[!grepl('audit|calibration', basename(files), ignore.case = T)]
 message('Loading ', length(files), ' files into cals_', site, '.sqlite...')
 mcals = data.frame(f = files) %>%
   transform(ds = gsub('^.*calibrations/|/[0-9]{4}/[^/].*$', '', f)) %>%
-  with(mapply(atmoschem.process:::transform_calibration, f = f, site = site,
-              ds = ds, SIMPLIFY = F)) %>%
+  with(mapply(transform_calibration, f = f, site = site, ds = ds,
+              SIMPLIFY = F)) %>%
   do.call(rbind, .)
 # ideally, the data source would be assigned via the config files. But for now,
 # hardcoded

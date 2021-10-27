@@ -1,3 +1,4 @@
+#' @export
 transform_mesonet = function(f) {
   df = read.csv(f, check.names = F)
   if (!nrow(df)) return(data.frame())

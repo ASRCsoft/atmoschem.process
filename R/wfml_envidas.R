@@ -34,6 +34,7 @@ patch_wfms_envidas = function(df) {
   df
 }
 
+#' @export
 transform_wfml_envidas = function(f, site = 'WFML') {
   df = read_wfml_envidas(f)
   ## get timestamps from date and time columns

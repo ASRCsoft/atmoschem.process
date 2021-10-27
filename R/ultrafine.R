@@ -29,6 +29,7 @@ read_ultrafine = function(f) {
   df
 }
 
+#' @export
 transform_ultrafine = function(f) {
   uf = read_ultrafine(f)
   uf$flagged = parse_ultrafine_flag(as.character(uf$`Status Flags`))

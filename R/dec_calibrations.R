@@ -136,17 +136,20 @@ transform_psp_single_calibrations = function(f, date_cell = 'L11',
   read_psp_cal_table(f, trange, chem_name, cal_times)
 }
 
+#' @export
 transform_psp_42C_calibrations = function(f) {
   transform_psp_NO_calibrations(f, 'K10', 'Z10', 'AF10',
                                 trange = 'F33:AD35',
                                 chem_names = c('NO', 'NOx'))
 }
 
+#' @export
 transform_psp_API300EU_calibrations = function(f) {  
   transform_psp_single_calibrations(f, trange = 'U38:AA42',
                                     chem_name = 'CO')
 }
 
+#' @export
 transform_psp_ASRC_TEI42i_Y_NOy_calibrations = function(f) {
   caldf = transform_psp_NO_calibrations(f,
                                         chem_names = c('NOy-HNO3', 'NOy'),
@@ -165,38 +168,21 @@ transform_psp_ASRC_TEI42i_Y_NOy_calibrations = function(f) {
   caldf
 }
 
+#' @export
 transform_psp_DEC_TEI42i_NOy_calibrations = function(f) {
   transform_psp_NO_calibrations(f, 'K11', trange = 'F34:AD36',
                                 chem_names = c('NO-DEC', 'NOy-DEC'),
                                 ce_row = 46)
 }
 
+#' @export
 transform_psp_TEI43i_SO2_calibrations = function(f) {  
   transform_psp_single_calibrations(f, chem_name = 'SO2')
 }
 
+#' @export
 transform_psp_TEI49i_O3_49i_calibrations = function(f) {  
   transform_psp_single_calibrations(f, 'L10', 'Z10', 'AE10',
                                     trange = 'U35:AA39',
                                     chem_name = 'Thermo_O3')
-}
-
-transform_psp_calibrations = function(f) {
-  ## figure out which function to send this file to
-  if (is_psp_42C_cal(f)) {
-    transform_psp_42C_calibrations(f)
-  } else if (is_psp_API300EU_cal(f)) {
-    transform_psp_API300EU_calibrations(f)
-  } else if (is_psp_ASRC_TEI42i_Y_NOy_cal(f)) {
-    transform_psp_ASRC_TEI42i_Y_NOy_calibrations(f)
-  } else if (is_psp_DEC_TEI42i_NOy_cal(f)) {
-    transform_psp_DEC_TEI42i_NOy_calibrations(f)
-  } else if (is_psp_TEI43i_SO2_cal(f)) {
-    transform_psp_TEI43i_SO2_calibrations(f)
-  } else if (is_psp_TEI49i_O3_49i_cal(f)) {
-    transform_psp_TEI49i_O3_49i_calibrations(f)
-  } else {
-    warning(paste('Transform not implemented for', f))
-    NULL
-  }
 }

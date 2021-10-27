@@ -69,6 +69,7 @@ transform_envidas_daily = function(f, site = 'PSP') {
   df
 }
 
+#' @export
 transform_psp_envidas = function(f, site = 'PSP') {
   ## check to see if the file is in the simpler daily format
   is_daily_format = grepl('^[0-9]{8}_envidas.csv$', basename(f))

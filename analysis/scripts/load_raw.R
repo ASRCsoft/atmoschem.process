@@ -14,9 +14,38 @@ site = commandArgs(trailingOnly = T)[1]
 data_source = commandArgs(trailingOnly = T)[2]
 raw_folder = paste0('raw_data_v', Sys.getenv('raw_version'))
 
+# transform a raw data file according to its site and data source
+transform_measurement = function(f, site, ds) {
+  if (ds == 'campbell') {
+    return(transform_campbell(f, site))
+  } else if (site == 'PSP' & ds == 'envidas') {
+    return(transform_psp_envidas(f))
+  } else if (site == 'WFML' && ds == 'envidas') {
+    return(transform_wfml_envidas(f))
+  } else if (site == 'WFMS' && ds == 'DEC_envidas') {
+    # this is really the same format as the WFML envidas
+    return(transform_wfml_envidas(f, 'WFMS'))
+  } else if (site == 'WFMS' && ds == 'envidas') {
+    # this is the same format as the daily PSP envidas
+    return(transform_psp_envidas(f, 'WFMS'))
+  }
+  res = if (ds == 'ultrafine') {
+    transform_ultrafine(f)
+  } else if (ds == 'mesonet') {
+    transform_mesonet(f)
+  } else if (site == 'WFMS' && ds == 'aethelometer') {
+    transform_wfms_aethelometer(f)
+  }
+  if (!nrow(res)) return(data.frame())
+  res %>%
+    transform(time = as.POSIXct(instrument_time, tz = 'EST')) %>%
+    reshape(timevar = 'measurement_name', idvar = 'time', direction = 'wide',
+            drop = c('record', 'instrument_time'))
+}
+
 # read the file and add it to the sqlite database
 load_file = function(f, db) {
-  dat = tryCatch(atmoschem.process:::transform_measurement(f, site, data_source),
+  dat = tryCatch(transform_measurement(f, site, data_source),
                  error = function(e) {
                    stop(f, ' loading failed: ', e)
                  })
