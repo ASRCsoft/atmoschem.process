@@ -97,20 +97,40 @@ get_didcheck_labels = function(x) {
   labels[order(n)]
 }
 
+# Return the labels for the corrected check boxes, ordered 3, 5 (zero,
+# span). `x` is a vector of labels. Some files contain 2 parameters, and in that
+# case the function will return different values depending on which parameter (1
+# or 2) is selected.
+get_corrected_labels = function(x, param = NULL) {
+  if (is.null(param)) {
+    regex = 'set.*zero.*3|set.*span.*5'
+  } else {
+    if (param == 1) {
+      regex = 'set.*zero.*3|set.*span.*a_5'
+    } else if (param == 2) {
+      regex = 'set.*zero.*3|set.*span.*b_5'
+    }
+  }
+  labels = x[grepl(regex, x)]
+  stopifnot(length(labels) == 2)
+  n = as.integer(sub('.*[^0-9]*', '', labels))
+  stopifnot(all(sort(n) == c(3, 5)))
+  labels[order(n)]
+}
+
 transform_wfm_cal_list = function(pdf, measurement_name,
-                                  corrected = c('set_42ctls_to_zero_3',
-                                                'set_span_noy_a_5',
-                                                NA),
                                   provided = c(0, 14, 0),
                                   measured = c('measured_zero_3',
                                                'measured_span_5',
-                                               'zero_check_7')) {
+                                               'zero_check_7'),
+                                  param = NULL) {
   time_entries = format_pdf_time(pdf, get_time_labels(names(pdf)))
   offline_time = time_entries[1]
   start_times = time_entries[c(2, 4, 6)]
   measured_times = time_entries[c(3, 5, 7)]
   online_time = time_entries[8]
   didcheck = get_didcheck_labels(names(pdf))
+  corrected = box_checked(unlist(pdf[get_corrected_labels(names(pdf), param)]))
   types = c('zero', 'span', 'zero check')
   res = data.frame()
   for (n in 1:3) {
@@ -135,14 +155,11 @@ transform_wfm_cal_list = function(pdf, measurement_name,
 
       if (!is.null(start_time) && !is.null(end_time)) {
         times_str = paste0('[', start_time, ', ', end_time, ']')
-        bool_corrected = !is.na(corrected[n]) &&
-          corrected[n] %in% names(pdf) &&
-          box_checked(pdf[[corrected[n]]])
         res1 = data.frame(measurement_name, type = types[n],
                           times = times_str,
                           provided_value = provided[n],
                           measured_value = pdf[[measured[n]]],
-                          corrected = bool_corrected)
+                          corrected = n < 3 && corrected[n])
         res = rbind(res, res1)
       }
     }
@@ -164,18 +181,12 @@ transform_wfm_no_cal = function(f, measurement_names, provided_span) {
                                 measured = c('measured_zero_noy_a_3',
                                              'measured_span_noy_a_5',
                                              '42ctls_zero_noy_a_7'),
-                                corrected = c('set_42ctls_to_zero_3',
-                                              'set_span_noy_a_5',
-                                              NA),
-                                provided = provided)
+                                provided = provided, param = 1)
   res2 = transform_wfm_cal_list(pdf, measurement_names[2],
                                 measured = c('measured_zero_noy_b_3',
                                              'measured_span_noy_b_5',
                                              '42ctls_zero_noy_b_7'),
-                                corrected = c('set_42ctls_to_zero_3',
-                                              'set_span_noy_b_5',
-                                              NA),
-                                provided = provided)
+                                provided = provided, param = 2)
   rbind(res1, res2)
 }
 
@@ -186,11 +197,7 @@ transform_wfml_42i = function(f) {
 
 #' @export
 transform_wfml_48C = function(f) {
-  df48C = transform_wfm_single_cal(f, 'CO',
-                                   corrected = c('set_48C_zero_offset_ 3',
-                                                 'set_48C_span_5',
-                                                 NA),
-                                   provided = c(0, 450, 0))
+  df48C = transform_wfm_single_cal(f, 'CO', provided = c(0, 450, 0))
   ## need to multiply by 1000 because cal values are recorded in
   ## different units than the measurements!
   df48C$measured_value =
@@ -201,9 +208,6 @@ transform_wfml_48C = function(f) {
 #' @export
 transform_wfms_300EU = function(f) {
   df300EU = transform_wfm_single_cal(f, 'CO',
-                                     corrected = c('set 300EU to zero 3',
-                                                   'set 300EU span 5',
-                                                   NA),
                                      provided = c(0, 452, 0),
                                      measured = c('measured zero 3',
                                                   'measured span 5',
@@ -228,9 +232,6 @@ transform_wfms_42Cs = function(f) {
 #' @export
 transform_wfms_43C = function(f) {
   transform_wfm_single_cal(f, 'SO2',
-                           corrected = c('set_43c_to_zero_3',
-                                         'set_span_so2_5',
-                                         NA),
                            measured = c('measured_zero_so2_3',
                                         'measured_span_so2_5',
                                         '43c_zero_7'),
