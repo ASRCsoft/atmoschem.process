@@ -87,10 +87,17 @@ get_time_labels = function(x) {
   labels[order(n)]
 }
 
+# Return the labels for the didcheck check boxes, ordered 2, 4, 6 (zero, span,
+# second zero). `x` is a vector of labels
+get_didcheck_labels = function(x) {
+  labels = x[grepl('(zero|span)[ _](cal[ _])?(mode|check)[ _][246]', x)]
+  stopifnot(length(labels) == 3)
+  n = as.integer(sub('[^0-9]*', '', labels))
+  stopifnot(all(sort(n) == c(2, 4, 6)))
+  labels[order(n)]
+}
+
 transform_wfm_cal_list = function(pdf, measurement_name,
-                                  calibrated = c('zero_cal_mode_2',
-                                                 'span_cal_mode_4',
-                                                 'zero_mode_6'),
                                   corrected = c('set_42ctls_to_zero_3',
                                                 'set_span_noy_a_5',
                                                 NA),
@@ -103,13 +110,14 @@ transform_wfm_cal_list = function(pdf, measurement_name,
   start_times = time_entries[c(2, 4, 6)]
   measured_times = time_entries[c(3, 5, 7)]
   online_time = time_entries[8]
+  didcheck = get_didcheck_labels(names(pdf))
   types = c('zero', 'span', 'zero check')
   res = data.frame()
   for (n in 1:3) {
     ## Hey! need to look at more info here to determine if the
     ## calibration happened-- occasionally people forget to check the
     ## box
-    performed_cal = box_checked(pdf[[calibrated[n]]])
+    performed_cal = box_checked(pdf[[didcheck[n]]])
     if (performed_cal) {
       start_time = get_cal_start_time(start_times[n], offline_time,
                                       measured_times[1:n])
@@ -179,9 +187,6 @@ transform_wfml_42i = function(f) {
 #' @export
 transform_wfml_48C = function(f) {
   df48C = transform_wfm_single_cal(f, 'CO',
-                                   calibrated = c('zero_cal_mode_2',
-                                                  'span_cal_mode_4',
-                                                  'zero_cal_check_6'),
                                    corrected = c('set_48C_zero_offset_ 3',
                                                  'set_48C_span_5',
                                                  NA),
@@ -196,9 +201,6 @@ transform_wfml_48C = function(f) {
 #' @export
 transform_wfms_300EU = function(f) {
   df300EU = transform_wfm_single_cal(f, 'CO',
-                                     calibrated = c('zero_cal_mode_2',
-                                                    'span cal mode 4',
-                                                    'zero cal check 6'),
                                      corrected = c('set 300EU to zero 3',
                                                    'set 300EU span 5',
                                                    NA),
