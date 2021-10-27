@@ -118,11 +118,36 @@ get_corrected_labels = function(x, param = NULL) {
   labels[order(n)]
 }
 
+# Return the labels for the measured check boxes, ordered 3, 5, 7 (zero, span,
+# second zero). `x` is a vector of labels. Some files contain 2 parameters, and
+# in that case the function will return different values depending on which
+# parameter (1 or 2) is selected.
+get_measured_labels = function(x, param = NULL) {
+  if (is.null(param)) {
+    # I think in the 43C form the zero_check_7 value somehow took the place of
+    # zero_check_complete_7 (the checkbox)?
+    if ('43c_zero_7' %in% x) {
+      regex_zero = '43c_zero_7'
+    } else {
+      regex_zero = 'zero.*[ _](check[ _])(7|300EU ppb)'
+    }
+    regex = paste0('measured[ _](zero|span)[ _].*[35]|', regex_zero)
+  } else {
+    if (param == 1) {
+      regex = 'measured[ _](zero|span)[ _].*a_[35]|zero.*[ _]a_7'
+    } else if (param == 2) {
+      regex = 'measured[ _](zero|span)[ _].*b_[35]|zero.*[ _]b_7'
+    }
+  }
+  labels = x[grepl(regex, x)]
+  stopifnot(length(labels) == 3)
+  n = as.integer(sub('.*[^0-9]*', '', labels))
+  stopifnot(all(sort(n) == c(3, 5, 7)))
+  labels[order(n)]
+}
+
 transform_wfm_cal_list = function(pdf, measurement_name,
                                   provided = c(0, 14, 0),
-                                  measured = c('measured_zero_3',
-                                               'measured_span_5',
-                                               'zero_check_7'),
                                   param = NULL) {
   time_entries = format_pdf_time(pdf, get_time_labels(names(pdf)))
   offline_time = time_entries[1]
@@ -131,6 +156,7 @@ transform_wfm_cal_list = function(pdf, measurement_name,
   online_time = time_entries[8]
   didcheck = get_didcheck_labels(names(pdf))
   corrected = box_checked(unlist(pdf[get_corrected_labels(names(pdf), param)]))
+  measured = get_measured_labels(names(pdf), param)
   types = c('zero', 'span', 'zero check')
   res = data.frame()
   for (n in 1:3) {
@@ -178,14 +204,8 @@ transform_wfm_no_cal = function(f, measurement_names, provided_span) {
   ## this one has different cal checkbox labels
   provided = c(0, provided_span, 0)
   res1 = transform_wfm_cal_list(pdf, measurement_names[1],
-                                measured = c('measured_zero_noy_a_3',
-                                             'measured_span_noy_a_5',
-                                             '42ctls_zero_noy_a_7'),
                                 provided = provided, param = 1)
   res2 = transform_wfm_cal_list(pdf, measurement_names[2],
-                                measured = c('measured_zero_noy_b_3',
-                                             'measured_span_noy_b_5',
-                                             '42ctls_zero_noy_b_7'),
                                 provided = provided, param = 2)
   rbind(res1, res2)
 }
@@ -207,11 +227,7 @@ transform_wfml_48C = function(f) {
 
 #' @export
 transform_wfms_300EU = function(f) {
-  df300EU = transform_wfm_single_cal(f, 'CO',
-                                     provided = c(0, 452, 0),
-                                     measured = c('measured zero 3',
-                                                  'measured span 5',
-                                                  'zero check 300EU ppb'))
+  df300EU = transform_wfm_single_cal(f, 'CO', provided = c(0, 452, 0))
   ## for whatever reason these cal values are being recorded as an
   ## offset from 200 rather than from zero
   df300EU$measured_value =
@@ -231,9 +247,5 @@ transform_wfms_42Cs = function(f) {
 
 #' @export
 transform_wfms_43C = function(f) {
-  transform_wfm_single_cal(f, 'SO2',
-                           measured = c('measured_zero_so2_3',
-                                        'measured_span_so2_5',
-                                        '43c_zero_7'),
-                           provided = c(0, 5.9, 0))
+  transform_wfm_single_cal(f, 'SO2', provided = c(0, 5.9, 0))
 }
