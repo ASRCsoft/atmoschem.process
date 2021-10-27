@@ -1,5 +1,10 @@
 # get manual calibrations from pdf cal sheets
 
+# ASRC cal sheets are pdf's with embedded forms. The forms can be read by pdftk
+# (included with the staplr package). Each instrument has its own version of the
+# pdf. Form field names are similar across instruments but with minor
+# variations.
+
 #' Get fields from a pdf form
 #'
 #' Get the field values from a pdf form (AcroForms). This function is a
@@ -40,6 +45,67 @@ box_checked = function(box) !is.na(box) & box == 'On'
 format_pdf_time = function(pdf, time_label)
   strptime(paste(pdf$date, unlist(pdf[time_label])), '%d-%b-%y %H:%M', tz = 'EST')
 
+# order matching strings so that the numbers at the ends of the strings match
+# numeric vector `i`
+order_matches = function(x, regex, i) {
+  labels = x[grepl(regex, x)]
+  stopifnot(length(labels) == length(i))
+  n = as.integer(sub('.*[^0-9]*', '', labels))
+  stopifnot(all(sort(n) == i))
+  labels[order(n)]
+}
+
+# Return the labels for the pdf time entries, ordered 1 to 8. `x` is a vector of
+# labels
+get_time_labels = function(x) order_matches(x, 'time[ _]log[ _][0-9]+', 1:8)
+
+# Return the labels for the didcheck check boxes, ordered 2, 4, 6 (zero, span,
+# second zero). `x` is a vector of labels
+get_didcheck_labels = function(x) {
+  order_matches(x, '(zero|span)[ _](cal[ _])?(mode|check)[ _][246]', c(2, 4, 6))
+}
+
+# Return the labels for the corrected check boxes, ordered 3, 5 (zero,
+# span). `x` is a vector of labels. Some files contain 2 parameters, and in that
+# case the function will return different values depending on which parameter (1
+# or 2) is selected.
+get_corrected_labels = function(x, param = NULL) {
+  if (is.null(param)) {
+    regex = 'set.*zero.*3|set.*span.*5'
+  } else {
+    if (param == 1) {
+      regex = 'set.*zero.*3|set.*span.*a_5'
+    } else if (param == 2) {
+      regex = 'set.*zero.*3|set.*span.*b_5'
+    }
+  }
+  order_matches(x, regex, c(3, 5))
+}
+
+# Return the labels for the measured check boxes, ordered 3, 5, 7 (zero, span,
+# second zero). `x` is a vector of labels. Some files contain 2 parameters, and
+# in that case the function will return different values depending on which
+# parameter (1 or 2) is selected.
+get_measured_labels = function(x, param = NULL) {
+  if (is.null(param)) {
+    # I think in the 43C form the zero_check_7 value somehow took the place of
+    # zero_check_complete_7 (the checkbox)?
+    if ('43c_zero_7' %in% x) {
+      regex_zero = '43c_zero_7'
+    } else {
+      regex_zero = 'zero.*[ _](check[ _])(7|300EU ppb)'
+    }
+    regex = paste0('measured[ _](zero|span)[ _].*[35]|', regex_zero)
+  } else {
+    if (param == 1) {
+      regex = 'measured[ _](zero|span)[ _].*a_[35]|zero.*[ _]a_7'
+    } else if (param == 2) {
+      regex = 'measured[ _](zero|span)[ _].*b_[35]|zero.*[ _]b_7'
+    }
+  }
+  order_matches(x, regex, c(3, 5, 7))
+}
+
 get_cal_start_time = function(start_time, offline_time, measured_times) {
   ## get the start time, guessing if needed
   prev_measured_times = measured_times[1:(length(measured_times) - 1)]
@@ -77,75 +143,6 @@ get_cal_end_time = function(start_times, online_time, measured_time) {
   }
 }
 
-# Return the labels for the pdf time entries, ordered 1 to 8. `x` is a vector of
-# labels
-get_time_labels = function(x) {
-  labels = x[grepl('time[ _]log[ _][0-9]+', x)]
-  stopifnot(length(labels) == 8)
-  n = as.integer(sub('[^0-9]*', '', labels))
-  stopifnot(all(sort(n) == 1:8))
-  labels[order(n)]
-}
-
-# Return the labels for the didcheck check boxes, ordered 2, 4, 6 (zero, span,
-# second zero). `x` is a vector of labels
-get_didcheck_labels = function(x) {
-  labels = x[grepl('(zero|span)[ _](cal[ _])?(mode|check)[ _][246]', x)]
-  stopifnot(length(labels) == 3)
-  n = as.integer(sub('[^0-9]*', '', labels))
-  stopifnot(all(sort(n) == c(2, 4, 6)))
-  labels[order(n)]
-}
-
-# Return the labels for the corrected check boxes, ordered 3, 5 (zero,
-# span). `x` is a vector of labels. Some files contain 2 parameters, and in that
-# case the function will return different values depending on which parameter (1
-# or 2) is selected.
-get_corrected_labels = function(x, param = NULL) {
-  if (is.null(param)) {
-    regex = 'set.*zero.*3|set.*span.*5'
-  } else {
-    if (param == 1) {
-      regex = 'set.*zero.*3|set.*span.*a_5'
-    } else if (param == 2) {
-      regex = 'set.*zero.*3|set.*span.*b_5'
-    }
-  }
-  labels = x[grepl(regex, x)]
-  stopifnot(length(labels) == 2)
-  n = as.integer(sub('.*[^0-9]*', '', labels))
-  stopifnot(all(sort(n) == c(3, 5)))
-  labels[order(n)]
-}
-
-# Return the labels for the measured check boxes, ordered 3, 5, 7 (zero, span,
-# second zero). `x` is a vector of labels. Some files contain 2 parameters, and
-# in that case the function will return different values depending on which
-# parameter (1 or 2) is selected.
-get_measured_labels = function(x, param = NULL) {
-  if (is.null(param)) {
-    # I think in the 43C form the zero_check_7 value somehow took the place of
-    # zero_check_complete_7 (the checkbox)?
-    if ('43c_zero_7' %in% x) {
-      regex_zero = '43c_zero_7'
-    } else {
-      regex_zero = 'zero.*[ _](check[ _])(7|300EU ppb)'
-    }
-    regex = paste0('measured[ _](zero|span)[ _].*[35]|', regex_zero)
-  } else {
-    if (param == 1) {
-      regex = 'measured[ _](zero|span)[ _].*a_[35]|zero.*[ _]a_7'
-    } else if (param == 2) {
-      regex = 'measured[ _](zero|span)[ _].*b_[35]|zero.*[ _]b_7'
-    }
-  }
-  labels = x[grepl(regex, x)]
-  stopifnot(length(labels) == 3)
-  n = as.integer(sub('.*[^0-9]*', '', labels))
-  stopifnot(all(sort(n) == c(3, 5, 7)))
-  labels[order(n)]
-}
-
 transform_wfm_cal_list = function(pdf, measurement_name,
                                   provided = c(0, 14, 0),
                                   param = NULL) {
@@ -154,17 +151,15 @@ transform_wfm_cal_list = function(pdf, measurement_name,
   start_times = time_entries[c(2, 4, 6)]
   measured_times = time_entries[c(3, 5, 7)]
   online_time = time_entries[8]
-  didcheck = get_didcheck_labels(names(pdf))
+  didcheck = box_checked(unlist(pdf[get_didcheck_labels(names(pdf))]))
   corrected = box_checked(unlist(pdf[get_corrected_labels(names(pdf), param)]))
-  measured = get_measured_labels(names(pdf), param)
+  measured = unlist(pdf[get_measured_labels(names(pdf), param)])
   types = c('zero', 'span', 'zero check')
   res = data.frame()
   for (n in 1:3) {
-    ## Hey! need to look at more info here to determine if the
-    ## calibration happened-- occasionally people forget to check the
-    ## box
-    performed_cal = box_checked(pdf[[didcheck[n]]])
-    if (performed_cal) {
+    # Hey! need to look at more info here to determine if the calibration
+    # happened-- occasionally people forget to check the box
+    if (didcheck[n]) {
       start_time = get_cal_start_time(start_times[n], offline_time,
                                       measured_times[1:n])
       end_time = get_cal_end_time(start_times[n:3], online_time,
@@ -184,7 +179,7 @@ transform_wfm_cal_list = function(pdf, measurement_name,
         res1 = data.frame(measurement_name, type = types[n],
                           times = times_str,
                           provided_value = provided[n],
-                          measured_value = pdf[[measured[n]]],
+                          measured_value = measured[n],
                           corrected = n < 3 && corrected[n])
         res = rbind(res, res1)
       }
