@@ -126,6 +126,9 @@ find_42C_ce = function(meas, no2val) {
 files = file.path('analysis', 'raw', raw_folder, site, 'calibrations', '*', '*',
                   '*') %>%
   Sys.glob
+# ignore Pinnacle audit and calibration files-- currently only care about the
+# weekly check files
+files = files[!grepl('audit|calibration', basename(files), ignore.case = T)]
 message('Loading ', length(files), ' files into cals_', site, '.sqlite...')
 mcals = data.frame(f = files) %>%
   transform(ds = gsub('^.*calibrations/|/[0-9]{4}/[^/].*$', '', f)) %>%
