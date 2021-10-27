@@ -77,30 +77,33 @@ get_cal_end_time = function(start_times, online_time, measured_time) {
   }
 }
 
+# Return the labels for the pdf time entries, ordered 1 to 8. `x` is a vector of
+# labels
+get_time_labels = function(x) {
+  labels = x[grepl('time[ _]log[ _][0-9]+', x)]
+  stopifnot(length(labels) == 8)
+  n = as.integer(sub('[^0-9]*', '', labels))
+  stopifnot(all(sort(n) == 1:8))
+  labels[order(n)]
+}
+
 transform_wfm_cal_list = function(pdf, measurement_name,
-                                  offline_time = 'time_log_1',
                                   calibrated = c('zero_cal_mode_2',
                                                  'span_cal_mode_4',
                                                  'zero_mode_6'),
-                                  start_time = c('time_log_2',
-                                                 'time_log_4',
-                                                 'time_log_6'),
-                                  measured_time = c('time_log_3',
-                                                    'time_log_5',
-                                                    'time_log_7'),
                                   corrected = c('set_42ctls_to_zero_3',
                                                 'set_span_noy_a_5',
                                                 NA),
                                   provided = c(0, 14, 0),
                                   measured = c('measured_zero_3',
                                                'measured_span_5',
-                                               'zero_check_7'),
-                                  online_time = 'time_log_8') {
-  offline_time = format_pdf_time(pdf, offline_time)
-  online_time = format_pdf_time(pdf, online_time)
+                                               'zero_check_7')) {
+  time_entries = format_pdf_time(pdf, get_time_labels(names(pdf)))
+  offline_time = time_entries[1]
+  start_times = time_entries[c(2, 4, 6)]
+  measured_times = time_entries[c(3, 5, 7)]
+  online_time = time_entries[8]
   types = c('zero', 'span', 'zero check')
-  start_times = format_pdf_time(pdf, start_time)
-  measured_times = format_pdf_time(pdf, measured_time)
   res = data.frame()
   for (n in 1:3) {
     ## Hey! need to look at more info here to determine if the
@@ -196,20 +199,13 @@ transform_wfms_300EU = function(f) {
                                      calibrated = c('zero_cal_mode_2',
                                                     'span cal mode 4',
                                                     'zero cal check 6'),
-                                     start_time = c('time_log_2',
-                                                    'time log 4',
-                                                    'time log 6'),
-                                     measured_time = c('time log 3',
-                                                       'time log 5',
-                                                       'time log 7'),
                                      corrected = c('set 300EU to zero 3',
                                                    'set 300EU span 5',
                                                    NA),
                                      provided = c(0, 452, 0),
                                      measured = c('measured zero 3',
                                                   'measured span 5',
-                                                  'zero check 300EU ppb'),
-                                     online_time = 'time log 8')
+                                                  'zero check 300EU ppb'))
   ## for whatever reason these cal values are being recorded as an
   ## offset from 200 rather than from zero
   df300EU$measured_value =
