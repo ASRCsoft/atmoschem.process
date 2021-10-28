@@ -3,6 +3,7 @@
 fmt_decimals = function(x, k) format(round(x, k), trim = TRUE, nsmall = k)
 
 ## convert strings from csv files to lubridate intervals
+#' @export
 as_interval = function(s) {
   formats = c('%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M', '%Y-%m-%d')
   tlow = gsub('^[[(]|,.*$', '', s)

@@ -17,12 +17,6 @@ start_time = as.POSIXct('2018-10-01', tz = 'EST')
 end_time = as.POSIXct(Sys.getenv('processing_end'), tz = 'EST')
 config = read_csv_dir('analysis/config')
 
-is_true = function(x) !is.na(x) & x
-
-# R's lead and lag functions aren't so useful. These are better.
-lag2 = function(x, k = 1) c(rep(NA, k), head(x, -k))
-lead2 = function(x, k = 1) c(tail(x, -k), rep(NA, k))
-
 # get delta precip from bucket instrument's cycling cumulative values
 # Open question-- how should this function deal with data gaps?
 bucket_precip = function(val, val.max = .5, err.min = -.02) {
@@ -51,11 +45,6 @@ interval_list = function(t, val) {
     subset(true) %>%
     split(., .$group) %>%
     lapply(function(x) interval(min(x$time), max(x$time)))
-}
-
-# add time around a lubridate interval
-pad_interval = function(interval, start, end) {
-  interval(int_start(interval) - start, int_end(interval) - end)
 }
 
 # add parameters used by `is_flagged` to a list of parameter values

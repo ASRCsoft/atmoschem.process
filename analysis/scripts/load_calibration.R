@@ -75,12 +75,6 @@ transform_calibration = function(f, site, ds) {
 # calibration-related functions
 min_ma = function(x, k) min(suppressWarnings(runmed(x, k, 'constant')), na.rm = TRUE)
 max_ma = function(x, k) max(suppressWarnings(runmed(x, k, 'constant')), na.rm = TRUE)
-# start and end times from interval notation
-as_interval = atmoschem.process:::as_interval
-# add time around a lubridate interval
-pad_interval = function(interval, start, end) {
-  interval(int_start(interval) - start, int_end(interval) - end)
-}
 # add time around a character clock time interval
 pad_time_interval = function(interval, start, end) {
   stime = as.POSIXct(gsub('^[[(]|,.*$', '', interval), tz = 'EST',
@@ -128,9 +122,6 @@ select time,
     transform(date = as.Date(time, tz = 'EST')) %>%
     aggregate(value ~ date, FUN = agg_f, data = .)
 }
-# R's lead and lag functions aren't so useful. These are better.
-lag2 = function(x, k = 1) c(rep(NA, k), head(x, -k))
-lead2 = function(x, k = 1) c(tail(x, -k), rep(NA, k))
 
 # Find the PSP conversion efficiency check time period using measurements from
 # the overall calibration check period (meas) and the recorded NO2 "instrument
