@@ -120,8 +120,17 @@ if (nrow(mcals)) {
   }
 }
 # autocals
-acals_ds = config$autocals[config$autocals$site == site &
-                           config$autocals$data_source == data_source, ]
+if (site == 'WFMS' && data_source == 'envidas') {
+  # envidas autocalibrations are the same as campbell autocalibrations
+  acals_ds = config$autocals[config$autocals$site == site &
+                             config$autocals$data_source == 'campbell', ]
+  # and capitalize the names
+  acals_ds = transform(acals_ds, measurement_name = toupper(measurement_name))
+} else {
+  acals_ds = config$autocals[config$autocals$site == site &
+                             config$autocals$data_source == data_source, ]
+}
+
 if (nrow(acals_ds)) {
   time_hms = hms(strftime(meas$time, format = '%H:%M:%S', tz = 'EST'))
   for (i in 1:nrow(acals_ds)) {
