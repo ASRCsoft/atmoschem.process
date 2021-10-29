@@ -17,7 +17,7 @@ config = read_csv_dir('analysis/config')
 # the wind speed and direction variables-- this should be made into a config
 # option somehow
 winds = switch(site, WFMS = c('WS', 'WD'),
-               WFML = c('wind_speed [m/s]', 'wind_direction [degrees]'),
+               WFMB = c('wind_speed [m/s]', 'wind_direction [degrees]'),
                PSP = c('VWS', 'VWD'))
 if (data_source == 'mesonet')
   winds = c('wind_speed [m/s]', 'wind_direction [degrees]')

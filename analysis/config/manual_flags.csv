@@ -164,109 +164,109 @@ WFMS,campbell,WindDirB_D1_WVT,"[2020-10-02 12:45, 2020-10-08 08:43)",AN,possibly
 WFMS,campbell,NOy,"[2020-11-20, 2020-11-23 07:18)",AM,unknown
 WFMS,campbell,SO2,"[2020-12-02 09:40, 2020-12-09 10:40)",AM,unknown
 WFMS,campbell,RH,"[2020-12-23, 2020-12-30 03:00)",AM,unknown
-WFML,campbell,NO,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
-WFML,campbell,NOX,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
-WFML,campbell,CO,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
-WFML,campbell,NO,"[2018-10-28 12:00, 2018-10-30 12:00)",AM,cal gases left on
-WFML,campbell,NOX,"[2018-10-28 11:00, 2018-10-30 12:00)",AM,cal gases left on
-WFML,envidas,API-T400-OZONE,"[2018-10-28 11:00, 2018-10-30 12:00)",AM,cal gases left on
-WFML,campbell,NO,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
-WFML,campbell,NOX,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
-WFML,campbell,CO,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
-WFML,envidas,PM25C,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
-WFML,envidas,SO2,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
-WFML,envidas,API-T400-OZONE,"[2018-12-11 05:03, 2018-12-11 05:21)",AM,unknown
-WFML,campbell,NGN3,"[2019-01-03 04:00, 2019-01-03 05:10)",AM,unknown
-WFML,envidas,BLK-CARBON-1,"[2019-01-03 04:00, 2019-01-03 05:10)",AM,unknown
-WFML,campbell,NO,"[2019-01-03 13:09, 2019-01-03 13:20)",AM,unknown
-WFML,campbell,NOX,"[2019-01-03 13:09, 2019-01-03 13:30)",AM,unknown
-WFML,envidas,BLK-CARBON-1,"[2019-01-03 13:15, 2019-01-03 13:20)",AM,unknown
-WFML,envidas,BLK-CARBON-1,"[2019-01-21 09:24, 2019-01-21 09:29)",AM,unknown
-WFML,envidas,BLK-CARBON-1,"[2019-02-21 02:51, 2019-02-21 03:01)",AM,unknown
-WFML,envidas,SO2,"[2019-02-22 11:00, 2019-02-22 12:30)",AT,calibration
-WFML,envidas,SO2,"[2019-03-07 11:30, 2019-03-07 12:30)",AT,calibration
-WFML,envidas,SO2,"[2019-03-22 11:00, 2019-03-22 12:30)",AT,calibration
-WFML,campbell,NO,"[2019-03-25 16:30, 2019-03-25 17:00)",AM,unknown
-WFML,campbell,NOX,"[2019-03-25 16:30, 2019-03-25 17:00)",AM,unknown
-WFML,campbell,CO,"[2019-03-25 16:30, 2019-03-25 16:35)",AM,unknown
-WFML,envidas,SO2,"[2019-03-27 12:30, 2019-03-27 13:30)",AT,calibration
-WFML,campbell,NO,"[2019-04-03 13:00, 2019-04-03 14:00)",AM,unknown
-WFML,campbell,NOX,"[2019-04-03 13:00, 2019-04-03 14:00)",AM,unknown
-WFML,envidas,SO2,"[2019-04-12 12:30, 2019-04-12 13:30)",AT,calibration
-WFML,campbell,NO,"[2019-04-17 09:00, 2019-04-23 13:00)",AN,pump failed
-WFML,campbell,NOX,"[2019-04-17 09:00, 2019-04-23 13:00)",AN,pump failed
-WFML,envidas,SO2,"[2019-04-18 11:00, 2019-04-18 12:00)",AT,calibration
-WFML,envidas,PM25C,"[2019-04-19 12:45, 2019-04-25)",AM,unknown
-WFML,envidas,BLK-CARBON-1,"[2019-04-25 09:00, 2019-04-25 10:30)",AM,unknown
-WFML,envidas,SO2,"[2019-04-25 10:30, 2019-04-25 12:00)",AT,calibration
-WFML,campbell,NO,"[2019-04-30 12:00, 2019-04-30 14:15)",AN,calibration gases in manifold
-WFML,campbell,NOX,"[2019-04-30 12:00, 2019-04-30 14:15)",AN,calibration gases in manifold
-WFML,campbell,CO,"[2019-04-30 12:00, 2019-04-30 14:15)",AN,calibration gases in manifold
-WFML,campbell,NO,"[2019-05-01 09:00, 2019-05-01 15:00)",AT,calibration
-WFML,campbell,NOX,"[2019-05-01 09:00, 2019-05-01 15:00)",AT,calibration
-WFML,campbell,CO,"[2019-05-01 09:00, 2019-05-01 15:00)",AT,calibration
-WFML,campbell,NO,"[2019-05-08 09:45, 2019-05-08 11:15)",AM,unknown
-WFML,campbell,NOX,"[2019-05-08 09:45, 2019-05-08 11:15)",AM,unknown
-WFML,envidas,SO2,"[2019-05-10 10:00, 2019-05-10 11:00)",AT,calibration
-WFML,envidas,PM25C,"[2019-05-13 09:00, 2019-05-13 15:00)",AM,unknown
-WFML,envidas,SO2,"[2019-05-15 14:00, 2019-05-15 16:00)",AT,calibration
-WFML,envidas,SO2,"[2019-05-20 13:00, 2019-05-20 14:00)",AT,calibration
-WFML,campbell,NO,"[2019-05-23 22:00, 2019-05-24 02:00)",AM,unknown
-WFML,campbell,NOX,"[2019-05-23 22:00, 2019-05-24 02:00)",AM,unknown
-WFML,campbell,CO,"[2019-05-23 22:00, 2019-05-24 02:00)",AM,unknown
-WFML,envidas,PM25C,"[2019-05-23 22:00, 2019-05-24 03:00)",AM,unknown
-WFML,envidas,SO2,"[2019-05-31 11:00, 2019-05-31 12:00)",AT,calibration
-WFML,envidas,SO2,"[2019-06-05 09:30, 2019-06-05 10:30)",AT,calibration
-WFML,campbell,NO,"[2019-06-11 12:00, 2019-06-18 12:00)",AM,unknown
-WFML,campbell,NOX,"[2019-06-11 12:00, 2019-06-18 12:00)",AM,unknown
-WFML,envidas,SO2,"[2019-06-13 09:00, 2019-06-13 10:00)",AT,calibration
-WFML,envidas,SO2,"[2019-06-20 09:00, 2019-06-20 10:00)",AT,calibration
-WFML,envidas,SO2,"[2019-06-26 09:30, 2019-06-26 10:30)",AT,calibration
-WFML,envidas,PM25C,"[2019-06-27 09:00, 2019-06-27 15:00)",AM,unknown
-WFML,campbell,NO,"[2019-06-30 06:30, 2019-06-30 10:30)",AM,unknown
-WFML,campbell,NOX,"[2019-06-30 06:30, 2019-06-30 10:30)",AM,unknown
-WFML,campbell,CO,"[2019-06-30 06:30, 2019-06-30 10:30)",AM,unknown
-WFML,envidas,PM25C,"[2019-06-30 06:30, 2019-06-30 11:00)",AM,unknown
-WFML,campbell,NO,"[2019-07-02 12:00, 2019-07-09 12:00)",BJ,bad calibration settings
-WFML,campbell,NOX,"[2019-07-02 12:00, 2019-07-09 12:00)",BJ,bad calibration settings
-WFML,envidas,SO2,"[2019-07-03 10:30, 2019-07-03 11:30)",AT,calibration
-WFML,envidas,PM25C,"[2019-07-08 06:00, 2019-07-08 12:00)",AM,unknown
-WFML,envidas,SO2,"[2019-07-10 10:30, 2019-07-10 12:00)",AT,calibration
-WFML,envidas,SO2,"[2019-07-15 10:30, 2019-07-15 11:30)",AT,calibration
-WFML,envidas,SO2,"[2019-07-24 10:00, 2019-07-24 11:00)",AT,calibration
-WFML,envidas,SO2,"[2019-07-31 11:00, 2019-07-31 12:00)",AT,calibration
-WFML,envidas,SO2,"[2019-08-08 13:00, 2019-08-08 14:00)",AT,calibration
-WFML,campbell,NO,"[2019-08-11 17:00, 2019-08-13 09:30)",AM,unknown
-WFML,campbell,NOX,"[2019-08-11 17:00, 2019-08-13 09:30)",AM,unknown
-WFML,campbell,NO,"[2019-08-15 21:30, 2019-08-17 14:00)",AM,unknown
-WFML,campbell,NOX,"[2019-08-15 21:30, 2019-08-17 14:00)",AM,unknown
-WFML,envidas,SO2,"[2019-08-16 09:00, 2019-08-16 10:30)",AT,calibration
-WFML,campbell,NO,"[2019-08-19 14:30, 2019-08-20 09:00)",AM,unknown
-WFML,campbell,NOX,"[2019-08-19 14:30, 2019-08-20 09:00)",AM,unknown
-WFML,envidas,SO2,"[2019-08-22 10:00, 2019-08-22 11:00)",AT,calibration
-WFML,envidas,SO2,"[2019-08-30 10:00, 2019-08-30 11:00)",AT,calibration
-WFML,envidas,SO2,"[2019-09-05 12:00, 2019-09-05 13:30)",AT,calibration
-WFML,campbell,CO,"[2019-09-11, 2019-09-20 12:00)",AM,unknown
-WFML,envidas,SO2,"[2019-09-12 10:30, 2019-09-12 12:00)",AT,calibration
-WFML,envidas,SO2,"[2019-09-18 10:30, 2019-09-18 12:00)",AT,calibration
-WFML,envidas,SO2,"[2019-09-26 10:30, 2019-09-26 12:00)",AT,calibration
-WFML,campbell,CO,"[2019-10-04 06:30, 2019-10-16)",AM,unknown
-WFML,campbell,NO,"[2019-10-31 15:45, 2019-11-05 14:15)",AM,manifold failure
-WFML,campbell,NOX,"[2019-10-31 15:45, 2019-11-05 14:15)",AM,manifold failure
-WFML,envidas,API-T400-OZONE,"[2019-10-31 15:45, 2019-11-05 14:15)",AM,manifold failure
-WFML,campbell,CO,"[2019-11-01 23:00, 2019-11-02 06:00)",AV,power failure
-WFML,campbell,NOX,"[2019-11-27 10:00, 2019-11-27 11:00)",AM,unknown
-WFML,envidas,PM25C,"[2020-02-28 15:36, 2020-03-04)",AM,unknown
-WFML,campbell,NGN3,"[2020-05-04 05:30, 2020-05-12 12:00)",AN,lamp failed
-WFML,campbell,NO,"[2020-05-20 23:00, 2020-05-26 11:00)",AN,pump failed
-WFML,campbell,NOX,"[2020-05-20 23:00, 2020-05-26 11:00)",AN,pump failed
-WFML,campbell,NO,"[2020-06-02 11:00, 2020-06-04 15:00)",AN,low ozone flow
-WFML,campbell,NOX,"[2020-06-02 11:00, 2020-06-04 15:00)",AN,low ozone flow
-WFML,campbell,NO,"[2020-08-12 13:31, 2020-08-18 10:28)",AN,unknown instrument error
-WFML,campbell,NOX,"[2020-08-12 13:31, 2020-08-18 10:28)",AN,unknown instrument error
-WFML,envidas,PM25C,"[2020-09-26 08:29, 2020-09-28 08:02)",AN,unknown
-WFML,envidas,SO2,"[2020-10-14 20:21, 2020-10-15 08:16)",AN,unknown
-WFML,envidas,API-T400-OZONE,"[2020-12-18 20:25, 2020-12-19 19:14)",AN,unknown
+WFMB,campbell,NO,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
+WFMB,campbell,NOX,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
+WFMB,campbell,CO,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
+WFMB,campbell,NO,"[2018-10-28 12:00, 2018-10-30 12:00)",AM,cal gases left on
+WFMB,campbell,NOX,"[2018-10-28 11:00, 2018-10-30 12:00)",AM,cal gases left on
+WFMB,envidas,API-T400-OZONE,"[2018-10-28 11:00, 2018-10-30 12:00)",AM,cal gases left on
+WFMB,campbell,NO,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
+WFMB,campbell,NOX,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
+WFMB,campbell,CO,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
+WFMB,envidas,PM25C,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
+WFMB,envidas,SO2,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
+WFMB,envidas,API-T400-OZONE,"[2018-12-11 05:03, 2018-12-11 05:21)",AM,unknown
+WFMB,campbell,NGN3,"[2019-01-03 04:00, 2019-01-03 05:10)",AM,unknown
+WFMB,envidas,BLK-CARBON-1,"[2019-01-03 04:00, 2019-01-03 05:10)",AM,unknown
+WFMB,campbell,NO,"[2019-01-03 13:09, 2019-01-03 13:20)",AM,unknown
+WFMB,campbell,NOX,"[2019-01-03 13:09, 2019-01-03 13:30)",AM,unknown
+WFMB,envidas,BLK-CARBON-1,"[2019-01-03 13:15, 2019-01-03 13:20)",AM,unknown
+WFMB,envidas,BLK-CARBON-1,"[2019-01-21 09:24, 2019-01-21 09:29)",AM,unknown
+WFMB,envidas,BLK-CARBON-1,"[2019-02-21 02:51, 2019-02-21 03:01)",AM,unknown
+WFMB,envidas,SO2,"[2019-02-22 11:00, 2019-02-22 12:30)",AT,calibration
+WFMB,envidas,SO2,"[2019-03-07 11:30, 2019-03-07 12:30)",AT,calibration
+WFMB,envidas,SO2,"[2019-03-22 11:00, 2019-03-22 12:30)",AT,calibration
+WFMB,campbell,NO,"[2019-03-25 16:30, 2019-03-25 17:00)",AM,unknown
+WFMB,campbell,NOX,"[2019-03-25 16:30, 2019-03-25 17:00)",AM,unknown
+WFMB,campbell,CO,"[2019-03-25 16:30, 2019-03-25 16:35)",AM,unknown
+WFMB,envidas,SO2,"[2019-03-27 12:30, 2019-03-27 13:30)",AT,calibration
+WFMB,campbell,NO,"[2019-04-03 13:00, 2019-04-03 14:00)",AM,unknown
+WFMB,campbell,NOX,"[2019-04-03 13:00, 2019-04-03 14:00)",AM,unknown
+WFMB,envidas,SO2,"[2019-04-12 12:30, 2019-04-12 13:30)",AT,calibration
+WFMB,campbell,NO,"[2019-04-17 09:00, 2019-04-23 13:00)",AN,pump failed
+WFMB,campbell,NOX,"[2019-04-17 09:00, 2019-04-23 13:00)",AN,pump failed
+WFMB,envidas,SO2,"[2019-04-18 11:00, 2019-04-18 12:00)",AT,calibration
+WFMB,envidas,PM25C,"[2019-04-19 12:45, 2019-04-25)",AM,unknown
+WFMB,envidas,BLK-CARBON-1,"[2019-04-25 09:00, 2019-04-25 10:30)",AM,unknown
+WFMB,envidas,SO2,"[2019-04-25 10:30, 2019-04-25 12:00)",AT,calibration
+WFMB,campbell,NO,"[2019-04-30 12:00, 2019-04-30 14:15)",AN,calibration gases in manifold
+WFMB,campbell,NOX,"[2019-04-30 12:00, 2019-04-30 14:15)",AN,calibration gases in manifold
+WFMB,campbell,CO,"[2019-04-30 12:00, 2019-04-30 14:15)",AN,calibration gases in manifold
+WFMB,campbell,NO,"[2019-05-01 09:00, 2019-05-01 15:00)",AT,calibration
+WFMB,campbell,NOX,"[2019-05-01 09:00, 2019-05-01 15:00)",AT,calibration
+WFMB,campbell,CO,"[2019-05-01 09:00, 2019-05-01 15:00)",AT,calibration
+WFMB,campbell,NO,"[2019-05-08 09:45, 2019-05-08 11:15)",AM,unknown
+WFMB,campbell,NOX,"[2019-05-08 09:45, 2019-05-08 11:15)",AM,unknown
+WFMB,envidas,SO2,"[2019-05-10 10:00, 2019-05-10 11:00)",AT,calibration
+WFMB,envidas,PM25C,"[2019-05-13 09:00, 2019-05-13 15:00)",AM,unknown
+WFMB,envidas,SO2,"[2019-05-15 14:00, 2019-05-15 16:00)",AT,calibration
+WFMB,envidas,SO2,"[2019-05-20 13:00, 2019-05-20 14:00)",AT,calibration
+WFMB,campbell,NO,"[2019-05-23 22:00, 2019-05-24 02:00)",AM,unknown
+WFMB,campbell,NOX,"[2019-05-23 22:00, 2019-05-24 02:00)",AM,unknown
+WFMB,campbell,CO,"[2019-05-23 22:00, 2019-05-24 02:00)",AM,unknown
+WFMB,envidas,PM25C,"[2019-05-23 22:00, 2019-05-24 03:00)",AM,unknown
+WFMB,envidas,SO2,"[2019-05-31 11:00, 2019-05-31 12:00)",AT,calibration
+WFMB,envidas,SO2,"[2019-06-05 09:30, 2019-06-05 10:30)",AT,calibration
+WFMB,campbell,NO,"[2019-06-11 12:00, 2019-06-18 12:00)",AM,unknown
+WFMB,campbell,NOX,"[2019-06-11 12:00, 2019-06-18 12:00)",AM,unknown
+WFMB,envidas,SO2,"[2019-06-13 09:00, 2019-06-13 10:00)",AT,calibration
+WFMB,envidas,SO2,"[2019-06-20 09:00, 2019-06-20 10:00)",AT,calibration
+WFMB,envidas,SO2,"[2019-06-26 09:30, 2019-06-26 10:30)",AT,calibration
+WFMB,envidas,PM25C,"[2019-06-27 09:00, 2019-06-27 15:00)",AM,unknown
+WFMB,campbell,NO,"[2019-06-30 06:30, 2019-06-30 10:30)",AM,unknown
+WFMB,campbell,NOX,"[2019-06-30 06:30, 2019-06-30 10:30)",AM,unknown
+WFMB,campbell,CO,"[2019-06-30 06:30, 2019-06-30 10:30)",AM,unknown
+WFMB,envidas,PM25C,"[2019-06-30 06:30, 2019-06-30 11:00)",AM,unknown
+WFMB,campbell,NO,"[2019-07-02 12:00, 2019-07-09 12:00)",BJ,bad calibration settings
+WFMB,campbell,NOX,"[2019-07-02 12:00, 2019-07-09 12:00)",BJ,bad calibration settings
+WFMB,envidas,SO2,"[2019-07-03 10:30, 2019-07-03 11:30)",AT,calibration
+WFMB,envidas,PM25C,"[2019-07-08 06:00, 2019-07-08 12:00)",AM,unknown
+WFMB,envidas,SO2,"[2019-07-10 10:30, 2019-07-10 12:00)",AT,calibration
+WFMB,envidas,SO2,"[2019-07-15 10:30, 2019-07-15 11:30)",AT,calibration
+WFMB,envidas,SO2,"[2019-07-24 10:00, 2019-07-24 11:00)",AT,calibration
+WFMB,envidas,SO2,"[2019-07-31 11:00, 2019-07-31 12:00)",AT,calibration
+WFMB,envidas,SO2,"[2019-08-08 13:00, 2019-08-08 14:00)",AT,calibration
+WFMB,campbell,NO,"[2019-08-11 17:00, 2019-08-13 09:30)",AM,unknown
+WFMB,campbell,NOX,"[2019-08-11 17:00, 2019-08-13 09:30)",AM,unknown
+WFMB,campbell,NO,"[2019-08-15 21:30, 2019-08-17 14:00)",AM,unknown
+WFMB,campbell,NOX,"[2019-08-15 21:30, 2019-08-17 14:00)",AM,unknown
+WFMB,envidas,SO2,"[2019-08-16 09:00, 2019-08-16 10:30)",AT,calibration
+WFMB,campbell,NO,"[2019-08-19 14:30, 2019-08-20 09:00)",AM,unknown
+WFMB,campbell,NOX,"[2019-08-19 14:30, 2019-08-20 09:00)",AM,unknown
+WFMB,envidas,SO2,"[2019-08-22 10:00, 2019-08-22 11:00)",AT,calibration
+WFMB,envidas,SO2,"[2019-08-30 10:00, 2019-08-30 11:00)",AT,calibration
+WFMB,envidas,SO2,"[2019-09-05 12:00, 2019-09-05 13:30)",AT,calibration
+WFMB,campbell,CO,"[2019-09-11, 2019-09-20 12:00)",AM,unknown
+WFMB,envidas,SO2,"[2019-09-12 10:30, 2019-09-12 12:00)",AT,calibration
+WFMB,envidas,SO2,"[2019-09-18 10:30, 2019-09-18 12:00)",AT,calibration
+WFMB,envidas,SO2,"[2019-09-26 10:30, 2019-09-26 12:00)",AT,calibration
+WFMB,campbell,CO,"[2019-10-04 06:30, 2019-10-16)",AM,unknown
+WFMB,campbell,NO,"[2019-10-31 15:45, 2019-11-05 14:15)",AM,manifold failure
+WFMB,campbell,NOX,"[2019-10-31 15:45, 2019-11-05 14:15)",AM,manifold failure
+WFMB,envidas,API-T400-OZONE,"[2019-10-31 15:45, 2019-11-05 14:15)",AM,manifold failure
+WFMB,campbell,CO,"[2019-11-01 23:00, 2019-11-02 06:00)",AV,power failure
+WFMB,campbell,NOX,"[2019-11-27 10:00, 2019-11-27 11:00)",AM,unknown
+WFMB,envidas,PM25C,"[2020-02-28 15:36, 2020-03-04)",AM,unknown
+WFMB,campbell,NGN3,"[2020-05-04 05:30, 2020-05-12 12:00)",AN,lamp failed
+WFMB,campbell,NO,"[2020-05-20 23:00, 2020-05-26 11:00)",AN,pump failed
+WFMB,campbell,NOX,"[2020-05-20 23:00, 2020-05-26 11:00)",AN,pump failed
+WFMB,campbell,NO,"[2020-06-02 11:00, 2020-06-04 15:00)",AN,low ozone flow
+WFMB,campbell,NOX,"[2020-06-02 11:00, 2020-06-04 15:00)",AN,low ozone flow
+WFMB,campbell,NO,"[2020-08-12 13:31, 2020-08-18 10:28)",AN,unknown instrument error
+WFMB,campbell,NOX,"[2020-08-12 13:31, 2020-08-18 10:28)",AN,unknown instrument error
+WFMB,envidas,PM25C,"[2020-09-26 08:29, 2020-09-28 08:02)",AN,unknown
+WFMB,envidas,SO2,"[2020-10-14 20:21, 2020-10-15 08:16)",AN,unknown
+WFMB,envidas,API-T400-OZONE,"[2020-12-18 20:25, 2020-12-19 19:14)",AN,unknown
 PSP,envidas,CO,"[2018-10-03 07:08, 2018-10-03 08:00)",AN,instrument reset
 PSP,envidas,Dichot(10)MC,"[2018-10-04 12:01, 2018-10-04 14:46)",AT,calibration
 PSP,envidas,Dichot(10)RefMC,"[2018-10-04 12:01, 2018-10-04 14:46)",AT,calibration

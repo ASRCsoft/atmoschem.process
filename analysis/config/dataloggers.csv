@@ -4,9 +4,9 @@ WFMS,ultrafine,60
 WFMS,aethelometer,4
 WFMS,DEC_envidas,60
 WFMS,envidas,60
-WFML,campbell,60
-WFML,envidas,60
-WFML,mesonet,12
+WFMB,campbell,60
+WFMB,envidas,60
+WFMB,mesonet,12
 PSP,envidas,60
 PSP,mesonet,12
 QC,AQS,1

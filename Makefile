@@ -18,7 +18,7 @@ conf_dir := analysis/config
 rscript := Rscript --vanilla
 export processing_end := 2021-07-01
 export raw_version := $(PKGVERS)
-sites := WFMS WFML PSP QC
+sites := WFMS WFMB PSP QC
 download_url := http://atmoschem.asrc.cestm.albany.edu/~aqm/AQM_Products/downloads
 routine_zip := $(raw_dir)/routine_chemistry_v0.1.zip
 old_routine_out := $(patsubst %,$(interm_dir)/old_%.csv,$(sites))
@@ -76,8 +76,8 @@ $(interm_dir)/processed_%.sqlite: $(interm_dir)/raw_%.sqlite \
                                   $(scripts_dir)/process_new_data.R \
                                   $(conf_dir)/manual_flags.csv
 	$(rscript) $(scripts_dir)/process_new_data.R $(shell echo $* | sed "s/_/ /")
-# the WFML campbell processing also depends on the processed Mesonet data
-$(interm_dir)/processed_WFML_campbell.sqlite: $(interm_dir)/processed_WFML_mesonet.sqlite
+# the WFMB campbell processing also depends on the processed Mesonet data
+$(interm_dir)/processed_WFMB_campbell.sqlite: $(interm_dir)/processed_WFMB_mesonet.sqlite
 
 # Calibration site file depends on all the raw site/calibration files
 make_cal_deps = $(patsubst %,$(interm_dir)/raw_%.sqlite, $(filter $(1)%, $(data_sources)))

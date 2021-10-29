@@ -66,7 +66,7 @@ transform_campbell = function(f, site) {
   campbell = read_campbell(f)
   if (site == 'WFMS') {
     campbell = fix_wfms(campbell)
-  } else if (site == 'WFML') {
+  } else if (site == 'WFMB') {
     # replace mislabeled NO2 column
     names(campbell)[names(campbell) == 'NO2_Avg'] = 'NOX_Avg'
   }
@@ -78,7 +78,7 @@ transform_campbell = function(f, site) {
   if (site == 'WFMS') {
     flag_mat = as.matrix(campbell[, is_flag]) != 1
     flag_dict = wfms_flags
-  } else if (site == 'WFML') {
+  } else if (site == 'WFMB') {
     flag_mat = as.matrix(campbell[, is_flag]) != 0
     flag_dict = wfml_flags
   }

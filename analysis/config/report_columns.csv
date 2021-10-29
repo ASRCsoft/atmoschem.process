@@ -23,27 +23,27 @@ WFMS,Ultrafine PM,"[2018-10-01, 2021-01-01)",ultrafine,Concentration,,
 WFMS,BC1_370nm,"[2018-10-01, 2021-01-01)",aethelometer,concentration_370,,
 WFMS,BC6_880nm,"[2018-10-01, 2021-01-01)",aethelometer,concentration_880,,
 WFMS,Woodsmoke,"[2018-10-01, 2021-01-01)",aethelometer,Wood smoke,,
-WFML,NO,"[2018-10-01, 2021-01-01)",campbell,NO,,
-WFML,NO2,"[2018-10-01, 2021-01-01)",campbell,NO2,,
-WFML,Ozone,"[2018-10-01, 2021-01-01)",envidas,Ozone_ppbv,,
-WFML,CO,"[2018-10-01, 2021-01-01)",campbell,CO,,
-WFML,SO2,"[2018-10-01, 2021-01-01)",envidas,SO2,,
-WFML,CH4,"[2018-10-01, 2021-01-01)",,,,ppmv
-WFML,NMHC,"[2018-10-01, 2021-01-01)",,,,ppmv
-WFML,T,"[2018-10-01, 2021-01-01)",mesonet,temperature_2m [degC],,
-WFML,RH,"[2018-10-01, 2021-01-01)",mesonet,relative_humidity [%],,
-WFML,WS,"[2018-10-01, 2021-01-01)",,,,m/s
-WFML,WS_MESO,"[2018-10-01, 2021-01-01)",mesonet,wind_speed [m/s],,
-WFML,WS_MAX_MESO,"[2018-10-01, 2021-01-01)",mesonet,wind_maximum [m/s],,
-WFML,WD,"[2018-10-01, 2021-01-01)",,,,degrees
-WFML,WD_V,"[2018-10-01, 2021-01-01)",,,,degrees
-WFML,WD_MESO,"[2018-10-01, 2021-01-01)",mesonet,wind_direction [degrees],,
-WFML,BP,"[2018-10-01, 2021-01-01)",campbell,BP2,,
-WFML,SLP,"[2018-10-01, 2021-01-01)",campbell,SLP,,
-WFML,PM25,"[2018-10-01, 2021-01-01)",envidas,PM25C,,
-WFML,Bscatt,"[2018-10-01, 2021-01-01)",campbell,NGN3,,
-WFML,Black Carbon,"[2018-10-01, 2021-01-01)",envidas,BLK-CARBON-1,,
-WFML,Precip,"[2018-10-01, 2021-01-01)",mesonet,precip_since_00Z [mm],,
+WFMB,NO,"[2018-10-01, 2021-01-01)",campbell,NO,,
+WFMB,NO2,"[2018-10-01, 2021-01-01)",campbell,NO2,,
+WFMB,Ozone,"[2018-10-01, 2021-01-01)",envidas,Ozone_ppbv,,
+WFMB,CO,"[2018-10-01, 2021-01-01)",campbell,CO,,
+WFMB,SO2,"[2018-10-01, 2021-01-01)",envidas,SO2,,
+WFMB,CH4,"[2018-10-01, 2021-01-01)",,,,ppmv
+WFMB,NMHC,"[2018-10-01, 2021-01-01)",,,,ppmv
+WFMB,T,"[2018-10-01, 2021-01-01)",mesonet,temperature_2m [degC],,
+WFMB,RH,"[2018-10-01, 2021-01-01)",mesonet,relative_humidity [%],,
+WFMB,WS,"[2018-10-01, 2021-01-01)",,,,m/s
+WFMB,WS_MESO,"[2018-10-01, 2021-01-01)",mesonet,wind_speed [m/s],,
+WFMB,WS_MAX_MESO,"[2018-10-01, 2021-01-01)",mesonet,wind_maximum [m/s],,
+WFMB,WD,"[2018-10-01, 2021-01-01)",,,,degrees
+WFMB,WD_V,"[2018-10-01, 2021-01-01)",,,,degrees
+WFMB,WD_MESO,"[2018-10-01, 2021-01-01)",mesonet,wind_direction [degrees],,
+WFMB,BP,"[2018-10-01, 2021-01-01)",campbell,BP2,,
+WFMB,SLP,"[2018-10-01, 2021-01-01)",campbell,SLP,,
+WFMB,PM25,"[2018-10-01, 2021-01-01)",envidas,PM25C,,
+WFMB,Bscatt,"[2018-10-01, 2021-01-01)",campbell,NGN3,,
+WFMB,Black Carbon,"[2018-10-01, 2021-01-01)",envidas,BLK-CARBON-1,,
+WFMB,Precip,"[2018-10-01, 2021-01-01)",mesonet,precip_since_00Z [mm],,
 PSP,Ozone,"[2018-10-01, 2021-01-01)",envidas,Thermo_O3,,
 PSP,NO,"[2018-10-01, 2021-01-01)",envidas,NO,,
 PSP,DEC_NO,"[2018-10-01, 2021-01-01)",envidas,NO-DEC,,

@@ -65,9 +65,9 @@ transform_calibration = function(f, site, ds) {
     transform_wfms_42Cs(f)
   } else if (site == 'WFMS' && ds == 'Thermo_43C') {
     transform_wfms_43C(f)
-  } else if (site == 'WFML' && ds == 'Thermo_42i') {
+  } else if (site == 'WFMB' && ds == 'Thermo_42i') {
     transform_wfml_42i(f)
-  } else if (site == 'WFML' && ds == 'Thermo_48C') {
+  } else if (site == 'WFMB' && ds == 'Thermo_48C') {
     transform_wfml_48C(f)
   }
 }
@@ -185,7 +185,7 @@ mcals = data.frame(f = files) %>%
   do.call(rbind, .)
 # ideally, the data source would be assigned via the config files. But for now,
 # hardcoded
-mcals$data_source = switch(site, WFMS = 'campbell', WFML = 'campbell',
+mcals$data_source = switch(site, WFMS = 'campbell', WFMB = 'campbell',
                            PSP = 'envidas')
 mcals$times = as_interval(mcals$times)
 mcals$measured_value = as.numeric(mcals$measured_value)

@@ -153,11 +153,11 @@ for (mname in unique(mflags_ds$measurement_name)) {
   meas[meas$time %within% as.list(meas_flag_periods), flagname] = T
 }
 # power outage flags
-if (site %in% c('WFMS', 'WFML') & data_source == 'campbell') {
+if (site %in% c('WFMS', 'WFMB') & data_source == 'campbell') {
   if (site == 'WFMS') {
     is_outage = with(meas, value.Phase1 < 105 | value.Phase3 < 100)
     padding_list = list(CO = 50, NO = 4, NOx = 4, NOy = 4, Ozone = 10, SO2 = 4)
-  } else if (site == 'WFML') {
+  } else if (site == 'WFMB') {
     is_outage = meas$value.Phase1 < 105
     padding_list = list(CO = 10, NO = 45, NOX = 45)
   }
@@ -307,7 +307,7 @@ if (site == 'WFMS') {
     meas$value.O3_ppbv = pr_meas$value.O3 * 1000
     meas$flagged.O3_ppbv = pr_meas$flagged.O3
   }
-} else if (site == 'WFML') {
+} else if (site == 'WFMB') {
   if (data_source == 'campbell') {
     # NO2
     meas$value.NO2 = with(pr_meas, value.NOX - value.NO)
@@ -317,7 +317,7 @@ if (site == 'WFMS') {
     # pressure. Solution is to interpolate Mesonet outside temps at Campbell
     # measurement times.
     dbpath = file.path('analysis', 'intermediate',
-                       'processed_WFML_mesonet.sqlite')
+                       'processed_WFMB_mesonet.sqlite')
     db = dbConnect(SQLite(), dbpath)
     sql_text =
 'select time,

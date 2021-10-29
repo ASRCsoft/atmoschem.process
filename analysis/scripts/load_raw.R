@@ -20,10 +20,10 @@ transform_measurement = function(f, site, ds) {
     return(transform_campbell(f, site))
   } else if (site == 'PSP' & ds == 'envidas') {
     return(transform_psp_envidas(f))
-  } else if (site == 'WFML' && ds == 'envidas') {
+  } else if (site == 'WFMB' && ds == 'envidas') {
     return(transform_wfml_envidas(f))
   } else if (site == 'WFMS' && ds == 'DEC_envidas') {
-    # this is really the same format as the WFML envidas
+    # this is really the same format as the WFMB envidas
     return(transform_wfml_envidas(f, 'WFMS'))
   } else if (site == 'WFMS' && ds == 'envidas') {
     # this is the same format as the daily PSP envidas

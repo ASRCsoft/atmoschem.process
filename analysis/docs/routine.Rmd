@@ -10,7 +10,7 @@ nocite: '@*'
 ---
 
 These files contain the ASRC's routine meteorological and chemistry data from
-the Whiteface Mountain summit (WFMS), the Whiteface Mountain lodge (WFML),
+the Whiteface Mountain summit (WFMS), the Whiteface Mountain base (WFMB),
 Pinnacle State Park (PSP), and Queens College (QC) up to
 `r Sys.getenv('processing_end')`. Along with data from ASRC instruments, the
 dataset also includes data from the NYS Department of Environmental
@@ -30,7 +30,7 @@ measurements, respectively. These values are sometimes misleading and should be
 used with caution. All other WS and WD values are resultant wind speeds and
 directions.
 
-Whiteface Mountain lodge CO measurements seem to be affected by room temperature
+Whiteface Mountain base CO measurements seem to be affected by room temperature
 and should also be used with caution.
 
 The instruments.csv file contains instrument information for some recent data.

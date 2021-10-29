@@ -91,7 +91,7 @@ for (site in config$sites$abbreviation) {
   names(newp) = gsub('\\(AQS\\)', '\\(AQS flag\\)', names(newp))
 
   # fix a silly inconsistency in the lodge data
-  if (site == 'WFML') {
+  if (site == 'WFMB') {
     names(newp) = gsub('Precip \\(mm since 00Z\\)', 'Precip since 00Z \\(mm\\)', names(newp))
     names(newp) = gsub('Precip \\(flag\\)', 'Precip since 00Z \\(flag\\)', names(newp))
   }

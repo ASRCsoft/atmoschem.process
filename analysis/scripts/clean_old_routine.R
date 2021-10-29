@@ -341,7 +341,12 @@ order_columns = function(x) {
 }
 
 write_site_file = function(site, ...) {
-  site_path = file.path('analysis/raw/routine_chemistry_v0.1', site)
+  if (site == 'WFMB') {
+    # used to be WFML (lodge)
+    site_path = file.path('analysis/raw/routine_chemistry_v0.1', 'WFML')
+  } else {
+    site_path = file.path('analysis/raw/routine_chemistry_v0.1', site)
+  }
   files = site_path %>%
     list.files(full.names = T) %>%
     subset(., !grepl('instruments', .)) %>%
