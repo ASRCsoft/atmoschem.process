@@ -77,6 +77,8 @@ invisible(dbExecute(db, 'create table measurements(time text)'))
 files = file.path('analysis', 'raw', raw_folder, site, 'measurements',
                   data_source, '*', '*') %>%
   Sys.glob
+# exclude files in the 'info' folder
+files = files[basename(dirname(files)) != 'info']
 message('Loading ', length(files), ' files into ', basename(dbpath), '...')
 for (f in files) load_file(f, db)
 
