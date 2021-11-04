@@ -50,8 +50,8 @@ format_pdf_time = function(pdf, time_label)
 order_matches = function(x, regex, i) {
   labels = x[grepl(regex, x)]
   stopifnot(length(labels) == length(i))
-  n = as.integer(sub('.*[^0-9]*', '', labels))
-  stopifnot(all(sort(n) == i))
+  n = as.integer(sub('.*[^0-9]+', '', labels))
+  stopifnot(all(!is.na(n)) && all(sort(n) == i))
   labels[order(n)]
 }
 
@@ -82,20 +82,26 @@ get_corrected_labels = function(x, param = NULL) {
   order_matches(x, regex, c(3, 5))
 }
 
-# Return the labels for the measured check boxes, ordered 3, 5, 7 (zero, span,
-# second zero). `x` is a vector of labels. Some files contain 2 parameters, and
-# in that case the function will return different values depending on which
-# parameter (1 or 2) is selected.
+# Return the labels for the measured values, ordered 3, 5, 7 (zero, span, second
+# zero). `x` is a vector of labels. Some files contain 2 parameters, and in that
+# case the function will return different values depending on which parameter (1
+# or 2) is selected.
 get_measured_labels = function(x, param = NULL) {
   if (is.null(param)) {
-    # I think in the 43C form the zero_check_7 value somehow took the place of
-    # zero_check_complete_7 (the checkbox)?
-    if ('43c_zero_7' %in% x) {
-      regex_zero = '43c_zero_7'
-    } else {
-      regex_zero = 'zero.*[ _](check[ _])(7|300EU ppb)'
+    regex35 = 'measured[ _](zero|span)[ _].*[35]'
+    # a couple of weird cases here
+    if ('zero check 300EU ppb' %in% x) {
+      # 300EU equivalent of zero check 7
+      return(c(order_matches(x, regex35, c(3, 5)), 'zero check 300EU ppb'))
     }
-    regex = paste0('measured[ _](zero|span)[ _].*[35]|', regex_zero)
+    if ('43c_zero_7' %in% x) {
+      # I think in the 43C form the zero_check_7 value somehow took the place of
+      # zero_check_complete_7 (the checkbox)?
+      regex7 = '43c_zero_7'
+    } else {
+      regex7 = 'zero.*[ _](check[ _])7'
+    }
+    regex = paste0(regex35, '|', regex7)
   } else {
     if (param == 1) {
       regex = 'measured[ _](zero|span)[ _].*a_[35]|zero.*[ _]a_7'
