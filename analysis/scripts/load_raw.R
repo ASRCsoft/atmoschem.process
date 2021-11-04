@@ -15,7 +15,8 @@ data_source = commandArgs(trailingOnly = T)[2]
 raw_folder = paste0('raw_data_v', Sys.getenv('raw_version'))
 
 # transform a raw data file according to its site and data source
-transform_measurement = function(f, site, ds) {
+transform_measurement = function(f) {
+  ds = data_source
   if (ds == 'campbell') {
     return(transform_campbell(f, site))
   } else if (site == 'PSP' & ds == 'envidas') {
@@ -43,23 +44,44 @@ transform_measurement = function(f, site, ds) {
             drop = c('record', 'instrument_time'))
 }
 
-# read the file and add it to the sqlite database
-load_file = function(f, db) {
-  dat = tryCatch(transform_measurement(f, site, data_source),
-                 error = function(e) {
-                   stop(f, ' loading failed: ', e)
-                 })
-  if (!nrow(dat)) return()
-  # add columns to the db table if needed
+# make corrections to raw data
+make_corrections = function(f, dat) {
+  if (site == 'WFMS') {
+    if (data_source == 'ultrafine') {
+      # fix some times
+      date_str = basename(tools::file_path_sans_ext(f))
+      if (date_str >= '21022402' && date_str <= '21031601') {
+        # Year says 2020, should be 2021. Due to leap year, some days are also
+        # off by one. Can solve using Julian days
+        dat$time = as.POSIXct(format(dat$time, '2021 %j %T'), tz = 'EST',
+                              format = '%Y %j %T')
+      }
+    }
+  }
+  dat
+}
+
+# add columns to the db table if needed
+add_db_columns = function(db, cols) {
   cur_fields = dbListFields(db, 'measurements')
-  if (!all(names(dat) %in% cur_fields)) {
-    new_fields = setdiff(names(dat), cur_fields)
+  if (!all(cols %in% cur_fields)) {
+    new_fields = setdiff(cols, cur_fields)
     for (fname in new_fields) {
       sql_text = 'alter table measurements add column ?'
       sql = sqlInterpolate(db, sql_text, dbQuoteIdentifier(db, fname))
       dbExecute(db, sql)
     }
   }
+}
+
+# read the file and add it to the sqlite database
+load_file = function(f, db) {
+  dat = tryCatch(transform_measurement(f), error = function(e) {
+    stop(f, ' loading failed: ', e)
+  })
+  if (!nrow(dat)) return()
+  dat = make_corrections(f, dat)
+  add_db_columns(db, names(dat))
   dat$time = format(dat$time, '%Y-%m-%d %H:%M:%S', tz = 'EST')
   dbWriteTable(db, 'measurements', dat, append = T)
 }
