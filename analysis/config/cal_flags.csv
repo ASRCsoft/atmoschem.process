@@ -108,6 +108,8 @@ WFMS,envidas,CO,span,"[2020-12-20, 2020-12-22)",campbell glitch
 WFMS,envidas,CO,zero,"[2020-12-20, 2020-12-21 12:00)",campbell glitch
 WFMS,envidas,SO2,span,"[2020-12-20, 2020-12-22)",campbell glitch
 WFMS,envidas,SO2,zero,"[2020-12-20, 2020-12-21 12:00)",campbell glitch
+WFMS,envidas,NOY,span,"[2020-12-31 06:00, 2021-01-06 11:00)",campbell glitch
+WFMS,envidas,NOY,zero,"[2020-12-31 06:00, 2021-01-06 11:00)",campbell glitch
 WFMB,campbell,NO,zero,"[2018-12-14, 2018-12-18)",
 WFMB,campbell,NOX,zero,"[2018-12-14, 2018-12-18)",
 WFMB,campbell,CO,zero,"[2018-12-14, 2018-12-18)",

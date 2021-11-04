@@ -164,6 +164,14 @@ WFMS,campbell,WindDirB_D1_WVT,"[2020-10-02 12:45, 2020-10-08 08:43)",AN,possibly
 WFMS,campbell,NOy,"[2020-11-20, 2020-11-23 07:18)",AM,unknown
 WFMS,campbell,SO2,"[2020-12-02 09:40, 2020-12-09 10:40)",AM,unknown
 WFMS,campbell,RH,"[2020-12-23, 2020-12-30 03:00)",AM,unknown
+WFMS,envidas,NOY,"[2020-12-27 10:24, 2020-12-27 12:00)",AM,unknown
+WFMS,envidas,NOY,"[2020-12-27 19:00, 2020-12-28 11:06)",AM,unknown
+WFMS,envidas,NOY,"[2020-12-28 18:02, 2020-12-29 05:22)",AM,unknown
+WFMS,envidas,NOY,"[2020-12-31 06:00, 2021-01-06 11:00)",AM,unknown
+WFMS,envidas,NOY,"[2021-01-06 17:59, 2021-01-06 20:03)",AM,unknown
+WFMS,envidas,NO,"[2021-01-14 10:42, 2021-01-14 13:32)",AT,calibration
+WFMS,envidas,NOX,"[2021-01-14 10:42, 2021-01-14 13:32)",AT,calibration
+WFMS,envidas,NOY,"[2021-01-14 10:42, 2021-01-14 13:32)",AT,calibration
 WFMB,campbell,NO,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
 WFMB,campbell,NOX,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
 WFMB,campbell,CO,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
