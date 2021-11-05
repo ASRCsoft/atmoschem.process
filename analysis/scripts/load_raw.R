@@ -47,7 +47,39 @@ transform_measurement = function(f) {
 # make corrections to raw data
 make_corrections = function(f, dat) {
   if (site == 'WFMS') {
-    if (data_source == 'ultrafine') {
+    if (data_source == 'campbell') {
+      # replace mislabeled NO2 column
+      names(dat) = sub('NO2', 'NOx', names(dat))
+      # correct miscalculated wind speeds
+      wind_miscalculated = dat$time > '2016-12-14' &
+        dat$time < '2019-02-14 15:57'
+      if (any(wind_miscalculated)) {
+        for (windvar in c('value.WS3Cup', 'value.WS3Cup_Max')) {
+          dat[wind_miscalculated, windvar] =
+            (.5 / .527) * (dat[wind_miscalculated, windvar] - 1) - .5
+        }
+      }
+      # ignore some incorrect flags
+      dat[dat$time > '2018-12-01' & dat$time < '2019-01-01',
+          paste0('flagged', c('T', 'RH'))] = F
+      dat[dat$time >= '2019-11-07 04:15' & dat$time < '2019-11-15',
+          'flagged.CO'] = F
+      dat[dat$time >= '2020-02-25 12:01' & dat$time < '2020-03-05 10:37',
+          paste0('flagged', c('NO', 'NOx'))] = F
+      dat[dat$time >= '2020-07-15 14:03' & dat$time < '2020-07-22 12:00',
+          'flagged.CO'] = F
+      # replace malfunctioning wind direction values with NA
+      dat[dat$value.WindDir_SD1_WVT == 0,
+          c('value.WindDir_D1_WVT', 'value.WindDir_SD1_WVT')] = NA
+      # a few column names got messed up 2020-06-30 when changes were made to
+      # wind columns
+      if ('value.WS3CupB_SWS3CupB_S_WVT' %in% names(dat)) {
+        names(dat) = sub('WS3CupB_SWS3CupB_S_WVT', 'WS3CupB_S', names(dat))
+        names(dat) = sub('WindDirB_D1_WVT', 'WS3CupB_S_WVT', names(dat))
+        names(dat) = sub('WindDirB_SD1_WVT', 'WindDirB_D1_WVT', names(dat))
+        names(dat) = sub('WS3CupB_WVc', 'WindDirB_SD1_WVT', names(dat))
+      }
+    } else if (data_source == 'ultrafine') {
       # fix some times
       date_str = basename(tools::file_path_sans_ext(f))
       if (date_str >= '21022402' && date_str <= '21031601') {
@@ -56,6 +88,11 @@ make_corrections = function(f, dat) {
         dat$time = as.POSIXct(format(dat$time, '2021 %j %T'), tz = 'EST',
                               format = '%Y %j %T')
       }
+    }
+  } else if (site == 'WFMB') {
+    if (data_source == 'campbell') {
+      # replace mislabeled NO2 column
+      names(dat) = sub('NO2', 'NOX', names(dat))
     }
   }
   dat
