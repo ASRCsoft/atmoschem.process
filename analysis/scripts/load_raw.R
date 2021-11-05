@@ -22,10 +22,10 @@ transform_measurement = function(f) {
   } else if (site == 'PSP' & ds == 'envidas') {
     return(transform_psp_envidas(f))
   } else if (site == 'WFMB' && ds == 'envidas') {
-    return(transform_wfml_envidas(f))
+    return(transform_wfm_envidas(f))
   } else if (site == 'WFMS' && ds == 'DEC_envidas') {
     # this is really the same format as the WFMB envidas
-    return(transform_wfml_envidas(f, 'WFMS'))
+    return(transform_wfm_envidas(f))
   } else if (site == 'WFMS' && ds == 'envidas') {
     # this is the same format as the daily PSP envidas
     return(transform_psp_envidas(f, 'WFMS'))

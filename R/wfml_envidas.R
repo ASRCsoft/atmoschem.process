@@ -13,7 +13,7 @@ read_wfml_envidas = function(f, ...) {
 }
 
 #' @export
-transform_wfml_envidas = function(f, site = 'WFML') {
+transform_wfm_envidas = function(f) {
   df = read_wfml_envidas(f)
   ## get timestamps from date and time columns
   df$instrument_time = as.POSIXct(paste(df$Date, df$Time),
