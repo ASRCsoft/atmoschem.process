@@ -79,6 +79,16 @@ make_corrections = function(f, dat) {
         names(dat) = sub('WindDirB_SD1_WVT', 'WindDirB_D1_WVT', names(dat))
         names(dat) = sub('WS3CupB_WVc', 'WindDirB_SD1_WVT', names(dat))
       }
+    } else if (data_source == 'DEC_envidas') {
+      # Unflagged WFMS ozone calibrations, 2020-06-27 to 2020-09-01, 2-4am every
+      # 3 days
+      if ('value.O3' %in% names(dat)) {
+        botched_period = dat$time > as.POSIXct('2020-06-27', tz = 'EST') &
+          dat$time < as.POSIXct('2020-09-02', tz = 'EST')
+        day3 = as.integer(as.Date(dat$time) - as.Date('2020-06-27')) %% 3 == 0
+        am2to4 = substr(dat$time, 12, 13) %in% c('02', '03')
+        dat$flagged.O3[botched_period & day3 & am2to4] = T
+      }
     } else if (data_source == 'ultrafine') {
       # fix some times
       date_str = basename(tools::file_path_sans_ext(f))
@@ -93,6 +103,13 @@ make_corrections = function(f, dat) {
     if (data_source == 'campbell') {
       # replace mislabeled NO2 column
       names(dat) = sub('NO2', 'NOX', names(dat))
+    } else if (data_source == 'envidas') {
+      # flag left on after instrument installed, 2020-01-03 14:02 to 2020-01-07
+      # 09:04
+      if ('flagged.PM25C' %in% names(dat)) {
+        dat$flagged.PM25C[dat$time >= as.POSIXct('2020-01-03 14:02', tz = 'EST') &
+                          dat$time < as.POSIXct('2020-01-07 09:04', tz = 'EST')] = F
+      }
     }
   }
   dat
