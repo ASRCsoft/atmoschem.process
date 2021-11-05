@@ -111,6 +111,26 @@ make_corrections = function(f, dat) {
                           dat$time < as.POSIXct('2020-01-07 09:04', tz = 'EST')] = F
       }
     }
+  } else if (site == 'PSP') {
+    if (data_source == 'envidas') {
+      # fix some black carbon data, which is incorrectly recorded as zero when it's
+      # missing
+      if (all(c('value.BC1', 'value.BC6') %in% names(dat))) {
+        na_bc = which(dat$value.BC1 == 0 & dat$value.BC6 == 0)
+        if (length(na_bc)) dat[na_bc, c('value.BC1', 'value.BC6')] = NA
+      }
+      # fix some incorrectly set flags
+      dat$flagged.NOy[dat$time >= '2020-01-24 12:00' &
+                      dat$time < '2020-01-27 11:00'] = F
+      dat$flagged.CO[dat$time >= '2020-08-17 14:10' &
+                     dat$time < '2020-08-18 10:00'] = F
+      dat$flagged.NOy[dat$time >= '2020-08-19 14:00' &
+                      dat$time < '2020-08-20 09:00'] = F
+      dat$flagged.VWS[dat$time >= '2020-11-04 09:23' &
+                      dat$time <= '2020-11-16 09:44'] = F
+      dat$flagged.VWD[dat$time >= '2020-11-04 09:23' &
+                      dat$time <= '2020-11-16 09:44'] = F
+    }
   }
   dat
 }

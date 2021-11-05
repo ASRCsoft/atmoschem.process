@@ -24,36 +24,12 @@ read_envidas_daily = function(f) {
   df
 }
 
-patch_psp_envidas_daily = function(df) {
-  # fix some black carbon data, which is incorrectly recorded as zero when it's
-  # missing
-  if (all(c('BC1 (ng/m3)', 'BC6 (ng/m3)') %in% names(df))) {
-    na_bc = which(df$`BC1 (ng/m3)` == 0 & df$`BC6 (ng/m3)` == 0)
-    if (length(na_bc) > 0) df[na_bc, c('BC1 (ng/m3)', 'BC6 (ng/m3)')] = NA
-  }
-  # fix some incorrectly set flags
-  df$`NOy (status)`[df$instrument_time >= '2020-01-24 12:00' &
-                    df$instrument_time < '2020-01-27 11:00'] = 1
-  df$`CO (status)`[df$instrument_time >= '2020-08-17 14:10' &
-                   df$instrument_time < '2020-08-18 10:00'] = 1
-  df$`NOy (status)`[df$instrument_time >= '2020-08-19 14:00' &
-                    df$instrument_time < '2020-08-20 09:00'] = 1
-  df$`VWS (status)`[df$instrument_time >= '2020-11-04 09:23' &
-                    df$instrument_time <= '2020-11-16 09:44'] = 1
-  df$`VWD (status)`[df$instrument_time >= '2020-11-04 09:23' &
-                    df$instrument_time <= '2020-11-16 09:44'] = 1
-  df
-}
-
 transform_envidas_daily = function(f, site = 'PSP') {
   df = read_envidas_daily(f)
   df$Date_Time = as.POSIXct(df$Date_Time, format = '%Y-%m-%d %H:%M:%S',
                             tz = 'EST')
   # make some corrections
   names(df)[1] = 'instrument_time'
-  if (site == 'PSP') {
-    df = patch_psp_envidas_daily(df)
-  }
   names(df)[1] = 'time'
   flagcols = grep(' \\(status\\)$', names(df))
   names(df)[flagcols] =
