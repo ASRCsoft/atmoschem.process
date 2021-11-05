@@ -39,8 +39,9 @@ transform_campbell = function(f, site) {
   for (i in 2:ncol(campbell2)) {
     varname = names(campbell2)[i]
     flagname = paste0('flagged.', varname)
-    if (varname %in% names(flag_dict)) {
-      flag_col = paste0('F_', flag_dict[varname], '_Avg')
+    varname2 = sub('_Avg', '', varname)
+    if (varname2 %in% names(flag_dict)) {
+      flag_col = paste0('F_', flag_dict[varname2], '_Avg')
       if (flag_col %in% colnames(flag_mat)) {
         campbell2[, flagname] = flag_mat[, flag_col]
       }
