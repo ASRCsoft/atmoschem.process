@@ -195,8 +195,8 @@ if (site == 'WFMS') {
   envidas_mcals = mcals %>%
     subset(int_start(times) >= as.POSIXct('2019-01-01', tz = 'EST')) %>%
     transform(data_source = 'envidas') %>%
-    # NOx is NOX, NOy is NOY in envidas (all uppercase)
-    transform(measurement_name = toupper(measurement_name))
+    # NOx_Avg is NOX, NOy_Avg is NOY in envidas (all uppercase)
+    transform(measurement_name = toupper(sub('_Avg', '', measurement_name)))
   mcals = rbind(mcals, envidas_mcals)
 }
 
@@ -280,7 +280,7 @@ if (site == 'WFMS') {
   envidas_acals = acals0 %>%
     transform(data_source = 'envidas') %>%
     # NOx is NOX, NOy is NOY in envidas (all uppercase)
-    transform(measurement_name = toupper(measurement_name))
+    transform(measurement_name = toupper(sub('_Avg', '', measurement_name)))
   # envidas data starts in 2019
   int_start(envidas_acals$dt_int) =
     pmax(int_start(envidas_acals$dt_int), as.POSIXct('2019-01-01', tz = 'EST'))
@@ -350,7 +350,7 @@ for (ds in unique(cal_flags2$data_source)) {
 # Calculate NO2 conversion efficiencies (derived from NOx and NO results)
 if (site == 'WFMS') {
   # WFMS NO2 conversion efficiencies are recorded on the NOx channel
-  no2_ce = all_cals$measurement_name %in% c('NOx', 'NOX') &
+  no2_ce = all_cals$measurement_name %in% c('NOx_Avg', 'NOX_Avg') &
     all_cals$type == 'CE'
   all_cals$measurement_name[no2_ce] = 'NO2'
 } else if (site == 'PSP') {

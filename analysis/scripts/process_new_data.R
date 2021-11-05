@@ -124,8 +124,9 @@ if (site == 'WFMS' && data_source == 'envidas') {
   # envidas autocalibrations are the same as campbell autocalibrations
   acals_ds = config$autocals[config$autocals$site == site &
                              config$autocals$data_source == 'campbell', ]
-  # and capitalize the names
-  acals_ds = transform(acals_ds, measurement_name = toupper(measurement_name))
+  # remove '_Avg' suffix and capitalize the names
+  acals_ds$measurement_name =
+    toupper(sub('_Avg', '', acals_ds$measurement_name))
 } else {
   acals_ds = config$autocals[config$autocals$site == site &
                              config$autocals$data_source == data_source, ]
@@ -155,10 +156,10 @@ for (mname in unique(mflags_ds$measurement_name)) {
 # power outage flags
 if (site %in% c('WFMS', 'WFMB') & data_source == 'campbell') {
   if (site == 'WFMS') {
-    is_outage = with(meas, value.Phase1 < 105 | value.Phase3 < 100)
+    is_outage = with(meas, value.Phase1_Avg < 105 | value.Phase3_Avg < 100)
     padding_list = list(CO = 50, NO = 4, NOx = 4, NOy = 4, Ozone = 10, SO2 = 4)
   } else if (site == 'WFMB') {
-    is_outage = meas$value.Phase1 < 105
+    is_outage = meas$value.Phase1_Avg < 105
     padding_list = list(CO = 10, NO = 45, NOX = 45)
   }
   outage_periods = interval_list(meas$time, is_outage)
@@ -174,14 +175,16 @@ if (site %in% c('WFMS', 'WFMB') & data_source == 'campbell') {
 }
 # freezing anemometers
 if (site == 'WFMS' & data_source == 'campbell') {
-  windcols = c('WS3Cup', 'WS3Cup_Max', 'WS3CupB', 'WS3CupB_Max',
+  windcols = c('WS3Cup_Avg', 'WS3Cup_Max', 'WS3CupB_Avg', 'WS3CupB_Max',
                'WS3CupA_S_WVT', 'WS3CupB_S_WVT')
   # has the wind been slow for at least 30 minutes?
   looks_frozen = function(x) {
     int_end(x) - int_start(x) > as.difftime(30, units = 'mins')
   }
   # is it (at least close to) freezing?
-  is_freezing = function(x) meas[match(int_start(x), meas$time), 'value.T'] < 5
+  is_freezing = function(x) {
+    meas[match(int_start(x), meas$time), 'value.T_Avg'] < 5
+  }
   for (w in windcols) {
     varname = paste0('value.', w)
     flagname = paste0('flagged.', w)
@@ -257,15 +260,16 @@ message('Calculating derived values...')
 if (site == 'WFMS') {
   if (data_source == 'campbell') {
     # NO2
-    meas$value.NO2 = with(pr_meas, value.NOx - value.NO)
-    meas$flagged.NO2 = with(pr_meas, flagged.NOx | flagged.NO)
+    meas$value.NO2 = with(pr_meas, value.NOx_Avg - value.NO_Avg)
+    meas$flagged.NO2 = with(pr_meas, flagged.NOx_Avg | flagged.NO_Avg)
     # SLP
     meas$value.SLP =
-      with(pr_meas, sea_level_pressure(value.BP, value.T, 1483.5))
-    meas$flagged.SLP = with(pr_meas, flagged.BP | flagged.T)
+      with(pr_meas, sea_level_pressure(value.BP_Avg, value.T_Avg, 1483.5))
+    meas$flagged.SLP = with(pr_meas, flagged.BP_Avg | flagged.T_Avg)
     # WS/WD (wind shadow corrected)
-    meas$value.WS = with(pr_meas, pmax(value.WS3Cup, value.WS3CupB, na.rm = T))
-    meas$flagged.WS = with(pr_meas, flagged.WS3Cup & flagged.WS3CupB)
+    meas$value.WS =
+      with(pr_meas, pmax(value.WS3Cup_Avg, value.WS3CupB_Avg, na.rm = T))
+    meas$flagged.WS = with(pr_meas, flagged.WS3Cup_Avg & flagged.WS3CupB_Avg)
     meas$value.WD = pr_meas$value.WindDir_D1_WVT
     meas$flagged.WD = pr_meas$flagged.WindDir_D1_WVT
     # WS/WD continued (new columns starting 2020-06-30)
@@ -310,8 +314,8 @@ if (site == 'WFMS') {
 } else if (site == 'WFMB') {
   if (data_source == 'campbell') {
     # NO2
-    meas$value.NO2 = with(pr_meas, value.NOX - value.NO)
-    meas$flagged.NO2 = with(pr_meas, flagged.NOX | flagged.NO)
+    meas$value.NO2 = with(pr_meas, value.NOX_Avg - value.NO_Avg)
+    meas$flagged.NO2 = with(pr_meas, flagged.NOX_Avg | flagged.NO_Avg)
     # SLP. This is a bit awkward because outside temps are only measured by the
     # Mesonet, at a different frequency than Campbell's barometric
     # pressure. Solution is to interpolate Mesonet outside temps at Campbell
@@ -335,8 +339,9 @@ if (site == 'WFMS') {
     interp_temps = approx(meso_temps$time,
                           meso_temps$`value.temperature_2m [degC]`, meas$time,
                           na.rm = F)$y
-    meas$value.SLP = sea_level_pressure(pr_meas$value.BP2, interp_temps, 604)
-    meas$flagged.SLP = with(pr_meas, flagged.BP2 | is.na(interp_temps))
+    meas$value.SLP =
+      sea_level_pressure(pr_meas$value.BP2_Avg, interp_temps, 604)
+    meas$flagged.SLP = with(pr_meas, flagged.BP2_Avg | is.na(interp_temps))
   } else if (data_source == 'envidas') {
     # Ozone_ppbv
     meas$value.Ozone_ppbv = pr_meas$`value.API-T400-OZONE` * 1000

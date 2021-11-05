@@ -1,91 +1,91 @@
 site,data_source,measurement_name,type,times,explanation
-WFMS,campbell,NO,zero,"[2019-02-27 12:00, 2019-02-28)",zero air disconnected
-WFMS,campbell,NOx,zero,"[2019-02-27 12:00, 2019-02-28)",zero air disconnected
-WFMS,campbell,NOy,zero,"[2019-02-27 12:00, 2019-02-28)",zero air disconnected
-WFMS,campbell,CO,zero,"[2019-02-27 12:00, 2019-02-28)",zero air disconnected
-WFMS,campbell,SO2,zero,"[2019-02-27 12:00, 2019-02-28)",zero air disconnected
-WFMS,campbell,NO,zero,"[2019-02-28 12:00, 2019-03-01 01:00)",zero air disconnected
-WFMS,campbell,NOx,zero,"[2019-02-28 12:00, 2019-03-01 01:00)",zero air disconnected
-WFMS,campbell,NOy,zero,"[2019-02-28 12:00, 2019-03-01 01:00)",zero air disconnected
-WFMS,campbell,CO,zero,"[2019-02-28 12:00, 2019-03-01 01:00)",zero air disconnected
-WFMS,campbell,SO2,zero,"[2019-02-28 12:00, 2019-03-01 01:00)",zero air disconnected
-WFMS,campbell,NO,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",zero air disconnected
-WFMS,campbell,NOx,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",zero air disconnected
-WFMS,campbell,NOy,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",zero air disconnected
-WFMS,campbell,CO,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",zero air disconnected
-WFMS,campbell,SO2,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",zero air disconnected
-WFMS,campbell,NOy,span,"[2019-03-25, 2019-03-28)",
-WFMS,campbell,NO,zero,"[2019-04-30 12:00, 2019-05-01 08:00)",
-WFMS,campbell,NOx,zero,"[2019-04-30 12:00, 2019-05-01 08:00)",
-WFMS,campbell,NOy,zero,"[2019-04-30 12:00, 2019-05-01 08:00)",
-WFMS,campbell,NO,zero,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
-WFMS,campbell,NOx,zero,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
-WFMS,campbell,NOy,zero,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
-WFMS,campbell,NO,span,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
-WFMS,campbell,NOx,span,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
-WFMS,campbell,NOy,span,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
-WFMS,campbell,NOx,CE,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
-WFMS,campbell,NOy,CE,"[2019-05-08 12:00, 2019-05-09 14:00)",spikes during measurement
-WFMS,campbell,NOx,CE,"[2019-05-15 12:00, 2019-05-16 14:00)",spikes during measurement
-WFMS,campbell,NOy,CE,"[2019-05-15 12:00, 2019-05-16 14:00)",spikes during measurement
-WFMS,campbell,NOx,CE,"[2019-05-18 12:00, 2019-05-18 14:00)",spikes during measurement
-WFMS,campbell,NOy,CE,"[2019-05-18 12:00, 2019-05-18 14:00)",spikes during measurement
-WFMS,campbell,NOx,CE,"[2019-05-24 12:00, 2019-05-25 14:00)",spikes during measurement
-WFMS,campbell,NOy,CE,"[2019-05-24 12:00, 2019-05-25 14:00)",spikes during measurement
-WFMS,campbell,NOx,CE,"[2019-05-27 12:00, 2019-05-27 14:00)",spikes during measurement
-WFMS,campbell,NOy,CE,"[2019-05-27 12:00, 2019-05-27 14:00)",spikes during measurement
-WFMS,campbell,NOx,CE,"[2019-05-30 12:00, 2019-06-02 14:00)",spikes during measurement
-WFMS,campbell,NOy,CE,"[2019-05-30 12:00, 2019-06-02 14:00)",spikes during measurement
-WFMS,campbell,NOx,CE,"[2019-06-04 12:00, 2019-06-04 14:00)",spikes during measurement
-WFMS,campbell,NOy,CE,"[2019-06-04 12:00, 2019-06-04 14:00)",spikes during measurement
-WFMS,campbell,NOx,CE,"[2019-06-06 12:00, 2019-06-06 14:00)",spikes during measurement
-WFMS,campbell,NOy,CE,"[2019-06-06 12:00, 2019-06-06 14:00)",spikes during measurement
-WFMS,campbell,NOx,CE,"[2019-06-11 12:00, 2019-06-11 14:00)",spikes during measurement
-WFMS,campbell,NOy,CE,"[2019-06-11 12:00, 2019-06-11 14:00)",spikes during measurement
-WFMS,campbell,NOx,CE,"[2019-06-22 12:00, 2019-06-23 14:00)",spikes during measurement
-WFMS,campbell,NOy,CE,"[2019-06-22 12:00, 2019-06-23 14:00)",spikes during measurement
-WFMS,campbell,NO,span,"[2019-06-26 09:30, 2019-07-03 09:00)",unknown
-WFMS,campbell,NOx,span,"[2019-06-26 09:30, 2019-07-03 09:00)",unknown
-WFMS,campbell,NOy,CE,"[2019-06-26 09:30, 2019-07-03 09:00)",unknown
-WFMS,campbell,CO,zero,"[2019-07-08 09:00, 2019-07-09 09:00)",power failure
-WFMS,campbell,CO,span,"[2019-07-09, 2019-07-09 02:00)",power failure
-WFMS,campbell,NO,zero,"[2019-07-26 06:00, 2019-07-30 06:00)",NO span valve stuck
-WFMS,campbell,NOx,zero,"[2019-07-26 06:00, 2019-07-30 06:00)",NO span valve stuck
-WFMS,campbell,NOx,CE,"[2019-07-26 06:00, 2019-07-30 06:00)",NO span valve stuck
-WFMS,campbell,NOy,zero,"[2019-07-26 06:00, 2019-07-30 06:00)",NO span valve stuck
-WFMS,campbell,NOy,CE,"[2019-07-26 06:00, 2019-07-30 06:00)",NO span valve stuck
-WFMS,campbell,CO,span,"[2019-07-31, 2019-08-14 09:00)",ran out of CO span gas
-WFMS,campbell,NO,zero,"[2019-08-05 06:00, 2019-08-07 18:00)",power failures and NO span valve stuck
-WFMS,campbell,NOx,zero,"[2019-08-05 06:00, 2019-08-07 18:00)",power failures and NO span valve stuck
-WFMS,campbell,NOx,CE,"[2019-08-05 06:00, 2019-08-07 18:00)",power failures and NO span valve stuck
-WFMS,campbell,NOy,zero,"[2019-08-05 06:00, 2019-08-07 18:00)",power failures and NO span valve stuck
-WFMS,campbell,NOy,CE,"[2019-08-05 06:00, 2019-08-07 18:00)",power failures and NO span valve stuck
-WFMS,campbell,CO,zero,"[2019-11-04 12:00, 2019-11-06 12:00)",power failure
-WFMS,campbell,CO,span,"[2019-11-04 12:00, 2019-11-06 12:00)",power failure
-WFMS,campbell,NOx,CE,"[2019-11-06, 2019-11-14)",unknown
-WFMS,campbell,NOy,CE,"[2019-11-06, 2019-11-14)",unknown
-WFMS,campbell,CO,zero,"[2019-12-13 18:00, 2019-12-19 06:00)",pump seized
-WFMS,campbell,CO,span,"[2019-12-13 18:00, 2019-12-19 06:00)",pump seized
-WFMS,campbell,CO,zero,"[2019-12-21 04:00, 2020-01-08 12:00)",pump seized
-WFMS,campbell,CO,span,"[2019-12-21 04:00, 2020-01-08 12:00)",pump seized
-WFMS,campbell,CO,zero,"[2020-02-25 18:00, 2020-03-05 09:00)",zero air valve off
-WFMS,campbell,CO,span,"[2020-02-25 18:00, 2020-03-05 09:00)",zero air valve off
-WFMS,campbell,CO,zero,"[2020-05-28 12:00, 2020-06-11 09:00)",pump issues
-WFMS,campbell,CO,span,"[2020-05-28 12:00, 2020-06-11 09:00)",pump issues
-WFMS,campbell,CO,zero,"[2020-06-21 14:00, 2020-06-24 09:00)",fuse
-WFMS,campbell,CO,span,"[2020-06-21 14:00, 2020-06-24 09:00)",fuse
-WFMS,campbell,CO,span,"[2020-07-02, 2020-07-07 01:00)",unknown
-WFMS,campbell,NO,span,"[2020-07-19, 2020-07-22 03:00)",unknown
-WFMS,campbell,NOx,span,"[2020-07-19, 2020-07-22 03:00)",unknown
-WFMS,campbell,NOy,span,"[2020-07-20, 2020-07-22 03:00)",unknown
-WFMS,campbell,NO,span,"[2020-08-09, 2020-08-12 03:00)",unknown
-WFMS,campbell,NOx,span,"[2020-08-09, 2020-08-12 03:00)",unknown
-WFMS,campbell,NOy,span,"[2020-08-11, 2020-08-12 03:00)",unknown
-WFMS,campbell,CO,zero,"[2020-11-05 03:00, 2020-11-12 09:00)",unknown
-WFMS,campbell,CO,span,"[2020-11-05 03:00, 2020-11-12 09:00)",unknown
-WFMS,campbell,NOy,zero,"[2020-11-21 12:00, 2020-11-23 12:00)",unknown
-WFMS,campbell,SO2,zero,"[2020-12-02 09:40, 2020-12-09 10:40)",unknown
-WFMS,campbell,SO2,span,"[2020-12-02 09:40, 2020-12-09 10:40)",unknown
+WFMS,campbell,NO_Avg,zero,"[2019-02-27 12:00, 2019-02-28)",zero air disconnected
+WFMS,campbell,NOx_Avg,zero,"[2019-02-27 12:00, 2019-02-28)",zero air disconnected
+WFMS,campbell,NOy_Avg,zero,"[2019-02-27 12:00, 2019-02-28)",zero air disconnected
+WFMS,campbell,CO_Avg,zero,"[2019-02-27 12:00, 2019-02-28)",zero air disconnected
+WFMS,campbell,SO2_Avg,zero,"[2019-02-27 12:00, 2019-02-28)",zero air disconnected
+WFMS,campbell,NO_Avg,zero,"[2019-02-28 12:00, 2019-03-01 01:00)",zero air disconnected
+WFMS,campbell,NOx_Avg,zero,"[2019-02-28 12:00, 2019-03-01 01:00)",zero air disconnected
+WFMS,campbell,NOy_Avg,zero,"[2019-02-28 12:00, 2019-03-01 01:00)",zero air disconnected
+WFMS,campbell,CO_Avg,zero,"[2019-02-28 12:00, 2019-03-01 01:00)",zero air disconnected
+WFMS,campbell,SO2_Avg,zero,"[2019-02-28 12:00, 2019-03-01 01:00)",zero air disconnected
+WFMS,campbell,NO_Avg,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",zero air disconnected
+WFMS,campbell,NOx_Avg,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",zero air disconnected
+WFMS,campbell,NOy_Avg,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",zero air disconnected
+WFMS,campbell,CO_Avg,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",zero air disconnected
+WFMS,campbell,SO2_Avg,zero,"[2019-03-01 12:00, 2019-03-02 01:00)",zero air disconnected
+WFMS,campbell,NOy_Avg,span,"[2019-03-25, 2019-03-28)",
+WFMS,campbell,NO_Avg,zero,"[2019-04-30 12:00, 2019-05-01 08:00)",
+WFMS,campbell,NOx_Avg,zero,"[2019-04-30 12:00, 2019-05-01 08:00)",
+WFMS,campbell,NOy_Avg,zero,"[2019-04-30 12:00, 2019-05-01 08:00)",
+WFMS,campbell,NO_Avg,zero,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
+WFMS,campbell,NOx_Avg,zero,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
+WFMS,campbell,NOy_Avg,zero,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
+WFMS,campbell,NO_Avg,span,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
+WFMS,campbell,NOx_Avg,span,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
+WFMS,campbell,NOy_Avg,span,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
+WFMS,campbell,NOx_Avg,CE,"[2019-05-07 12:00, 2019-05-14 12:00)",calibration gases stuck on
+WFMS,campbell,NOy_Avg,CE,"[2019-05-08 12:00, 2019-05-09 14:00)",spikes during measurement
+WFMS,campbell,NOx_Avg,CE,"[2019-05-15 12:00, 2019-05-16 14:00)",spikes during measurement
+WFMS,campbell,NOy_Avg,CE,"[2019-05-15 12:00, 2019-05-16 14:00)",spikes during measurement
+WFMS,campbell,NOx_Avg,CE,"[2019-05-18 12:00, 2019-05-18 14:00)",spikes during measurement
+WFMS,campbell,NOy_Avg,CE,"[2019-05-18 12:00, 2019-05-18 14:00)",spikes during measurement
+WFMS,campbell,NOx_Avg,CE,"[2019-05-24 12:00, 2019-05-25 14:00)",spikes during measurement
+WFMS,campbell,NOy_Avg,CE,"[2019-05-24 12:00, 2019-05-25 14:00)",spikes during measurement
+WFMS,campbell,NOx_Avg,CE,"[2019-05-27 12:00, 2019-05-27 14:00)",spikes during measurement
+WFMS,campbell,NOy_Avg,CE,"[2019-05-27 12:00, 2019-05-27 14:00)",spikes during measurement
+WFMS,campbell,NOx_Avg,CE,"[2019-05-30 12:00, 2019-06-02 14:00)",spikes during measurement
+WFMS,campbell,NOy_Avg,CE,"[2019-05-30 12:00, 2019-06-02 14:00)",spikes during measurement
+WFMS,campbell,NOx_Avg,CE,"[2019-06-04 12:00, 2019-06-04 14:00)",spikes during measurement
+WFMS,campbell,NOy_Avg,CE,"[2019-06-04 12:00, 2019-06-04 14:00)",spikes during measurement
+WFMS,campbell,NOx_Avg,CE,"[2019-06-06 12:00, 2019-06-06 14:00)",spikes during measurement
+WFMS,campbell,NOy_Avg,CE,"[2019-06-06 12:00, 2019-06-06 14:00)",spikes during measurement
+WFMS,campbell,NOx_Avg,CE,"[2019-06-11 12:00, 2019-06-11 14:00)",spikes during measurement
+WFMS,campbell,NOy_Avg,CE,"[2019-06-11 12:00, 2019-06-11 14:00)",spikes during measurement
+WFMS,campbell,NOx_Avg,CE,"[2019-06-22 12:00, 2019-06-23 14:00)",spikes during measurement
+WFMS,campbell,NOy_Avg,CE,"[2019-06-22 12:00, 2019-06-23 14:00)",spikes during measurement
+WFMS,campbell,NO_Avg,span,"[2019-06-26 09:30, 2019-07-03 09:00)",unknown
+WFMS,campbell,NOx_Avg,span,"[2019-06-26 09:30, 2019-07-03 09:00)",unknown
+WFMS,campbell,NOy_Avg,CE,"[2019-06-26 09:30, 2019-07-03 09:00)",unknown
+WFMS,campbell,CO_Avg,zero,"[2019-07-08 09:00, 2019-07-09 09:00)",power failure
+WFMS,campbell,CO_Avg,span,"[2019-07-09, 2019-07-09 02:00)",power failure
+WFMS,campbell,NO_Avg,zero,"[2019-07-26 06:00, 2019-07-30 06:00)",NO span valve stuck
+WFMS,campbell,NOx_Avg,zero,"[2019-07-26 06:00, 2019-07-30 06:00)",NO span valve stuck
+WFMS,campbell,NOx_Avg,CE,"[2019-07-26 06:00, 2019-07-30 06:00)",NO span valve stuck
+WFMS,campbell,NOy_Avg,zero,"[2019-07-26 06:00, 2019-07-30 06:00)",NO span valve stuck
+WFMS,campbell,NOy_Avg,CE,"[2019-07-26 06:00, 2019-07-30 06:00)",NO span valve stuck
+WFMS,campbell,CO_Avg,span,"[2019-07-31, 2019-08-14 09:00)",ran out of CO span gas
+WFMS,campbell,NO_Avg,zero,"[2019-08-05 06:00, 2019-08-07 18:00)",power failures and NO span valve stuck
+WFMS,campbell,NOx_Avg,zero,"[2019-08-05 06:00, 2019-08-07 18:00)",power failures and NO span valve stuck
+WFMS,campbell,NOx_Avg,CE,"[2019-08-05 06:00, 2019-08-07 18:00)",power failures and NO span valve stuck
+WFMS,campbell,NOy_Avg,zero,"[2019-08-05 06:00, 2019-08-07 18:00)",power failures and NO span valve stuck
+WFMS,campbell,NOy_Avg,CE,"[2019-08-05 06:00, 2019-08-07 18:00)",power failures and NO span valve stuck
+WFMS,campbell,CO_Avg,zero,"[2019-11-04 12:00, 2019-11-06 12:00)",power failure
+WFMS,campbell,CO_Avg,span,"[2019-11-04 12:00, 2019-11-06 12:00)",power failure
+WFMS,campbell,NOx_Avg,CE,"[2019-11-06, 2019-11-14)",unknown
+WFMS,campbell,NOy_Avg,CE,"[2019-11-06, 2019-11-14)",unknown
+WFMS,campbell,CO_Avg,zero,"[2019-12-13 18:00, 2019-12-19 06:00)",pump seized
+WFMS,campbell,CO_Avg,span,"[2019-12-13 18:00, 2019-12-19 06:00)",pump seized
+WFMS,campbell,CO_Avg,zero,"[2019-12-21 04:00, 2020-01-08 12:00)",pump seized
+WFMS,campbell,CO_Avg,span,"[2019-12-21 04:00, 2020-01-08 12:00)",pump seized
+WFMS,campbell,CO_Avg,zero,"[2020-02-25 18:00, 2020-03-05 09:00)",zero air valve off
+WFMS,campbell,CO_Avg,span,"[2020-02-25 18:00, 2020-03-05 09:00)",zero air valve off
+WFMS,campbell,CO_Avg,zero,"[2020-05-28 12:00, 2020-06-11 09:00)",pump issues
+WFMS,campbell,CO_Avg,span,"[2020-05-28 12:00, 2020-06-11 09:00)",pump issues
+WFMS,campbell,CO_Avg,zero,"[2020-06-21 14:00, 2020-06-24 09:00)",fuse
+WFMS,campbell,CO_Avg,span,"[2020-06-21 14:00, 2020-06-24 09:00)",fuse
+WFMS,campbell,CO_Avg,span,"[2020-07-02, 2020-07-07 01:00)",unknown
+WFMS,campbell,NO_Avg,span,"[2020-07-19, 2020-07-22 03:00)",unknown
+WFMS,campbell,NOx_Avg,span,"[2020-07-19, 2020-07-22 03:00)",unknown
+WFMS,campbell,NOy_Avg,span,"[2020-07-20, 2020-07-22 03:00)",unknown
+WFMS,campbell,NO_Avg,span,"[2020-08-09, 2020-08-12 03:00)",unknown
+WFMS,campbell,NOx_Avg,span,"[2020-08-09, 2020-08-12 03:00)",unknown
+WFMS,campbell,NOy_Avg,span,"[2020-08-11, 2020-08-12 03:00)",unknown
+WFMS,campbell,CO_Avg,zero,"[2020-11-05 03:00, 2020-11-12 09:00)",unknown
+WFMS,campbell,CO_Avg,span,"[2020-11-05 03:00, 2020-11-12 09:00)",unknown
+WFMS,campbell,NOy_Avg,zero,"[2020-11-21 12:00, 2020-11-23 12:00)",unknown
+WFMS,campbell,SO2_Avg,zero,"[2020-12-02 09:40, 2020-12-09 10:40)",unknown
+WFMS,campbell,SO2_Avg,span,"[2020-12-02 09:40, 2020-12-09 10:40)",unknown
 WFMS,envidas,NO,span,"[2020-12-10, 2020-12-16 03:00)",campbell glitch
 WFMS,envidas,NO,zero,"[2020-12-09 12:00, 2020-12-14 12:00)",campbell glitch
 WFMS,envidas,NOX,span,"[2020-12-10, 2020-12-16 03:00)",campbell glitch
@@ -110,45 +110,45 @@ WFMS,envidas,SO2,span,"[2020-12-20, 2020-12-22)",campbell glitch
 WFMS,envidas,SO2,zero,"[2020-12-20, 2020-12-21 12:00)",campbell glitch
 WFMS,envidas,NOY,span,"[2020-12-31 06:00, 2021-01-06 11:00)",campbell glitch
 WFMS,envidas,NOY,zero,"[2020-12-31 06:00, 2021-01-06 11:00)",campbell glitch
-WFMB,campbell,NO,zero,"[2018-12-14, 2018-12-18)",
-WFMB,campbell,NOX,zero,"[2018-12-14, 2018-12-18)",
-WFMB,campbell,CO,zero,"[2018-12-14, 2018-12-18)",
-WFMB,campbell,CO,span,"[2018-12-14, 2018-12-18)",
-WFMB,campbell,NO,zero,"[2019-04-17 09:00, 2019-04-23 13:00)",pump failed
-WFMB,campbell,NOX,zero,"[2019-04-17 09:00, 2019-04-23 13:00)",pump failed
-WFMB,campbell,NO,span,"[2019-04-17 09:00, 2019-04-23 13:00)",pump failed
-WFMB,campbell,NOX,span,"[2019-04-17 09:00, 2019-04-23 13:00)",pump failed
-WFMB,campbell,NO,span,"[2019-08-12 10:00, 2019-08-12 14:00)",unknown
-WFMB,campbell,NOX,span,"[2019-08-12 10:00, 2019-08-12 14:00)",unknown
-WFMB,campbell,NO,span,"[2019-08-16, 2019-08-18)",unknown
-WFMB,campbell,NOX,span,"[2019-08-16, 2019-08-18)",unknown
-WFMB,campbell,CO,zero,"[2019-11-14, 2019-11-19)",power outages
-WFMB,campbell,CO,span,"[2019-11-14, 2019-11-19)",power outages
-WFMB,campbell,NO,zero,"[2019-11-14, 2019-11-19)",power outages
-WFMB,campbell,NOX,zero,"[2019-11-14, 2019-11-19)",power outages
-WFMB,campbell,NOX,span,"[2019-11-14, 2019-11-19)",power outages
-WFMB,campbell,CO,zero,"[2019-12-19, 2019-12-31)",power outages
-WFMB,campbell,CO,span,"[2019-12-19, 2019-12-31)",power outages
-WFMB,campbell,NO,zero,"[2019-12-19, 2019-12-31)",power outages
-WFMB,campbell,NOX,zero,"[2019-12-19, 2019-12-31)",power outages
-WFMB,campbell,NOX,span,"[2019-12-19, 2019-12-31)",power outages
-WFMB,campbell,NO,zero,"[2020-05-20 23:00, 2020-05-26 11:00)",pump failed
-WFMB,campbell,NO,span,"[2020-05-20 23:00, 2020-05-26 11:00)",pump failed
-WFMB,campbell,NOX,zero,"[2020-05-20 23:00, 2020-05-26 11:00)",pump failed
-WFMB,campbell,NOX,span,"[2020-05-20 23:00, 2020-05-26 11:00)",pump failed
-WFMB,campbell,NO,zero,"[2020-06-02, 2020-06-05)",low ozone flow
-WFMB,campbell,NO,span,"[2020-06-02, 2020-06-05)",low ozone flow
-WFMB,campbell,NOX,zero,"[2020-06-02, 2020-06-05)",low ozone flow
-WFMB,campbell,NOX,span,"[2020-06-02, 2020-06-05)",low ozone flow
-WFMB,campbell,NO,zero,"[2020-08-12 13:31, 2020-08-18 10:28)",unknown instrument error
-WFMB,campbell,NO,span,"[2020-08-12 13:31, 2020-08-18 10:28)",unknown instrument error
-WFMB,campbell,NOX,zero,"[2020-08-12 13:31, 2020-08-18 10:28)",unknown instrument error
-WFMB,campbell,NOX,span,"[2020-08-12 13:31, 2020-08-18 10:28)",unknown instrument error
-WFMB,campbell,CO,span,"[2020-09-29, 2020-10-06)",Calibrator program corrupted
-WFMB,campbell,NO,span,"[2020-09-30, 2020-10-06)",Calibrator program corrupted
-WFMB,campbell,NOX,span,"[2020-09-30, 2020-10-06)",Calibrator program corrupted
-WFMB,campbell,NO,span,"[2020-10-06, 2020-10-13)",tube pinched
-WFMB,campbell,NOX,span,"[2020-10-06, 2020-10-13)",tube pinched
+WFMB,campbell,NO_Avg,zero,"[2018-12-14, 2018-12-18)",
+WFMB,campbell,NOX_Avg,zero,"[2018-12-14, 2018-12-18)",
+WFMB,campbell,CO_Avg,zero,"[2018-12-14, 2018-12-18)",
+WFMB,campbell,CO_Avg,span,"[2018-12-14, 2018-12-18)",
+WFMB,campbell,NO_Avg,zero,"[2019-04-17 09:00, 2019-04-23 13:00)",pump failed
+WFMB,campbell,NOX_Avg,zero,"[2019-04-17 09:00, 2019-04-23 13:00)",pump failed
+WFMB,campbell,NO_Avg,span,"[2019-04-17 09:00, 2019-04-23 13:00)",pump failed
+WFMB,campbell,NOX_Avg,span,"[2019-04-17 09:00, 2019-04-23 13:00)",pump failed
+WFMB,campbell,NO_Avg,span,"[2019-08-12 10:00, 2019-08-12 14:00)",unknown
+WFMB,campbell,NOX_Avg,span,"[2019-08-12 10:00, 2019-08-12 14:00)",unknown
+WFMB,campbell,NO_Avg,span,"[2019-08-16, 2019-08-18)",unknown
+WFMB,campbell,NOX_Avg,span,"[2019-08-16, 2019-08-18)",unknown
+WFMB,campbell,CO_Avg,zero,"[2019-11-14, 2019-11-19)",power outages
+WFMB,campbell,CO_Avg,span,"[2019-11-14, 2019-11-19)",power outages
+WFMB,campbell,NO_Avg,zero,"[2019-11-14, 2019-11-19)",power outages
+WFMB,campbell,NOX_Avg,zero,"[2019-11-14, 2019-11-19)",power outages
+WFMB,campbell,NOX_Avg,span,"[2019-11-14, 2019-11-19)",power outages
+WFMB,campbell,CO_Avg,zero,"[2019-12-19, 2019-12-31)",power outages
+WFMB,campbell,CO_Avg,span,"[2019-12-19, 2019-12-31)",power outages
+WFMB,campbell,NO_Avg,zero,"[2019-12-19, 2019-12-31)",power outages
+WFMB,campbell,NOX_Avg,zero,"[2019-12-19, 2019-12-31)",power outages
+WFMB,campbell,NOX_Avg,span,"[2019-12-19, 2019-12-31)",power outages
+WFMB,campbell,NO_Avg,zero,"[2020-05-20 23:00, 2020-05-26 11:00)",pump failed
+WFMB,campbell,NO_Avg,span,"[2020-05-20 23:00, 2020-05-26 11:00)",pump failed
+WFMB,campbell,NOX_Avg,zero,"[2020-05-20 23:00, 2020-05-26 11:00)",pump failed
+WFMB,campbell,NOX_Avg,span,"[2020-05-20 23:00, 2020-05-26 11:00)",pump failed
+WFMB,campbell,NO_Avg,zero,"[2020-06-02, 2020-06-05)",low ozone flow
+WFMB,campbell,NO_Avg,span,"[2020-06-02, 2020-06-05)",low ozone flow
+WFMB,campbell,NOX_Avg,zero,"[2020-06-02, 2020-06-05)",low ozone flow
+WFMB,campbell,NOX_Avg,span,"[2020-06-02, 2020-06-05)",low ozone flow
+WFMB,campbell,NO_Avg,zero,"[2020-08-12 13:31, 2020-08-18 10:28)",unknown instrument error
+WFMB,campbell,NO_Avg,span,"[2020-08-12 13:31, 2020-08-18 10:28)",unknown instrument error
+WFMB,campbell,NOX_Avg,zero,"[2020-08-12 13:31, 2020-08-18 10:28)",unknown instrument error
+WFMB,campbell,NOX_Avg,span,"[2020-08-12 13:31, 2020-08-18 10:28)",unknown instrument error
+WFMB,campbell,CO_Avg,span,"[2020-09-29, 2020-10-06)",Calibrator program corrupted
+WFMB,campbell,NO_Avg,span,"[2020-09-30, 2020-10-06)",Calibrator program corrupted
+WFMB,campbell,NOX_Avg,span,"[2020-09-30, 2020-10-06)",Calibrator program corrupted
+WFMB,campbell,NO_Avg,span,"[2020-10-06, 2020-10-13)",tube pinched
+WFMB,campbell,NOX_Avg,span,"[2020-10-06, 2020-10-13)",tube pinched
 PSP,envidas,NO-DEC,zero,"[2018-10-23, 2018-11-09)",calibration
 PSP,envidas,NOx,CE,"[2019-01-02, 2019-02-02)",wrong NOx values recorded
 PSP,envidas,NOx,CE,"[2019-02-08, 2019-02-22)","new calibration instrument, values recorded before leveling off"

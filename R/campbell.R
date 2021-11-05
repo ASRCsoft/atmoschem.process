@@ -25,10 +25,8 @@ read_campbell = function(f) {
 #' @export
 transform_campbell = function(f, site) {
   campbell = read_campbell(f)
-  ## clean and reorganize the data
+  # clean and reorganize the data
   is_flag = grepl('^F_', names(campbell))
-  # assume 'Avg' by default, so it can be removed
-  names(campbell) = sub('_Avg$', '', names(campbell))
   if (site == 'WFMS') {
     flag_mat = as.matrix(campbell[, is_flag]) != 1
     flag_dict = wfms_flags
@@ -41,10 +39,11 @@ transform_campbell = function(f, site) {
   for (i in 2:ncol(campbell2)) {
     varname = names(campbell2)[i]
     flagname = paste0('flagged.', varname)
-    if (varname %in% names(flag_dict) &
-        paste0('F_', flag_dict[varname]) %in% colnames(flag_mat)) {
-      flag_col = paste0('F_', flag_dict[varname])
-      campbell2[, flagname] = flag_mat[, flag_col]
+    if (varname %in% names(flag_dict)) {
+      flag_col = paste0('F_', flag_dict[varname], '_Avg')
+      if (flag_col %in% colnames(flag_mat)) {
+        campbell2[, flagname] = flag_mat[, flag_col]
+      }
     } else {
       campbell2[, flagname] = FALSE
     }

@@ -213,12 +213,12 @@ transform_wfm_no_cal = function(f, measurement_names, provided_span) {
 
 #' @export
 transform_wfml_42i = function(f) {
-  transform_wfm_no_cal(f, c('NO', 'NOX'), 14)
+  transform_wfm_no_cal(f, c('NO_Avg', 'NOX_Avg'), 14)
 }
 
 #' @export
 transform_wfml_48C = function(f) {
-  df48C = transform_wfm_single_cal(f, 'CO', provided = c(0, 450, 0))
+  df48C = transform_wfm_single_cal(f, 'CO_Avg', provided = c(0, 450, 0))
   ## need to multiply by 1000 because cal values are recorded in
   ## different units than the measurements!
   df48C$measured_value =
@@ -228,7 +228,7 @@ transform_wfml_48C = function(f) {
 
 #' @export
 transform_wfms_300EU = function(f) {
-  df300EU = transform_wfm_single_cal(f, 'CO', provided = c(0, 452, 0))
+  df300EU = transform_wfm_single_cal(f, 'CO_Avg', provided = c(0, 452, 0))
   ## for whatever reason these cal values are being recorded as an
   ## offset from 200 rather than from zero
   df300EU$measured_value =
@@ -238,15 +238,15 @@ transform_wfms_300EU = function(f) {
 
 #' @export
 transform_wfms_42C = function(f) {
-  transform_wfm_no_cal(f, c('NO', 'NOx'), 4)
+  transform_wfm_no_cal(f, c('NO_Avg', 'NOx_Avg'), 4)
 }
 
 #' @export
 transform_wfms_42Cs = function(f) {
-  transform_wfm_no_cal(f, c('NO 42Cs', 'NOy'), 4)
+  transform_wfm_no_cal(f, c('NO 42Cs', 'NOy_Avg'), 4)
 }
 
 #' @export
 transform_wfms_43C = function(f) {
-  transform_wfm_single_cal(f, 'SO2', provided = c(0, 5.9, 0))
+  transform_wfm_single_cal(f, 'SO2_Avg', provided = c(0, 5.9, 0))
 }

@@ -15,12 +15,12 @@ PSP,envidas,PM_2_5,"[2019-01-02, 2021-01-01)",DEC_Teledyne_T640
 PSP,envidas,PM_10calc,"[2019-01-02, 2021-01-01)",DEC_Teledyne_T640
 PSP,envidas,Concentration,"[2018-10-01, 2019-01-18)",Teledyne_M651
 PSP,envidas,Concentration,"[2019-01-25, 2021-01-01)",TSI_EPC3783
-WFMS,campbell,CO,"[2018-10-01, 2021-01-01)",Teledyne_300EU
-WFMS,campbell,SO2,"[2018-10-01, 2021-01-01)",Thermo_43C-TL
-WFMS,campbell,NO,"[2018-10-01, 2021-01-01)",Thermo_42C-TL
-WFMS,campbell,NOx,"[2018-10-01, 2021-01-01)",Thermo_42C-TL
+WFMS,campbell,CO_Avg,"[2018-10-01, 2021-01-01)",Teledyne_300EU
+WFMS,campbell,SO2_Avg,"[2018-10-01, 2021-01-01)",Thermo_43C-TL
+WFMS,campbell,NO_Avg,"[2018-10-01, 2021-01-01)",Thermo_42C-TL
+WFMS,campbell,NOx_Avg,"[2018-10-01, 2021-01-01)",Thermo_42C-TL
 WFMS,campbell,NO2,"[2018-10-01, 2021-01-01)",Thermo_42C-TL
-WFMS,campbell,NOy,"[2018-10-01, 2021-01-01)",Thermo_42C-TL_2
+WFMS,campbell,NOy_Avg,"[2018-10-01, 2021-01-01)",Thermo_42C-TL_2
 WFMS,campbell,concentration_370,"[2018-10-01, 2021-01-01)",Magee_AE22-HS
 WFMS,campbell,concentration_880,"[2018-10-01, 2021-01-01)",Magee_AE22-HS
 WFMS,campbell,Wood smoke,"[2018-10-01, 2021-01-01)",Magee_AE22-HS

@@ -1,54 +1,54 @@
 site,data_source,measurement_name,times,aqs_flag,explanation
-WFMS,campbell,CO,"[2018-10-03 08:50, 2018-10-03 09:05)",AT,calibration
-WFMS,campbell,CO,"[2018-10-09 06:26, 2018-10-09 06:32)",AT,calibration
-WFMS,campbell,CO,"[2018-10-10 08:45, 2018-10-10 08:52)",AT,calibration
-WFMS,campbell,NOy,"[2018-10-01 00:00, 2018-10-03 12:00)",AN,instrument malfunction
-WFMS,campbell,NO,"[2018-12-05 10:13, 2018-12-05 11:28)",AT,manual calibration
-WFMS,campbell,NOx,"[2018-12-05 10:13, 2018-12-05 11:28)",AT,manual calibration
-WFMS,campbell,NOy,"[2018-12-05 10:13, 2018-12-05 11:28)",AT,manual calibration
-WFMS,campbell,CO,"[2018-12-05 10:13, 2018-12-05 11:28)",AT,manual calibration
-WFMS,campbell,SO2,"[2018-12-05 10:13, 2018-12-05 11:28)",AT,manual calibration
-WFMS,campbell,CO,"[2018-10-15 06:00, 2018-10-21 00:00)",AC,elevator construction
-WFMS,campbell,CO,"[2018-10-22 06:00, 2018-10-28 00:00)",AC,elevator construction
-WFMS,campbell,CO,"[2018-10-29 06:00, 2018-11-03 15:00)",AC,elevator construction
-WFMS,campbell,CO,"[2018-11-05 06:00, 2018-11-10 18:00)",AC,elevator construction
-WFMS,campbell,CO,"[2018-11-12 06:00, 2018-11-13 18:00)",AC,elevator construction
-WFMS,campbell,CO,"[2018-11-15 12:00, 2018-11-17 18:00)",AC,elevator construction
-WFMS,campbell,CO,"[2018-11-20 09:00, 2018-11-22 21:00)",AC,elevator construction
-WFMS,campbell,CO,"[2018-11-29 06:00, 2018-11-30 18:00)",AC,elevator construction
-WFMS,campbell,NO,"[2018-10-15 06:00, 2018-10-21 00:00)",AC,elevator construction
-WFMS,campbell,NO,"[2018-10-22 06:00, 2018-10-28 00:00)",AC,elevator construction
-WFMS,campbell,NO,"[2018-10-29 06:00, 2018-11-03 15:00)",AC,elevator construction
-WFMS,campbell,NO,"[2018-11-05 06:00, 2018-11-10 18:00)",AC,elevator construction
-WFMS,campbell,NO,"[2018-11-12 06:00, 2018-11-13 18:00)",AC,elevator construction
-WFMS,campbell,NO,"[2018-11-15 12:00, 2018-11-17 18:00)",AC,elevator construction
-WFMS,campbell,NO,"[2018-11-20 09:00, 2018-11-22 21:00)",AC,elevator construction
-WFMS,campbell,NO,"[2018-11-29 06:00, 2018-11-30 18:00)",AC,elevator construction
-WFMS,campbell,NOx,"[2018-10-15 06:00, 2018-10-21 00:00)",AC,elevator construction
-WFMS,campbell,NOx,"[2018-10-22 06:00, 2018-10-28 00:00)",AC,elevator construction
-WFMS,campbell,NOx,"[2018-10-29 06:00, 2018-11-03 15:00)",AC,elevator construction
-WFMS,campbell,NOx,"[2018-11-05 06:00, 2018-11-10 18:00)",AC,elevator construction
-WFMS,campbell,NOx,"[2018-11-12 06:00, 2018-11-13 18:00)",AC,elevator construction
-WFMS,campbell,NOx,"[2018-11-15 12:00, 2018-11-17 18:00)",AC,elevator construction
-WFMS,campbell,NOx,"[2018-11-20 09:00, 2018-11-22 21:00)",AC,elevator construction
-WFMS,campbell,NOx,"[2018-11-29 06:00, 2018-11-30 18:00)",AC,elevator construction
-WFMS,campbell,NOy,"[2018-10-15 06:00, 2018-10-21 00:00)",AC,elevator construction
-WFMS,campbell,NOy,"[2018-10-22 06:00, 2018-10-28 00:00)",AC,elevator construction
-WFMS,campbell,NOy,"[2018-10-29 06:00, 2018-11-03 15:00)",AC,elevator construction
-WFMS,campbell,NOy,"[2018-11-05 06:00, 2018-11-10 18:00)",AC,elevator construction
-WFMS,campbell,NOy,"[2018-11-12 06:00, 2018-11-13 18:00)",AC,elevator construction
-WFMS,campbell,NOy,"[2018-11-15 12:00, 2018-11-17 18:00)",AC,elevator construction
-WFMS,campbell,NOy,"[2018-11-20 09:00, 2018-11-22 21:00)",AC,elevator construction
-WFMS,campbell,NOy,"[2018-11-29 06:00, 2018-11-30 18:00)",AC,elevator construction
-WFMS,campbell,NOy,"[2018-11-30 00:00, 2018-12-02 00:00)",AN,bad zero calibrations
-WFMS,campbell,SO2,"[2018-10-15 06:00, 2018-10-21 00:00)",AC,elevator construction
-WFMS,campbell,SO2,"[2018-10-22 06:00, 2018-10-28 00:00)",AC,elevator construction
-WFMS,campbell,SO2,"[2018-10-29 06:00, 2018-11-03 15:00)",AC,elevator construction
-WFMS,campbell,SO2,"[2018-11-05 06:00, 2018-11-10 18:00)",AC,elevator construction
-WFMS,campbell,SO2,"[2018-11-12 06:00, 2018-11-13 18:00)",AC,elevator construction
-WFMS,campbell,SO2,"[2018-11-15 12:00, 2018-11-17 18:00)",AC,elevator construction
-WFMS,campbell,SO2,"[2018-11-20 09:00, 2018-11-22 21:00)",AC,elevator construction
-WFMS,campbell,SO2,"[2018-11-29 06:00, 2018-11-30 18:00)",AC,elevator construction
+WFMS,campbell,CO_Avg,"[2018-10-03 08:50, 2018-10-03 09:05)",AT,calibration
+WFMS,campbell,CO_Avg,"[2018-10-09 06:26, 2018-10-09 06:32)",AT,calibration
+WFMS,campbell,CO_Avg,"[2018-10-10 08:45, 2018-10-10 08:52)",AT,calibration
+WFMS,campbell,NOy_Avg,"[2018-10-01 00:00, 2018-10-03 12:00)",AN,instrument malfunction
+WFMS,campbell,NO_Avg,"[2018-12-05 10:13, 2018-12-05 11:28)",AT,manual calibration
+WFMS,campbell,NOx_Avg,"[2018-12-05 10:13, 2018-12-05 11:28)",AT,manual calibration
+WFMS,campbell,NOy_Avg,"[2018-12-05 10:13, 2018-12-05 11:28)",AT,manual calibration
+WFMS,campbell,CO_Avg,"[2018-12-05 10:13, 2018-12-05 11:28)",AT,manual calibration
+WFMS,campbell,SO2_Avg,"[2018-12-05 10:13, 2018-12-05 11:28)",AT,manual calibration
+WFMS,campbell,CO_Avg,"[2018-10-15 06:00, 2018-10-21 00:00)",AC,elevator construction
+WFMS,campbell,CO_Avg,"[2018-10-22 06:00, 2018-10-28 00:00)",AC,elevator construction
+WFMS,campbell,CO_Avg,"[2018-10-29 06:00, 2018-11-03 15:00)",AC,elevator construction
+WFMS,campbell,CO_Avg,"[2018-11-05 06:00, 2018-11-10 18:00)",AC,elevator construction
+WFMS,campbell,CO_Avg,"[2018-11-12 06:00, 2018-11-13 18:00)",AC,elevator construction
+WFMS,campbell,CO_Avg,"[2018-11-15 12:00, 2018-11-17 18:00)",AC,elevator construction
+WFMS,campbell,CO_Avg,"[2018-11-20 09:00, 2018-11-22 21:00)",AC,elevator construction
+WFMS,campbell,CO_Avg,"[2018-11-29 06:00, 2018-11-30 18:00)",AC,elevator construction
+WFMS,campbell,NO_Avg,"[2018-10-15 06:00, 2018-10-21 00:00)",AC,elevator construction
+WFMS,campbell,NO_Avg,"[2018-10-22 06:00, 2018-10-28 00:00)",AC,elevator construction
+WFMS,campbell,NO_Avg,"[2018-10-29 06:00, 2018-11-03 15:00)",AC,elevator construction
+WFMS,campbell,NO_Avg,"[2018-11-05 06:00, 2018-11-10 18:00)",AC,elevator construction
+WFMS,campbell,NO_Avg,"[2018-11-12 06:00, 2018-11-13 18:00)",AC,elevator construction
+WFMS,campbell,NO_Avg,"[2018-11-15 12:00, 2018-11-17 18:00)",AC,elevator construction
+WFMS,campbell,NO_Avg,"[2018-11-20 09:00, 2018-11-22 21:00)",AC,elevator construction
+WFMS,campbell,NO_Avg,"[2018-11-29 06:00, 2018-11-30 18:00)",AC,elevator construction
+WFMS,campbell,NOx_Avg,"[2018-10-15 06:00, 2018-10-21 00:00)",AC,elevator construction
+WFMS,campbell,NOx_Avg,"[2018-10-22 06:00, 2018-10-28 00:00)",AC,elevator construction
+WFMS,campbell,NOx_Avg,"[2018-10-29 06:00, 2018-11-03 15:00)",AC,elevator construction
+WFMS,campbell,NOx_Avg,"[2018-11-05 06:00, 2018-11-10 18:00)",AC,elevator construction
+WFMS,campbell,NOx_Avg,"[2018-11-12 06:00, 2018-11-13 18:00)",AC,elevator construction
+WFMS,campbell,NOx_Avg,"[2018-11-15 12:00, 2018-11-17 18:00)",AC,elevator construction
+WFMS,campbell,NOx_Avg,"[2018-11-20 09:00, 2018-11-22 21:00)",AC,elevator construction
+WFMS,campbell,NOx_Avg,"[2018-11-29 06:00, 2018-11-30 18:00)",AC,elevator construction
+WFMS,campbell,NOy_Avg,"[2018-10-15 06:00, 2018-10-21 00:00)",AC,elevator construction
+WFMS,campbell,NOy_Avg,"[2018-10-22 06:00, 2018-10-28 00:00)",AC,elevator construction
+WFMS,campbell,NOy_Avg,"[2018-10-29 06:00, 2018-11-03 15:00)",AC,elevator construction
+WFMS,campbell,NOy_Avg,"[2018-11-05 06:00, 2018-11-10 18:00)",AC,elevator construction
+WFMS,campbell,NOy_Avg,"[2018-11-12 06:00, 2018-11-13 18:00)",AC,elevator construction
+WFMS,campbell,NOy_Avg,"[2018-11-15 12:00, 2018-11-17 18:00)",AC,elevator construction
+WFMS,campbell,NOy_Avg,"[2018-11-20 09:00, 2018-11-22 21:00)",AC,elevator construction
+WFMS,campbell,NOy_Avg,"[2018-11-29 06:00, 2018-11-30 18:00)",AC,elevator construction
+WFMS,campbell,NOy_Avg,"[2018-11-30 00:00, 2018-12-02 00:00)",AN,bad zero calibrations
+WFMS,campbell,SO2_Avg,"[2018-10-15 06:00, 2018-10-21 00:00)",AC,elevator construction
+WFMS,campbell,SO2_Avg,"[2018-10-22 06:00, 2018-10-28 00:00)",AC,elevator construction
+WFMS,campbell,SO2_Avg,"[2018-10-29 06:00, 2018-11-03 15:00)",AC,elevator construction
+WFMS,campbell,SO2_Avg,"[2018-11-05 06:00, 2018-11-10 18:00)",AC,elevator construction
+WFMS,campbell,SO2_Avg,"[2018-11-12 06:00, 2018-11-13 18:00)",AC,elevator construction
+WFMS,campbell,SO2_Avg,"[2018-11-15 12:00, 2018-11-17 18:00)",AC,elevator construction
+WFMS,campbell,SO2_Avg,"[2018-11-20 09:00, 2018-11-22 21:00)",AC,elevator construction
+WFMS,campbell,SO2_Avg,"[2018-11-29 06:00, 2018-11-30 18:00)",AC,elevator construction
 WFMS,ultrafine,Concentration,"[2018-10-15 06:00, 2018-10-21 00:00)",AC,elevator construction
 WFMS,ultrafine,Concentration,"[2018-10-22 06:00, 2018-10-28 00:00)",AC,elevator construction
 WFMS,ultrafine,Concentration,"[2018-10-29 06:00, 2018-11-03 15:00)",AC,elevator construction
@@ -73,13 +73,13 @@ WFMS,aethelometer,concentration_880,"[2018-11-12 06:00, 2018-11-13 18:00)",AC,el
 WFMS,aethelometer,concentration_880,"[2018-11-15 12:00, 2018-11-17 18:00)",AC,elevator construction
 WFMS,aethelometer,concentration_880,"[2018-11-20 09:00, 2018-11-22 21:00)",AC,elevator construction
 WFMS,aethelometer,concentration_880,"[2018-11-29 06:00, 2018-11-30 18:00)",AC,elevator construction
-WFMS,campbell,Ozone,"[2018-10-15 21:30, 2018-10-15 23:45)",AT,manual calibration
-WFMS,campbell,NOy,"[2018-09-27 13:00, 2018-10-03 10:00)",AN,unknown error
-WFMS,campbell,CO,"[2018-12-27 14:26, 2018-12-27 14:38)",AT,calibration
+WFMS,campbell,Ozone_Avg,"[2018-10-15 21:30, 2018-10-15 23:45)",AT,manual calibration
+WFMS,campbell,NOy_Avg,"[2018-09-27 13:00, 2018-10-03 10:00)",AN,unknown error
+WFMS,campbell,CO_Avg,"[2018-12-27 14:26, 2018-12-27 14:38)",AT,calibration
 WFMS,ultrafine,Concentration,"[2019-01-01, 2019-02-13)",AN,unexplained cycling
-WFMS,campbell,WS3Cup,"[2019-01-11 02:30, 2019-01-11 07:00)",AN,instrument frozen
-WFMS,campbell,WS3Cup,"[2019-01-24 22:00, 2019-01-25 11:00)",AN,instrument frozen
-WFMS,campbell,WS3CupB,"[2019-01-24 19:00, 2019-01-25 10:30)",AN,instrument frozen
+WFMS,campbell,WS3Cup_Avg,"[2019-01-11 02:30, 2019-01-11 07:00)",AN,instrument frozen
+WFMS,campbell,WS3Cup_Avg,"[2019-01-24 22:00, 2019-01-25 11:00)",AN,instrument frozen
+WFMS,campbell,WS3CupB_Avg,"[2019-01-24 19:00, 2019-01-25 10:30)",AN,instrument frozen
 WFMS,aethelometer,concentration_370,"[2019-02-14 15:15, 2019-02-14 15:30)",AM,unknown
 WFMS,aethelometer,concentration_880,"[2019-02-14 15:15, 2019-02-14 15:30)",AM,unknown
 WFMS,aethelometer,concentration_370,"[2019-02-15 08:00, 2019-02-15 09:30)",AM,unknown
@@ -89,81 +89,81 @@ WFMS,aethelometer,concentration_880,"[2019-02-15 11:15, 2019-02-15 11:30)",AM,un
 WFMS,aethelometer,concentration_370,"[2019-02-15 15:15, 2019-02-15 15:45)",AM,unknown
 WFMS,aethelometer,concentration_880,"[2019-02-15 15:15, 2019-02-15 15:45)",AM,unknown
 WFMS,ultrafine,Concentration,"[2019-02-20, 2019-03-21 10:00)",AN,unexplained cycling
-WFMS,campbell,CO,"[2019-04-15 21:00, 2019-04-16 21:00)",AM,unknown
+WFMS,campbell,CO_Avg,"[2019-04-15 21:00, 2019-04-16 21:00)",AM,unknown
 WFMS,ultrafine,Concentration,"[2019-04-01, 2019-05-01)",AN,unexplained cycling
-WFMS,campbell,NO,"[2019-05-07 12:00, 2019-05-14 12:00)",AN,calibration gases stuck on
-WFMS,campbell,NOx,"[2019-05-07 12:00, 2019-05-14 12:00)",AN,calibration gases stuck on
-WFMS,campbell,CO,"[2019-05-10 06:53, 2019-05-10 12:00)",AV,power failure
-WFMS,campbell,NOy,"[2019-05-14 10:30, 2019-05-14 12:00)",AT,calibration
-WFMS,campbell,NO,"[2019-05-23 14:30, 2019-05-23 21:15)",AM,unknown
-WFMS,campbell,NOx,"[2019-05-23 14:30, 2019-05-23 21:15)",AM,unknown
+WFMS,campbell,NO_Avg,"[2019-05-07 12:00, 2019-05-14 12:00)",AN,calibration gases stuck on
+WFMS,campbell,NOx_Avg,"[2019-05-07 12:00, 2019-05-14 12:00)",AN,calibration gases stuck on
+WFMS,campbell,CO_Avg,"[2019-05-10 06:53, 2019-05-10 12:00)",AV,power failure
+WFMS,campbell,NOy_Avg,"[2019-05-14 10:30, 2019-05-14 12:00)",AT,calibration
+WFMS,campbell,NO_Avg,"[2019-05-23 14:30, 2019-05-23 21:15)",AM,unknown
+WFMS,campbell,NOx_Avg,"[2019-05-23 14:30, 2019-05-23 21:15)",AM,unknown
 WFMS,ultrafine,Concentration,"[2019-05-07 09:30, 2019-05-07 10:30)",AM,unknown
 WFMS,ultrafine,Concentration,"[2019-05-11 11:00, 2019-05-12)",AN,unexplained cycling
 WFMS,ultrafine,Concentration,"[2019-05-15 18:00, 2019-05-17 02:00)",AN,unexplained cycling
-WFMS,campbell,CO,"[2019-06-10 09:00, 2019-06-10 10:30)",AV,power failure
+WFMS,campbell,CO_Avg,"[2019-06-10 09:00, 2019-06-10 10:30)",AV,power failure
 WFMS,ultrafine,Concentration,"[2019-06-12 23:00, 2019-06-15 18:00)",AN,unexplained cycling
 WFMS,ultrafine,Concentration,"[2019-06-17 06:00, 2019-06-26 18:00)",AN,unexplained cycling
-WFMS,campbell,NO,"[2019-06-26 09:30, 2019-07-03 09:00)",AV,power failure
-WFMS,campbell,NOx,"[2019-06-26 09:30, 2019-07-03 09:00)",AV,power failure
+WFMS,campbell,NO_Avg,"[2019-06-26 09:30, 2019-07-03 09:00)",AV,power failure
+WFMS,campbell,NOx_Avg,"[2019-06-26 09:30, 2019-07-03 09:00)",AV,power failure
 WFMS,ultrafine,Concentration,"[2019-06-24 06:43, 2019-06-24 06:51)",AV,power failure
-WFMS,campbell,CO,"[2019-07-08 06:29, 2019-07-10 08:01)",AV,power failure
+WFMS,campbell,CO_Avg,"[2019-07-08 06:29, 2019-07-10 08:01)",AV,power failure
 WFMS,ultrafine,Concentration,"[2019-07-18 06:00, 2019-07-19 03:00)",AN,unexplained cycling
-WFMS,campbell,Ozone,"[2019-07-18 08:30, 2019-07-18 14:30)",AT,calibration
+WFMS,campbell,Ozone_Avg,"[2019-07-18 08:30, 2019-07-18 14:30)",AT,calibration
 WFMS,ultrafine,Concentration,"[2019-07-22 03:00, 2019-07-23 14:00)",AN,unexplained cycling
-WFMS,campbell,NO,"[2019-07-22 12:00, 2019-07-22 16:00)",AM,unknown
-WFMS,campbell,NOx,"[2019-07-22 12:00, 2019-07-22 16:00)",AM,unknown
-WFMS,campbell,CO,"[2019-07-29 05:25, 2019-07-30 08:00)",AV,power failure
+WFMS,campbell,NO_Avg,"[2019-07-22 12:00, 2019-07-22 16:00)",AM,unknown
+WFMS,campbell,NOx_Avg,"[2019-07-22 12:00, 2019-07-22 16:00)",AM,unknown
+WFMS,campbell,CO_Avg,"[2019-07-29 05:25, 2019-07-30 08:00)",AV,power failure
 WFMS,ultrafine,Concentration,"[2019-07-30 09:00, 2019-07-30 21:00)",AN,unexplained cycling
-WFMS,campbell,CO,"[2019-07-31 05:03, 2019-07-31 08:00)",AV,power failure
-WFMS,campbell,CO,"[2019-08-01 05:03, 2019-08-01 08:00)",AV,power failure
-WFMS,campbell,CO,"[2019-08-05 05:06, 2019-08-10)",AV,power failure
+WFMS,campbell,CO_Avg,"[2019-07-31 05:03, 2019-07-31 08:00)",AV,power failure
+WFMS,campbell,CO_Avg,"[2019-08-01 05:03, 2019-08-01 08:00)",AV,power failure
+WFMS,campbell,CO_Avg,"[2019-08-05 05:06, 2019-08-10)",AV,power failure
 WFMS,ultrafine,Concentration,"[2019-08-10 10:30, 2019-08-11 12:00)",AN,unexplained cycling
-WFMS,campbell,CO,"[2019-08-12 05:10, 2019-08-13 07:30)",AV,power failure
-WFMS,campbell,CO,"[2019-08-15 07:33, 2019-08-15 09:00)",AV,power failure
-WFMS,campbell,CO,"[2019-08-16 07:48, 2019-08-22)",AV,power failure
+WFMS,campbell,CO_Avg,"[2019-08-12 05:10, 2019-08-13 07:30)",AV,power failure
+WFMS,campbell,CO_Avg,"[2019-08-15 07:33, 2019-08-15 09:00)",AV,power failure
+WFMS,campbell,CO_Avg,"[2019-08-16 07:48, 2019-08-22)",AV,power failure
 WFMS,ultrafine,Concentration,"[2019-08-22 10:00, 2019-08-23 06:00)",AN,unexplained cycling
 WFMS,ultrafine,Concentration,"[2019-08-24 05:00, 2019-08-25 12:00)",AN,unexplained cycling
 WFMS,ultrafine,Concentration,"[2019-08-26 12:00, 2019-08-27)",AN,unexplained cycling
-WFMS,campbell,CO,"[2019-08-27 08:13, 2019-08-31)",AV,power failure
+WFMS,campbell,CO_Avg,"[2019-08-27 08:13, 2019-08-31)",AV,power failure
 WFMS,ultrafine,Concentration,"[2019-08-28 16:00, 2019-08-30 11:00)",AN,unexplained cycling
 WFMS,ultrafine,Concentration,"[2019-09-01, 2019-11-01)",AN,unexplained cycling
-WFMS,campbell,CO,"[2019-11-04 09:00, 2019-11-06 12:00)",AV,power failure
-WFMS,campbell,WS3Cup,"[2019-11-28 06:00, 2019-11-29 16:00)",AN,instrument frozen
+WFMS,campbell,CO_Avg,"[2019-11-04 09:00, 2019-11-06 12:00)",AV,power failure
+WFMS,campbell,WS3Cup_Avg,"[2019-11-28 06:00, 2019-11-29 16:00)",AN,instrument frozen
 WFMS,campbell,WS3Cup_Max,"[2019-11-28 06:00, 2019-11-29 16:00)",AN,instrument frozen
-WFMS,campbell,WS3CupB,"[2019-11-28 06:00, 2019-11-30)",AN,instrument frozen
+WFMS,campbell,WS3CupB_Avg,"[2019-11-28 06:00, 2019-11-30)",AN,instrument frozen
 WFMS,campbell,WS3CupB_Max,"[2019-11-28 06:00, 2019-11-30)",AN,instrument frozen
-WFMS,campbell,WS3Cup,"[2019-12-05 19:30, 2019-12-06 09:00)",AN,instrument frozen
+WFMS,campbell,WS3Cup_Avg,"[2019-12-05 19:30, 2019-12-06 09:00)",AN,instrument frozen
 WFMS,campbell,WS3Cup_Max,"[2019-12-05 19:30, 2019-12-06 09:00)",AN,instrument frozen
-WFMS,campbell,WS3CupB,"[2019-12-05 20:30, 2019-12-06 09:00)",AN,instrument frozen
+WFMS,campbell,WS3CupB_Avg,"[2019-12-05 20:30, 2019-12-06 09:00)",AN,instrument frozen
 WFMS,campbell,WS3CupB_Max,"[2019-12-05 20:30, 2019-12-06 09:00)",AN,instrument frozen
-WFMS,campbell,WS3Cup,"[2019-12-11 18:45, 2020-01-01)",AN,instrument frozen
+WFMS,campbell,WS3Cup_Avg,"[2019-12-11 18:45, 2020-01-01)",AN,instrument frozen
 WFMS,campbell,WS3Cup_Max,"[2019-12-11 18:45, 2020-01-01)",AN,instrument frozen
-WFMS,campbell,CO,"[2019-12-13 18:00, 2019-12-19 06:00)",AN,pump seized
+WFMS,campbell,CO_Avg,"[2019-12-13 18:00, 2019-12-19 06:00)",AN,pump seized
 WFMS,ultrafine,Concentration,"[2019-12-16 19:30, 2019-12-18 09:00)",AN,unexplained cycling
-WFMS,campbell,CO,"[2019-12-21 04:00, 2020-01-08 12:00)",AN,pump seized
+WFMS,campbell,CO_Avg,"[2019-12-21 04:00, 2020-01-08 12:00)",AN,pump seized
 WFMS,ultrafine,Concentration,"[2019-12-31 17:30, 2020-01-02 12:00)",AN,unexplained cycling
-WFMS,campbell,CO,"[2020-01-08 12:00, 2020-01-09 12:00)",AN,instrument instability
-WFMS,campbell,WS3Cup,"[2020-01-16 18:00, 2020-01-17 11:08]",AN,instrument frozen
+WFMS,campbell,CO_Avg,"[2020-01-08 12:00, 2020-01-09 12:00)",AN,instrument instability
+WFMS,campbell,WS3Cup_Avg,"[2020-01-16 18:00, 2020-01-17 11:08]",AN,instrument frozen
 WFMS,campbell,WS3Cup_Max,"[2020-01-16 18:00, 2020-01-17 11:08]",AN,instrument frozen
-WFMS,campbell,WS3CupB,"[2020-01-16 18:00, 2020-01-17 13:57]",AN,instrument frozen
+WFMS,campbell,WS3CupB_Avg,"[2020-01-16 18:00, 2020-01-17 13:57]",AN,instrument frozen
 WFMS,campbell,WS3CupB_Max,"[2020-01-16 18:00, 2020-01-17 13:57]",AN,instrument frozen
-WFMS,campbell,WS3Cup,"[2020-01-25 18:00, 2020-01-29 10:21]",AN,instrument frozen
+WFMS,campbell,WS3Cup_Avg,"[2020-01-25 18:00, 2020-01-29 10:21]",AN,instrument frozen
 WFMS,campbell,WS3Cup_Max,"[2020-01-25 18:00, 2020-01-29 10:21]",AN,instrument frozen
-WFMS,campbell,WS3CupB,"[2020-01-27 03:00, 2020-01-29 10:21]",AN,instrument frozen
+WFMS,campbell,WS3CupB_Avg,"[2020-01-27 03:00, 2020-01-29 10:21]",AN,instrument frozen
 WFMS,campbell,WS3CupB_Max,"[2020-01-27 03:00, 2020-01-29 10:21]",AN,instrument frozen
 WFMS,aethelometer,concentration_370,"[2020-04-20 04:30, 2020-04-20 07:30)",AM,unknown
 WFMS,aethelometer,concentration_880,"[2020-04-20 04:30, 2020-04-20 07:30)",AM,unknown
-WFMS,campbell,CO,"[2020-04-23 03:00, 2020-04-23 15:00)",AN,filter issues
-WFMS,campbell,CO,"[2020-05-22, 2020-05-29)",AN,pump issues
-WFMS,campbell,CO,"[2020-06-21 14:00, 2020-06-24 09:00)",AN,fuse
-WFMS,campbell,Ozone,"[2020-06-24, 2021-07-01)",AM,unknown
+WFMS,campbell,CO_Avg,"[2020-04-23 03:00, 2020-04-23 15:00)",AN,filter issues
+WFMS,campbell,CO_Avg,"[2020-05-22, 2020-05-29)",AN,pump issues
+WFMS,campbell,CO_Avg,"[2020-06-21 14:00, 2020-06-24 09:00)",AN,fuse
+WFMS,campbell,Ozone_Avg,"[2020-06-24, 2021-07-01)",AM,unknown
 WFMS,DEC_envidas,O3,"[2020-08-11 05:01, 2020-08-11 08:17)",AM,unknown
-WFMS,campbell,CO,"[2020-09-09 09:45, 2020-09-09 13:56)",AT,Pico checks
+WFMS,campbell,CO_Avg,"[2020-09-09 09:45, 2020-09-09 13:56)",AT,Pico checks
 WFMS,campbell,WindDirA_D1_WVT,"[2020-10-02 12:45, 2020-10-08 08:43)",AN,possibly frozen
 WFMS,campbell,WindDirB_D1_WVT,"[2020-10-02 12:45, 2020-10-08 08:43)",AN,possibly frozen
-WFMS,campbell,NOy,"[2020-11-20, 2020-11-23 07:18)",AM,unknown
-WFMS,campbell,SO2,"[2020-12-02 09:40, 2020-12-09 10:40)",AM,unknown
-WFMS,campbell,RH,"[2020-12-23, 2020-12-30 03:00)",AM,unknown
+WFMS,campbell,NOy_Avg,"[2020-11-20, 2020-11-23 07:18)",AM,unknown
+WFMS,campbell,SO2_Avg,"[2020-12-02 09:40, 2020-12-09 10:40)",AM,unknown
+WFMS,campbell,RH_Avg,"[2020-12-23, 2020-12-30 03:00)",AM,unknown
 WFMS,envidas,NOY,"[2020-12-27 10:24, 2020-12-27 12:00)",AM,unknown
 WFMS,envidas,NOY,"[2020-12-27 19:00, 2020-12-28 11:06)",AM,unknown
 WFMS,envidas,NOY,"[2020-12-28 18:02, 2020-12-29 05:22)",AM,unknown
@@ -172,71 +172,71 @@ WFMS,envidas,NOY,"[2021-01-06 17:59, 2021-01-06 20:03)",AM,unknown
 WFMS,envidas,NO,"[2021-01-14 10:42, 2021-01-14 13:32)",AT,calibration
 WFMS,envidas,NOX,"[2021-01-14 10:42, 2021-01-14 13:32)",AT,calibration
 WFMS,envidas,NOY,"[2021-01-14 10:42, 2021-01-14 13:32)",AT,calibration
-WFMB,campbell,NO,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
-WFMB,campbell,NOX,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
-WFMB,campbell,CO,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
-WFMB,campbell,NO,"[2018-10-28 12:00, 2018-10-30 12:00)",AM,cal gases left on
-WFMB,campbell,NOX,"[2018-10-28 11:00, 2018-10-30 12:00)",AM,cal gases left on
+WFMB,campbell,NO_Avg,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
+WFMB,campbell,NOX_Avg,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
+WFMB,campbell,CO_Avg,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
+WFMB,campbell,NO_Avg,"[2018-10-28 12:00, 2018-10-30 12:00)",AM,cal gases left on
+WFMB,campbell,NOX_Avg,"[2018-10-28 11:00, 2018-10-30 12:00)",AM,cal gases left on
 WFMB,envidas,API-T400-OZONE,"[2018-10-28 11:00, 2018-10-30 12:00)",AM,cal gases left on
-WFMB,campbell,NO,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
-WFMB,campbell,NOX,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
-WFMB,campbell,CO,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
+WFMB,campbell,NO_Avg,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
+WFMB,campbell,NOX_Avg,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
+WFMB,campbell,CO_Avg,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
 WFMB,envidas,PM25C,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
 WFMB,envidas,SO2,"[2018-11-19 08:30, 2018-11-19 12:00)",AM,unknown
 WFMB,envidas,API-T400-OZONE,"[2018-12-11 05:03, 2018-12-11 05:21)",AM,unknown
-WFMB,campbell,NGN3,"[2019-01-03 04:00, 2019-01-03 05:10)",AM,unknown
+WFMB,campbell,NGN3_Avg,"[2019-01-03 04:00, 2019-01-03 05:10)",AM,unknown
 WFMB,envidas,BLK-CARBON-1,"[2019-01-03 04:00, 2019-01-03 05:10)",AM,unknown
-WFMB,campbell,NO,"[2019-01-03 13:09, 2019-01-03 13:20)",AM,unknown
-WFMB,campbell,NOX,"[2019-01-03 13:09, 2019-01-03 13:30)",AM,unknown
+WFMB,campbell,NO_Avg,"[2019-01-03 13:09, 2019-01-03 13:20)",AM,unknown
+WFMB,campbell,NOX_Avg,"[2019-01-03 13:09, 2019-01-03 13:30)",AM,unknown
 WFMB,envidas,BLK-CARBON-1,"[2019-01-03 13:15, 2019-01-03 13:20)",AM,unknown
 WFMB,envidas,BLK-CARBON-1,"[2019-01-21 09:24, 2019-01-21 09:29)",AM,unknown
 WFMB,envidas,BLK-CARBON-1,"[2019-02-21 02:51, 2019-02-21 03:01)",AM,unknown
 WFMB,envidas,SO2,"[2019-02-22 11:00, 2019-02-22 12:30)",AT,calibration
 WFMB,envidas,SO2,"[2019-03-07 11:30, 2019-03-07 12:30)",AT,calibration
 WFMB,envidas,SO2,"[2019-03-22 11:00, 2019-03-22 12:30)",AT,calibration
-WFMB,campbell,NO,"[2019-03-25 16:30, 2019-03-25 17:00)",AM,unknown
-WFMB,campbell,NOX,"[2019-03-25 16:30, 2019-03-25 17:00)",AM,unknown
-WFMB,campbell,CO,"[2019-03-25 16:30, 2019-03-25 16:35)",AM,unknown
+WFMB,campbell,NO_Avg,"[2019-03-25 16:30, 2019-03-25 17:00)",AM,unknown
+WFMB,campbell,NOX_Avg,"[2019-03-25 16:30, 2019-03-25 17:00)",AM,unknown
+WFMB,campbell,CO_Avg,"[2019-03-25 16:30, 2019-03-25 16:35)",AM,unknown
 WFMB,envidas,SO2,"[2019-03-27 12:30, 2019-03-27 13:30)",AT,calibration
-WFMB,campbell,NO,"[2019-04-03 13:00, 2019-04-03 14:00)",AM,unknown
-WFMB,campbell,NOX,"[2019-04-03 13:00, 2019-04-03 14:00)",AM,unknown
+WFMB,campbell,NO_Avg,"[2019-04-03 13:00, 2019-04-03 14:00)",AM,unknown
+WFMB,campbell,NOX_Avg,"[2019-04-03 13:00, 2019-04-03 14:00)",AM,unknown
 WFMB,envidas,SO2,"[2019-04-12 12:30, 2019-04-12 13:30)",AT,calibration
-WFMB,campbell,NO,"[2019-04-17 09:00, 2019-04-23 13:00)",AN,pump failed
-WFMB,campbell,NOX,"[2019-04-17 09:00, 2019-04-23 13:00)",AN,pump failed
+WFMB,campbell,NO_Avg,"[2019-04-17 09:00, 2019-04-23 13:00)",AN,pump failed
+WFMB,campbell,NOX_Avg,"[2019-04-17 09:00, 2019-04-23 13:00)",AN,pump failed
 WFMB,envidas,SO2,"[2019-04-18 11:00, 2019-04-18 12:00)",AT,calibration
 WFMB,envidas,PM25C,"[2019-04-19 12:45, 2019-04-25)",AM,unknown
 WFMB,envidas,BLK-CARBON-1,"[2019-04-25 09:00, 2019-04-25 10:30)",AM,unknown
 WFMB,envidas,SO2,"[2019-04-25 10:30, 2019-04-25 12:00)",AT,calibration
-WFMB,campbell,NO,"[2019-04-30 12:00, 2019-04-30 14:15)",AN,calibration gases in manifold
-WFMB,campbell,NOX,"[2019-04-30 12:00, 2019-04-30 14:15)",AN,calibration gases in manifold
-WFMB,campbell,CO,"[2019-04-30 12:00, 2019-04-30 14:15)",AN,calibration gases in manifold
-WFMB,campbell,NO,"[2019-05-01 09:00, 2019-05-01 15:00)",AT,calibration
-WFMB,campbell,NOX,"[2019-05-01 09:00, 2019-05-01 15:00)",AT,calibration
-WFMB,campbell,CO,"[2019-05-01 09:00, 2019-05-01 15:00)",AT,calibration
-WFMB,campbell,NO,"[2019-05-08 09:45, 2019-05-08 11:15)",AM,unknown
-WFMB,campbell,NOX,"[2019-05-08 09:45, 2019-05-08 11:15)",AM,unknown
+WFMB,campbell,NO_Avg,"[2019-04-30 12:00, 2019-04-30 14:15)",AN,calibration gases in manifold
+WFMB,campbell,NOX_Avg,"[2019-04-30 12:00, 2019-04-30 14:15)",AN,calibration gases in manifold
+WFMB,campbell,CO_Avg,"[2019-04-30 12:00, 2019-04-30 14:15)",AN,calibration gases in manifold
+WFMB,campbell,NO_Avg,"[2019-05-01 09:00, 2019-05-01 15:00)",AT,calibration
+WFMB,campbell,NOX_Avg,"[2019-05-01 09:00, 2019-05-01 15:00)",AT,calibration
+WFMB,campbell,CO_Avg,"[2019-05-01 09:00, 2019-05-01 15:00)",AT,calibration
+WFMB,campbell,NO_Avg,"[2019-05-08 09:45, 2019-05-08 11:15)",AM,unknown
+WFMB,campbell,NOX_Avg,"[2019-05-08 09:45, 2019-05-08 11:15)",AM,unknown
 WFMB,envidas,SO2,"[2019-05-10 10:00, 2019-05-10 11:00)",AT,calibration
 WFMB,envidas,PM25C,"[2019-05-13 09:00, 2019-05-13 15:00)",AM,unknown
 WFMB,envidas,SO2,"[2019-05-15 14:00, 2019-05-15 16:00)",AT,calibration
 WFMB,envidas,SO2,"[2019-05-20 13:00, 2019-05-20 14:00)",AT,calibration
-WFMB,campbell,NO,"[2019-05-23 22:00, 2019-05-24 02:00)",AM,unknown
-WFMB,campbell,NOX,"[2019-05-23 22:00, 2019-05-24 02:00)",AM,unknown
-WFMB,campbell,CO,"[2019-05-23 22:00, 2019-05-24 02:00)",AM,unknown
+WFMB,campbell,NO_Avg,"[2019-05-23 22:00, 2019-05-24 02:00)",AM,unknown
+WFMB,campbell,NOX_Avg,"[2019-05-23 22:00, 2019-05-24 02:00)",AM,unknown
+WFMB,campbell,CO_Avg,"[2019-05-23 22:00, 2019-05-24 02:00)",AM,unknown
 WFMB,envidas,PM25C,"[2019-05-23 22:00, 2019-05-24 03:00)",AM,unknown
 WFMB,envidas,SO2,"[2019-05-31 11:00, 2019-05-31 12:00)",AT,calibration
 WFMB,envidas,SO2,"[2019-06-05 09:30, 2019-06-05 10:30)",AT,calibration
-WFMB,campbell,NO,"[2019-06-11 12:00, 2019-06-18 12:00)",AM,unknown
-WFMB,campbell,NOX,"[2019-06-11 12:00, 2019-06-18 12:00)",AM,unknown
+WFMB,campbell,NO_Avg,"[2019-06-11 12:00, 2019-06-18 12:00)",AM,unknown
+WFMB,campbell,NOX_Avg,"[2019-06-11 12:00, 2019-06-18 12:00)",AM,unknown
 WFMB,envidas,SO2,"[2019-06-13 09:00, 2019-06-13 10:00)",AT,calibration
 WFMB,envidas,SO2,"[2019-06-20 09:00, 2019-06-20 10:00)",AT,calibration
 WFMB,envidas,SO2,"[2019-06-26 09:30, 2019-06-26 10:30)",AT,calibration
 WFMB,envidas,PM25C,"[2019-06-27 09:00, 2019-06-27 15:00)",AM,unknown
-WFMB,campbell,NO,"[2019-06-30 06:30, 2019-06-30 10:30)",AM,unknown
-WFMB,campbell,NOX,"[2019-06-30 06:30, 2019-06-30 10:30)",AM,unknown
-WFMB,campbell,CO,"[2019-06-30 06:30, 2019-06-30 10:30)",AM,unknown
+WFMB,campbell,NO_Avg,"[2019-06-30 06:30, 2019-06-30 10:30)",AM,unknown
+WFMB,campbell,NOX_Avg,"[2019-06-30 06:30, 2019-06-30 10:30)",AM,unknown
+WFMB,campbell,CO_Avg,"[2019-06-30 06:30, 2019-06-30 10:30)",AM,unknown
 WFMB,envidas,PM25C,"[2019-06-30 06:30, 2019-06-30 11:00)",AM,unknown
-WFMB,campbell,NO,"[2019-07-02 12:00, 2019-07-09 12:00)",BJ,bad calibration settings
-WFMB,campbell,NOX,"[2019-07-02 12:00, 2019-07-09 12:00)",BJ,bad calibration settings
+WFMB,campbell,NO_Avg,"[2019-07-02 12:00, 2019-07-09 12:00)",BJ,bad calibration settings
+WFMB,campbell,NOX_Avg,"[2019-07-02 12:00, 2019-07-09 12:00)",BJ,bad calibration settings
 WFMB,envidas,SO2,"[2019-07-03 10:30, 2019-07-03 11:30)",AT,calibration
 WFMB,envidas,PM25C,"[2019-07-08 06:00, 2019-07-08 12:00)",AM,unknown
 WFMB,envidas,SO2,"[2019-07-10 10:30, 2019-07-10 12:00)",AT,calibration
@@ -244,34 +244,34 @@ WFMB,envidas,SO2,"[2019-07-15 10:30, 2019-07-15 11:30)",AT,calibration
 WFMB,envidas,SO2,"[2019-07-24 10:00, 2019-07-24 11:00)",AT,calibration
 WFMB,envidas,SO2,"[2019-07-31 11:00, 2019-07-31 12:00)",AT,calibration
 WFMB,envidas,SO2,"[2019-08-08 13:00, 2019-08-08 14:00)",AT,calibration
-WFMB,campbell,NO,"[2019-08-11 17:00, 2019-08-13 09:30)",AM,unknown
-WFMB,campbell,NOX,"[2019-08-11 17:00, 2019-08-13 09:30)",AM,unknown
-WFMB,campbell,NO,"[2019-08-15 21:30, 2019-08-17 14:00)",AM,unknown
-WFMB,campbell,NOX,"[2019-08-15 21:30, 2019-08-17 14:00)",AM,unknown
+WFMB,campbell,NO_Avg,"[2019-08-11 17:00, 2019-08-13 09:30)",AM,unknown
+WFMB,campbell,NOX_Avg,"[2019-08-11 17:00, 2019-08-13 09:30)",AM,unknown
+WFMB,campbell,NO_Avg,"[2019-08-15 21:30, 2019-08-17 14:00)",AM,unknown
+WFMB,campbell,NOX_Avg,"[2019-08-15 21:30, 2019-08-17 14:00)",AM,unknown
 WFMB,envidas,SO2,"[2019-08-16 09:00, 2019-08-16 10:30)",AT,calibration
-WFMB,campbell,NO,"[2019-08-19 14:30, 2019-08-20 09:00)",AM,unknown
-WFMB,campbell,NOX,"[2019-08-19 14:30, 2019-08-20 09:00)",AM,unknown
+WFMB,campbell,NO_Avg,"[2019-08-19 14:30, 2019-08-20 09:00)",AM,unknown
+WFMB,campbell,NOX_Avg,"[2019-08-19 14:30, 2019-08-20 09:00)",AM,unknown
 WFMB,envidas,SO2,"[2019-08-22 10:00, 2019-08-22 11:00)",AT,calibration
 WFMB,envidas,SO2,"[2019-08-30 10:00, 2019-08-30 11:00)",AT,calibration
 WFMB,envidas,SO2,"[2019-09-05 12:00, 2019-09-05 13:30)",AT,calibration
-WFMB,campbell,CO,"[2019-09-11, 2019-09-20 12:00)",AM,unknown
+WFMB,campbell,CO_Avg,"[2019-09-11, 2019-09-20 12:00)",AM,unknown
 WFMB,envidas,SO2,"[2019-09-12 10:30, 2019-09-12 12:00)",AT,calibration
 WFMB,envidas,SO2,"[2019-09-18 10:30, 2019-09-18 12:00)",AT,calibration
 WFMB,envidas,SO2,"[2019-09-26 10:30, 2019-09-26 12:00)",AT,calibration
-WFMB,campbell,CO,"[2019-10-04 06:30, 2019-10-16)",AM,unknown
-WFMB,campbell,NO,"[2019-10-31 15:45, 2019-11-05 14:15)",AM,manifold failure
-WFMB,campbell,NOX,"[2019-10-31 15:45, 2019-11-05 14:15)",AM,manifold failure
+WFMB,campbell,CO_Avg,"[2019-10-04 06:30, 2019-10-16)",AM,unknown
+WFMB,campbell,NO_Avg,"[2019-10-31 15:45, 2019-11-05 14:15)",AM,manifold failure
+WFMB,campbell,NOX_Avg,"[2019-10-31 15:45, 2019-11-05 14:15)",AM,manifold failure
 WFMB,envidas,API-T400-OZONE,"[2019-10-31 15:45, 2019-11-05 14:15)",AM,manifold failure
-WFMB,campbell,CO,"[2019-11-01 23:00, 2019-11-02 06:00)",AV,power failure
-WFMB,campbell,NOX,"[2019-11-27 10:00, 2019-11-27 11:00)",AM,unknown
+WFMB,campbell,CO_Avg,"[2019-11-01 23:00, 2019-11-02 06:00)",AV,power failure
+WFMB,campbell,NOX_Avg,"[2019-11-27 10:00, 2019-11-27 11:00)",AM,unknown
 WFMB,envidas,PM25C,"[2020-02-28 15:36, 2020-03-04)",AM,unknown
-WFMB,campbell,NGN3,"[2020-05-04 05:30, 2020-05-12 12:00)",AN,lamp failed
-WFMB,campbell,NO,"[2020-05-20 23:00, 2020-05-26 11:00)",AN,pump failed
-WFMB,campbell,NOX,"[2020-05-20 23:00, 2020-05-26 11:00)",AN,pump failed
-WFMB,campbell,NO,"[2020-06-02 11:00, 2020-06-04 15:00)",AN,low ozone flow
-WFMB,campbell,NOX,"[2020-06-02 11:00, 2020-06-04 15:00)",AN,low ozone flow
-WFMB,campbell,NO,"[2020-08-12 13:31, 2020-08-18 10:28)",AN,unknown instrument error
-WFMB,campbell,NOX,"[2020-08-12 13:31, 2020-08-18 10:28)",AN,unknown instrument error
+WFMB,campbell,NGN3_Avg,"[2020-05-04 05:30, 2020-05-12 12:00)",AN,lamp failed
+WFMB,campbell,NO_Avg,"[2020-05-20 23:00, 2020-05-26 11:00)",AN,pump failed
+WFMB,campbell,NOX_Avg,"[2020-05-20 23:00, 2020-05-26 11:00)",AN,pump failed
+WFMB,campbell,NO_Avg,"[2020-06-02 11:00, 2020-06-04 15:00)",AN,low ozone flow
+WFMB,campbell,NOX_Avg,"[2020-06-02 11:00, 2020-06-04 15:00)",AN,low ozone flow
+WFMB,campbell,NO_Avg,"[2020-08-12 13:31, 2020-08-18 10:28)",AN,unknown instrument error
+WFMB,campbell,NOX_Avg,"[2020-08-12 13:31, 2020-08-18 10:28)",AN,unknown instrument error
 WFMB,envidas,PM25C,"[2020-09-26 08:29, 2020-09-28 08:02)",AN,unknown
 WFMB,envidas,SO2,"[2020-10-14 20:21, 2020-10-15 08:16)",AN,unknown
 WFMB,envidas,API-T400-OZONE,"[2020-12-18 20:25, 2020-12-19 19:14)",AN,unknown
