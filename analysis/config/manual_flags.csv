@@ -172,6 +172,8 @@ WFMS,envidas,NOY,"[2021-01-06 17:59, 2021-01-06 20:03)",AM,unknown
 WFMS,envidas,NO,"[2021-01-14 10:42, 2021-01-14 13:32)",AT,calibration
 WFMS,envidas,NOX,"[2021-01-14 10:42, 2021-01-14 13:32)",AT,calibration
 WFMS,envidas,NOY,"[2021-01-14 10:42, 2021-01-14 13:32)",AT,calibration
+WFMS,campbell,WS3Cup_Avg,"[2021-02-02 06:00, 2021-02-24 17:24)",AN,instrument frozen
+WFMS,campbell,WS3Cup_Max,"[2021-02-02 06:00, 2021-02-24 17:24)",AN,instrument frozen
 WFMB,campbell,NO_Avg,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
 WFMB,campbell,NOX_Avg,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
 WFMB,campbell,CO_Avg,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
