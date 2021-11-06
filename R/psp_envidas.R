@@ -24,6 +24,7 @@ read_envidas_daily = function(f) {
   df
 }
 
+#' @export
 transform_envidas_daily = function(f) {
   df = read_envidas_daily(f)
   df$Date_Time = as.POSIXct(df$Date_Time, format = '%Y-%m-%d %H:%M:%S',
@@ -47,11 +48,6 @@ transform_envidas_daily = function(f) {
 
 #' @export
 transform_psp_envidas = function(f) {
-  ## check to see if the file is in the simpler daily format
-  is_daily_format = grepl('^[0-9]{8}_envidas.csv$', basename(f))
-  if (is_daily_format) {
-    return(transform_envidas_daily(f))
-  }
   df = read_psp_envidas(f)
   ## check for newer files with the absurd date format
   file_date = gsub('.*envi_rpt-|\\.csv', '', f)

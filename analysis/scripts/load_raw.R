@@ -15,21 +15,23 @@ data_source = commandArgs(trailingOnly = T)[2]
 raw_folder = paste0('raw_data_v', Sys.getenv('raw_version'))
 
 # transform a raw data file according to its site and data source
-transform_measurement = function(f) {
+transform_raw = function(f) {
   ds = data_source
-  if (ds == 'campbell') {
-    return(transform_campbell(f, site))
-  } else if (site == 'PSP' & ds == 'envidas') {
-    return(transform_psp_envidas(f))
-  } else if (site == 'WFMB' && ds == 'envidas') {
-    return(transform_wfm_envidas(f))
-  } else if (site == 'WFMS' && ds == 'DEC_envidas') {
-    # this is really the same format as the WFMB envidas
-    return(transform_wfm_envidas(f))
-  } else if (site == 'WFMS' && ds == 'envidas') {
-    # this is the same format as the daily PSP envidas
-    return(transform_psp_envidas(f))
+  if (ds == 'campbell') return(transform_campbell(f, site))
+  if (site == 'WFMS' && ds == 'envidas') return(transform_envidas_daily(f))
+  if (site == 'WFMS' && ds == 'DEC_envidas') return(transform_wfm_envidas(f))
+  if (site == 'WFMB' && ds == 'envidas') return(transform_wfm_envidas(f))
+  if (site == 'PSP' && ds == 'envidas') {
+    # check to see if the file is in the simpler daily format
+    is_daily_format = grepl('^[0-9]{8}_envidas.csv$', basename(f))
+    if (is_daily_format) {
+      return(transform_envidas_daily(f))
+    } else {
+      return(transform_psp_envidas(f))
+    }
   }
+  # these remaining functions are from older code that requires the results to
+  # be reshaped
   res = if (ds == 'ultrafine') {
     transform_ultrafine(f)
   } else if (ds == 'mesonet') {
@@ -150,7 +152,7 @@ add_db_columns = function(db, cols) {
 
 # read the file and add it to the sqlite database
 load_file = function(f, db) {
-  dat = tryCatch(transform_measurement(f), error = function(e) {
+  dat = tryCatch(transform_raw(f), error = function(e) {
     stop(f, ' loading failed: ', e)
   })
   if (!nrow(dat)) return()
