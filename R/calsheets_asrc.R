@@ -5,11 +5,32 @@
 # pdf. Form field names are similar across instruments but with minor
 # variations.
 
+# I'm trying to get this function added to staplr (see
+# https://github.com/pridiltal/staplr/pull/52). In the meantime it can live
+# here.
+pdftk_ReportAcroFormFields = function(f) {
+  rJava::.jinit()
+  pdftk_jar = system.file('pdftk-java/pdftk.jar', package = 'staplr',
+                          mustWork = TRUE)
+  rJava::.jaddClassPath(pdftk_jar)
+  # instead of an output file, write the output to this byte array so we can
+  # send it directly back to R
+  out = rJava::.jnew('java/io/ByteArrayOutputStream')
+  ofs = rJava::.jnew('java/io/PrintStream',
+                     rJava::.jcast(out, 'java/io/OutputStream'))
+  input_reader = rJava::.jnew('pdftk/com/lowagie/text/pdf/PdfReader', f)
+  output_utf8_b = FALSE
+  # `report.ReportAcroFormFields` is the java function that actually prints the
+  # form fields
+  rJava::.jcall('com/gitlab/pdftk_java/report', 'V', 'ReportAcroFormFields',
+                ofs, input_reader, output_utf8_b)
+  rJava::.jcall(out, 'Ljava/lang/String;', 'toString')
+}
+
 #' Get fields from a pdf form
 #'
-#' Get the field values from a pdf form (AcroForms). This function is a
-#' streamlined alternative to \code{staplr::get_fields} that's about twice as
-#' fast.
+#' Get the field values from a pdf form (AcroForms). This function is a faster,
+#' streamlined alternative to \code{staplr::get_fields}.
 #'
 #' @param f Path to pdf file.
 #' @return A list of the field values.
@@ -22,12 +43,10 @@
 #' @importFrom magrittr %>%
 #' @export
 read_pdf_form = function(f) {
-  out = tempfile()
-  cmd = paste(staplr:::pdftk_cmd(), shQuote(f), "dump_data_fields", "output",
-              shQuote(out))
-  system(cmd)
-  on.exit(file.remove(out))
-  data.frame(lines = readLines(out)) %>%
+  pdftk_ReportAcroFormFields(f) %>%
+    strsplit('\n') %>%
+    getElement(1) %>%
+    data.frame(lines = .) %>%
     transform(field_id = cumsum(lines == '---')) %>%
     subset(lines != '---') %>%
     transform(attr = sub('Field([^:]*):.*', '\\1', lines),

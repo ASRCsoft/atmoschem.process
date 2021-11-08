@@ -20,6 +20,7 @@ Imports:
     ratelimitr,
     Rdpack (>= 0.7),
     readxl,
+    rJava,
     staplr (>= 2.10),
     tidyr
 Depends: R (>= 3.4.4)
