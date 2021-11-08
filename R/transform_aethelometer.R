@@ -1,3 +1,4 @@
+#' @describeIn transform Aethelometer files.
 #' @export
 transform_wfms_aethelometer = function(f) {
   if (startsWith(basename(f), 'ae')) {

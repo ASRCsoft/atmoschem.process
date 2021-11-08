@@ -1,3 +1,4 @@
+#' @describeIn transform NYS Mesonet files.
 #' @export
 transform_mesonet = function(f) {
   df = read.csv(f, check.names = F)

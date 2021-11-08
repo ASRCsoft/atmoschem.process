@@ -5,8 +5,7 @@ read_envidas_daily = function(f) {
   df
 }
 
-# these files were downloaded directly from SQL Server and stored in a simple
-# csv format
+#' @describeIn transform Daily Envidas files generated from SQL by a script.
 #' @export
 transform_envidas_daily = function(f) {
   df = read_envidas_daily(f)
@@ -29,7 +28,6 @@ transform_envidas_daily = function(f) {
   df
 }
 
-# manually exported files (WFMS/WFMB)
 read_wfml_envidas = function(f, ...) {
   na_strings = c('NA', 'NAN', 'NANN', '-9999')
   ## Sometimes the files have extra commas at the end of the
@@ -44,6 +42,7 @@ read_wfml_envidas = function(f, ...) {
   df1
 }
 
+#' @describeIn transform Manually exported Envidas files (WFMS and WFMB).
 #' @export
 transform_wfm_envidas = function(f) {
   df = read_wfml_envidas(f)
@@ -67,7 +66,6 @@ transform_wfm_envidas = function(f) {
   df
 }
 
-# manually exported files (PSP)
 read_psp_envidas = function(f, ...) {
   ## get the headers separately since there's a line of units
   ## separating them from the data
@@ -85,6 +83,7 @@ read_psp_envidas = function(f, ...) {
   df
 }
 
+#' @describeIn transform Manually exported Envidas files (PSP).
 #' @export
 transform_psp_envidas = function(f) {
   df = read_psp_envidas(f)

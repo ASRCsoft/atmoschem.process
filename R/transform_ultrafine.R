@@ -29,6 +29,7 @@ read_ultrafine = function(f) {
   df
 }
 
+#' @describeIn transform Ultrafine (EPC) files.
 #' @export
 transform_ultrafine = function(f) {
   uf = read_ultrafine(f)

@@ -22,6 +22,18 @@ read_campbell = function(f) {
   df[, -grep('Spare', names(df), ignore.case = T)]
 }
 
+#' Transform raw data into a common format
+#'
+#' Read a raw data file and return a data frame of measurements in a
+#' standardized format.
+#'
+#' @param f Filepath of the raw data file.
+#' @param site Site abbreviation (only needed when format varies by site).
+#' @return A data frame of measurements. The first column is "time" (POSIXct),
+#'   followed by two columns for each parameter-- "value.param_name" and
+#'   "flagged.param_name". "flagged.param_name" columns are all logical vectors,
+#'   where flagged=TRUE indicates that the measurement shouldn't be used.
+#' @describeIn transform Campbell datalogger files (WFMS and WFMB).
 #' @export
 transform_campbell = function(f, site) {
   campbell = read_campbell(f)
