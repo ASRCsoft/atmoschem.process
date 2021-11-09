@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get fields from a pdf form — read_pdf_form • atmoschem.process</title>
+<title>Transform raw data into a common format — transform_wfms_aethelometer • atmoschem.process</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,9 @@
 
 
 
-<meta property="og:title" content="Get fields from a pdf form — read_pdf_form" />
-<meta property="og:description" content="Get the field values from a pdf form (AcroForms). This function is a
-streamlined alternative to staplr::get_fields that's about twice as
-fast." />
+<meta property="og:title" content="Transform raw data into a common format — transform_wfms_aethelometer" />
+<meta property="og:description" content="Read a raw data file and return a data frame of measurements in a
+standardized format." />
 
 
 
@@ -128,58 +127,62 @@ fast." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get fields from a pdf form</h1>
-    <small class="dont-index">Source: <a href='https://github.com/ASRCsoft/atmoschem.process/blob/master/R/calsheets_asrc.R'><code>R/calsheets_asrc.R</code></a></small>
-    <div class="hidden name"><code>read_pdf_form.Rd</code></div>
+    <h1>Transform raw data into a common format</h1>
+    <small class="dont-index">Source: <a href='https://github.com/ASRCsoft/atmoschem.process/blob/master/R/transform_aethelometer.R'><code>R/transform_aethelometer.R</code></a>, <a href='https://github.com/ASRCsoft/atmoschem.process/blob/master/R/transform_campbell.R'><code>R/transform_campbell.R</code></a>, <a href='https://github.com/ASRCsoft/atmoschem.process/blob/master/R/transform_envidas.R'><code>R/transform_envidas.R</code></a>, and 2 more</small>
+    <div class="hidden name"><code>transform.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Get the field values from a pdf form (AcroForms). This function is a
-streamlined alternative to <code><a href='https://rdrr.io/pkg/staplr/man/get_fields.html'>staplr::get_fields</a></code> that's about twice as
-fast.</p>
+    <p>Read a raw data file and return a data frame of measurements in a
+standardized format.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>read_pdf_form</span><span class='op'>(</span><span class='va'>f</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>transform_wfms_aethelometer</span><span class='op'>(</span><span class='va'>f</span><span class='op'>)</span>
+
+<span class='fu'>transform_campbell</span><span class='op'>(</span><span class='va'>f</span>, <span class='va'>site</span><span class='op'>)</span>
+
+<span class='fu'>transform_envidas_daily</span><span class='op'>(</span><span class='va'>f</span><span class='op'>)</span>
+
+<span class='fu'>transform_wfm_envidas</span><span class='op'>(</span><span class='va'>f</span><span class='op'>)</span>
+
+<span class='fu'>transform_psp_envidas</span><span class='op'>(</span><span class='va'>f</span><span class='op'>)</span>
+
+<span class='fu'>transform_mesonet</span><span class='op'>(</span><span class='va'>f</span><span class='op'>)</span>
+
+<span class='fu'>transform_ultrafine</span><span class='op'>(</span><span class='va'>f</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>f</th>
-      <td><p>Path to pdf file.</p></td>
+      <td><p>Filepath of the raw data file.</p></td>
+    </tr>
+    <tr>
+      <th>site</th>
+      <td><p>Site abbreviation (only needed when format varies by site).</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list of the field values.</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+    <p>A data frame of measurements. The first column is "time" (POSIXct),
+  followed by two columns for each parameter-- "value.param_name" and
+  "flagged.param_name". "flagged.param_name" columns are all logical vectors,
+  where flagged=TRUE indicates that the measurement shouldn't be used.</p>
+    <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
 
-    <div class='dont-index'><p><a href='https://rdrr.io/pkg/staplr/man/get_fields.html'>get_fields</a></p></div>
+    
+<ul>
+<li><p><code>transform_wfms_aethelometer</code>: Aethelometer files.</p></li>
+<li><p><code>transform_campbell</code>: Campbell datalogger files (WFMS and WFMB).</p></li>
+<li><p><code>transform_envidas_daily</code>: Daily Envidas files generated from SQL by a script.</p></li>
+<li><p><code>transform_wfm_envidas</code>: Manually exported Envidas files (WFMS and WFMB).</p></li>
+<li><p><code>transform_psp_envidas</code>: Manually exported Envidas files (PSP).</p></li>
+<li><p><code>transform_mesonet</code>: NYS Mesonet files.</p></li>
+<li><p><code>transform_ultrafine</code>: Ultrafine (EPC) files.</p></li>
+</ul>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># read the staplr example file</span>
-<span class='va'>pdf</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>'testForm.pdf'</span>, package <span class='op'>=</span> <span class='st'>'staplr'</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='fu'>read_pdf_form</span><span class='op'>(</span><span class='va'>pdf</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $TextField1
-#&gt; [1] ""
-#&gt; 
-#&gt; $TextField2
-#&gt; [1] ""
-#&gt; 
-#&gt; $RadioGroup
-#&gt; [1] "Off"
-#&gt; 
-#&gt; $checkBox
-#&gt; [1] "Off"
-#&gt; 
-#&gt; $`List Box`
-#&gt; [1] ""
-#&gt; 
-#&gt; $hierarchy.node1
-#&gt; [1] ""
-#&gt; </div><div class='input'>
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
