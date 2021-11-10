@@ -149,6 +149,16 @@ WFMB,campbell,NO_Avg,span,"[2020-09-30, 2020-10-06)",Calibrator program corrupte
 WFMB,campbell,NOX_Avg,span,"[2020-09-30, 2020-10-06)",Calibrator program corrupted
 WFMB,campbell,NO_Avg,span,"[2020-10-06, 2020-10-13)",tube pinched
 WFMB,campbell,NOX_Avg,span,"[2020-10-06, 2020-10-13)",tube pinched
+WFMB,campbell,NOX_Avg,zero,"[2021-01-23, 2021-01-26)",compressor down
+WFMB,campbell,NOX_Avg,span,"[2021-01-23, 2021-01-26)",compressor down
+WFMB,campbell,CO_Avg,zero,"[2021-01-23, 2021-01-26)",compressor down
+WFMB,campbell,CO_Avg,span,"[2021-01-23, 2021-01-26)",compressor down
+WFMB,campbell,NO_Avg,zero,"[2021-02-13, 2021-02-16)",compressor down
+WFMB,campbell,NO_Avg,span,"[2021-02-13, 2021-02-16)",compressor down
+WFMB,campbell,NOX_Avg,zero,"[2021-02-13, 2021-02-16)",compressor down
+WFMB,campbell,NOX_Avg,span,"[2021-02-13, 2021-02-16)",compressor down
+WFMB,campbell,CO_Avg,zero,"[2021-02-13, 2021-02-16)",compressor down
+WFMB,campbell,CO_Avg,span,"[2021-02-13, 2021-02-16)",compressor down
 PSP,envidas,NO-DEC,zero,"[2018-10-23, 2018-11-09)",calibration
 PSP,envidas,NOx,CE,"[2019-01-02, 2019-02-02)",wrong NOx values recorded
 PSP,envidas,NOx,CE,"[2019-02-08, 2019-02-22)","new calibration instrument, values recorded before leveling off"
