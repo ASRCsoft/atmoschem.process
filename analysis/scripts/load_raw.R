@@ -70,6 +70,10 @@ make_corrections = function(f, dat) {
           paste0('flagged', c('NO', 'NOx'), '_Avg')] = F
       dat[dat$time >= '2020-07-15 14:03' & dat$time < '2020-07-22 12:00',
           'flagged.CO_Avg'] = F
+      # T/RH flags have not been working correctly and were probably never
+      # flagged
+      dat$flagged.T_Avg = F
+      dat$flagged.RH_Avg = F
       # replace malfunctioning wind direction values with NA
       dat[dat$value.WindDir_SD1_WVT == 0,
           c('value.WindDir_D1_WVT', 'value.WindDir_SD1_WVT')] = NA
