@@ -418,3 +418,6 @@ PSP,envidas,Concentration,"[2020-12-04 05:19, 2020-12-04 09:53)",AN,pump failure
 PSP,envidas,Concentration,"[2020-12-18 14:15, 2020-12-18 14:45)",AM,unknown
 PSP,envidas,BC1,"[2020-12-18 14:15, 2020-12-18 14:45)",AM,unknown
 PSP,envidas,BC6,"[2020-12-18 14:15, 2020-12-18 14:45)",AM,unknown
+PSP,envidas,CO,"[2021-01-16 15:52, 2021-01-16 16:59)",AM,unknown
+PSP,envidas,CO,"[2021-01-27 18:12, 2021-01-28 01:15)",AM,unknown
+PSP,envidas,PM_2_5,"[2021-02-26 13:16, 2021-02-26 15:06)",BA,pump replaced
