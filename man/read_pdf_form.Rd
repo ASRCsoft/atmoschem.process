@@ -13,9 +13,8 @@ read_pdf_form(f)
 A list of the field values.
 }
 \description{
-Get the field values from a pdf form (AcroForms). This function is a
-streamlined alternative to \code{staplr::get_fields} that's about twice as
-fast.
+Get the field values from a pdf form (AcroForms). This function is a faster,
+streamlined alternative to \code{staplr::get_fields}.
 }
 \examples{
 # read the staplr example file
