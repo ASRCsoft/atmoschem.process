@@ -1,4 +1,4 @@
-## R package variables
+# R package variables
 # h/t to @jimhester and @yihui for this parse block:
 # https://github.com/yihui/knitr/blob/dc5ead7bcfc0ebd2789fe99c527c7d91afb3de4a/Makefile#L1-L4
 PKGNAME := $(shell sed -n "s/Package: *\([^ ]*\)/\1/p" DESCRIPTION)
@@ -31,17 +31,28 @@ export routine_out := $(out_dir)/routine_chemistry_v$(PKGVERS)
 # ensure R package availability
 check_rpkg = if (!requireNamespace("$(1)")) install.packages("$(1)")
 
+## Options available for make:	
+##
+## help       : Display available make commands.
+.PHONY : help
+help : Makefile
+	@sed -n 's/^##//p' $<
+
 .PHONY: all
 all: routine
 
-## Atmoschem Dataset
+##
+## Data processing commands
+##
 
+## check_data : Run data tests.
 .PHONY: check_data
 check_data:
 	$(rscript) \
 	-e '$(call check_rpkg,tinytest)' \
 	-e 'tinytest::run_test_dir("analysis/tests")'
 
+## clean_data : Remove intermediate data processing files.
 .PHONY: clean_data
 clean_data:
 	@rm $(raw_data) && rm -rf $(raw_dir) && rm -rf $(interm_dir) && rm -rf $(out_dir)
@@ -49,6 +60,7 @@ clean_data:
 # save intermediate sqlite files for the processing viewer
 .SECONDARY:
 
+## routine    : Generate routine monitoring dataset.
 .PHONY: routine
 routine: $(routine_out).zip
 
@@ -101,32 +113,37 @@ $(raw_dir)/%.zip:
 	mkdir -p $(raw_dir) && \
 	wget --user=$(asrc_user) --password=$(asrc_pass) -O $@ $(download_url)/$(shell echo $* | sed -E s/_v[0-9.]+$$//)/$*.zip
 
+## view       : Open the data viewer web app.
 .PHONY: view
 view:
 	$(rscript) \
 	-e '$(call check_rpkg,shiny)' \
 	-e 'shiny::runApp("analysis/processing_viewer", launch.browser = T)'
 
-## Raw data
-
+## save_raw   : Package the raw data.
 .PHONY: save_raw
 save_raw:
 	cd $(raw_dir) && \
 	$(rscript) \
 	-e 'zip("../../$(out_dir)/raw_data_v$(raw_version).zip", "raw_data_v$(raw_version)")'
 
-## R package
+##
+## R package commands
+##
 
+## check      : Run `R CMD check` on the package.
 .PHONY: check
 check: $(build_file)
 	R CMD check --no-manual $(build_file)
 
+## website    : Generate and open package documentation website.
 .PHONY: website
 website: docs
 	Rscript \
 	-e '$(call check_rpkg,pkgdown)' \
 	-e 'pkgdown::build_site(preview = TRUE)'
 
+## install    : Install the package.
 .PHONY: install
 install: docs
 	Rscript \
@@ -146,6 +163,7 @@ install_deps: DESCRIPTION
 $(build_file): docs
 	R CMD build .
 
+## docs       : Update the package documentation.
 .INTERMEDIATE: docs
 docs: $(pkgdata_rda) $(r_files) README.md
 	Rscript \
@@ -161,6 +179,7 @@ README.md: README.Rmd DESCRIPTION
 	-e '$(call check_rpkg,rmarkdown)' \
 	-e 'rmarkdown::render("README.Rmd")'
 
+## clean      : Remove package build files.
 .PHONY: clean
 clean:
 	@rm -rf $(build_file) $(PKGNAME).Rcheck

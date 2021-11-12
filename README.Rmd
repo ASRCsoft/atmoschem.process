@@ -106,6 +106,8 @@ make routine asrc_user=youruser asrc_pass=yourpassword aqs_email=youremail aqs_k
 
 (replacing the values with your information).
 
+Run `make help` to see more make options.
+
 ### Viewing the data
 
 The R package comes with a Shiny app for viewing the processing steps. After
