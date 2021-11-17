@@ -74,6 +74,26 @@ append_cals = function(cals) {
     dbWriteTable(dbout, 'calibrations', ., append = TRUE)
 }
 
+# get the processed cal check results
+get_processed_cals = function(datalogger, param, type) {
+  sql_str = "
+select *
+  from calibrations
+ where data_source=?
+   and measurement_name=?
+   and type=?
+ order by time asc"
+  q = sqlInterpolate(dbout, sql_str, datalogger, param, type)
+  res = dbGetQuery(dbout, q)
+  res$time = as.POSIXct(res$time, tz = 'EST')
+  res
+}
+
+get_flow_values = function(param, t) {
+  flows = site_flows[site_flows$measurement_name == param, ]
+  f_breaks = flows$time[is_true(flows$changed)]
+  estimate_cals(flows$time, flows$measured_value, NA, t, f_breaks)
+}
 
 parameters = dbGetQuery(dbin, 'select distinct data_source, measurement_name from calibrations')
 
@@ -81,7 +101,6 @@ for (i in seq_len(nrow(parameters))) {
   datalogger = parameters$data_source[i]
   measurement = parameters$measurement_name[i]
   if (measurement == 'NO2') next()
-  print(paste(datalogger, measurement))
   meas_conf = site_channels[site_channels$data_source == datalogger &
                             site_channels$name == measurement, ]
   # skip if there's no processing instructions
@@ -100,11 +119,8 @@ for (i in seq_len(nrow(parameters))) {
     spans$value = spans$measured_value - s_zeros
     # convert spans to ratio, possibly using flow cals
     if (site == 'WFMS') {
-      # flow values estimated at the span times
-      flows = site_flows[site_flows$measurement_name == meas_conf$gilibrator_span, ]
-      f_breaks = flows$time[is_true(flows$changed)]
-      provided_value = estimate_cals(flows$time, flows$measured_value, NA,
-                                     spans$end_time, f_breaks)
+      provided_value = get_flow_values(meas_conf$gilibrator_span,
+                                       spans$end_time)
     } else {
       provided_value = spans$provided_value
     }
@@ -113,7 +129,7 @@ for (i in seq_len(nrow(parameters))) {
   }
   # get CE cals
   ceffs = get_cals(datalogger, measurement, 'CE')
-  if (nrow(ceffs) && is_true(meas_conf$apply_ce)) {
+  if (nrow(ceffs)) {
     # zero and span values estimated at the ceff times
     z_breaks = zeros$end_time[is_true(zeros$corrected)]
     ce_zeros = estimate_cals(zeros$end_time, zeros$measured_value,
@@ -124,28 +140,49 @@ for (i in seq_len(nrow(parameters))) {
                              meas_conf$span_smooth_window, ceffs$end_time,
                              s_breaks)
     ceffs$value = (ceffs$measured_value - ce_zeros) / ce_spans
-    # convert ceffs to ratio, possibly using flow cals
-    if (site == 'WFMS') {
-      # flow values estimated at the span times
-      flows = site_flows[site_flows$measurement_name == meas_conf$gilibrator_ce, ]
-      f_breaks = flows$time[is_true(flows$changed)]
-      provided_value = estimate_cals(flows$time, flows$measured_value, NA,
-                                     ceffs$end_time, f_breaks)
-    } else {
-      provided_value = ceffs$provided_value
+    # Convert ceffs to ratio, possibly using flow cals. But only if it applies
+    # to this parameter-- otherwise need to save the non-ratio value, and the
+    # ratio is calculated further down
+    if (is_true(meas_conf$apply_ce)) {
+      if (site == 'WFMS') {
+        provided_value = get_flow_values(meas_conf$gilibrator_ce,
+                                         ceffs$end_time)
+      } else {
+        provided_value = ceffs$provided_value
+      }
+      ceffs$value = ceffs$value / provided_value
     }
-    ceffs$value = ceffs$value / provided_value
     append_cals(ceffs)
   }
 }
 
-
-
-
-# NO2 CEs
-
-# if site=='WFMS' etc.
-
+# Calculate NO2 conversion efficiencies (derived from NOx and NO results)
+if (site == 'WFMS') {
+  # WFMS NO2 conversion efficiencies are recorded on the NOx channel
+  no2_ceffs = rbind(get_processed_cals('campbell', 'NOx_Avg', 'CE'),
+                    get_processed_cals('envidas', 'NOX', 'CE'))
+  no2_ceffs$measurement_name = 'NO2'
+  # convert to ratio
+  no2_ceffs$value = no2_ceffs$value / get_flow_values('NO2', no2_ceffs$time)
+  no2_ceffs$time = format(no2_ceffs$time, '%Y-%m-%d %H:%M:%S', tz = 'EST')
+  dbWriteTable(dbout, 'calibrations', no2_ceffs, append = TRUE)
+} else if (site == 'PSP') {
+  # PSP NO2 conversion efficiencies require subtracting NO, because the CE air
+  # includes both NO2 and NO
+  no2_ceffs = rbind(get_processed_cals('envidas', 'NO', 'CE'),
+                    get_processed_cals('envidas', 'NOx', 'CE'))
+  no2_ceffs = reshape(no2_ceffs, timevar = 'measurement_name', idvar = 'time',
+                      v.names = 'value', direction = 'wide')
+  # also need to get the raw values to get the provided_value
+  nox_ceffs = get_cals('envidas', 'NOx', 'CE')
+  provided_values =
+    nox_ceffs$provided_value[match(no2_ceffs$time, nox_ceffs$end_time)]
+  no2_ceffs$value = with(no2_ceffs, value.NOx - value.NO) / provided_values
+  no2_ceffs$measurement_name = 'NO2'
+  no2_ceffs[, c('value.NO', 'value.NOx')] = NULL
+  no2_ceffs$time = format(no2_ceffs$time, '%Y-%m-%d %H:%M:%S', tz = 'EST')
+  dbWriteTable(dbout, 'calibrations', no2_ceffs, append = TRUE)
+}
 
 dbDisconnect(dbin)
 dbDisconnect(dbout)
