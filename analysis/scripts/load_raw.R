@@ -109,6 +109,20 @@ make_corrections = function(f, dat) {
     if (data_source == 'campbell') {
       # replace mislabeled NO2 column
       names(dat) = sub('NO2', 'NOX', names(dat))
+      # add missing data, 2021-02-16 to 2021-02-24
+      if (basename(f) == 'WFMS_LODGE_Table1_2021_02_15_0001.dat') {
+        # Missing data is in file info/2021_gap.dat. That file has the same
+        # structure as a normal campbell file, but without the header and with
+        # tabs instead of commas.
+        gap_file = file.path(dirname(dirname(f)), 'info', '2021_gap.dat')
+        gap_lines = gsub('\t', ',', readLines(gap_file, warn = F))
+        f_header = readLines(f, n = 4)
+        gap_conn = textConnection(c(f_header, gap_lines))
+        gap_dat = transform_campbell(gap_conn, 'WFMB') %>%
+          subset(time > as.POSIXct('2021-02-16 00:00', tz = 'EST') &
+                 time < as.POSIXct('2021-02-24 00:00', tz = 'EST'))
+        dat = rbind(dat, gap_dat)
+      }
     } else if (data_source == 'envidas') {
       # flag left on after instrument installed, 2020-01-03 14:02 to 2020-01-07
       # 09:04
