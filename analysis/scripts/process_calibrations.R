@@ -71,7 +71,7 @@ append_cals = function(cals) {
   # write time, value, corrected columns
   transform(cals, time = format(end_time, '%Y-%m-%d %H:%M:%S', tz = 'EST')) %>%
     subset(select = c(data_source, measurement_name, type, time, value, flagged,
-                      corrected)) %>%
+                      corrected, manual)) %>%
     dbWriteTable(dbout, 'calibrations', ., append = TRUE)
 }
 
