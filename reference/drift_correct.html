@@ -40,8 +40,7 @@
 
 
 <meta property="og:title" content="Instrument drift corrections — drift_correct" />
-<meta property="og:description" content="Apply instrument drift corrections based on calibration and flow check
-results." />
+<meta property="og:description" content="Apply instrument drift corrections based on calibration check results." />
 
 
 
@@ -133,11 +132,10 @@ results." />
     </div>
 
     <div class="ref-description">
-    <p>Apply instrument drift corrections based on calibration and flow check
-results.</p>
+    <p>Apply instrument drift corrections based on calibration check results.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>drift_correct</span><span class='op'>(</span><span class='va'>t</span>, <span class='va'>v</span>, z <span class='op'>=</span> <span class='cn'>NULL</span>, s <span class='op'>=</span> <span class='cn'>NULL</span>, f <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>config</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>drift_correct</span><span class='op'>(</span><span class='va'>t</span>, <span class='va'>v</span>, z <span class='op'>=</span> <span class='cn'>NULL</span>, s <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>config</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -153,26 +151,19 @@ results.</p>
     <tr>
       <th>z</th>
       <td><p>Data frame of zero calibration checks. Should contain columns
-<code>time</code>, <code>measured_value</code>, and <code>corrected</code> (logical, whether
-the instrument was adjusted).</p></td>
+<code>time</code>, <code>value</code>, and <code>corrected</code> (logical, whether the
+instrument was adjusted).</p></td>
     </tr>
     <tr>
       <th>s</th>
       <td><p>Data frame of span calibration checks. Should contain columns
-<code>time</code>, <code>measured_value</code>, and <code>corrected</code> (logical, whether
-the instrument was adjusted), and optionally <code>provided_value</code>. One of
-<code>provided_value</code> or <code>f</code> should be supplied.</p></td>
-    </tr>
-    <tr>
-      <th>f</th>
-      <td><p>Data frame of flow checks for calibration spans. Should contain
-columns <code>time</code>, <code>measured_value</code>, and <code>changed</code> (logical,
-whether the source has changed).</p></td>
+<code>time</code>, <code>value</code>, and <code>corrected</code> (logical, whether the
+instrument was adjusted).</p></td>
     </tr>
     <tr>
       <th>config</th>
-      <td><p>list of Configuration options from the
-<code>measurement_types</code> table.</p></td>
+      <td><p>list of Configuration options from the <code>measurement_types</code>
+config table.</p></td>
     </tr>
     </table>
 
@@ -181,15 +172,12 @@ whether the source has changed).</p></td>
     <p>Drift-corrected measurements.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Zero, span, and flow values are estimated using
-<code><a href='estimate_cals.html'>estimate_cals</a></code>. Measured span values are corrected for
-instrument drift, then converted to a ratio by dividing by the flow values
-(if provided) or the <code>provided_values</code> column. If not provided, zeros
-and spans are assumed to be 0 and 1, respectively. The corrected values are
-calculated as \((measurement - zero) / span\).</p>
+    <p>Zero and span values are estimated using <code><a href='estimate_cals.html'>estimate_cals</a></code>. If not
+provided, zeros and spans are assumed to be 0 and 1, respectively. The
+corrected values are calculated as \((measurement - zero) / span\).</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='estimate_cals.html'>estimate_cals</a></code>, <code>measurement_types</code></p></div>
+    <div class='dont-index'><p><code><a href='estimate_cals.html'>estimate_cals</a></code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
