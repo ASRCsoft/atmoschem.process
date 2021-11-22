@@ -4,7 +4,7 @@
 \alias{drift_correct}
 \title{Instrument drift corrections}
 \usage{
-drift_correct(t, v, z = NULL, s = NULL, f = NULL, config)
+drift_correct(t, v, z = NULL, s = NULL, config)
 }
 \arguments{
 \item{t}{Measurement times (POSIXct).}
@@ -12,36 +12,27 @@ drift_correct(t, v, z = NULL, s = NULL, f = NULL, config)
 \item{v}{Measurement values.}
 
 \item{z}{Data frame of zero calibration checks. Should contain columns
-\code{time}, \code{measured_value}, and \code{corrected} (logical, whether
-the instrument was adjusted).}
+\code{time}, \code{value}, and \code{corrected} (logical, whether the
+instrument was adjusted).}
 
 \item{s}{Data frame of span calibration checks. Should contain columns
-\code{time}, \code{measured_value}, and \code{corrected} (logical, whether
-the instrument was adjusted), and optionally \code{provided_value}. One of
-\code{provided_value} or \code{f} should be supplied.}
+\code{time}, \code{value}, and \code{corrected} (logical, whether the
+instrument was adjusted).}
 
-\item{f}{Data frame of flow checks for calibration spans. Should contain
-columns \code{time}, \code{measured_value}, and \code{changed} (logical,
-whether the source has changed).}
-
-\item{config}{list of Configuration options from the
-\code{\link{measurement_types}} table.}
+\item{config}{list of Configuration options from the \code{measurement_types}
+config table.}
 }
 \value{
 Drift-corrected measurements.
 }
 \description{
-Apply instrument drift corrections based on calibration and flow check
-results.
+Apply instrument drift corrections based on calibration check results.
 }
 \details{
-Zero, span, and flow values are estimated using
-\code{\link{estimate_cals}}. Measured span values are corrected for
-instrument drift, then converted to a ratio by dividing by the flow values
-(if provided) or the \code{provided_values} column. If not provided, zeros
-and spans are assumed to be 0 and 1, respectively. The corrected values are
-calculated as \eqn{(measurement - zero) / span}.
+Zero and span values are estimated using \code{\link{estimate_cals}}. If not
+provided, zeros and spans are assumed to be 0 and 1, respectively. The
+corrected values are calculated as \eqn{(measurement - zero) / span}.
 }
 \seealso{
-\code{\link{estimate_cals}}, \code{\link{measurement_types}}
+\code{\link{estimate_cals}}
 }

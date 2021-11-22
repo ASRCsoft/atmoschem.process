@@ -91,66 +91,41 @@ estimate_cals = function(x, y, k, xout, breaks) {
 
 #' Instrument drift corrections
 #'
-#' Apply instrument drift corrections based on calibration and flow check
-#' results.
+#' Apply instrument drift corrections based on calibration check results.
 #'
-#' Zero, span, and flow values are estimated using
-#' \code{\link{estimate_cals}}. Measured span values are corrected for
-#' instrument drift, then converted to a ratio by dividing by the flow values
-#' (if provided) or the \code{provided_values} column. If not provided, zeros
-#' and spans are assumed to be 0 and 1, respectively. The corrected values are
-#' calculated as \eqn{(measurement - zero) / span}.
+#' Zero and span values are estimated using \code{\link{estimate_cals}}. If not
+#' provided, zeros and spans are assumed to be 0 and 1, respectively. The
+#' corrected values are calculated as \eqn{(measurement - zero) / span}.
 #'
 #' @param t Measurement times (POSIXct).
 #' @param v Measurement values.
 #' @param z Data frame of zero calibration checks. Should contain columns
-#'   \code{time}, \code{measured_value}, and \code{corrected} (logical, whether
-#'   the instrument was adjusted).
+#'   \code{time}, \code{value}, and \code{corrected} (logical, whether the
+#'   instrument was adjusted).
 #' @param s Data frame of span calibration checks. Should contain columns
-#'   \code{time}, \code{measured_value}, and \code{corrected} (logical, whether
-#'   the instrument was adjusted), and optionally \code{provided_value}. One of
-#'   \code{provided_value} or \code{f} should be supplied.
-#' @param f Data frame of flow checks for calibration spans. Should contain
-#'   columns \code{time}, \code{measured_value}, and \code{changed} (logical,
-#'   whether the source has changed).
-#' @param config list of Configuration options from the
-#'   \code{\link{measurement_types}} table.
+#'   \code{time}, \code{value}, and \code{corrected} (logical, whether the
+#'   instrument was adjusted).
+#' @param config list of Configuration options from the \code{measurement_types}
+#'   config table.
 #' @return Drift-corrected measurements.
-#' @seealso \code{\link{estimate_cals}}, \code{\link{measurement_types}}
+#' @seealso \code{\link{estimate_cals}}
 #' @export
-drift_correct = function(t, v, z = NULL, s = NULL, f = NULL, config) {
+drift_correct = function(t, v, z = NULL, s = NULL, config) {
   # zeros
   if (!is.null(z) && nrow(z)) {
     # zero values estimated at the measurement times
     z_breaks = z$time[is_true(z$corrected)]
-    zeros = estimate_cals(z$time, z$measured_value, config$zero_smooth_window,
-                          t, z_breaks)
+    zeros = estimate_cals(z$time, z$value, config$zero_smooth_window, t,
+                          z_breaks)
   } else {
     zeros = NULL
   }
   # spans
   if (!is.null(s) && nrow(s)) {
-    if (!is.null(f) && nrow(f)) {
-      # flow values estimated at the span times
-      f_breaks = f$time[is_true(f$changed)]
-      provided_value = estimate_cals(f$time, f$measured_value, NA, s$time,
-                                     f_breaks)
-    } else {
-      provided_value = s$provided_value
-    }
-    if (!is.null(zeros)) {
-      # apply zero corrections to measured spans
-      s_zeros = estimate_cals(z$time, z$measured_value,
-                              config$zero_smooth_window, s$time, z_breaks)
-      measured_value = s$measured_value - s_zeros
-    } else {
-      measured_value = s$measured_value
-    }
-    # convert to ratio
-    ratio = measured_value / provided_value
     # span ratios estimated at the measurement times
     s_breaks = s$time[is_true(s$corrected)]
-    spans = estimate_cals(s$time, ratio, config$span_smooth_window, t, s_breaks)
+    spans = estimate_cals(s$time, s$value, config$span_smooth_window, t,
+                          s_breaks)
   } else {
     spans = NULL
   }
@@ -162,19 +137,10 @@ drift_correct = function(t, v, z = NULL, s = NULL, f = NULL, config) {
 }
 
 # apply conversion efficiency corrections to measured values
-ceff_correct = function(t, v, ceff, f = NULL, config) {
-  if (!is.null(f) && nrow(f)) {
-    # flow values estimated at the ceff times
-    f_breaks = f$time[is_true(f$changed)]
-    provided_value = estimate_cals(f$time, f$measured_value, NA, ceff$time,
-                                   f_breaks)
-  } else {
-    provided_value = ceff$provided_value
-  }
-  raw_efficiency = ceff$measured_value / provided_value
+ceff_correct = function(t, v, ceff, config) {
   # get smoothed conversion efficiencies estimated at the measurement times
   ceff_breaks = ceff$time[is_true(ceff$corrected)]
-  smoothed_efficiency = estimate_cals(ceff$time, raw_efficiency,
+  smoothed_efficiency = estimate_cals(ceff$time, ceff$value,
                                       config$ce_smooth_window, t, ceff_breaks)
   # conversion efficiencies can't go above 1
   v / pmin(smoothed_efficiency, 1)

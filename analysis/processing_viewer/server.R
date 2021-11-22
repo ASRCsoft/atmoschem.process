@@ -50,33 +50,25 @@ get_processed = function(s, ds, m, t1, t2) {
   res
 }
 
-get_cals = function(s, ds, m, t1, t2) {
-  dbpath = file.path(interm_dir, paste0('cals_', s, '.sqlite'))
+.get_cals = function(s, ds, m, type, t1, t2) {
+  dbpath = file.path(interm_dir, paste0('processedcals_', s, '.sqlite'))
   db = dbConnect(SQLite(), dbpath)
   on.exit(dbDisconnect(db))
   # if end_time is missing, crudely estimate it by adding an hour to the
   # start_time
   q = "
-select *,
-       coalesce(end_time, datetime(start_time, '+1 hour')) as time,
-       measured_value as value
+select *
   from calibrations
  where data_source = ?
    and measurement_name = ?
    and type = ?
- order by start_time asc"
-  sql = sqlInterpolate(db, q, ds, m, 'zero')
+ order by time asc"
+  sql = sqlInterpolate(db, q, ds, m, type)
   zeros = dbGetQuery(db, sql)
-  sql = sqlInterpolate(db, q, ds, m, 'span')
-  spans = dbGetQuery(db, sql)
   zeros$time = as.POSIXct(zeros$time, tz = 'EST')
-  spans$time = as.POSIXct(spans$time, tz = 'EST')
   zeros$flagged = as.logical(zeros$flagged)
-  spans$flagged = as.logical(spans$flagged)
   zeros$filtered = F
-  spans$filtered = F
-  zeros$label = 'zero'
-  spans$label = 'span'
+  zeros$label = type
 
   # Get the estimated (median filtered) zeros from the raw values. These
   # calculations are the same as in `drift_correct`
@@ -99,31 +91,14 @@ select *,
   fzeros$filtered = if (nrow(fzeros)) T else logical()
   zeros = rbind(zeros, fzeros)
 
-  # convert spans to ratios
-  if (nrow(spans) > 0) {
-    szeros = estimate_cals(zeros0$time, good_zeros, m_conf$zero_smooth_window,
-                           spans$time, z_breaks)
-    measured_value = spans$value - szeros
-    # convert to ratio
-    spans$value = measured_value / spans$provided_value
-    s_breaks = spans$time[is_true(spans$corrected)]
-    spans0 = spans
-    spans = spans %>%
-      transform(lead_time = c(tail(time, -1), NA),
-                lag_time = c(NA, head(time, -1))) %>%
-      subset(ifelse(is.na(lead_time), time > t1, lead_time > t1) &
-             ifelse(is.na(lag_time), time < t2, lag_time < t2))
-    fspans = spans
-    good_spans = replace(spans0$value, spans0$flagged, NA)
-    fspans$value = estimate_cals(spans0$time, good_spans,
-                                 m_conf$span_smooth_window, spans$time,
-                                 s_breaks)
-    fspans$filtered = if (nrow(fspans)) T else logical()
-    spans = rbind(spans, fspans)
-  }
-
   cols = c('time', 'value', 'flagged', 'filtered', 'label')
-  rbind(zeros, spans)[, cols]
+  zeros[, cols]
+}
+
+get_cals = function(s, ds, m, t1, t2) {
+  zeros = .get_cals(s, ds, m, 'zero', t1, t2)
+  spans = .get_cals(s, ds, m, 'span', t1, t2)
+  rbind(zeros, spans)
 }
 
 get_cal_breaks = function(s, ds, m, type, t1, t2) {
