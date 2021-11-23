@@ -98,8 +98,7 @@ $(interm_dir)/processedcals_%.sqlite: $(scripts_dir)/process_calibrations.R \
 # Calibration site file depends on all the raw site/calibration files
 make_cal_deps = $(patsubst %,$(interm_dir)/raw_%.sqlite, $(filter $(1)%, $(data_sources)))
 $(interm_dir)/cals_%.sqlite: $$(call make_cal_deps,$$*) \
-                             raw_data $(scripts_dir)/load_calibration.R \
-                             $(conf_dir)/cal_flags.csv
+                             raw_data $(scripts_dir)/load_calibration.R
 	$(rscript) $(scripts_dir)/load_calibration.R $*
 
 $(interm_dir)/raw_%.sqlite: raw_data $(scripts_dir)/load_raw.R

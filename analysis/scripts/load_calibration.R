@@ -329,24 +329,6 @@ if (nrow(acals0)) {
   all_cals = mcals
 }
 
-# apply calibration flags
-all_cals$flagged = F
-cal_flags2 = config$cal_flags[config$cal_flags$site == site, ] %>%
-  transform(times = as_interval(times))
-for (ds in unique(cal_flags2$data_source)) {
-  cal_flags_ds = subset(cal_flags2, data_source == ds)
-  for (name in unique(cal_flags_ds$measurement_name)) {
-    cal_flags_name = subset(cal_flags_ds, measurement_name == name)
-    for (ntype in unique(cal_flags_name$type)) {
-      ntype_flags = subset(cal_flags_name, type == ntype)
-      matches = with(all_cals, data_source == ds & measurement_name == name &
-                               type == ntype)
-      all_cals[matches, 'flagged'] =
-        all_cals[matches, 'end_time'] %within% as.list(ntype_flags$times)
-    }
-  }
-}
-
 # write to sqlite file
 # fix time formatting for sqlite compatibility
 all_cals$start_time = format(all_cals$start_time, '%Y-%m-%d %H:%M:%S', tz = 'EST')
