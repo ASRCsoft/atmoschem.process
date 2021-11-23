@@ -87,6 +87,7 @@ select *
   q = sqlInterpolate(dbout, sql_str, datalogger, param, type)
   res = dbGetQuery(dbout, q)
   res$time = as.POSIXct(res$time, tz = 'EST')
+  res$flagged = as.logical(res$flagged)
   res
 }
 
@@ -173,14 +174,15 @@ if (site == 'WFMS') {
   no2_ceffs = rbind(get_processed_cals('envidas', 'NO', 'CE'),
                     get_processed_cals('envidas', 'NOx', 'CE'))
   no2_ceffs = reshape(no2_ceffs, timevar = 'measurement_name', idvar = 'time',
-                      v.names = 'value', direction = 'wide')
+                       v.names = c('value', 'flagged'), direction = 'wide')
   # also need to get the raw values to get the provided_value
   nox_ceffs = get_cals('envidas', 'NOx', 'CE')
   provided_values =
     nox_ceffs$provided_value[match(no2_ceffs$time, nox_ceffs$end_time)]
   no2_ceffs$value = with(no2_ceffs, value.NOx - value.NO) / provided_values
   no2_ceffs$measurement_name = 'NO2'
-  no2_ceffs[, c('value.NO', 'value.NOx')] = NULL
+  no2_ceffs$flagged = with(no2_ceffs, flagged.NO | flagged.NOx)
+  no2_ceffs[, c('value.NO', 'value.NOx', 'flagged.NO', 'flagged.NOx')] = NULL
   no2_ceffs$time = format(no2_ceffs$time, '%Y-%m-%d %H:%M:%S', tz = 'EST')
   dbWriteTable(dbout, 'calibrations', no2_ceffs, append = TRUE)
 }
