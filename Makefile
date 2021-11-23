@@ -84,12 +84,16 @@ $(interm_dir)/hourly_%.sqlite: $(interm_dir)/processed_%.sqlite $(scripts_dir)/a
 # calibration site file
 .SECONDEXPANSION:
 $(interm_dir)/processed_%.sqlite: $(interm_dir)/raw_%.sqlite \
-                                  $(interm_dir)/cals_$$(shell echo $$* | sed "s/_.*//").sqlite \
+                                  $(interm_dir)/processedcals_$$(shell echo $$* | sed "s/_.*//").sqlite \
                                   $(scripts_dir)/process_new_data.R \
                                   $(conf_dir)/manual_flags.csv
 	$(rscript) $(scripts_dir)/process_new_data.R $(shell echo $* | sed "s/_/ /")
 # the WFMB campbell processing also depends on the processed Mesonet data
 $(interm_dir)/processed_WFMB_campbell.sqlite: $(interm_dir)/processed_WFMB_mesonet.sqlite
+
+$(interm_dir)/processedcals_%.sqlite: $(scripts_dir)/process_calibrations.R \
+                             $(interm_dir)/cals_%.sqlite $(conf_dir)/cal_flags.csv
+	$(rscript) $(scripts_dir)/process_calibrations.R $*
 
 # Calibration site file depends on all the raw site/calibration files
 make_cal_deps = $(patsubst %,$(interm_dir)/raw_%.sqlite, $(filter $(1)%, $(data_sources)))
