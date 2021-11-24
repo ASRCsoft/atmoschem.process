@@ -104,8 +104,9 @@ select *
            ifelse(is.na(lag_time), time < t2, lag_time < t2))
   fzeros = zeros
   good_zeros = replace(zeros0$value, zeros0$flagged, NA)
-  fzeros$value = estimate_cals(zeros0$time, good_zeros,
-                               m_conf$zero_smooth_window, zeros$time, z_breaks)
+  smooth_window = m_conf[[paste0(tolower(type), '_smooth_window')]]
+  fzeros$value = estimate_cals(zeros0$time, good_zeros, smooth_window,
+                               zeros$time, z_breaks)
   fzeros$filtered = if (nrow(fzeros)) T else logical()
   zeros = rbind(zeros, fzeros)
 
