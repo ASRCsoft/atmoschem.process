@@ -13,6 +13,24 @@ config = read_csv_dir('../config')
 # get only true values
 is_true = function(x) !is.na(x) & x
 
+# get all available channels from a sqlite measurements file
+.get_channels = function(f) {
+  if (!file.exists(f)) return(character())
+  db = dbConnect(SQLite(), f)
+  on.exit(dbDisconnect(db))
+  columns = dbListFields(db, 'measurements')
+  columns = columns[startsWith(columns, 'value')]
+  sub('value\\.', '', columns)
+}
+
+# get all available channels (including derived values) for a given datalogger
+get_channels = function(site, datalogger) {
+  file_suffix = paste0(site, '_', datalogger, '.sqlite')
+  raw_path = file.path(interm_dir, paste0('raw_', file_suffix))
+  processed_path = file.path(interm_dir, paste0('processed_', file_suffix))
+  unique(c(.get_channels(raw_path), .get_channels(processed_path)))
+}
+
 ## retrieve data from table based on timerange and measure
 get_raw = function(s, ds, m, t1, t2) {
   dbpath = file.path(interm_dir, paste0('raw_', s, '_', ds, '.sqlite'))
@@ -160,17 +178,28 @@ make_processing_plot = function(s, ds, m, t1, t2, plot_types, logt = F,
   if (is.null(ds) || m == '') return(NULL)
   ## get measurement info
   m_info = subset(config$channels, site == s & data_source == ds & name == m)
-  ylabel = paste0(m, ' (', m_info$units, ')')
+  if (nrow(m_info)) {
+    ylabel = paste0(m, ' (', m_info$units, ')')
+    has_raw = 'raw' %in% plot_types && !is_true(m_info$derived)
+    has_processed = is_true(m_info$apply_processing) &
+      'processed' %in% plot_types
+    has_cal = is_true(m_info$has_calibration) &
+      any(c('zero','span') %in% plot_types)
+    has_ce = is_true(m_info$apply_ce) &
+      'ce' %in% plot_types
+    has_hourly = is_true(m_info$apply_processing) &
+      'hourly' %in% plot_types
+  } else {
+    # if this channel isn't in the channel tables then only the raw data is
+    # available
+    ylabel = m
+    has_raw = 'raw' %in% plot_types
+    has_processed = F
+    has_cal = F
+    has_ce = F
+    has_hourly = F
+  }
   if (logt) ylabel = paste('Log', ylabel)
-  has_raw = 'raw' %in% plot_types && !is_true(m_info$derived)
-  has_processed = is_true(m_info$apply_processing) &
-    'processed' %in% plot_types
-  has_cal = is_true(m_info$has_calibration) &
-    any(c('zero','span') %in% plot_types)
-  has_ce = is_true(m_info$apply_ce) &
-    'ce' %in% plot_types
-  has_hourly = is_true(m_info$apply_processing) &
-    'hourly' %in% plot_types
 
   # temporarily, until I rewrite the CE functions
   has_ce = F
@@ -278,9 +307,8 @@ shinyServer(function(input, output) {
     selectInput('data_source', 'Data Source:', site_data_sources$name)
   })
   output$measurements = renderUI({
-    source_measurements = config$channels %>%
-      subset(site == input$site & data_source == input$data_source)
-    selectInput('measurement', 'Measurement:', source_measurements$name)
+    selectInput('measurement', 'Measurement:',
+                get_channels(input$site, input$data_source))
   })
   output$plots = renderPlot({
     ## to make sure the time zone is handled correctly
