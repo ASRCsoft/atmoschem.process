@@ -247,7 +247,7 @@ make_processing_plot = function(s, ds, m, t1, t2, plot_types, logt = F,
       scale_color_manual(values = c('black', 'red')) +
       scale_shape_manual(values = c(19, NA)) +
       scale_linetype_manual(values = c('blank', 'solid')) +
-      xlim(t1, t2) +
+      coord_cartesian(xlim = c(t1, t2)) +
       facet_wrap(~ label, ncol = 1, scales = 'free_y',
                  strip.position = 'right') +
       xlab('Time (EST)') + ylab('value')
@@ -264,7 +264,7 @@ make_processing_plot = function(s, ds, m, t1, t2, plot_types, logt = F,
       scale_color_manual(values = c('black', 'red')) +
       scale_shape_manual(values = c(19, NA)) +
       scale_linetype_manual(values = c('blank', 'solid')) +
-      xlim(t1, t2) +
+      coord_cartesian(xlim = c(t1, t2)) +
       facet_wrap(~ label, ncol = 1, scales = 'free_y',
                  strip.position = 'right') +
       xlab('Time (EST)') + ylab('value')
