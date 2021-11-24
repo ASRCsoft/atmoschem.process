@@ -141,22 +141,9 @@ select end_time as time
   as.POSIXct(res[, 1], tz = 'EST')
 }
 
-# get_ces = function(measure, t1, t2) {
-#   ces = obj %>%
-#     atmoschem.process:::get_ces(measure)
-#   if (nrow(ces) > 0) {
-#     ces = ces %>%
-#       select(time, efficiency, flagged) %>%
-#       mutate(filtered_value =
-#                atmoschem.process:::estimate_ces(obj, measure, time)) %>%
-#       filter(ifelse(is.na(lead(time)), time > t1, lead(time) > t1),
-#              ifelse(is.na(lag(time)), time < t2, lag(time) < t2)) %>%
-#       gather(filtered, value, -time, -flagged) %>%
-#       mutate(filtered = filtered == 'filtered_value',
-#              flagged = ifelse(filtered, FALSE, flagged))
-#   }
-#   ces
-# }
+get_ceffs = function(s, ds, m, t1, t2) {
+  .get_cals(s, ds, m, 'CE', t1, t2)
+}
 
 get_hourly = function(s, ds, m, t1, t2) {
   dbpath = file.path(interm_dir, paste0('hourly_', s, '_', ds, '.sqlite'))
@@ -201,15 +188,6 @@ make_processing_plot = function(s, ds, m, t1, t2, plot_types, logt = F,
     has_hourly = F
   }
   if (logt) ylabel = paste('Log', ylabel)
-
-  # temporarily, until I rewrite the CE functions
-  has_ce = F
-  if (has_ce) ces = get_ces(m, t1, t2)
-  if (has_ce && nrow(ces) > 0) {
-    ces$label = 'Conversion Efficiency'
-    ces = ces[, c('time', 'value', 'label', 'flagged', 'filtered')]
-    df_list$ces = ces
-  }
 
   # organize subplots
   n = 1
@@ -274,6 +252,23 @@ make_processing_plot = function(s, ds, m, t1, t2, plot_types, logt = F,
                  strip.position = 'right') +
       xlab('Time (EST)') + ylab('value')
     rel_heights = c(rel_heights, length(unique(cals$label)))
+    n = n + 1
+  }
+
+  if (has_ce && nrow(ceffs <- get_ceffs(s, ds, m, t1, t2))) {
+    if (!show_flagged) ceffs$value[ceffs$flagged] = NA
+    plist[[n]] = ggplot(ceffs, aes(x = time, y = value, color = flagged,
+                                   group = filtered)) +
+      geom_point(aes(shape = filtered)) +
+      geom_line(aes(linetype = filtered), color = 'black') +
+      scale_color_manual(values = c('black', 'red')) +
+      scale_shape_manual(values = c(19, NA)) +
+      scale_linetype_manual(values = c('blank', 'solid')) +
+      xlim(t1, t2) +
+      facet_wrap(~ label, ncol = 1, scales = 'free_y',
+                 strip.position = 'right') +
+      xlab('Time (EST)') + ylab('value')
+    rel_heights = c(rel_heights, 1)
     n = n + 1
   }
 
