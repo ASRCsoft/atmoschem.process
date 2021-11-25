@@ -177,6 +177,8 @@ WFMS,campbell,WS3Cup_Max,"[2021-02-02 06:00, 2021-02-24 17:24)",AN,instrument fr
 WFMS,DEC_envidas,O3,"[2021-04-05 03:12, 2021-04-06 09:39)",AV,power failure
 WFMS,envidas,NO,"[2021-04-20 16:23, 2021-04-28 10:30)",AN,NOx pump died
 WFMS,envidas,NOX,"[2021-04-20 16:23, 2021-04-28 10:30)",AN,NOx pump died
+WFMS,envidas,CO,"[2021-06-01 08:11, 2021-06-01 10:57)",AV,power failure
+WFMS,envidas,CO,"[2021-06-28 07:35, 2021-06-28 08:14)",AV,power failure
 WFMB,campbell,NO_Avg,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
 WFMB,campbell,NOX_Avg,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
 WFMB,campbell,CO_Avg,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
