@@ -197,6 +197,10 @@ if (site == 'WFMS') {
     transform(data_source = 'envidas') %>%
     # NOx_Avg is NOX, NOy_Avg is NOY in envidas (all uppercase)
     transform(measurement_name = toupper(sub('_Avg', '', measurement_name)))
+  # Campbell CO data is offset by 200 compared to Envidas CO
+  co_cal = envidas_mcals$measurement_name == 'CO'
+  envidas_mcals$measured_value[co_cal] =
+    envidas_mcals$measured_value[co_cal] - 200
   mcals = rbind(mcals, envidas_mcals)
 }
 
