@@ -150,6 +150,10 @@ make_corrections = function(f, dat) {
                       dat$time <= '2020-11-16 09:44'] = F
       dat$flagged.VWD[dat$time >= '2020-11-04 09:23' &
                       dat$time <= '2020-11-16 09:44'] = F
+      dat$flagged.NO[dat$time >= as.POSIXct('2021-05-11 13:45', tz = 'EST') &
+                     dat$time < as.POSIXct('2021-05-12 07:28', tz = 'EST')] = F
+      dat$flagged.NOx[dat$time >= as.POSIXct('2021-05-11 13:45', tz = 'EST') &
+                      dat$time < as.POSIXct('2021-05-12 07:28', tz = 'EST')] = F
     }
   }
   dat
