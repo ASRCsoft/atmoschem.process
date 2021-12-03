@@ -55,7 +55,7 @@ check_data:
 ## clean_data : Remove intermediate data processing files.
 .PHONY: clean_data
 clean_data:
-	@rm $(raw_data) && rm -rf $(raw_dir) && rm -rf $(interm_dir) && rm -rf $(out_dir)
+	@rm -rf $(raw_dir) && rm -rf $(interm_dir) && rm -rf $(out_dir)
 
 # save intermediate sqlite files for the processing viewer
 .SECONDARY:
