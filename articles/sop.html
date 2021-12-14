@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">atmoschem.process</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -67,7 +63,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/ASRCsoft/atmoschem.process/">
+  <a href="https://github.com/ASRCsoft/atmoschem.process/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -86,29 +82,29 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Data Manager Standard Operating Procedures</h1>
-                        <h4 class="author">William May</h4>
+                        <h4 data-toc-skip class="author">William May</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ASRCsoft/atmoschem.process/blob/master/vignettes/sop.Rmd"><code>vignettes/sop.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ASRCsoft/atmoschem.process/blob/HEAD/vignettes/sop.Rmd" class="external-link"><code>vignettes/sop.Rmd</code></a></small>
       <div class="hidden name"><code>sop.Rmd</code></div>
 
     </div>
 
     
     
-<div id="getting-data" class="section level1">
-<h1 class="hasAnchor">
-<a href="#getting-data" class="anchor"></a>Getting Data</h1>
+<div class="section level1">
+<h1 id="getting-data">Getting Data<a class="anchor" aria-label="anchor" href="#getting-data"></a>
+</h1>
 <p>The Whiteface Mountain datasets can be obtained on the atmoschem server. These include a calibration sheet, a flag report sheet, and the individual data files. Data can also be accessed through the Campbell datalogger, currently made available on the webdev server.</p>
 <p>Most Pinnacle State Park data is recieved via email from the site operator, with the exception of the Envidas files. Currently the data manager accesses the Pinnacle computer using VNC, then generates the data file with Envidas and downloads it over VNC. Some relevant data is stored in a logbook. Sections of the logbook are scanned and emailed periodically to the ASRC data manager, and when logbooks are filled they’re sent to the ASRC for more scanning and archiving, before being sent back to Pinnacle.</p>
-<p>Most Queens College data is obtained from the <a href="https://aqs.epa.gov/aqsweb/documents/data_mart_welcome.html">EPA Air Quality System Data Mart</a>. Ultrafine data is emailed monthly from the Queens College data manager.</p>
+<p>Most Queens College data is obtained from the <a href="https://aqs.epa.gov/aqsweb/documents/data_mart_welcome.html" class="external-link">EPA Air Quality System Data Mart</a>. Ultrafine data is emailed monthly from the Queens College data manager.</p>
 </div>
-<div id="making-changes" class="section level1">
-<h1 class="hasAnchor">
-<a href="#making-changes" class="anchor"></a>Making Changes</h1>
+<div class="section level1">
+<h1 id="making-changes">Making Changes<a class="anchor" aria-label="anchor" href="#making-changes"></a>
+</h1>
 <p>Any changes to the processing procedures should be clearly documented. This means the new code (if applicable) should be available on Github, and the change should be noted in the Github repository changelog as well as the data manager SOP.</p>
 <p>When making changes to the processing code, experimental changes and works in progress should be saved to separate git branches so that others can still use the code from the master branch. When the changes are completed and ready for use in the production database they should be merged into the master branch. Before merging into master it should also be verified that the code passes all automated tests.</p>
-<p>The changelog follows the format described at <a href="https://keepachangelog.com">keepachangelog.com</a>.</p>
+<p>The changelog follows the format described at <a href="https://keepachangelog.com" class="external-link">keepachangelog.com</a>.</p>
 </div>
   </div>
 
@@ -123,11 +119,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by William May, <a href="https://www.nyserda.ny.gov/">NYSERDA</a>.</p>
+  <p></p>
+<p>Developed by William May, <a href="https://www.nyserda.ny.gov/" class="external-link">NYSERDA</a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -135,6 +133,8 @@
 
   
 
+
+  
 
   </body>
 </html>

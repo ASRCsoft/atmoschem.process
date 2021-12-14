@@ -21,6 +21,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -33,18 +35,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">atmoschem.process</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
@@ -69,7 +65,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/ASRCsoft/atmoschem.process/">
+  <a href="https://github.com/ASRCsoft/atmoschem.process/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -86,15 +82,15 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="asrc-atmospheric-chemistry-data-processing" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#asrc-atmospheric-chemistry-data-processing" class="anchor"></a>ASRC Atmospheric Chemistry Data Processing</h1></div>
+<div class="section level1">
+<div class="page-header"><h1 id="asrc-atmospheric-chemistry-data-processing">ASRC Atmospheric Chemistry Data Processing<a class="anchor" aria-label="anchor" href="#asrc-atmospheric-chemistry-data-processing"></a>
+</h1></div>
 
 <p><img src="reference/figures/whiteface-station.jpg" width="400px" align="right" style="padding:0px 10px 10px 10px;"></p>
 <p>The <code>atmoschem.process</code> R package processes atmospheric chemistry data from ASRC sites in New York State. It provides tools to generate reports and processed datasets from the ASRC’s atmospheric chemistry data, and tools to visualize the data.</p>
-<div id="table-of-contents" class="section level2">
-<h2 class="hasAnchor">
-<a href="#table-of-contents" class="anchor"></a>Table of contents</h2>
+<div class="section level2">
+<h2 id="table-of-contents">Table of contents<a class="anchor" aria-label="anchor" href="#table-of-contents"></a>
+</h2>
 <ul>
 <li><a href="#overview">Overview</a></li>
 <li><a href="#installation">Installation</a></li>
@@ -104,95 +100,95 @@
 <li><a href="#references">References</a></li>
 </ul>
 </div>
-<div id="overview" class="section level2">
-<h2 class="hasAnchor">
-<a href="#overview" class="anchor"></a>Overview</h2>
+<div class="section level2">
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
 <p>The atmospheric chemistry group at the ASRC, run by Dr. Jim Schwab, collects data from instruments at 4 sites across the state of New York: Whiteface Mountain (summit and base), Pinnacle State Park, and Queens College. We maintain a variety of instruments measuring ozone and ozone precursors, airborne particulate matter, sulfur dioxide, and meteorology.</p>
-<p>The data undergoes a variety of adjustments and quality assurance checks before being released to the public, where it is used by government agencies and atmospheric science researchers, among others. Users can access the datasets online via our website at <a href="http://atmoschem.asrc.cestm.albany.edu/" class="uri">http://atmoschem.asrc.cestm.albany.edu/</a>.</p>
+<p>The data undergoes a variety of adjustments and quality assurance checks before being released to the public, where it is used by government agencies and atmospheric science researchers, among others. Users can access the datasets online via our website at <a href="http://atmoschem.asrc.cestm.albany.edu/" class="external-link uri">http://atmoschem.asrc.cestm.albany.edu/</a>.</p>
 <p>This software, which generates the processed datasets, synthesizes advice from atmospheric monitoring, statistical programming, and data management. In terms of data processing, we tend to follow guidelines from NARSTO (Christensen et al. <a href="#ref-christensen_narsto_2000">2000</a>), and we also work regularly with EPA standards. The code is organized as an R package (Marwick, Boettiger, and Mullen <a href="#ref-marwick_packaging_2018">2018</a>), and we use GitHub for project management (Bryan <a href="#ref-bryan_excuse_2018">2018</a>). For data management, we tend to follow Briney (<a href="#ref-briney_data_2015">2015</a>), and we try to make the data convenient to use (White et al. <a href="#ref-white_nine_2013">2013</a>).</p>
 <p>The data collection at Whiteface Mountain is described in detail in a series of publications (Schwab, Wolfe, et al. <a href="#ref-schwab_atmospheric_2016">2016</a>; Brandt et al. <a href="#ref-brandt_atmospheric_2016">2016</a>; Schwab, Casson, et al. <a href="#ref-schwab_atmospheric_2016-1">2016</a>), and another paper describes the measurements at Pinnacle State Park (Schwab, Spicer, and Demerjian <a href="#ref-schwab_ozone_2009">2009</a>).</p>
 </div>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <p>To install the package, run (from within R)</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">'remotes'</span><span class="op">)</span>
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">'ASRCsoft/atmoschem.process'</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'remotes'</span><span class="op">)</span>
+<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">'ASRCsoft/atmoschem.process'</span><span class="op">)</span></code></pre></div>
 <p>To generate the processed dataset, additional dependencies are requried:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">'ASRCsoft/atmoschem.process'</span>, dependencies <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">'ASRCsoft/atmoschem.process'</span>, dependencies <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="reproducing-the-routine-chemistry-dataset" class="section level2">
-<h2 class="hasAnchor">
-<a href="#reproducing-the-routine-chemistry-dataset" class="anchor"></a>Reproducing the routine chemistry dataset</h2>
-<div id="requirements" class="section level3">
-<h3 class="hasAnchor">
-<a href="#requirements" class="anchor"></a>Requirements</h3>
+<div class="section level2">
+<h2 id="reproducing-the-routine-chemistry-dataset">Reproducing the routine chemistry dataset<a class="anchor" aria-label="anchor" href="#reproducing-the-routine-chemistry-dataset"></a>
+</h2>
+<div class="section level3">
+<h3 id="requirements">Requirements<a class="anchor" aria-label="anchor" href="#requirements"></a>
+</h3>
 <ul>
 <li>R and R package dependencies</li>
 <li>GNU Make</li>
 <li>15GB of disk space and 8GB of RAM</li>
-<li>An Air Quality System API key (get one <a href="https://aqs.epa.gov/aqsweb/documents/data_api.html">here</a>)</li>
-<li>A user/password for the ASRC’s atmoschem server (sign up <a href="http://atmoschem.asrc.cestm.albany.edu/">here</a>)</li>
+<li>An Air Quality System API key (get one <a href="https://aqs.epa.gov/aqsweb/documents/data_api.html" class="external-link">here</a>)</li>
+<li>A user/password for the ASRC’s atmoschem server (sign up <a href="http://atmoschem.asrc.cestm.albany.edu/" class="external-link">here</a>)</li>
 </ul>
 </div>
-<div id="creating-the-dataset" class="section level3">
-<h3 class="hasAnchor">
-<a href="#creating-the-dataset" class="anchor"></a>Creating the dataset</h3>
+<div class="section level3">
+<h3 id="creating-the-dataset">Creating the dataset<a class="anchor" aria-label="anchor" href="#creating-the-dataset"></a>
+</h3>
 <p>Download or clone the repository. The dataset package can be generated by running, from a terminal,</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="bu">cd</span> /path/to/atmoschem.process</span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="fu">make</span> routine asrc_user=youruser asrc_pass=yourpassword aqs_email=youremail aqs_key=yourkey</span></code></pre></div>
 <p>(replacing the values with your information).</p>
 <p>Run <code>make help</code> to see more make options.</p>
 </div>
-<div id="viewing-the-data" class="section level3">
-<h3 class="hasAnchor">
-<a href="#viewing-the-data" class="anchor"></a>Viewing the data</h3>
+<div class="section level3">
+<h3 id="viewing-the-data">Viewing the data<a class="anchor" aria-label="anchor" href="#viewing-the-data"></a>
+</h3>
 <p>The R package comes with a Shiny app for viewing the processing steps. After data has been processed, it can be launched with <code>make</code>:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">make</span> view</span></code></pre></div>
 </div>
 </div>
-<div id="citation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#citation" class="anchor"></a>Citation</h2>
-<p>Please cite this package using the citation available from Zenodo: <a href="https://zenodo.org/badge/latestdoi/157783204"><img src="https://zenodo.org/badge/157783204.svg" alt="DOI"></a></p>
+<div class="section level2">
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
+</h2>
+<p>Please cite this package using the citation available from Zenodo: <a href="https://zenodo.org/badge/latestdoi/157783204" class="external-link"><img src="https://zenodo.org/badge/157783204.svg" alt="DOI"></a></p>
 </div>
-<div id="license" class="section level2">
-<h2 class="hasAnchor">
-<a href="#license" class="anchor"></a>License</h2>
+<div class="section level2">
+<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
+</h2>
 <p><code>atmoschem.process</code> is released under the open source MIT license.</p>
 </div>
-<div id="references" class="section level2">
-<h2 class="hasAnchor">
-<a href="#references" class="anchor"></a>References</h2>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
 <div id="refs" class="references">
 <div id="ref-brandt_atmospheric_2016">
-<p>Brandt, Richard E., James J. Schwab, Paul W. Casson, Utpal K. Roychowdhury, Douglas Wolfe, Kenneth L. Demerjian, Kevin L. Civerolo, Oliver V. Rattigan, and H. Dirk Felton. 2016. “Atmospheric Chemistry Measurements at Whiteface Mountain, NY: Ozone and Reactive Trace Gases.” <em>Aerosol and Air Quality Research</em> 16 (3): 873–84. <a href="https://doi.org/10.4209/aaqr.2015.05.0376" class="uri">https://doi.org/10.4209/aaqr.2015.05.0376</a>.</p>
+<p>Brandt, Richard E., James J. Schwab, Paul W. Casson, Utpal K. Roychowdhury, Douglas Wolfe, Kenneth L. Demerjian, Kevin L. Civerolo, Oliver V. Rattigan, and H. Dirk Felton. 2016. “Atmospheric Chemistry Measurements at Whiteface Mountain, NY: Ozone and Reactive Trace Gases.” <em>Aerosol and Air Quality Research</em> 16 (3): 873–84. <a href="https://doi.org/10.4209/aaqr.2015.05.0376" class="external-link uri">https://doi.org/10.4209/aaqr.2015.05.0376</a>.</p>
 </div>
 <div id="ref-briney_data_2015">
 <p>Briney, Kristin. 2015. <em>Data Management for Researchers: Organize, Maintain and Share Your Data for Research Success</em>. Pelagic Publishing Ltd.</p>
 </div>
 <div id="ref-bryan_excuse_2018">
-<p>Bryan, Jennifer. 2018. “Excuse Me, Do You Have a Moment to Talk About Version Control?” <em>The American Statistician</em> 72 (1): 20–27. <a href="https://doi.org/10.1080/00031305.2017.1399928" class="uri">https://doi.org/10.1080/00031305.2017.1399928</a>.</p>
+<p>Bryan, Jennifer. 2018. “Excuse Me, Do You Have a Moment to Talk About Version Control?” <em>The American Statistician</em> 72 (1): 20–27. <a href="https://doi.org/10.1080/00031305.2017.1399928" class="external-link uri">https://doi.org/10.1080/00031305.2017.1399928</a>.</p>
 </div>
 <div id="ref-christensen_narsto_2000">
-<p>Christensen, Sigurd W., Thomas A. Boden, Les A. Hook, and Meng-Dawn Cheng. 2000. “NARSTO Data Management Handbook.” NARSTO Quality Systems Science Center. <a href="https://web.archive.org/web/20030401082229/http://cdiac.esd.ornl.gov:80/programs/NARSTO/pdf/dmhb_current_version.PDF" class="uri">https://web.archive.org/web/20030401082229/http://cdiac.esd.ornl.gov:80/programs/NARSTO/pdf/dmhb_current_version.PDF</a>.</p>
+<p>Christensen, Sigurd W., Thomas A. Boden, Les A. Hook, and Meng-Dawn Cheng. 2000. “NARSTO Data Management Handbook.” NARSTO Quality Systems Science Center. <a href="https://web.archive.org/web/20030401082229/http://cdiac.esd.ornl.gov:80/programs/NARSTO/pdf/dmhb_current_version.PDF" class="external-link uri">https://web.archive.org/web/20030401082229/http://cdiac.esd.ornl.gov:80/programs/NARSTO/pdf/dmhb_current_version.PDF</a>.</p>
 </div>
 <div id="ref-marwick_packaging_2018">
-<p>Marwick, Ben, Carl Boettiger, and Lincoln Mullen. 2018. “Packaging Data Analytical Work Reproducibly Using R (and Friends).” <em>The American Statistician</em> 72 (1): 80–88. <a href="https://doi.org/10.1080/00031305.2017.1375986" class="uri">https://doi.org/10.1080/00031305.2017.1375986</a>.</p>
+<p>Marwick, Ben, Carl Boettiger, and Lincoln Mullen. 2018. “Packaging Data Analytical Work Reproducibly Using R (and Friends).” <em>The American Statistician</em> 72 (1): 80–88. <a href="https://doi.org/10.1080/00031305.2017.1375986" class="external-link uri">https://doi.org/10.1080/00031305.2017.1375986</a>.</p>
 </div>
 <div id="ref-schwab_atmospheric_2016-1">
-<p>Schwab, James J., Paul Casson, Richard Brandt, Liquat Husain, Vincent Dutkewicz, Douglas Wolfe, Kenneth L. Demerjian, et al. 2016. “Atmospheric Chemistry Measurements at Whiteface Mountain, NY: Cloud Water Chemistry, Precipitation Chemistry, and Particulate Matter.” <em>Aerosol and Air Quality Research</em> 16 (3): 841–54. <a href="https://doi.org/10.4209/aaqr.2015.05.0344" class="uri">https://doi.org/10.4209/aaqr.2015.05.0344</a>.</p>
+<p>Schwab, James J., Paul Casson, Richard Brandt, Liquat Husain, Vincent Dutkewicz, Douglas Wolfe, Kenneth L. Demerjian, et al. 2016. “Atmospheric Chemistry Measurements at Whiteface Mountain, NY: Cloud Water Chemistry, Precipitation Chemistry, and Particulate Matter.” <em>Aerosol and Air Quality Research</em> 16 (3): 841–54. <a href="https://doi.org/10.4209/aaqr.2015.05.0344" class="external-link uri">https://doi.org/10.4209/aaqr.2015.05.0344</a>.</p>
 </div>
 <div id="ref-schwab_ozone_2009">
-<p>Schwab, James J., John B. Spicer, and Kenneth L. Demerjian. 2009. “Ozone, Trace Gas, and Particulate Matter Measurements at a Rural Site in Southwestern New York State: 1995–2005.” <em>Journal of the Air &amp; Waste Management Association</em> 59 (3): 293–309. <a href="https://doi.org/10.3155/1047-3289.59.3.293" class="uri">https://doi.org/10.3155/1047-3289.59.3.293</a>.</p>
+<p>Schwab, James J., John B. Spicer, and Kenneth L. Demerjian. 2009. “Ozone, Trace Gas, and Particulate Matter Measurements at a Rural Site in Southwestern New York State: 1995–2005.” <em>Journal of the Air &amp; Waste Management Association</em> 59 (3): 293–309. <a href="https://doi.org/10.3155/1047-3289.59.3.293" class="external-link uri">https://doi.org/10.3155/1047-3289.59.3.293</a>.</p>
 </div>
 <div id="ref-schwab_atmospheric_2016">
-<p>Schwab, James J., Douglas Wolfe, Paul Casson, Richard Brandt, Kenneth L. Demerjian, Liquat Husain, Vincent A. Dutkiewicz, Kevin L. Civerolo, and Oliver V. Rattigan. 2016. “Atmospheric Science Research at Whiteface Mountain, NY: Site Description and History.” <em>Aerosol and Air Quality Research</em> 16 (3): 827–40. <a href="https://doi.org/10.4209/aaqr.2015.05.0343" class="uri">https://doi.org/10.4209/aaqr.2015.05.0343</a>.</p>
+<p>Schwab, James J., Douglas Wolfe, Paul Casson, Richard Brandt, Kenneth L. Demerjian, Liquat Husain, Vincent A. Dutkiewicz, Kevin L. Civerolo, and Oliver V. Rattigan. 2016. “Atmospheric Science Research at Whiteface Mountain, NY: Site Description and History.” <em>Aerosol and Air Quality Research</em> 16 (3): 827–40. <a href="https://doi.org/10.4209/aaqr.2015.05.0343" class="external-link uri">https://doi.org/10.4209/aaqr.2015.05.0343</a>.</p>
 </div>
 <div id="ref-white_nine_2013">
-<p>White, Ethan P., Elita Baldridge, Zachary T. Brym, Kenneth J. Locey, Daniel J. McGlinn, and Sarah R. Supp. 2013. “Nine Simple Ways to Make It Easier to (Re)use Your Data.” <em>Ideas in Ecology and Evolution</em> 6 (2). <a href="https://doi.org/10.4033/iee.2013.6b.6.f" class="uri">https://doi.org/10.4033/iee.2013.6b.6.f</a>.</p>
+<p>White, Ethan P., Elita Baldridge, Zachary T. Brym, Kenneth J. Locey, Daniel J. McGlinn, and Sarah R. Supp. 2013. “Nine Simple Ways to Make It Easier to (Re)use Your Data.” <em>Ideas in Ecology and Evolution</em> 6 (2). <a href="https://doi.org/10.4033/iee.2013.6b.6.f" class="external-link uri">https://doi.org/10.4033/iee.2013.6b.6.f</a>.</p>
 </div>
 </div>
 </div>
@@ -201,50 +197,61 @@
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="https://github.com/ASRCsoft/atmoschem.process/">https://​github.com/​ASRCsoft/​atmoschem.process/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/ASRCsoft/atmoschem.process/issues">https://​github.com/​ASRCsoft/​atmoschem.process/​issues</a>
-</li>
-</ul>
-</div>
-<div class="license">
-<h2>License</h2>
-<ul class="list-unstyled">
-<li>
-<a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a>
-</li>
-</ul>
-</div>
-<div class="developers">
-<h2>Developers</h2>
-<ul class="list-unstyled">
-<li>William May <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-3201-1885" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>
-<a href="https://www.nyserda.ny.gov/">NYSERDA</a> <br><small class="roles"> Funder </small>  </li>
-<li><a href="authors.html">All authors...</a></li>
+<li><a href="https://github.com/ASRCsoft/atmoschem.process/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/ASRCsoft/atmoschem.process/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="license">
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/ASRCsoft/atmoschem.process/actions"><img src="https://github.com/ASRCsoft/atmoschem.process/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
-<li><a href="https://codecov.io/gh/ASRCsoft/atmoschem.process?branch=master"><img src="https://codecov.io/gh/ASRCsoft/atmoschem.process/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
-<li><a href="https://zenodo.org/badge/latestdoi/157783204"><img src="https://zenodo.org/badge/157783204.svg" alt="DOI"></a></li>
+<li>
+<a href="https://opensource.org/licenses/mit-license.php" class="external-link">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a>
+</li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing atmoschem.process</a></li>
+</ul>
 </div>
+
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
+<ul class="list-unstyled">
+<li>William May <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-3201-1885" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>
+<a href="https://www.nyserda.ny.gov/" class="external-link">NYSERDA</a> <br><small class="roles"> Funder </small>  </li>
+<li><a href="authors.html">More about authors...</a></li>
+</ul>
+</div>
+
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/ASRCsoft/atmoschem.process/actions" class="external-link"><img src="https://github.com/ASRCsoft/atmoschem.process/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+<li><a href="https://codecov.io/gh/ASRCsoft/atmoschem.process?branch=master" class="external-link"><img src="https://codecov.io/gh/ASRCsoft/atmoschem.process/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
+<li><a href="https://zenodo.org/badge/latestdoi/157783204" class="external-link"><img src="https://zenodo.org/badge/157783204.svg" alt="DOI"></a></li>
+</ul>
+</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by William May, <a href="https://www.nyserda.ny.gov/">NYSERDA</a>.</p>
+  <p></p>
+<p>Developed by William May, <a href="https://www.nyserda.ny.gov/" class="external-link">NYSERDA</a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -252,6 +259,8 @@
 
   
 
+
+  
 
   </body>
 </html>
