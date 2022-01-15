@@ -1,0 +1,11 @@
+site,datalogger,parameter,time,value
+WFMS,aethelometer,concentration_880,2021-05-01 00:00:00,18.7
+WFMS,campbell,NO_Avg,2021-05-01 00:00:00,-0.12
+WFMS,DEC_envidas,O3,2021-05-01 00:02:00,0.03405
+WFMS,envidas,NO,2021-05-01 00:19:00,1.217
+WFMS,ultrafine,Concentration,2021-05-01 00:00:51,91.9
+WFMB,campbell,NO_Avg,2021-05-01 00:00:00,0.894
+WFMB,envidas,SO2,2021-05-01 00:02:00,0.1664
+WFMB,mesonet,wind_speed [m/s],2021-05-01 00:00:00,4.23
+PSP,envidas,Noy-DEC,2021-05-01 00:01:00,0.01767
+PSP,mesonet,wind_speed [m/s],2021-05-01 00:00:00,5.9
