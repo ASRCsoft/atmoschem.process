@@ -12,9 +12,7 @@ transform_wfms_aethelometer = function(f) {
   }
   df$instrument_time =
     as.POSIXct(strptime(paste(df$V1, df$V2),
-                        '%d-%B-%y %H:%M', tz = 'GMT'))
-  ## GMT is used here to keep R from trying to convert between
-  ## timezones
+                        '%d-%B-%y %H:%M', tz = 'EST'))
   ae_col_names = c('concentration', 'sz', 'sb', 'rz', 'rb',
                    'fraction', 'attenuation')
   names(df)[c(3, 6:11)] = paste(ae_col_names, '880', sep = '_')
