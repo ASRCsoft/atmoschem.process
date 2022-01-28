@@ -295,6 +295,18 @@ WFMB,campbell,NOX_Avg,"[2021-02-19, 2021-02-25 12:00)",AN,pump failed
 WFMB,envidas,PM25C,"[2021-03-12 17:41, 2021-03-12 19:04)",AV,power glitch
 WFMB,envidas,PM25C,"[2021-03-13 14:10, 2021-03-15 12:00)",AV,power glitch
 WFMB,envidas,PM25C,"[2021-03-19 10:16, 2021-03-22 12:00)",AV,power glitch
+WFMB,envidas,PM25C,"[2021-04-06 09:53, 2021-04-06 16:13)",AM,unknown
+WFMB,envidas,PM25C,"[2021-04-11 10:58, 2021-04-12 08:16)",AM,unknown
+WFMB,envidas,PM25C,"[2021-04-14 11:28, 2021-04-15 07:53)",AM,unknown
+WFMB,envidas,PM25C,"[2021-04-18 10:50, 2021-04-18 18:53)",AM,unknown
+WFMB,envidas,PM25C,"[2021-04-20 03:46, 2021-04-20 07:30)",AM,unknown
+WFMB,envidas,PM25C,"[2021-04-23 09:00, 2021-04-23 16:14)",AM,unknown
+WFMB,envidas,PM25C,"[2021-04-25 01:49, 2021-04-25 21:00)",AM,unknown
+WFMB,envidas,PM25C,"[2021-04-28 01:11, 2021-04-28 08:00)",AM,unknown
+WFMB,envidas,PM25C,"[2021-05-23, 2021-05-23 11:16)",AM,unknown
+WFMB,campbell,NGN3_Avg,"[2021-05-23 12:00, 2021-05-24 15:12)",AM,unknown
+WFMB,envidas,PM25C,"[2021-06-17 09:00, 2021-06-17 21:00)",AM,unknown
+WFMB,envidas,PM25C,"[2021-06-21 16:26, 2021-06-22 14:08)",AV,power glitch
 PSP,envidas,CO,"[2018-10-03 07:08, 2018-10-03 08:00)",AN,instrument reset
 PSP,envidas,Dichot(10)MC,"[2018-10-04 12:01, 2018-10-04 14:46)",AT,calibration
 PSP,envidas,Dichot(10)RefMC,"[2018-10-04 12:01, 2018-10-04 14:46)",AT,calibration
