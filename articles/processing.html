@@ -97,9 +97,9 @@
     font-style: italic;
 }
 </style>
-<div class="section level1">
-<h1 id="scripts">Scripts<a class="anchor" aria-label="anchor" href="#scripts"></a>
-</h1>
+<div class="section level2">
+<h2 id="scripts">Scripts<a class="anchor" aria-label="anchor" href="#scripts"></a>
+</h2>
 <p>Data processing instructions are stored as a set of scripts under the <code>analysis/scripts</code> folder. The following flowchart shows the relationship between scripts and data files, leading to the final packaged dataset:</p>
 <div class="figure">
 <img src="processing_files/figure-html/scripts-1.png" alt="Processing flowchart. Green boxes are data files and gray ellipses are scripts. Text in angle brackets depends on options provided to the script." width="700"><p class="caption">
@@ -109,9 +109,9 @@ Processing flowchart. Green boxes are data files and gray ellipses are scripts. 
 <p>The scripts are typically run indirectly via <code>make</code>, but instructions for running them individually can be found at the top of each script.</p>
 <p>Data files are stored under <code>analysis/raw</code>, <code>analysis/intermediate</code>, and <code>analysis/out</code>. Most intermediate files are stored in sqlite format so that they can be easily queried by the viewer app.</p>
 </div>
-<div class="section level1">
-<h1 id="configuration">Configuration<a class="anchor" aria-label="anchor" href="#configuration"></a>
-</h1>
+<div class="section level2">
+<h2 id="configuration">Configuration<a class="anchor" aria-label="anchor" href="#configuration"></a>
+</h2>
 <p>Many aspects of the data processing are controlled by a collection of csv files stored under <code>analysis/config</code>. The files are organized like a normalized relational database, as shown below.</p>
 <div class="figure">
 <img src="processing_files/figure-html/config-1.png" alt='Data model of the configuration files. Each arrow is a foreign key relationship. For example, A-&gt;B can be read as "each A has a B".' width="700"><p class="caption">
@@ -138,7 +138,7 @@ Data model of the configuration files. Each arrow is a foreign key relationship.
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
