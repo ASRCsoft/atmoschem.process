@@ -1,0 +1,10 @@
+site,data_source,measurement_name,times,explanation
+PSP,envidas,NO,"[2021-06-23 10:00, 2021-06-23 14:00)",wildfire smoke
+PSP,envidas,NOx,"[2021-06-23 10:00, 2021-06-23 14:00)",wildfire smoke
+PSP,envidas,NOy,"[2021-06-23 10:00, 2021-06-23 14:00)",wildfire smoke
+PSP,envidas,NOy-HNO3,"[2021-06-23 10:00, 2021-06-23 14:00)",wildfire smoke
+PSP,envidas,NO2,"[2021-06-23 10:00, 2021-06-23 14:00)",wildfire smoke
+PSP,envidas,CO,"[2021-06-23 10:00, 2021-06-23 14:00)",wildfire smoke
+PSP,envidas,NOy-DEC,"[2021-06-23 10:00, 2021-06-23 14:00)",wildfire smoke
+PSP,envidas,NGN3a-BScatt,"[2021-06-23 10:00, 2021-06-23 14:00)",wildfire smoke
+PSP,envidas,Concentration,"[2021-06-23 10:00, 2021-06-23 14:00)",wildfire smoke

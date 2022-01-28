@@ -150,6 +150,9 @@ if (nrow(acals_ds)) {
 # manual flags
 mflags_ds = config$manual_flags[config$manual_flags$site == site &
                                 config$manual_flags$data_source == data_source, ]
+manual_unflags = config$manual_unflag[config$manual_unflag$site == site &
+                                      config$manual_unflag$data_source == data_source, ]
+manual_unflags$times = atmoschem.process:::as_interval(manual_unflags$times)
 for (mname in unique(mflags_ds$measurement_name)) {
   meas_flags = subset(mflags_ds, measurement_name == mname)
   meas_flag_periods = atmoschem.process:::as_interval(meas_flags$times)
@@ -221,6 +224,7 @@ for (n in 1:nrow(mtypes)) {
     m_spans = subset(m_cals, type == 'span')
     m_ces = subset(m_cals, type == 'CE')
     m_conf = add_flag_params(subset(mtypes, name == mname))
+    unflags = subset(manual_unflags, measurement_name == mname)
     tryCatch({
       if (is_true(m_conf$has_calibration)) {
         msmts$value = drift_correct(msmts$time, msmts$value, m_zeros, m_spans,
@@ -231,8 +235,14 @@ for (n in 1:nrow(mtypes)) {
           atmoschem.process:::ceff_correct(msmts$time, msmts$value, m_ces,
                                            m_conf)
       }
-      msmts$flagged = atmoschem.process:::is_flagged(msmts$value, m_conf,
-                                                     msmts$flagged)
+      if (nrow(unflags)) {
+        unflagged = msmts$time %within% as.list(unflags$times)
+      } else {
+        unflagged = F
+      }
+      autoflagged = atmoschem.process:::is_flagged(msmts$value, m_conf,
+                                                   msmts$flagged) & !unflagged
+      msmts$flagged = msmts$flagged | autoflagged
       # write to pr_meas
       pr_meas[, paste0('value.', mname)] = msmts$value
       pr_meas[, paste0('flagged.', mname)] = msmts$flagged
@@ -395,6 +405,7 @@ for (mname in derived) {
   m_spans = subset(m_cals, type == 'span')
   m_ces = subset(m_cals, type == 'CE')
   m_conf = add_flag_params(subset(mtypes, name == mname))
+  unflags = subset(manual_unflags, measurement_name == mname)
   tryCatch({
     if (is_true(m_conf$has_calibration)) {
       msmts$value = drift_correct(msmts$time, msmts$value, m_zeros, m_spans,
@@ -404,8 +415,14 @@ for (mname in derived) {
       msmts$value =
         atmoschem.process:::ceff_correct(msmts$time, msmts$value, m_ces, m_conf)
     }
-    msmts$flagged = atmoschem.process:::is_flagged(msmts$value, m_conf,
-                                                   msmts$flagged)
+    if (nrow(unflags)) {
+      unflagged = msmts$time %within% as.list(unflags$times)
+    } else {
+      unflagged = F
+    }
+    autoflagged = atmoschem.process:::is_flagged(msmts$value, m_conf,
+                                                 msmts$flagged) & !unflagged
+    msmts$flagged = msmts$flagged | autoflagged
     # write to pr_meas
     pr_meas[, paste0('value.', mname)] = msmts$value
     pr_meas[, paste0('flagged.', mname)] = msmts$flagged
