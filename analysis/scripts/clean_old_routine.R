@@ -1,9 +1,26 @@
 ## reorganize and clean the original processed routine data files
 
+library(atmoschem.process)
 library(magrittr)
 
 out_dir = 'analysis/intermediate'
 site = commandArgs(trailingOnly = TRUE)[1]
+config = read_csv_dir('analysis/config')
+
+# When deriving a value from two measurements, decide which of the two flags
+# takes priority
+prioritize_flags = function(f1, f2) {
+  # later flags in this vector are prioritized over the earlier flags
+  flags = c('V0', 'V1', 'V4', 'M1')
+  # check for unexpected flags
+  if (any(!na.omit(c(f1, f2)) %in% flags)) {
+    stop('unprioritized flags ', setdiff(unique(c(f1, f2)), flags))
+  }
+  i1 = match(f1, flags)
+  i2 = match(f2, flags)
+  iout = pmax(i1, i2)
+  flags[iout]
+}
 
 ## convert a list to a named vector
 map_to_dict = function(l) {
@@ -355,6 +372,14 @@ write_site_file = function(site, ...) {
   dflist = lapply(files, read_processed, ...)
   finaldf = merge_dfs(dflist)
   finaldf = finaldf[, order_columns(names(finaldf))]
+  # fix sea level pressure calculations, which incorrectly used inside
+  # temperatures in these files
+  site_info = subset(config$sites, abbreviation == site)
+  site_elev = site_info$elevation
+  finaldf$`SLP (mbar)` =
+    with(finaldf, sea_level_pressure(`BP (mbar)`, `T (degrees C)`, site_elev))
+  finaldf$`SLP (flag)` =
+    with(finaldf, prioritize_flags(`BP (flag)`, `T (flag)`))
   out_path = file.path(out_dir, paste0('old_', site, '.csv'))
   write.csv(finaldf, file = out_path, row.names = F)
 }
