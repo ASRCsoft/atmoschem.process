@@ -107,6 +107,10 @@ $(interm_dir)/raw_%.sqlite: raw_data $(scripts_dir)/load_raw.R
 $(interm_dir)/old_%.csv: $(routine_zip) $(scripts_dir)/clean_old_routine.R
 	$(rscript) -e 'unzip("$(routine_zip)", overwrite = F, exdir = "$(raw_dir)")' && \
 	$(rscript) $(scripts_dir)/clean_old_routine.R $*
+# the old PSP data also depends on the PSP envidas conversion efficiencies, in
+# order to correct some old CE numbers
+$(interm_dir)/old_PSP.csv: $(interm_dir)/processedcals_PSP.sqlite
+
 
 .INTERMEDIATE: raw_data
 raw_data: $(raw_zip)

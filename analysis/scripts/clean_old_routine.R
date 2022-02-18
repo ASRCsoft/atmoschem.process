@@ -7,6 +7,12 @@ out_dir = 'analysis/intermediate'
 site = commandArgs(trailingOnly = TRUE)[1]
 config = read_csv_dir('analysis/config')
 
+if (site == 'PSP') {
+  # will need to read conversion efficiency values
+  library(DBI)
+  library(RSQLite)
+}
+
 # When deriving a value from two measurements, decide which of the two flags
 # takes priority
 prioritize_flags = function(f1, f2) {
@@ -216,6 +222,38 @@ patch_psp = function(f, df) {
     df$`WD (flag)`[raw] = 'M1'
     df$`WS (m/s)`[raw] = NA
     df$`WS (flag)`[raw] = 'M1'
+  }
+  # Conversion efficiencies were miscalculated 2018-08 and 2018-09. See
+  # https://github.com/ASRCsoft/atmoschem.process/issues/127.
+  if (basename(f) == 'PSP2018_v04.csv') {
+    # undo Brian's CE correction
+    mon08 = df$`Time (EST)` >= '2018-08-01' & df$`Time (EST)` < '2018-09-01'
+    mon09 = df$`Time (EST)` >= '2018-09-01' & df$`Time (EST)` < '2018-10-01'
+    df$`NO2 (ppbv)`[mon08] = df$`NO2 (ppbv)`[mon08] * 0.922
+    df$`NO2 (ppbv)`[mon09] = df$`NO2 (ppbv)`[mon09] * 0.929
+    # ^ those two constants came from the excel worksheets for those months
+    # get calculated CE values
+    dbpath = file.path('analysis', 'intermediate', 'processedcals_PSP.sqlite')
+    db = dbConnect(SQLite(), dbpath)
+    sql_text = "
+select *
+  from calibrations
+ where data_source='envidas'
+   and measurement_name='NO2'
+   and type='CE'
+ order by time asc"
+    ce_cals = dbGetQuery(db, sql_text)
+    dbDisconnect(db)
+    ce_cals$time = as.POSIXct(ce_cals$time, tz = 'EST')
+    ce_cals$manual = as.logical(ce_cals$manual)
+    # apply new CE correction
+    needs_ce = mon08 | mon09
+    no2_conf = config$channels %>%
+      subset(site == 'PSP' & data_source == 'envidas' & name == 'NO2')
+    df$`NO2 (ppbv)`[needs_ce] =
+      with(df[needs_ce, ], atmoschem.process:::ceff_correct(`Time (EST)`,
+                                                            `NO2 (ppbv)`,
+                                                            ce_cals, no2_conf))
   }
   df
 }
