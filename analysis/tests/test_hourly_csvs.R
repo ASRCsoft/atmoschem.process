@@ -26,12 +26,12 @@ for (site in config$sites$abbreviation) {
     hourly[[site]] = read.csv(site_csv, check.names = F)
 }
 
-# check numeric formatting (just WFML NO to make sure it's running)
-wfml = hourly[['WFML']]
-no_config = subset(config$channels, site == 'WFML' & data_source == 'campbell' &
-                                    name == 'NO')
+# check numeric formatting (just WFMB NO to make sure it's running)
+wfmb = hourly[['WFMB']]
+no_config = subset(config$channels, site == 'WFMB' & data_source == 'campbell' &
+                                    name == 'NO_Avg')
 no_report_decimals = no_config$report_decimals
-new_no = wfml[wfml$`Time (EST)` >= '2018-10-01', 'NO (ppbv)']
+new_no = wfmb[wfmb$`Time (EST)` >= '2018-10-01', 'NO (ppbv)']
 max_no_decimals =
   max(nchar(sub('^[^.]*\\.?', '', as.character(new_no))), na.rm = T)
 expect_true(max_no_decimals <= no_report_decimals, 'correct number of decimals')
