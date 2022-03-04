@@ -1,6 +1,20 @@
 # version (development version) <small>Unreleased</small>
 ## Added
+- Add 2021 3rd and 4th quarter WFMS, WFML, and PSP data flags.
+
+# version 0.7.0 <small>2022-03-04</small>
+## Added
 - Add 2021 1st and 2nd quarter WFMS, WFML, and PSP data flags.
+
+## Changed
+- Rename Whiteface Mountain lodge (WFML) to Whiteface Mountain base (WFMB).
+
+## Fixed
+- Use correct units for Queens College CO.
+- Fix PSP NO2 conversion efficiency calculations.
+- Ignore incorrectly set WFMS temperature and relative humidity flags.
+- Use outside temperatures for sea level pressure calculations (before
+  2018-10-01).
 
 # version 0.6.0 <small>2021-10-15</small>
 ## Added
