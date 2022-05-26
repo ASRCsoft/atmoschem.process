@@ -12,7 +12,7 @@ lead2 = function(x, k = 1) c(tail(x, -k), rep(NA, k))
 # add time around a lubridate interval
 #' @export
 pad_interval = function(interval, start, end) {
-  interval(int_start(interval) - start, int_end(interval) - end)
+  interval(int_start(interval) - start, int_end(interval) + end)
 }
 
 #' @export
