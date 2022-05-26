@@ -160,15 +160,41 @@ for (mname in unique(mflags_ds$measurement_name)) {
   meas[meas$time %within% as.list(meas_flag_periods), flagname] = T
 }
 # power outage flags
-if (site %in% c('WFMS', 'WFMB') & data_source == 'campbell') {
-  if (site == 'WFMS') {
-    is_outage = with(meas, value.Phase1_Avg < 105 | value.Phase3_Avg < 100)
-    padding_list = list(CO = 50, NO = 4, NOx = 4, NOy = 4, Ozone = 10, SO2 = 4)
-  } else if (site == 'WFMB') {
-    is_outage = meas$value.Phase1_Avg < 105
-    padding_list = list(CO = 10, NO = 45, NOX = 45)
-  }
+# Numbers in `padding_list` are the number of minutes to flag after power is
+# restored
+if (site == 'WFMS' && data_source == 'campbell') {
+  is_outage = with(meas, value.Phase1_Avg < 105 | value.Phase3_Avg < 100)
   outage_periods = interval_list(meas$time, is_outage)
+  padding_list = list(CO = 50, NO = 4, NOx = 4, NOy = 4, Ozone = 10, SO2 = 4)
+} else if (site == 'WFMS' && data_source == 'ultrafine') {
+  # get the outage values from campbell
+  dbpath = file.path('analysis', 'intermediate', 'raw_WFMS_campbell.sqlite')
+  db = dbConnect(SQLite(), dbpath)
+  sql_text = '
+select time,
+       ?
+  from measurements
+ where time >= ?
+   and time <= ?
+ order by time asc'
+  sql = sqlInterpolate(db, sql_text, dbQuoteIdentifier(db, 'value.Phase2_Avg'),
+                       format(start_time, '%Y-%m-%d %H:%M:%S', tz = 'EST'),
+                       format(end_time, '%Y-%m-%d %H:%M:%S', tz = 'EST'))
+  wfms_power = dbGetQuery(db, sql, check.names = F)
+  dbDisconnect(db)
+  wfms_power$time = as.POSIXct(wfms_power$time, tz = 'EST')
+  # these are actually power spikes, not outages, but it's the same idea
+  is_outage = wfms_power$value.Phase2_Avg > 130
+  outage_periods = interval_list(wfms_power$time, is_outage)
+  padding_list = list(Concentration = 10)
+} else if (site == 'WFMB' && data_source == 'campbell') {
+  is_outage = meas$value.Phase1_Avg < 105
+  outage_periods = interval_list(meas$time, is_outage)
+  padding_list = list(CO = 10, NO = 45, NOX = 45)
+} else {
+  padding_list = NULL
+}
+if (!is.null(padding_list)) {
   for (i in 1:length(padding_list)) {
     varname = paste0('value.', names(padding_list)[i])
     flagname = paste0('flagged.', names(padding_list)[i])
