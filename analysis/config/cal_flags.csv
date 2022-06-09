@@ -125,6 +125,20 @@ WFMS,envidas,SO2,zero,"[2021-06-14 12:00, 2021-06-16 09:00)",campbell glitch
 WFMS,envidas,SO2,span,"[2021-06-14 12:00, 2021-06-16 09:00)",campbell glitch
 WFMS,envidas,CO,zero,"[2021-06-14 12:00, 2021-06-16 09:00)",campbell glitch
 WFMS,envidas,CO,span,"[2021-06-14 12:00, 2021-06-16 09:00)",campbell glitch
+WFMS,envidas,NO,zero,"[2021-07-20, 2021-07-21 09:00)",unknown
+WFMS,envidas,NO,span,"[2021-07-20, 2021-07-21 09:00)",unknown
+WFMS,envidas,NOX,zero,"[2021-07-20, 2021-07-21 09:00)",unknown
+WFMS,envidas,NOX,span,"[2021-07-20, 2021-07-21 09:00)",unknown
+WFMS,envidas,NOX,CE,"[2021-07-20, 2021-07-21 09:00)",unknown
+WFMS,envidas,NOY,zero,"[2021-07-20, 2021-07-21 09:00)",unknown
+WFMS,envidas,NOY,span,"[2021-07-20, 2021-07-21 09:00)",unknown
+WFMS,envidas,NOY,CE,"[2021-07-20, 2021-07-21 09:00)",unknown
+WFMS,envidas,CO,zero,"[2021-07-20, 2021-07-21 09:00)",unknown
+WFMS,envidas,CO,span,"[2021-07-20, 2021-07-21 09:00)",unknown
+WFMS,envidas,SO2,zero,"[2021-07-20, 2021-07-21 09:00)",unknown
+WFMS,envidas,SO2,span,"[2021-07-20, 2021-07-21 09:00)",unknown
+WFMS,envidas,NOX,CE,"[2021-08-26, 2021-09-01)",unknown
+WFMS,envidas,NOY,CE,"[2021-08-26, 2021-09-01)",unknown
 WFMB,campbell,NO_Avg,zero,"[2018-12-14, 2018-12-18)",
 WFMB,campbell,NOX_Avg,zero,"[2018-12-14, 2018-12-18)",
 WFMB,campbell,CO_Avg,zero,"[2018-12-14, 2018-12-18)",
