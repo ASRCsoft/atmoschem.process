@@ -16,7 +16,7 @@ docs_dir := analysis/docs
 conf_dir := analysis/config
 # processing variables
 rscript := Rscript --vanilla
-export processing_end := 2021-07-01
+export processing_end := 2022-01-01
 export raw_version := $(PKGVERS)
 sites := WFMS WFMB PSP QC
 download_url := http://atmoschem.asrc.cestm.albany.edu/~aqm/AQM_Products/downloads
