@@ -307,6 +307,12 @@ WFMB,envidas,PM25C,"[2021-05-23, 2021-05-23 11:16)",AM,unknown
 WFMB,campbell,NGN3_Avg,"[2021-05-23 12:00, 2021-05-24 15:12)",AM,unknown
 WFMB,envidas,PM25C,"[2021-06-17 09:00, 2021-06-17 21:00)",AM,unknown
 WFMB,envidas,PM25C,"[2021-06-21 16:26, 2021-06-22 14:08)",AV,power glitch
+WFMB,campbell,NO_Avg,"[2021-10-05 10:01, 2021-10-05 14:03)",AT,calibration
+WFMB,campbell,NOX_Avg,"[2021-10-05 10:01, 2021-10-05 14:03)",AT,calibration
+WFMB,campbell,CO_Avg,"[2021-10-05 10:01, 2021-10-05 14:13)",AT,calibration
+WFMB,campbell,NO_Avg,"[2021-10-06 09:13, 2021-10-06 14:30)",AT,calibration
+WFMB,campbell,NOX_Avg,"[2021-10-06 09:13, 2021-10-06 14:30)",AT,calibration
+WFMB,campbell,CO_Avg,"[2021-10-06 09:13, 2021-10-06 14:30)",AT,calibration
 PSP,envidas,CO,"[2018-10-03 07:08, 2018-10-03 08:00)",AN,instrument reset
 PSP,envidas,Dichot(10)MC,"[2018-10-04 12:01, 2018-10-04 14:46)",AT,calibration
 PSP,envidas,Dichot(10)RefMC,"[2018-10-04 12:01, 2018-10-04 14:46)",AT,calibration
