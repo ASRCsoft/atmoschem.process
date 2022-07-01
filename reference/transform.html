@@ -68,31 +68,36 @@ standardized format.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">transform_wfms_aethelometer</span><span class="op">(</span><span class="va">f</span><span class="op">)</span>
-
-<span class="fu">transform_campbell</span><span class="op">(</span><span class="va">f</span>, <span class="va">site</span><span class="op">)</span>
-
-<span class="fu">transform_envidas_daily</span><span class="op">(</span><span class="va">f</span><span class="op">)</span>
-
-<span class="fu">transform_wfm_envidas</span><span class="op">(</span><span class="va">f</span><span class="op">)</span>
-
-<span class="fu">transform_psp_envidas</span><span class="op">(</span><span class="va">f</span><span class="op">)</span>
-
-<span class="fu">transform_mesonet</span><span class="op">(</span><span class="va">f</span><span class="op">)</span>
-
-<span class="fu">transform_ultrafine</span><span class="op">(</span><span class="va">f</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">transform_wfms_aethelometer</span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">transform_campbell</span><span class="op">(</span><span class="va">f</span>, <span class="va">site</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">transform_envidas_daily</span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">transform_wfm_envidas</span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">transform_psp_envidas</span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">transform_mesonet</span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">transform_ultrafine</span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>f</dt>
 <dd><p>Filepath of the raw data file.</p></dd>
+
+
 <dt>site</dt>
 <dd><p>Site abbreviation (only needed when format varies by site).</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A data frame of measurements. The first column is "time" (POSIXct),
+    
+
+<p>A data frame of measurements. The first column is "time" (POSIXct),
   followed by two columns for each parameter-- "value.param_name" and
   "flagged.param_name". "flagged.param_name" columns are all logical vectors,
   where flagged=TRUE indicates that the measurement shouldn't be used.</p>
@@ -121,7 +126,7 @@ standardized format.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

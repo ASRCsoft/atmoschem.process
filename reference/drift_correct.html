@@ -66,30 +66,41 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">drift_correct</span><span class="op">(</span><span class="va">t</span>, <span class="va">v</span>, z <span class="op">=</span> <span class="cn">NULL</span>, s <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">config</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">drift_correct</span><span class="op">(</span><span class="va">t</span>, <span class="va">v</span>, z <span class="op">=</span> <span class="cn">NULL</span>, s <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">config</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>t</dt>
 <dd><p>Measurement times (POSIXct).</p></dd>
+
+
 <dt>v</dt>
 <dd><p>Measurement values.</p></dd>
+
+
 <dt>z</dt>
 <dd><p>Data frame of zero calibration checks. Should contain columns
 <code>time</code>, <code>value</code>, and <code>corrected</code> (logical, whether the
 instrument was adjusted).</p></dd>
+
+
 <dt>s</dt>
 <dd><p>Data frame of span calibration checks. Should contain columns
 <code>time</code>, <code>value</code>, and <code>corrected</code> (logical, whether the
 instrument was adjusted).</p></dd>
+
+
 <dt>config</dt>
 <dd><p>list of Configuration options from the <code>measurement_types</code>
 config table.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Drift-corrected measurements.</p>
+    
+
+<p>Drift-corrected measurements.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -114,7 +125,7 @@ corrected values are calculated as \((measurement - zero) / span\).</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

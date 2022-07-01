@@ -1,8 +1,8 @@
 pandoc: 2.7.3
-pkgdown: 2.0.3
+pkgdown: 2.0.5
 pkgdown_sha: ~
 articles:
   processing: processing.html
   sop: sop.html
-last_built: 2022-06-09T00:43Z
+last_built: 2022-07-01T21:44Z
 
