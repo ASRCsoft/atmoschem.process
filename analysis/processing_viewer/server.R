@@ -230,8 +230,10 @@ make_processing_plot = function(s, ds, m, t1, t2, plot_types, logt = F,
         zero_breaks = get_cal_breaks(s, ds, m, type, t1, t2)
         cals$segment[cals$label == type] =
           findInterval(cals$time[cals$label == type], zero_breaks)
-        breaks = c(breaks, zero_breaks)
-        labels = c(labels, rep(type, length(zero_breaks)))
+        if (length(zero_breaks)) {
+          breaks = c(breaks, zero_breaks)
+          labels = c(labels, rep(type, length(zero_breaks)))
+        }
       } else {
         cals = subset(cals, label != type)
       }
