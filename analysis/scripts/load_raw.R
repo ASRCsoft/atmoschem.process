@@ -154,6 +154,14 @@ make_corrections = function(f, dat) {
                      dat$time < as.POSIXct('2021-05-12 07:28', tz = 'EST')] = F
       dat$flagged.NOx[dat$time >= as.POSIXct('2021-05-11 13:45', tz = 'EST') &
                       dat$time < as.POSIXct('2021-05-12 07:28', tz = 'EST')] = F
+      dat$flagged.WS[dat$time >= as.POSIXct('2021-09-10 09:00', tz = 'EST') &
+                     dat$time <= as.POSIXct('2021-10-29 09:00', tz = 'EST')] = F
+      dat$flagged.WD[dat$time >= as.POSIXct('2021-09-10 09:00', tz = 'EST') &
+                     dat$time <= as.POSIXct('2021-10-29 09:00', tz = 'EST')] = F
+      dat$flagged.VWS[dat$time >= as.POSIXct('2021-09-10 09:00', tz = 'EST') &
+                      dat$time <= as.POSIXct('2021-10-29 09:00', tz = 'EST')] = F
+      dat$flagged.VWD[dat$time >= as.POSIXct('2021-09-10 09:00', tz = 'EST') &
+                      dat$time <= as.POSIXct('2021-10-29 09:00', tz = 'EST')] = F
     }
   }
   dat
