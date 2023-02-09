@@ -186,6 +186,10 @@ WFMS,envidas,CO,"[2021-06-01 08:11, 2021-06-01 10:57)",AV,power failure
 WFMS,aethelometer,concentration_370,"[2021-06-23 10:22, 2021-06-28 07:33)",AM,power fluctuations
 WFMS,aethelometer,concentration_880,"[2021-06-23 10:22, 2021-06-28 07:33)",AM,power fluctuations
 WFMS,envidas,CO,"[2021-06-28 07:35, 2021-06-28 08:14)",AV,power failure
+WFMS,campbell,WS3Cup_Avg,"[2021-10-20 09:21, 2021-10-27 13:19)",AM,unknown
+WFMS,campbell,WS3CupA_S_WVT,"[2021-10-20 09:21, 2021-10-27 13:19)",AM,unknown
+WFMS,campbell,WindDirA_D1_WVT,"[2021-10-20 09:21, 2021-10-27 13:19)",AM,unknown
+WFMS,campbell,WS3Cup_Max,"[2021-10-20 09:21, 2021-10-27 13:19)",AM,unknown
 WFMB,campbell,NO_Avg,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
 WFMB,campbell,NOX_Avg,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
 WFMB,campbell,CO_Avg,"[2018-10-18 12:00, 2018-10-18 13:00)",AT,calibration
